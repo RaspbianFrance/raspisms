@@ -272,7 +272,7 @@
 				'name' => $name
 			);
 
-			return $this->runQuery($query, $params, SELF::FETCH);
+			return $this->runQuery($query, $params, self::FETCH);
 		}
 
 		/**
