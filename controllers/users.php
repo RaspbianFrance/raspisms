@@ -120,7 +120,7 @@
 			else
 			{
 				header('Location: ' . $this->generateUrl('users', 'showAll', array(
-					'errormessage' => 'Impossible d\'envoyer le SMS d\'inscription à l\'utilisateur. Le compte n\'a donc pas été créé.'
+					'errormessage' => 'Impossible d\'envoyer le mail d\'inscription à l\'utilisateur. Le compte n\'a donc pas été créé.'
 				)));
 				return false;
 			}
