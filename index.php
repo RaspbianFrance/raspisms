@@ -3,6 +3,8 @@
 	##############
 	# INCLUSIONS #
 	##############
+	//récupération du  chemin absolu
+        $filepath = realpath (dirname(__FILE__));
 	//On va inclure l'ensemble des fichiers necessaires
 	require_once('./mvc/constants.php');
 	require_once('./mvc/autoload.php');
