@@ -184,8 +184,8 @@
 
 			echo json_encode(array(
 				'error'     => self::API_ERROR_NO,
-				'page'		=> $page,
-				'limit'		=> $limit,
+				'page'      => $page,
+				'limit'     => $limit,
 				'total'     => $nbTotal,
 				'receiveds' => $receiveds,
 			));
@@ -219,10 +219,10 @@
 
 			echo json_encode(array(
 				'error'     => self::API_ERROR_NO,
-				'page'		=> $page,
-				'limit'		=> $limit,
+				'page'      => $page,
+				'limit'     => $limit,
 				'total'     => $nbTotal,
-				'sendeds' => $sendeds,
+				'sendeds'   => $sendeds,
 			));
 		}
 	}	
