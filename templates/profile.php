@@ -49,7 +49,7 @@
 										<h4 class="panel-title"><i class="fa fa-key fa-fw"></i> Modifier mot de passe</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'changePassword'); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('profile', 'changePassword', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
 											<div class="form-group">
 												<label>Mot de passe :</label>
 												<input name="password" type="password" class="form-control" placeholder="Nouveau mot de passe" />
@@ -71,7 +71,7 @@
 										<h4 class="panel-title"><i class="fa fa-at fa-fw"></i> Modifier e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'changeEmail'); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('profile', 'changeEmail', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
 											<div class="form-group">
 												<label>Adresse e-mail :</label>
 												<input name="mail" type="email" class="form-control" placeholder="Nouvelle adresse e-mail" />
@@ -91,7 +91,7 @@
 										<h4 class="panel-title"><i class="fa fa-delete fa-fw"></i> Supprimer ce compte</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'delete'); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('profile', 'delete', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
 											<div class="checkbox">
 												<label>
 													<input name="delete_account" type="checkbox" value="1" /> Je suis totalement sûr de vouloir supprimer ce compte 

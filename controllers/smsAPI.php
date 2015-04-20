@@ -9,7 +9,7 @@
 		const API_ERROR_BAD_ID = 1;
 		const API_ERROR_CREATION_FAILED = 2;
 		const API_ERROR_MISSING_FIELD = 3;
-		
+
 
 		/**
 		 * Cette fonction est alias de showAll()
@@ -20,7 +20,28 @@
 		}
 
 		/**
-		 * Cette fonction permet d'envoyer un SMS, en passant simplement des arguments à l'URL (ou pas $_GET)
+		 * Cette fonction permet de valider l'authentification d'un utilisateur via l'API
+		 * @param string email = Adresse email de l'utilisateur
+		 * @param string password = Mot de passe de l'utilisateur
+		 */
+		private function checkApiLogin() {
+			global $db;
+
+			//On récupère l'email et le password
+			$email = isset($_REQUEST['email']) ? $_REQUEST['email'] : NULL;
+			$password = isset($_REQUEST['password']) ? $_REQUEST['password'] : NULL;
+
+			//Si les identifiants sont incorrect on retourne une erreur
+			$user = $db->getUserFromEmail($email);
+
+			if (!$user || sha1($password) != $user['password']) {
+				return false;
+			}
+			return true;
+		}
+
+		/**
+		 * Cette fonction permet d'envoyer un SMS
 		 * @param string text = Le contenu du SMS
 		 * @param mixed numbers = Les numéros auxquels envoyer les SMS. Soit un seul numéro, et il s'agit d'un string. Soit plusieurs numéros, et il s'agit d'un tableau
 		 * @param mixed contacts = Les noms des contacts auxquels envoyer les SMS. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
@@ -31,17 +52,7 @@
 		{
 			global $db;
 
-			//On récupère l'email et le password
-			$email = isset($_GET['email']) ? $_GET['email'] : NULL;
-			$email = isset($_POST['email']) ? $_POST['email'] : $email;
-			$password = isset($_GET['password']) ? $_GET['password'] : NULL;
-			$password = isset($_POST['password']) ? $_POST['password'] : $password;
-
-			//Si les identifiants sont incorrect on retourne une erreur
-			$user = $db->getUserFromEmail($email);
-
-			if (!$user || sha1($password) != $user['password'])
-			{
+			if( ! $this->checkApiLogin()) {
 				echo json_encode(array(
 					'error' => self::API_ERROR_BAD_ID,
 				));
@@ -52,7 +63,7 @@
 			$get_numbers = isset($_GET['numbers']) ? $_GET['numbers'] : array();
 			$get_contacts = isset($_GET['contacts']) ? $_GET['contacts'] : array();
 			$get_groups = isset($_GET['groups']) ? $_GET['groups'] : array();
-			
+
 			//On map les variables POST
 			$post_numbers = isset($_POST['numbers']) ? $_POST['numbers'] : array();
 			$post_contacts = isset($_POST['contacts']) ? $_POST['contacts'] : array();
@@ -127,10 +138,10 @@
 			$_POST['numbers'] = $numbers;
 			$_POST['contacts'] = $contacts;
 			$_POST['groups'] = $groups;
-		
+
 			$scheduleds = new scheduleds();
 			$success = $scheduleds->create(true);
-		
+
 			if ($success)
 			{
 				echo json_encode(array(
@@ -143,5 +154,75 @@
 					'error' => self::API_ERROR_CREATION_FAILED,
 				));
 			}
+		}
+
+		/**
+		 * Cette fonction permet de récupérer les messages reçus
+		 * @param int page = La page à afficher (1ère page = 0)
+		 */
+		public function receiveds() {
+			global $db;
+
+			if( ! $this->checkApiLogin()) {
+				echo json_encode(array(
+					'error' => self::API_ERROR_BAD_ID,
+				));
+				return true;
+			}
+
+			$page = (int)(isset($_REQUEST['page']) ? $_REQUEST['page'] : 0);
+			$limit = 25;
+			$offset = $limit * $page;
+
+			// Récupération des SMS reçus triés par date, du plus récent au plus ancien, par paquets de $limit, en ignorant les $offset premiers
+			$receiveds = $db->getAll('receiveds', 'at', true, $limit, $offset);
+
+			$nbTotal = 0;
+			foreach($db->getNbReceivedsSinceGroupDay('1900-01-01') as $msg) {
+				$nbTotal += $msg['nb'];
+			}
+
+			echo json_encode(array(
+				'error'     => self::API_ERROR_NO,
+				'page'      => $page,
+				'limit'     => $limit,
+				'total'     => $nbTotal,
+				'receiveds' => $receiveds,
+			));
+		}
+
+		/**
+		 * Cette fonction permet de récupérer les messages envoyés
+		 * @param int page = La page à afficher (1ère page = 0)
+		 */
+		public function sendeds() {
+			global $db;
+
+			if( ! $this->checkApiLogin()) {
+				echo json_encode(array(
+					'error' => self::API_ERROR_BAD_ID,
+				));
+				return true;
+			}
+
+			$page = (int)(isset($_REQUEST['page']) ? $_REQUEST['page'] : 0);
+			$limit = 25;
+			$offset = $limit * $page;
+
+			// Récupération des SMS envoyés triés par date, du plus récent au plus ancien, par paquets de $limit, en ignorant les $offset premiers
+			$sendeds = $db->getAll('sendeds', 'at', true, $limit, $offset);
+
+			$nbTotal = 0;
+			foreach($db->getNbSendedsSinceGroupDay('1900-01-01') as $msg) {
+				$nbTotal += $msg['nb'];
+			}
+
+			echo json_encode(array(
+				'error'     => self::API_ERROR_NO,
+				'page'      => $page,
+				'limit'     => $limit,
+				'total'     => $nbTotal,
+				'sendeds'   => $sendeds,
+			));
 		}
 	}	
