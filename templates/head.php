@@ -12,7 +12,7 @@
 		<!-- Morris Charts CSS -->
 		<link href="<?php echo HTTP_PWD; ?>css/plugins/morris.css" rel="stylesheet">
 		<!-- Custom Fonts -->
-		<link href="<?php echo HTTP_PWD; ?>font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+		<link href="<?php echo HTTP_PWD; ?>font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 		<!-- Custom CSS site -->
 		<link href="<?php echo HTTP_PWD; ?>css/style.css" rel="stylesheet">
 		<script src="<?php echo HTTP_PWD; ?>js/jquery.js"></script>
@@ -32,12 +32,13 @@
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD; ?>js/custom.js"></script>
 
-		    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-		    <!--[if lt IE 9]>
-			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-		    <![endif]-->
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
 		<script>
 			jQuery(document).ready(function ()
 			{
