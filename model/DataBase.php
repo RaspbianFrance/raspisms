@@ -621,7 +621,7 @@
 
 		/**
 		 * Insert un sms
-		 * @param string $date : La date d'envoie du SMS
+		 * @param string $date : La date d'envoi du SMS
 		 * @param string $content : Le contenu du SMS
 		 * @return int : le nombre de lignes crées
 		 */

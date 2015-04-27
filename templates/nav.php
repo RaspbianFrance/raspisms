@@ -13,14 +13,14 @@
 			<!-- Top Menu Items -->
 			<ul class="nav navbar-right top-nav">
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?php secho($email); ?> <b class="caret"></b></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-user"></i> <?php secho($email); ?> <b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						<li>
 							<a href="<?php echo $this->generateUrl('profile'); ?>"><i class="fa fa-fw fa-user"></i> Profil</a>
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="<?php echo $this->generateUrl('connect', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+							<a href="<?php echo $this->generateUrl('connect', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Déconnexion</a>
 						</li>
 					</ul>
 				</li>
@@ -39,7 +39,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#repertoire"><i class="fa fa-fw fa-book"></i> Répertoire <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="repertoire" class="collapse">
+						<ul id="repertoire" class="collapse <?php echo in_array($page, array('contacts', 'groups')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'contacts' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('contacts'); ?>"><i class="fa fa-fw fa-user"></i> Contacts</a>
 							</li>
@@ -50,7 +50,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="logs" class="collapse">
+						<ul id="logs" class="collapse <?php echo in_array($page, array('sendeds', 'receiveds', 'events')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'sendeds' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('sendeds'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
 							</li>
