@@ -43,7 +43,7 @@
 									<textarea name="content" class="form-control" required></textarea>
 								</div>
 								<div class="form-group">
-									<label>Date d'envoie du SMS</label>
+									<label>Date d'envoi du SMS</label>
 									<input name="date" class="form-control form-datetime" type="text" value="<?php secho($now); ?>" readonly>
 								</div>	
 								<div class="form-group">
