@@ -68,7 +68,7 @@
 										<textarea name="scheduleds[<?php secho($scheduled['id']); ?>][content]" class="form-control" required><?php secho($scheduled['content'], true); ?></textarea>
 									</div>
 									<div class="form-group">
-										<label>Date d'envoie du SMS</label>
+										<label>Date d'envoi du SMS</label>
 										<input name="scheduleds[<?php secho($scheduled['id']); ?>][date]" class="form-control form-datetime" type="text" value="<?php secho($scheduled['at']); ?>" readonly>
 									</div>	
 									<div class="form-group">
