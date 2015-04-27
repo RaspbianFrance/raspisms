@@ -1084,9 +1084,6 @@
 				'admin' => $admin,
 			);
 
-			$req = $this->bdd->prepare($query);
-			$req->execute($params);
-
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
