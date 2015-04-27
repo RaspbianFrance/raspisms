@@ -20,7 +20,7 @@
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="<?php echo $this->generateUrl('connect', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+							<a href="<?php echo $this->generateUrl('connect', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Déconnexion</a>
 						</li>
 					</ul>
 				</li>
