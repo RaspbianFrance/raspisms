@@ -212,9 +212,6 @@
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
 
-			$req = $this->bdd->prepare($query);
-			$req->execute($params);
-
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
@@ -621,7 +618,7 @@
 
 		/**
 		 * Insert un sms
-		 * @param string $date : La date d'envoie du SMS
+		 * @param string $date : La date d'envoi du SMS
 		 * @param string $content : Le contenu du SMS
 		 * @return int : le nombre de lignes crées
 		 */
@@ -1052,9 +1049,6 @@
 			$params = array(
 				'email' => $email
 			);
-
-			$req = $this->bdd->prepare($query);
-			$req->execute($params);
 
 			return $this->runQuery($query, $params, self::FETCH);
 		}
