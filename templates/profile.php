@@ -88,7 +88,7 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-delete fa-fw"></i> Supprimer ce compte</h4>
+										<h4 class="panel-title"><i class="fa fa-trash-o fa-fw"></i> Supprimer ce compte</h4>
 									</div>
 									<div class="panel-body">
 										<form action="<?php echo $this->generateUrl('profile', 'delete', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
