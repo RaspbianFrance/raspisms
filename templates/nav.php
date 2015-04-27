@@ -39,7 +39,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#repertoire"><i class="fa fa-fw fa-book"></i> Répertoire <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="repertoire" class="collapse">
+						<ul id="repertoire" class="collapse <?php echo in_array($page, array('contacts', 'groups')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'contacts' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('contacts'); ?>"><i class="fa fa-fw fa-user"></i> Contacts</a>
 							</li>
@@ -50,7 +50,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="logs" class="collapse">
+						<ul id="logs" class="collapse <?php echo in_array($page, array('sendeds', 'receiveds', 'events')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'sendeds' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('sendeds'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
 							</li>
