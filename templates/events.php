@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo $this->generateUrl('dashboard'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-clock"></i> Évènements
+							<i class="fa fa-clock-o"></i> Évènements
 						</li>
 					</ol>
 				</div>
