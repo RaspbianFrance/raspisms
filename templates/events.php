@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo $this->generateUrl('dashboard'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-clock"></i> Évènements
+							<i class="fa fa-clock-o"></i> Évènements
 						</li>
 					</ol>
 				</div>
@@ -31,7 +31,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-clock fa-fw"></i> Liste des évènements</h3>
+							<h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Liste des évènements</h3>
 						</div>
 						<div class="panel-body">
 							<div class="table-events">
