@@ -7,7 +7,7 @@
 		 */
 		public function help()
 		{
-			//On défini les commandes dispo
+			//On définit les commandes disponibles
 			$commands = array(
 				'sendScheduleds' => array(
 					'description' => 'Cette commande permet d\'envoyer les SMS programmés qui doivent l\'êtres.',
@@ -35,7 +35,7 @@
 				$message .= "		Arguments obligatoires : \n";
 				if (!count($requireds))
 				{
-					$message .= "			Pas d'arguments\n";
+					$message .= "			Pas d'argument\n";
 				}
 				else
 				{
@@ -45,11 +45,11 @@
 					}
 				}
 
-				$message .= "		Arguments optionels : \n";
+				$message .= "		Arguments optionnels : \n";
 				
 				if (!count($optionals))
 				{
-					$message .= "			Pas d'arguments\n";
+					$message .= "			Pas d'argument\n";
 				}
 				else
 				{
@@ -64,18 +64,18 @@
 		}
 
 		/**
-		 * Cette fonction envoie tous les SMS programmés qui doivent l'êtres
+		 * Cette fonction envoie tous les SMS programmés qui doivent l'être
 		 */
 		public function sendScheduleds()
 		{
-			//On créer l'objet de base de données
+			//On créé l'objet de base de données
 			global $db;
 			
 
 			$now = new DateTime();
 			$now = $now->format('Y-m-d H:i:s');
 
-			echo "Début de l'envoie des SMS programmés\n";
+			echo "Début de l'envoi des SMS programmés\n";
 
 			$scheduleds = $db->getScheduledsNotInProgressBefore($now);
 
@@ -87,7 +87,7 @@
 				$ids_scheduleds[] = $scheduled['id'];
 			}
 
-			echo count($ids_scheduleds) . " SMS à envoyer ont été trouvés et ajouté à la liste des SMS en cours d'envoie.\n";
+			echo count($ids_scheduleds) . " SMS à envoyer ont été trouvés et ajoutés à la liste des SMS en cours d'envoi.\n";
 
 			$db->updateProgressScheduledsIn($ids_scheduleds, true);
 
@@ -100,7 +100,7 @@
 				//On initialise les numéros auxquelles envoyer le SMS
 				$numbers = array();
 
-				//On récupère les numéros pour le SMS et on les ajoutes
+				//On récupère les numéros pour le SMS et on les ajoute
 				$target_numbers = $db->getNumbersForScheduled($id_scheduled);
 				foreach ($target_numbers as $target_number)
 				{
@@ -118,7 +118,7 @@
 				$groups = $db->getGroupsForScheduled($id_scheduled);
 				foreach ($groups as $group)
 				{
-					//On récupère les contacts du groupe et on les ajoutes aux numéros
+					//On récupère les contacts du groupe et on les ajoute aux numéros
 					$contacts = $db->getContactsForGroup($group['id']);
 					foreach ($contacts as $contact)
 					{
@@ -128,7 +128,7 @@
 				
 				foreach ($numbers as $number)
 				{
-					echo "	Envoie d'un SMS au " . $number . "\n";
+					echo "	Envoi d'un SMS au " . $number . "\n";
 					//On ajoute le SMS aux SMS envoyés
 					$db->createSended($now, $number, $scheduled['content']);
 					$id_sended = $db->lastId();
@@ -137,14 +137,14 @@
 					$commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
 					//Commande qui s'assure de passer le SMS dans ceux envoyés, et de lui donner le bon statut
 
-					//On va liée les deux commandes pour envoyer le SMS puis le passer en echec
+					//On va lier les deux commandes pour envoyer le SMS puis le passer en echec
 					$commande = '(' . $commande_send_sms . ') >/dev/null 2>/dev/null &';
 
-					exec($commande); //On execute la commande d'envoie d'un SMS
+					exec($commande); //On execute la commande d'envoi d'un SMS
 				}
 			}
 
-			echo "Tous les SMS sont en cours d'envoie.\n";
+			echo "Tous les SMS sont en cours d'envoi.\n";
 			//Tous les SMS ont été envoyés.	
 			$db->deleteScheduledsIn($ids_scheduleds);
 		}
@@ -165,25 +165,29 @@
 					continue;
 				}				
 
+				//On récupère la date du SMS à la seconde près grâce au nom du fichier (Cf. parseSMS.sh)
+				//Il faut mettre la date au format Y-m-d H:i:s
+				$date = substr($dir, 0, 4) . '-' . substr($dir, 4, 2) . '-' . substr($dir, 6, 2) . ' ' . substr($dir, 8, 2) . ':' . substr($dir, 10, 2) . ':' . substr($dir, 12, 2);
+
 				//On récupère le fichier, et on récupère la chaine jusqu'au premier ':' pour le numéro de téléphone source, et la fin pour le message
 				$content_file = file_get_contents(PWD_RECEIVEDS . $dir);
-				//Si on peux pas ouvrir le fichier, on quitte en logant une erreur
+				//Si on ne peut pas ouvrir le fichier, alors on quitte en logant une erreur
 				if (!$content_file)
 				{
-					$this->wlog('Impossible to read file "' . $dir);
+					$this->wlog('Unable to read file "' . $dir);
 					die(4);
 				}
 
-				//On delete le fichier. Si on y arrive pas on log
+				//On supprime le fichier. Si on n'y arrive pas, alors on log
 				if (!unlink(PWD_RECEIVEDS . $dir))
 				{
-					$this->wlog('Impossible to delete file "' . $dir);
+					$this->wlog('Unable to delete file "' . $dir);
 					die(8);
 				}
 
 				$content_file = explode(':', $content_file, 2);
 
-				//Si on a pas passé de SMS ou de numéro on leve une erreure
+				//Si on a pas passé de numéro ou de message, alors on lève une erreur
 				if (!isset($content_file[0], $content_file[1]))
 				{
 					$this->wlog('Missing params in file "' . $dir);
@@ -217,7 +221,7 @@
 					if ($user && $user['password'] == sha1($flags['PASSWORD']))
 					{
 						$this->wlog('Password is valid');
-						//On va faire toutes les commandes, pour voir si on en trouve dans ce message
+						//On va passer en revue toutes les commandes, pour voir si on en trouve dans ce message
 						$commands = $db->getAll('commands');
 
 						$this->wlog('We found ' . count($commands) . ' commands');
@@ -228,7 +232,7 @@
 							{
 								$this->wlog('We found command ' . $command_name);
 								
-								//Si la commande ne demande pas d'être admin, ou si on est admin
+								//Si la commande ne nécessite pas d'être admin, ou si on est admin
 								if (!$command['admin'] || $user['admin'])
 								{
 									$this->wlog('And the count is ok');
@@ -239,23 +243,21 @@
 					}
 				}
 
-				//On va supprimer le mot de passe du SMS pour pouvoir l'enregistrer sans dangers
+				//On va supprimer le mot de passe du SMS pour pouvoir l'enregistrer sans danger
 				$text = str_replace($flags['PASSWORD'], '*****', $text);
 
 				//On map les données et on créer le SMS reçu
-				$now = new DateTime();
-				$date = $now->format('Y-m-d H:i');
 				$send_by = $number;
 				$content = $text;
 				$is_command = count($found_commands);
 				if (!$db->createReceived($date, $send_by, $content, $is_command))
 				{
 					echo "Erreur lors de l'enregistrement du SMS\n";
-					$this->wlog('Impossible to register the SMS in file "' . $dir);
+					$this->wlog('Unable to process the SMS in file "' . $dir);
 					die(7);
 				}
 
-				//Pour chaque commande, on execute la commande.
+				//Chaque commande sera executée.
 				foreach ($found_commands as $command_name => $command)
 				{
 					echo 'Execution de la commande : ' . $command_name . ' :: ' . $command . "\n";
