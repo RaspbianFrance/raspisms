@@ -8,11 +8,22 @@
 		 */
 		public function head($title = '')
 		{
-			$title = (!empty($title)) ? $title . ' - RaspiSMS' : 'RaspiSMS';	
-			$author = 'Ajani';
+			$title = (!empty($title)) ? $title . ' - ' . WEBSITE_TITLE : WEBSITE_TITLE;	
+			$author = WEBSITE_AUTHOR;
 
-			$error_message = (isset($_GET['errormessage'])) ? $_GET['errormessage'] : '';
-			$success_message = (isset($_GET['successmessage'])) ? $_GET['successmessage'] : '';
+			$error_message = false;
+			$success_message = false;
+			if (isset($_SESSION['errormessage']))
+			{
+				$error_message = $_SESSION['errormessage'];
+				unset($_SESSION['errormessage']);
+			}
+
+			if (isset($_SESSION['successmessage']))
+			{
+				$success_message = $_SESSION['successmessage'];
+				unset($_SESSION['successmessage']);
+			}
 
 			$this->render('head', array(
 				'title' => $title,

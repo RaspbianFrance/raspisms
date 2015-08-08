@@ -32,34 +32,34 @@
 			global $db;
 			
 			//Recupération des nombres des 4 panneaux d'accueil
-			$contacts = $db->getAll('contacts');
+			$contacts = $db->getFromTableWhere('contacts');
 
 			$this->render('contacts', array(
 				'contacts' => $contacts,
 			));
-			
 		}
 
 		/**
 		 * Cette fonction supprimer une liste de contacts
-		 * @return void;
+		 * @param int... $ids : Les id des commandes à supprimer
+		 * @return Boolean;
 		 */
-		public function delete()
+		public function delete(...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				return false;
 			}
 
 			//Create de l'object de base de données
 			global $db;
 			
-			$contacts_ids = $_GET;
-			$db->deleteContactsIn($contacts_ids);
-			header('Location: ' . $this->generateUrl('contacts'));		
+			$db->deleteContactsIn($ids);
+			header('Location: ' . $this->generateUrl('contacts'));
+			return true;
 		}
 
 		/**
@@ -72,13 +72,13 @@
 
 		/**
 		 * Cette fonction retourne la page d'édition des contacts
+		 * @param int... $ids : Les id des commandes à supprimer
 		 */
-		public function edit()
+		public function edit(...$ids)
 		{
 			global $db;
 			
-
-			$contacts = $db->getContactsIn($_GET);
+			$contacts = $db->getContactsIn($ids);
 			$this->render('editContacts', array(
 				'contacts' => $contacts,
 			));
@@ -86,91 +86,91 @@
 
 		/**
 		 * Cette fonction insert un nouveau contact
+		 * @param string $_POST['name'] : Le nom du contact
+		 * @param string $_POST['phone'] : Le numero de téléphone du contact
 		 */
 		public function create()
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				return false;
 			}
 
 			global $db;
-			
+
+			if (empty($_POST['name']) || empty($_POST['phone']))
+			{
+				$_SESSION['errormessage'] = 'Des champs sont manquants.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
+			}
 
 			$nom = $_POST['name'];
 			$phone = $_POST['phone'];
+
 			if ($phone = internalTools::parsePhone($phone))
 			{
-				if ($db->createContact($nom, $phone))
-				{
-					$db->createEvent('CONTACT_ADD', 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')');
-					header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-						'successmessage' => 'Le contact a bien été créé.'
-					)));
-
-					return true;
-				}
-
-				header('Location: ' . $this->generateUrl('contacts', 'add', array(
-					'errormessage' => 'Impossible créer ce contact.'
-				)));
-				return true;
+				$_SESSION['errormessage'] = 'Numéro de téléphone incorrect.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
 			}
 
-			header('Location: ' . $this->generateUrl('contacts', 'add', array(
-				'errormessage' => 'Numéro de téléphone incorrect.'
-			)));
+			if (!$db->insertIntoTable('contacts', ['nom' => $nom, 'phone' => $phone]))
+			{
+				$_SESSION['errormessage'] = 'Impossible créer ce contact.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
+			}
+
+			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')']);
+
+			$_SESSION['successmessage'] = 'Le contact a bien été créé.';
+			header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+			return true;
 		}
 
 		/**
 		 * Cette fonction met à jour une liste de contacts
+		 * @param array $_POST['contacts'] : Un tableau des contacts avec leur nouvelle valeurs
+		 * @return boolean;
 		 */
 		public function update()
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
 			}
 
 			global $db;
-			
 
 			$errors = array(); //On initialise le tableau qui contiendra les erreurs rencontrés
 			//Pour chaque contact reçu, on boucle en récupérant son id (la clef), et le contact lui-même (la value)
 
 			foreach ($_POST['contacts'] as $id => $contact)
 			{
-				if ($number = internalTools::parsePhone($contact['phone']))
-				{
-					$db->updateContact($id, $contact['name'], $number);
-				}
-				else
+				if (!$number = internalTools::parsePhone($contact['phone']))
 				{
 					$errors[] = $contact['id'];
+					continue;
 				}
+
+				$db->updateTableWhere('contacts', ['name' => $contact['name'], 'number' => $number], ['id' => $contact['id']]);
 			}
 
 			//Si on a eu des erreurs
 			if (count($errors))
 			{
-				$message = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => $message,
-				)));
+				$_SESSION['errormessage'] = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
+				return header('Location: ' . $this->generateUrl('contacts', 'showAll'));
 			}
-			else
-			{
-				$message = 'Tous les contacts ont été modifiés avec succès.';
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'successmessage' => $message,
-				)));
-			}
+
+			$_SESSION['successmessage'] = 'Tous les contacts ont été modifiés avec succès.';
+			return header('Location: ' . $this->generateUrl('contacts', 'showAll'));
 		}
 
 		/**
@@ -180,6 +180,6 @@
 		{
 			global $db;
 			
-			echo json_encode($db->getAll('contacts'));
+			echo json_encode($db->getFromTableWhere('contacts'));
 		}
 	}

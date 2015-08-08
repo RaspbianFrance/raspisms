@@ -28,10 +28,6 @@
 		 */
 		public function show()
 		{
-			//Creation de l'object de base de données
-			global $db;
-			
-			
 			$this->render('profile');
 		}
 
@@ -46,35 +42,34 @@
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('profile', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
-				return true;
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				return false;
 			}
 
 			//Creation de l'object de base de données
 			global $db;
 			
-			
 			if (empty($_POST['password']) || empty($_POST['verif_password']) || $_POST['password'] != $_POST['verif_password'])
 			{
-				header('Location: ' . $this->generateUrl('profile', 'show', array(
-					'errormessage' => 'Les mots de passe ne correspondent pas.'
-				)));
+				$_SESSION['errormessage'] = 'Les mots de passe ne correspondent pas.';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
 				return false;
 			}
 
-			$user = $db->getUserFromEmail($_SESSION['email']);
-
+			$user = $db->getFromTableWhere('users', ['email' => $_SESSION['email']]);
 			$password = sha1($_POST['password']);
 			
-			if ($db->updateUser($user['id'], $user['email'], $password, $user['admin']))
+			if (!$db->updateTableWhere('users', ['password' => $password], ['id' => $user['id']]))
 			{
-				header('Location: ' . $this->generateUrl('profile', 'show', array(
-					'successmessage' => 'Les données ont été mises à jour.'
-				)));
+				$_SESSION['errormessage'] = 'Impossible de mettre à jour le mot de passe.';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
 				return false;
 			}
+
+			$_SESSION['successmessage'] = 'Les données ont été mises à jour.';
+			header('Location: ' . $this->generateUrl('profile', 'show'));
+			return true;
 		}
 
 		/**
@@ -88,10 +83,9 @@
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('profile', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
-				return true;
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				return false;
 			}
 
 			//Creation de l'object de base de données
@@ -100,6 +94,7 @@
 			
 			if (empty($_POST['mail']) || empty($_POST['verif_mail']) || $_POST['mail'] != $_POST['verif_mail'])
 			{
+				$_SESSION['errormessage'] = 'Les e-mails ne correspondent pas.';
 				header('Location: ' . $this->generateUrl('profile', 'show', array(
 					'errormessage' => 'Les e-mails ne correspondent pas.'
 				)));
@@ -110,27 +105,24 @@
 
 			if (!filter_var($email, FILTER_VALIDATE_EMAIL))
 			{
-				header('Location: ' . $this->generateUrl('profile', 'show', array(
-					'errormessage' => 'L\'adresse e-mail est invalide.'
-				)));
+				$_SESSION['errormessage'] = 'L\'adresse e-mail est invalide.';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
 				return false;
 			}
 
-			$user = $db->getUserFromEmail($_SESSION['email']);
+			$user = $db->getFromTableWhere('users', ['email' => $_SESSION['email']]);
 
-			if ($db->updateUser($user['id'], $email, $user['password'], $user['admin']))
+			if (!$db->updateTableWhere('users', ['email' => $email], ['id' => $user['id']]))
 			{
-				$_SESSION['email'] = $email;
-				header('Location: ' . $this->generateUrl('profile', 'show', array(
-					'successmessage' => 'Les données ont été mises à jour.'
-				)));
+				$_SESSION['errormessage'] = 'Cette adresse e-mail est déjà utilisée.';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
 				return false;
 			}
 
-			header('Location: ' . $this->generateUrl('profile', 'show', array(
-				'errormessage' => 'Cette adresse e-mail est déjà utilisée.'
-			)));
-			return false;
+			$_SESSION['email'] = $email;
+			$_SESSION['successmessage'] = 'Les données ont été mises à jour.';
+			header('Location: ' . $this->generateUrl('profile', 'show'));
+			return true;
 		}
 
 		/**
@@ -143,29 +135,32 @@
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF())
 			{
-				header('Location: ' . $this->generateUrl('profile', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
-				return true;
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				return false;
 			}
 
 			//Creation de l'object de base de données
 			global $db;
 			
-			
 			//Si l'utilisateur veux vraiment supprimer son compte
-			if (!empty($_POST['delete_account']))
+			if (empty($_POST['delete_account']))
 			{
-				$user = $db->getUserFromEmail($_SESSION['email']); //On récupère l'utilisateur en base
-				$db->deleteUsersIn(array($user['id'])); //On supprime l'utilisateur
-				$this->logout();
-				return true;	
+				$_SESSION['errormessage'] = 'Le compte n\'a pas été supprimé';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
+				return false;
 			}
 
-			header('Location: ' . $this->generateUrl('profile', 'show', array(
-				'errormessage' => 'Le compte n\'a pas été supprimé'
-			)));
-			return false;
+			if (!$db->deleteFromTableWhere('users', ['email' => $_SESSION['email']]))
+			{
+				$_SESSION['errormessage'] = 'Impossible de supprime le compte';
+				header('Location: ' . $this->generateUrl('profile', 'show'));
+				return false;
+			}
+
+			$this->logout();
+			return true;	
+
 		}
 
 		/**
