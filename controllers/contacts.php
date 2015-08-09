@@ -162,7 +162,7 @@
 					continue;
 				}
 
-				$db->updateTableWhere('contacts', ['name' => $contact['name'], 'number' => $number], ['id' => $contact['id']]);
+				$db->updateTableWhere('contacts', ['name' => $contact['name'], 'number' => $number], ['id' => $id]);
 			}
 
 			//Si on a eu des erreurs
