@@ -71,7 +71,7 @@
 											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
 											<ul class="dropdown-menu pull-right" role="menu">
 												<li><a href="<?php echo $this->generateUrl('scheduleds', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-												<li><a href="<?php echo $this->generateUrl('scheduleds', 'delete', array('csrf' => $_SESSION['csrf'])); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+												<li><a href="<?php echo $this->generateUrl('scheduleds', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
 											</ul>
 										</div>
 									</div>

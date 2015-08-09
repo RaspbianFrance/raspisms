@@ -39,13 +39,14 @@
 
 		/**
 		 * Cette fonction supprime une liste de groupes
+		 * @param $csrf : Le jeton CSRF
 		 * @param int... $ids : Les id des groups à supprimer
 		 * @return void;
 		 */
-		public function delete(...$ids)
+		public function delete($csrf, ...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] => 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('groups', 'showAll'));
@@ -92,13 +93,14 @@
 
 		/**
 		 * Cette fonction insert un nouveau contact
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['name'] : Le nom du groupe
 		 * @param array $_POST['contacts'] : Les id des contacts à mettre dans le du groupe
 		 */
-		public function create()
+		public function create($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('groups', 'showAll'));
@@ -130,13 +132,14 @@
 
 		/**
 		 * Cette fonction met à jour une liste de groupes
+		 * @param $csrf : Le jeton CSRF
 		 * @param array $_POST['groups'] : Un tableau des groups avec leur nouvelle valeurs
 		 * @return boolean;
 		 */
-		public function update()
+		public function update($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('groups', 'showAll'));

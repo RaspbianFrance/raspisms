@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification de contacts</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('contacts', 'update', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('contacts', 'update', [$_SESSION['csrf']]);?>" method="POST">
 							<?php
 								foreach ($contacts as $contact)
 								{

@@ -28,5 +28,4 @@
 	</div>
 </div>
 <?php
-	include_once(PWD . 'mvc/pingback.php');
 	$incs->footer();

@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Ajout d'un SMS programmé</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('scheduleds', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('scheduleds', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Texte du SMS</label>
 									<textarea name="content" class="form-control" required></textarea>
