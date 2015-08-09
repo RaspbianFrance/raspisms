@@ -52,7 +52,9 @@
 				return false;
 			}
 
-			if (sha1($password) != $users[0]['password'])
+			$user = $users[0];
+
+			if (sha1($password) != $user['password'])
 			{
 				$_SESSION['errormessage'] = 'Cet e-mail n\'existe pas.';
 				header('Location: ' . $this->generateUrl('connect', 'login'));

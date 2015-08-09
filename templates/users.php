@@ -93,7 +93,7 @@
 			var url = jQuery(this).attr('href');
 			jQuery(target).find('input:checked').each(function ()
 			{
-				url += '/users' + jQuery(this).val() + '_' + jQuery(this).val();
+				url += '/' + jQuery(this).val();
 			});
 			window.location = url;
 		});

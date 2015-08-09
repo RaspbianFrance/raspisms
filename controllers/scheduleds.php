@@ -49,7 +49,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				header('Location: ' . $this->generateUrl('profile', 'showAll'));
 				return false;
 			}
 
@@ -119,13 +119,12 @@
 				if (!internalTools::verifyCSRF($csrf))
 				{
 					$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-					header('Location: ' . $this->generateUrl('profile', 'showAll');
+					header('Location: ' . $this->generateUrl('profile', 'showAll'));
 					return false;
 				}
 			}
 
 			global $db;
-			
 
 			$date = $_POST['date'];
 			$content = $_POST['content'];
@@ -215,7 +214,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'Le SMS a bien été créé, mais certains numéro ne sont pas valides.';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll');
+					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
 				}
 				return true;
 			}
@@ -223,7 +222,7 @@
 			if (!$api)
 			{
 				$_SESSION['successmessage'] = 'Le SMS a bien été créé.';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll');
+				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
 			}
 			return true;
 		}
@@ -239,7 +238,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['successmessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll');
+				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
 				return false;
 			}
 

@@ -48,7 +48,7 @@
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF($csrf))
 			{
-				$_SESSION['errormessage'] => 'Jeton CSRF invalide !';
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('groups', 'showAll'));
 				return false;
 			}
@@ -110,7 +110,7 @@
 			global $db;
 			
 			$nom = $_POST['name'];
-			if (!$db->insertIntoTable('groups' ['name' => $nom]))
+			if (!$db->insertIntoTable('groups', ['name' => $nom]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de créer ce groupe.';
 				header('Location: ' . $this->generateUrl('groups', 'showAll'));
@@ -170,6 +170,6 @@
 		{
 			global $db;
 			
-			echo json_encode($db->getAll('groups'));
+			echo json_encode($db->getFromTableWhere('groups'));
 		}
 	}

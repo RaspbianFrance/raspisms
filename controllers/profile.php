@@ -44,7 +44,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				header('Location: ' . $this->generateUrl('profile', 'showAll'));
 				return false;
 			}
 
@@ -61,7 +61,7 @@
 			$user = $db->getFromTableWhere('users', ['email' => $_SESSION['email']]);
 			$password = sha1($_POST['password']);
 			
-			if (!$db->updateTableWhere('users', ['password' => $password], ['id' => $user['id']]))
+			if (!$db->updateTableWhere('users', ['password' => $password], ['id' => $user[0]['id']]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de mettre à jour le mot de passe.';
 				header('Location: ' . $this->generateUrl('profile', 'show'));
@@ -86,7 +86,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				header('Location: ' . $this->generateUrl('profile', 'showAll'));
 				return false;
 			}
 
@@ -114,7 +114,7 @@
 
 			$user = $db->getFromTableWhere('users', ['email' => $_SESSION['email']]);
 
-			if (!$db->updateTableWhere('users', ['email' => $email], ['id' => $user['id']]))
+			if (!$db->updateTableWhere('users', ['email' => $email], ['id' => $user[0]['id']]))
 			{
 				$_SESSION['errormessage'] = 'Cette adresse e-mail est déjà utilisée.';
 				header('Location: ' . $this->generateUrl('profile', 'show'));
@@ -139,7 +139,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('profile', 'showAll');
+				header('Location: ' . $this->generateUrl('profile', 'showAll'));
 				return false;
 			}
 
