@@ -45,9 +45,9 @@
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return boolean;
 		 */
-		public function delete(...$ids)
+		public function delete($csrf, ...$ids)
 		{
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('commands', 'showAll'));
@@ -86,14 +86,15 @@
 
 		/**
 		 * Cette fonction insert une nouvelle commande
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['name'] : Le nom de la commande
 		 * @param string $_POST['script'] : Le script a appeler
 		 * @param boolean $_POST['admin'] : Si la commande necessite les droits d'admin (par défaut non)
 		 * @return boolean;
 		 */
-		public function create()
+		public function create($csrf)
 		{
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('commands', 'showAll'));
@@ -123,12 +124,13 @@
 
 		/**
 		 * Cette fonction met à jour une commande
+		 * @param $csrf : Le jeton CSRF
 		 * @param array $_POST['commands'] : Un tableau des commandes avec leur nouvelle valeurs
 		 * @return boolean;
 		 */
-		public function update()
+		public function update($csrf)
 		{
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('commands', 'showAll'));

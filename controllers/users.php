@@ -50,14 +50,15 @@
 
 		/**
 		 * Cette fonction insert un nouvel utilisateur
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['email'] : L'email de l'utilisateur
 		 * @param string $_POST['email_confirm'] : Confirmation de l'email de l'utilisateur
 		 * @param boolean $_POST['admin'] : Optionnel : Si l'utilisateur est admin. Par défaut non
 		 */
-		public function create()
+		public function create($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('users', 'add'));
@@ -122,13 +123,14 @@
 
 		/**
 		 * Cette fonction supprimer une liste d'utilisateur
+		 * @param $csrf : Le jeton CSRF
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return boolean;
 		 */
-		public function delete(...$ids)
+		public function delete($csrf, ...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('users', 'showAll'));

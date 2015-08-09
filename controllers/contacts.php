@@ -41,13 +41,14 @@
 
 		/**
 		 * Cette fonction supprimer une liste de contacts
+		 * @param $csrf : Le jeton CSRF
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return Boolean;
 		 */
-		public function delete(...$ids)
+		public function delete($csrf, ...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
@@ -86,13 +87,14 @@
 
 		/**
 		 * Cette fonction insert un nouveau contact
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['name'] : Le nom du contact
 		 * @param string $_POST['phone'] : Le numero de téléphone du contact
 		 */
-		public function create()
+		public function create($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
@@ -111,14 +113,14 @@
 			$nom = $_POST['name'];
 			$phone = $_POST['phone'];
 
-			if ($phone = internalTools::parsePhone($phone))
+			if (!$phone = internalTools::parsePhone($phone))
 			{
 				$_SESSION['errormessage'] = 'Numéro de téléphone incorrect.';
 				header('Location: ' . $this->generateUrl('contacts', 'add'));
 				return false;
 			}
 
-			if (!$db->insertIntoTable('contacts', ['nom' => $nom, 'phone' => $phone]))
+			if (!$db->insertIntoTable('contacts', ['name' => $nom, 'number' => $phone]))
 			{
 				$_SESSION['errormessage'] = 'Impossible créer ce contact.';
 				header('Location: ' . $this->generateUrl('contacts', 'add'));
@@ -134,13 +136,14 @@
 
 		/**
 		 * Cette fonction met à jour une liste de contacts
+		 * @param $csrf : Le jeton CSRF
 		 * @param array $_POST['contacts'] : Un tableau des contacts avec leur nouvelle valeurs
 		 * @return boolean;
 		 */
-		public function update()
+		public function update($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('contacts', 'showAll'));

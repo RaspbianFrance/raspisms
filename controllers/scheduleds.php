@@ -39,13 +39,14 @@
 
 		/**
 		 * Cette fonction supprime une liste de groupes
+		 * @param $csrf : Le jeton CSRF
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return boolean;
 		 */
-		public function delete(...$ids)
+		public function delete($csrf, ...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('profile', 'showAll');
@@ -101,6 +102,7 @@
 
 		/**
 		 * Cette fonction insert un nouveau SMS programmé
+		 * @param $csrf : Le jeton CSRF
 		 * @param optionnal boolean $api : Si vrai (faux par défaut), on retourne des réponses au lieu de rediriger
 		 * @param string $_POST['date'] : La date a la quelle de sms devra être envoyé
 		 * @param string $_POST['content'] : Le contenu du SMS
@@ -109,12 +111,12 @@
 		 * @param string $_POST['groups'] : Un tableau avec les ids des groupes auxquels envoyer le sms
 		 * @return boolean;
 		 */
-		public function create($api = false)
+		public function create($csrf = '', $api = false)
 		{
 			if (!$api)
 			{
 				//On vérifie que le jeton csrf est bon
-				if (!internalTools::verifyCSRF())
+				if (!internalTools::verifyCSRF($csrf))
 				{
 					$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 					header('Location: ' . $this->generateUrl('profile', 'showAll');
@@ -228,12 +230,13 @@
 
 		/**
 		 * Cette fonction met à jour une liste de sms
+		 * @param $csrf : Le jeton CSRF
 		 * @param array $_POST['scheduleds'] : Un tableau contenant les sms avec leurs nouvelles valeurs
 		 */
-		public function update()
+		public function update($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['successmessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('scheduleds', 'showAll');

@@ -29,19 +29,163 @@
 			$this->bdd = $bdd;
 		}
 
+		/*
+			Fonctions relatives aux informations de la base
+		*/
+
+		/**
+		* Cette fonction vérifie si une table existe
+		* @param string $table : Nom de la table
+		* @return mixed : Vrai si la table existe, faux sinon
+		*/
+		public function tableExist($table)
+		{
+				$tables = $this->getAllTables();
+				return in_array($table, $tables);
+		}
+
+		/**
+		* Cette fonction vérifie si un champs existe dans une table
+		* @param string $field : Nom du champ
+		* @param string $table : Nom de la table
+		* @return mixed : Vrai si le champs existe, faux, si le champs ou la table n'existe pas
+		*/
+		public function fieldExist($field, $table)
+		{
+			$fields = $this->getColumnsForTable($table);	
+			$fields = $fields ? explode(', ', $fields) : array();
+			return in_array($field, $fields);
+		}
+
+		/**
+		 * Cette requete retourne le dernier id inséré
+		 * return int : le dernier id inséré
+		 */
+		public function lastId()
+		{
+			return	$this->bdd->lastInsertId();
+		}
+
+		/**
+		 * Cette fonction permet de retourner toutes les tables de la base
+		 * @return array : La liste des tables
+		 */
+		public function getAllTables()
+		{
+			$query = 'SHOW TABLES';
+			$tables = $this->runQuery($query);
+			$tablesNames = array();
+
+			foreach ($tables as $table)
+			{
+				$tablesNames[] = array_values($table)[0];
+			}
+
+			return $tablesNames;
+		}
+
+		/**
+		 * Cette fonction permet de récupérer la liste de toutes les colonnes d'une table de façon propre, appelable via MySQL. Cela permet de faire des requetes plus optimisée qu'avec "*"
+		 * @param string $table : Nom de la table pour laquelle on veux les colonnes
+		 * @param string $prefix : Le prefix que l'on veux devant les champs, utile pour les requetes avec jointures. Par défaut null => pas de prefix. A noter, en cas d'utilisation de prefix, les champs aurons un alias de la forme $prefix_$nom_champ
+		 * @return boolean string : Tous les noms des colonnes liées par des ", ". Ex : 'id, nom, prenom". Si la table n'existe pas, on retourne false.
+		 */
+		public function getColumnsForTable($table, $prefix = null)
+		{
+			if ($this->tableExist($table))
+			{
+				$query = 'SHOW COLUMNS FROM ' . $table;
+				
+				$datas = array();
+				
+				$fields = $this->runQuery($query, $datas, self::FETCHALL);
+				$fieldsName = array();
+				foreach ($fields as $field)
+				{
+					$fieldsName[] = $prefix ? $prefix . '.' . $field['Field'] . ' AS ' . $prefix . '_' . $field['Field'] : $field['Field'];
+				}
+
+				return implode(', ', $fieldsName);
+			}
+
+			return false;
+		}
+
+		/**
+		 * Cette fonction décrit une table et retourne un tableau sur cette description
+		 * @param string $table : Le nom de la table a analyser
+		 * @return mixed : Si la table existe un tableau la décrivant, sinon false
+		 */
+		public function describeTable($table)
+		{
+			if (!$this->tableExist($table))
+			{
+				return false;
+			}
+
+			//On recupere tous les champs pour pouvoir apres les analyser
+			$query = 'DESCRIBE ' . $table;
+			$fields = $this->runQuery($query);
+
+			$return = array();
+			foreach ($fields as $field)
+			{
+				$fieldInfo = array();
+				$fieldInfo['NULL'] = $field['Null'] == 'NO' ? false : true;
+				$fieldInfo['AUTO_INCREMENT'] = $field['Extra'] == 'auto_increment' ? true : false;
+				$fieldInfo['PRIMARY'] = $field['Key'] == 'PRI' ? true : false;
+				$fieldInfo['UNIQUE'] = $field['Key'] == 'UNI' ? true : false;
+				$fieldInfo['TYPE'] = mb_convert_case(preg_replace('#[^a-z]#ui', '', $field['Type']), MB_CASE_UPPER);
+				$fieldInfo['SIZE'] = filter_var($field['Type'], FILTER_SANITIZE_NUMBER_INT);
+				$fieldInfo['HAS_DEFAULT'] = $field['Default'] !== NULL ? true : false;
+				$fieldInfo['DEFAULT'] = $field['Default'];
+				$return[$field['Field']] = $fieldInfo;
+			}
+
+			return $return;
+		}
+
+		/**
+		 * Cette fonction permet de compter le nombre de ligne d'une table
+		 * @param string $table : Le nom de la table à compter
+		 * @return mixed : Le nombre de ligne dans la table ou false si la table n'existe pas
+		 */
+		public function countTable ($table)
+		{
+			if (!$this->tableExist($table))
+			{
+				return false;
+			}
+
+			$query = "SELECT COUNT(*) as nb_lignes FROM " . $table;
+			
+			$return = $this->runQuery($query, array(), self::FETCH);
+			return $return['nb_lignes'];
+		}	 
+
+		/*
+			Fonctions d'execution des requetes ou de génération
+		*/
+
 		/**
 		 * Cette fonction joue une requete depuis une requete et un tableau d'argument
 		 * @param string $query : Requete à jouer
 		 * @param array $datas : Les données pour la requete. Si non fourni, vide par défaut.
 		 * @param const $return_type : Type de retour à utiliser. (Voir les constantes de la classe Model ici présente). Par défaut FETCHALL
 		 * @param const $fetch_mode : Le type de récupération a effectuer. Par défaut FETCH_ASSOC
+		 * @param boolean $debug : Par défaut à faux, si vrai retourne les infos de débug de la requete
 		 * @return mixed : Dépend du type spécifié dans $return_type
 		 */
-		public function runQuery($query, $datas = array(), $return_type = self::FETCHALL, $fetch_mode = PDO::FETCH_ASSOC)
+		public function runQuery($query, $datas = array(), $return_type = self::FETCHALL, $fetch_mode = PDO::FETCH_ASSOC, $debug = false)
 		{
 			$req = $this->bdd->prepare($query);
 			$req->setFetchMode($return_type);
 			$req->execute($datas);
+
+			if ($debug)
+			{
+				return $req->errorInfo();
+			}
 
 			switch ($return_type)
 			{
@@ -69,62 +213,6 @@
 		}
 		
 		/**
-		* Cette fonction vérifie si une table existe
-		* @param string $table : Nom de la table
-		* @return mixed : Vrai si la table existe, faux sinon
-		*/
-		public function tableExist($table)
-		{
-				$query = '
-					SHOW TABLES LIKE :table
-				';
-				
-				$query_datas = array(
-					'table' => $table
-				);
-				
-				$req = $this->bdd->prepare($query);
-				$req->execute($query_datas);
-				$result = $req->fetch();
-				if(count($result))
-				{
-					return true;
-				}
-
-				return false;
-		}
-
-		/**
-		* Cette fonction vérifie si un champs existe dans une table
-		* @param string $field : Nom du champ
-		* @param string $table : Nom de la table
-		* @return mixed : Vrai si le champs existe, faux, si le champs ou la table n'existe pas
-		*/
-		public function fieldExist($field, $table)
-		{
-			if($this->tableExist($table))
-			{
-				$query = '
-					SHOW COLUMNS FROM ' . $table . ' LIKE :field
-				';
-				
-				$query_datas = array(
-					'field' => $field
-				);
-				
-				$req = $this->bdd->prepare($query);
-				$req->execute($query_datas);
-				$result = $req->fetch();
-				if(count($result))
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/**
 		* Cette fonction permet de récupérer les éléments necessaires à une requete 'IN' depuis un tableau php
 		* @param string $values : Tableau PHP des valeurs
 		* @return array : Tableau des éléments nécessaires ('QUERY' => clause 'IN(...)' à ajouter à la query. 'DATAS' => tableau des valeurs à ajouter à celles passées en paramètre à l'execution de la requete
@@ -150,91 +238,242 @@
 			return $return;
 		}
 
-		/**
-		 * Cette requete retourne le dernier id inséré
-		 * return int : le dernier id inséré
-		 */
-		public function lastId()
-		{
-			return	$this->bdd->lastInsertId();
-		}
+
+		/*
+			Fonctions de manipulations basiques des données
+		*/
 
 		/**
-		 * Cette fonction permet de récupérer la liste de toutes les colonnes d'une table de façon propre, appelable via MySQL. Cela permet de faire des requetes plus optimisée qu'avec "*"
-		 * @param string $table : Nom de la table pour laquelle on veux les colonnes
-		 * @return boolean string : Tous les noms des colonnes liées par des ", ". Ex : 'id, nom, prenom". Si la table n'existe pas, on retourne false.
-		 */
-		public function getColumnsForTable($table)
-		{
-			if ($this->tableExist($table))
-			{
-				$query = 'SHOW COLUMNS FROM ' . $table;
-				
-				$datas = array();
-				
-				$fields = $this->runQuery($query, $datas, self::FETCHALL);
-				$fieldsName = array();
-				foreach ($fields as $field)
-				{
-					$fieldsName[] = $field['Field'];
-				}
-
-				return implode(', ', $fieldsName);
-			}
-
-			return false;
-		}
-
-		/**
-		 * Cette fonction permet de récupérer une table complète, éventuellement en la triant par une colonne, éventuellement en limitant le nombre de résultat, ou en sautant certains (notamment pour de la pagination)
-		 * @param string $table : Le nom de la table a récupérer
+		 * Cette fonction permet de récupérer des lignes en fonction de restrictions
+		 * @param string $table : Le nom de la table dans laquelle on veux recuperer la ligne
+		 * @param array $restrictions : Les restrictions que l'on veux appliquer
 		 * @param string $order_by : Le nom de la colonne par laquelle on veux trier les résultats. Si non fourni, tri automatique
 		 * @param string $desc : L'ordre de tri (asc ou desc). Si non défini, ordre par défaut (ASC)
 		 * @param string $limit : Le nombre maximum de résultats à récupérer (par défaut pas le limite)
 		 * @param string $offset : Le nombre de résultats à ignorer (par défaut pas de résultats ignorés)
-		 * @return array : Tableau avec dans chaque case une ligne de la base
+		 * @return mixed : False en cas d'erreur, sinon les lignes retournées
 		 */
-		public function getAll($table, $order_by = '', $desc = false, $limit = false, $offset = false)
+		public function getFromTableWhere($table, $restrictions = array(), $order_by = '', $desc = false, $limit = false, $offset = false)
 		{
-			if ($this->tableExist($table))
+			$restrictions = !is_array($restrictions) ? array() : $restrictions;
+
+			$fields = $this->describeTable($table);
+			if (!$fields)
 			{
-				$query = "SELECT " . $this->getColumnsForTable($table) . " FROM " . $table;
-
-				if ($order_by)
-				{
-					if ($this->fieldExist($order_by, $table))
-					{
-						$query .= ' ORDER BY '. $order_by;
-						if ($desc) 
-						{
-							$query .= ' DESC';
-						}
-					}
-				}
-
-				if ($limit !== false)
-				{
-					$query .= ' LIMIT :limit';
-					if ($offset !== false)
-					{
-						$query .= ' OFFSET :offset';
-					}
-				}
-
-				$req = $this->bdd->prepare($query);
-
-				if ($limit !== false)
-				{
-					$req->bindParam(':limit', $limit, PDO::PARAM_INT);
-					if ($offset !== false)
-					{
-						$req->bindParam(':offset', $offset, PDO::PARAM_INT);
-					}
-				}
-
-				$req->setFetchMode(PDO::FETCH_ASSOC);
-				$req->execute();
-				return $req->fetchAll();
+				return false;
 			}
+
+			//On gère les restrictions
+			$wheres = array();
+			$params = array();
+
+			foreach ($restrictions as $label => $value)
+			{
+				//Si le champs pour la restriction n'existe pas on retourne false
+				if (!array_key_exists($label, $fields))
+				{
+					return false;
+				}
+				
+				//On ajoute la restriction au WHERE
+				$params['where_' . $label] = $value;
+				$wheres[] = $label . ' = :where_' . $label . ' ';
+			}
+
+			$query = "SELECT " . $this->getColumnsForTable($table) . " FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
+
+			if ($order_by)
+			{
+				if ($this->fieldExist($order_by, $table))
+				{
+					$query .= ' ORDER BY '. $order_by;
+					if ($desc) 
+					{
+						$query .= ' DESC';
+					}
+				}
+			}
+
+			if ($limit !== false)
+			{
+				$query .= ' LIMIT :limit';
+				if ($offset !== false)
+				{
+					$query .= ' OFFSET :offset';
+				}
+			}
+
+			$req = $this->bdd->prepare($query);
+
+			if ($limit !== false)
+			{
+				$req->bindParam(':limit', $limit, PDO::PARAM_INT);
+				if ($offset !== false)
+				{
+					$req->bindParam(':offset', $offset, PDO::PARAM_INT);
+				}
+			}
+
+			//On associe les paramètres
+			foreach ($params as $label => &$param)
+			{
+				$req->bindParam(':' . $label, $param);
+			}
+
+			$req->setFetchMode(PDO::FETCH_ASSOC);
+			$req->execute();
+			return $req->fetchAll();
 		}
+
+		/**
+		 * Cette fonction permet de modifier les données d'une table pour un la clef primaire
+		 * @param string $table : Le nom de la table dans laquelle on veux insérer des données
+		 * @param string $primary : La clef primaire qui sert à identifier la ligne a modifier
+		 * @param array $datas : Les données à insérer au format "champ" => "valeur"
+		 * @param array $restrictions : Un tableau des restrictions à appliquer sous forme "champ" => "valeur". Par défaut un tableau vide
+		 * @return mixed : False en cas d'erreur, sinon le nombre de lignes modifiées
+		 */
+		public function updateTableWhere ($table, $datas, $restrictions = array())
+		{
+			$fields = $this->describeTable($table);
+			if (!$fields)
+			{
+				return false;
+			}
+			
+			$params = array();
+			$sets = array();
+
+			//On gère les set
+			foreach ($datas as $label => $value)
+			{
+				//Si le champs pour la nouvelle valeur n'existe pas on retourne false
+				if (!array_key_exists($label, $fields))
+				{
+					return false;
+				}
+				
+				//Si le champs est Nullable est qu'on à reçu une chaine vide, on passe à null plutot qu'à chaine vide
+				if ($fields[$label]['NULL'] && $value === '')
+				{
+					$value = null;
+				}
+
+				$params['set_' . $label] = $value;
+				$sets[] = $label . ' = :set_' . $label . ' ';
+			}
+
+			//On gère les restrictions
+			$wheres = array();
+			foreach ($restrictions as $label => $value)
+			{
+				//Si le champs pour la restriction n'existe pas on retourne false
+				if (!array_key_exists($label, $fields))
+				{
+					return false;
+				}
+				
+				//On ajoute la restriction au WHERE
+				$params['where_' . $label] = $value;
+				$wheres[] = $label . ' = :where_' . $label . ' ';
+			}
+
+			//On fabrique la requete
+			$query = "UPDATE " . $table . " SET " . implode(', ', $sets) . " WHERE 1 AND " . implode('AND ', $wheres);
+
+			//On retourne le nombre de lignes insérées
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
+		/**
+		 * Cette fonction permet de supprimer des lignes d'une table en fonctions de restrictions
+		 * @param string $table : Le nom de la table dans laquelle on veux supprimer la ligne
+		 * @param array $restrictions : Les restrictions pour la suppression sous la forme "label" => "valeur"
+		 * @return mixed : False en cas d'erreur, sinon le nombre de lignes supprimées
+		 */
+		public function deleteFromTableWhere($table, $restrictions = array())
+		{
+
+			$fields = $this->describeTable($table);
+			if (!$fields)
+			{
+				return false;
+			}
+
+			//On gère les restrictions
+			$wheres = array();
+			$params = array();
+
+			foreach ($restrictions as $label => $value)
+			{
+				//Si le champs pour la restriction n'existe pas on retourne false
+				if (!array_key_exists($label, $fields))
+				{
+					return false;
+				}
+				
+				//On ajoute la restriction au WHERE
+				$params['where_' . $label] = $value;
+				$wheres[] = $label . ' = :where_' . $label . ' ';
+			}
+
+			$query = "DELETE FROM " . $table . " WHERE 1 AND " . implode('AND ', $wheres);
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
+		/**
+		 * Cette fonction permet d'insérer des données dans une table
+		 * @param string $table : Le nom de la table dans laquelle on veux insérer des données
+		 * @param array $datas : Les données à insérer
+		 * @return mixed : False en cas d'erreur, et le nombre de lignes insérées sinon
+		 */
+		public function insertIntoTable($table, $datas)
+		{
+			$fields = $this->describeTable($table);
+			if (!$fields)
+			{
+				return false;
+			}
+			
+			$params = array();
+			$fieldNames = array();
+
+			//On s'assure davoir toutes les données, on evite les auto increment, on casse en cas de donnée absente
+			foreach ($fields as $nom => $field)
+			{
+				if ($field['AUTO_INCREMENT'])
+				{
+					continue;
+				}
+
+				//Si il manque un champs qui peux être NULL ou qu'il est rempli avec une chaine vide ou null, on passe au suivant				
+				if ((!isset($datas[$nom]) || $datas[$nom] === NULL || $datas[$nom] === '') && $field['NULL'])
+				{
+					continue;
+				}
+				
+				//Si il manque un champs qui a une valeur par défaut
+				if (!isset($datas[$nom]) && $field['HAS_DEFAULT'])
+				{
+					continue;
+				}
+
+				//Si il nous manque un champs
+				if (!isset($datas[$nom]))
+				{
+					return false;
+				}
+
+				$params[$nom] = $datas[$nom];
+				$fieldNames[] = $nom;
+			}
+
+			//On fabrique la requete
+			$query = "INSERT INTO " . $table . "(" . implode(', ', $fieldNames) . ") VALUES(:" . implode(', :', $fieldNames) . ")";
+
+			//On retourne le nombre de lignes insérées
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
 	} 

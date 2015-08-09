@@ -1,9 +1,9 @@
 <?php
 	//CETTE PAGE GERE LA CONNEXION A LA BASE DE DONNEES
-	$host = 'localhost';
-	$dbname = 'raspisms';
-	$user = 'root';
-	$password = 'DATABASE_PASSWORD';
+	$host = DATABASE_HOST;
+	$dbname = DATABASE_NAME;
+	$user = DATABASE_USER;
+	$password = DATABASE_PASSWORD;
 
 	try
 	{

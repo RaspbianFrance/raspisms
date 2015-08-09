@@ -33,14 +33,15 @@
 
 		/**
 		 * Cette fonction change le mot de passe de l'utilisateur
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['password'] : Le nouveau mot de passe de l'utilisateur
 		 * @param string $_POST['verif_password'] : La vérification du nouveau mot de passe de l'utilisateur
 		 * @return void;
 		 */
-		public function changePassword()
+		public function changePassword($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('profile', 'showAll');
@@ -74,14 +75,15 @@
 
 		/**
 		 * Cette fonction change l'email de l'utilisateur
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['email'] : Le nouvel email de l'utilisateur
 		 * @param string $_POST['verif_email'] : La vérification du nouvel email de l'utilisateur
 		 * @return void;
 		 */
-		public function changeEmail()
+		public function changeEmail($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('profile', 'showAll');
@@ -127,13 +129,14 @@
 
 		/**
 		 * Cette fonction supprime l'utilisateur
+		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['delete_account'] : La vérification que l'on veux bien supprimer l'utilisateur
 		 * @return void;
 		 */
-		public function delete()
+		public function delete($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
 				header('Location: ' . $this->generateUrl('profile', 'showAll');

@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-group fa-fw"></i> Ajout d'un groupe</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('groups', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('groups', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom du groupe</label>
 									<div class="form-group input-group">

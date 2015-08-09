@@ -72,8 +72,8 @@
 										<div class="btn-group action-dropdown" target="#table-commands">
 											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
 											<ul class="dropdown-menu pull-right" role="menu">
-												<li><a href="<?php echo $this->generateUrl('commands', 'edit', array('csrf' => $_SESSION['csrf'])); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-												<li><a href="<?php echo $this->generateUrl('commands', 'delete', array('csrf' => $_SESSION['csrf'])); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+												<li><a href="<?php echo $this->generateUrl('commands', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
+												<li><a href="<?php echo $this->generateUrl('commands', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
 											</ul>
 										</div>
 									</div>

@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-user fa-fw"></i> Ajout d'un contact</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('contacts', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('contacts', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom contact</label>
 									<div class="form-group input-group">
