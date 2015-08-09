@@ -165,7 +165,7 @@
 				return false;
 			}		
 
-			if (!$db->createScheduleds($date, $content))
+			if (!$db->insertIntoTable('scheduleds', ['at' => $date, 'content' => $content, 'progress' => false]))
 			{
 				if (!$api)
 				{
@@ -259,7 +259,12 @@
 				//Si la date fournie est passée, on la change pour dans 2 minutes	
 				$objectDate = DateTime::createFromFormat('Y-m-d H:i', $date);
 
-				$db->updateTableWhere('scheduleds', ['content' => $scheduled['content'], 'date' => $date], ['id' => $id_scheduled]); //On met à jour le sms
+				if (!$db->updateTableWhere('scheduleds', ['content' => $scheduled['content'], 'at' => $date], ['id' => $id_scheduled]))
+				{
+					$_SESSION['errormessage'] = 'Impossible de mettre à jour le SMS numéro ' . $scheduled['id'] . '.';
+					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					return false;
+				}
 
 				$db->deleteScheduleds_numbersForScheduled($id_scheduled); //On supprime tous les numéros pour ce SMS
 				$db->deleteScheduleds_contactsForScheduled($id_scheduled); //On supprime tous les contacts pour ce SMS
