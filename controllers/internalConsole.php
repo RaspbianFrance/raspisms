@@ -136,10 +136,9 @@
 					//Commande qui envoie le SMS
 					$commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
 					//Commande qui s'assure de passer le SMS dans ceux envoyés, et de lui donner le bon statut
-
+echo $commande_send_sms . "\n";
 					//On va liée les deux commandes pour envoyer le SMS puis le passer en echec
 					$commande = '(' . $commande_send_sms . ') >/dev/null 2>/dev/null &';
-
 					exec($commande); //On execute la commande d'envoie d'un SMS
 				}
 			}
@@ -168,7 +167,7 @@
 				//On récupère le fichier, et on récupère la chaine jusqu'au premier ':' pour le numéro de téléphone source, et la fin pour le message
 				$content_file = file_get_contents(PWD_RECEIVEDS . $dir);
 				//Si on peux pas ouvrir le fichier, on quitte en logant une erreur
-				if (!$content_file)
+				if ($content_file == false)
 				{
 					$this->wlog('Impossible to read file "' . $dir);
 					die(4);
