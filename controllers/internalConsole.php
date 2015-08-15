@@ -134,7 +134,7 @@
 					$now = new DateTime();
 					$now = $now->format('Y-m-d H:i:s');
 					//On peut maintenant ajouter le SMS
-					$db->createSended($now, $number, $scheduled['content']);
+					$db->insertIntoTable('sendeds', ['at' => $now, 'number' => $number, 'content' => $scheduled['content']]);
 					$id_sended = $db->lastId();
 					
 					//Commande qui envoie le SMS
@@ -254,7 +254,7 @@
 				$send_by = $number;
 				$content = $text;
 				$is_command = count($found_commands);
-				if (!$db->createReceived($date, $send_by, $content, $is_command))
+				if (!$db->insertIntoTable('receiveds', ['at' => $date, 'send_by' => $send_by, 'content' => $content, 'is_command' => $is_command]))
 				{
 					echo "Erreur lors de l'enregistrement du SMS\n";
 					$this->wlog('Unable to process the SMS in file "' . $dir);
