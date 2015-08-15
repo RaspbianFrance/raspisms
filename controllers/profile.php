@@ -15,20 +15,11 @@
 		}
 
 		/**
-		 * Cette fonction est alias de show()
+		 * Cette fonction retourne la fenetre du profile
 		 */	
 		public function byDefault()
 		{
-			$this->show();
-		}
-		
-		/**
-		 * Cette fonction retourne la fenetre du profile
-		 * @return void;
-		 */
-		public function show()
-		{
-			$this->render('profile');
+			$this->render('profile/default');
 		}
 
 		/**

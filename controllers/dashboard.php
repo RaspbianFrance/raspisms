@@ -20,11 +20,6 @@
 		 */	
 		public function byDefault()
 		{
-			$this->show();
-		}
-
-		public function show()
-		{
 			//Creation de l'object de base de données
 			global $db;
 			
@@ -97,7 +92,7 @@
 			$array_area_chart = array_values($array_area_chart);
 
 
-			$this->render('dashboard', array(
+			$this->render('dashboard/default', array(
 				'nb_contacts' => $nb_contacts,
 				'nb_groups' => $nb_groups,
 				'nb_scheduleds' => $nb_scheduleds,

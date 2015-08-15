@@ -15,24 +15,15 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne tous les sms programmés, sous forme d'un tableau permettant l'administration de ces sms
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne tous les sms programmés, sous forme d'un tableau permettant l'administration de ces sms
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
 
 			$scheduleds = $db->getFromTableWhere('scheduleds');
-			$this->render('scheduleds', array(
+			$this->render('scheduleds/default', array(
 				'scheduleds' => $scheduleds,
 			));
 		}
@@ -49,7 +40,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('profile', 'showAll'));
+				header('Location: ' . $this->generateUrl('profile'));
 				return false;
 			}
 
@@ -70,7 +61,7 @@
 			$babyonemoretime = new DateInterval('PT1M'); //Haha, i'm so a funny guy
 			$now->add($babyonemoretime);	
 			$now = $now->format('Y-m-d H:i');
-			return $this->render('addScheduled', array(
+			return $this->render('scheduleds/add', array(
 				'now' => $now
 			));
 		}
@@ -95,7 +86,7 @@
 				$scheduleds[$key]['groups'] = $db->getGroupsForScheduled($scheduled['id']);	
 			}
 
-			$this->render('editScheduleds', array(
+			$this->render('scheduleds/edit', array(
 				'scheduleds' => $scheduleds,
 			));
 		}
@@ -119,7 +110,7 @@
 				if (!internalTools::verifyCSRF($csrf))
 				{
 					$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-					header('Location: ' . $this->generateUrl('profile', 'showAll'));
+					header('Location: ' . $this->generateUrl('profile'));
 					return false;
 				}
 			}
@@ -138,7 +129,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'Pas de texte pour ce SMS !';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 				}
 				return false;
 			}
@@ -149,7 +140,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'Pas numéro, de contacts, ni de groupes définis pour envoyer ce SMS !';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 				}
 				return false;
 			}
@@ -159,7 +150,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'La date renseignée est invalide.';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 				}
 
 				return false;
@@ -170,7 +161,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'Impossible de créer ce SMS.';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 				}
 				return false;
 			}
@@ -214,7 +205,7 @@
 				if (!$api)
 				{
 					$_SESSION['errormessage'] = 'Le SMS a bien été créé, mais certains numéro ne sont pas valides.';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 				}
 				return true;
 			}
@@ -222,7 +213,7 @@
 			if (!$api)
 			{
 				$_SESSION['successmessage'] = 'Le SMS a bien été créé.';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+				header('Location: ' . $this->generateUrl('scheduleds'));
 			}
 			return true;
 		}
@@ -238,7 +229,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['successmessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+				header('Location: ' . $this->generateUrl('scheduleds'));
 				return false;
 			}
 
@@ -252,7 +243,7 @@
 				if (!internalTools::validateDate($date, 'Y-m-d H:i'))
 				{
 					$_SESSION['errormessage'] = 'La date renseignée pour le SMS numéro ' . $scheduled['id'] . ' est invalide.';
-					header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+					header('Location: ' . $this->generateUrl('scheduleds'));
 					return false;
 				}		
 
@@ -299,13 +290,13 @@
 			if ($errors)
 			{
 				$_SESSION['errormessage'] = 'Tous les SMS ont été modifiés mais certaines données incorrects ont été ignorées.';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+				header('Location: ' . $this->generateUrl('scheduleds'));
 				return false;
 			}
 			else
 			{
 				$_SESSION['successmessage'] = 'Tous les SMS ont été modifiés avec succès.';
-				header('Location: ' . $this->generateUrl('scheduleds', 'showAll'));
+				header('Location: ' . $this->generateUrl('scheduleds'));
 				return true;
 			}
 		}

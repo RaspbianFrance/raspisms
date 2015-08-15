@@ -5,20 +5,11 @@
 	class connect extends Controller
 	{
 		/**
-		 * Cette fonction est alias de login()
+		 * Cette fonction retourne la fenetre de connexion
 		 */	
 		public function byDefault()
 		{
-			$this->login();
-		}
-		
-		/**
-		 * Cette fonction retourne la fenetre de connexion
-		 * @return void;
-		 */
-		public function login()
-		{
-			$this->render('login');
+			$this->render('connect/login');
 		}
 
 		/**

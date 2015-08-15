@@ -15,18 +15,9 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne toutes les commandes, sous forme d'un tableau permettant l'administration de ces commandess
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne toutes les commandes, sous forme d'un tableau permettant l'administration de ces commandess
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
@@ -34,7 +25,7 @@
 			//Recupération des commandes
 			$commands = $db->getFromTableWhere('commands');
 
-			$this->render('commands', array(
+			$this->render('commands/default', array(
 				'commands' => $commands,
 			));
 			
@@ -67,7 +58,7 @@
 		 */
 		public function add()
 		{
-			$this->render('addCommand');
+			$this->render('commands/add');
 		}
 
 		/**
@@ -79,7 +70,7 @@
 			global $db;
 
 			$commands = $db->getCommandsIn($ids);
-			$this->render('editCommands', array(
+			$this->render('commands/edit', array(
 				'commands' => $commands,
 			));
 		}

@@ -15,18 +15,9 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
@@ -34,7 +25,7 @@
 			//Recupération des nombres des 4 panneaux d'accueil
 			$contacts = $db->getFromTableWhere('contacts');
 
-			$this->render('contacts', array(
+			$this->render('contacts/default', array(
 				'contacts' => $contacts,
 			));
 		}
@@ -51,7 +42,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				header('Location: ' . $this->generateUrl('contacts'));
 				return false;
 			}
 
@@ -68,7 +59,7 @@
 		 */
 		public function add()
 		{
-			$this->render('addContact');
+			$this->render('contacts/add');
 		}
 
 		/**
@@ -80,7 +71,7 @@
 			global $db;
 			
 			$contacts = $db->getContactsIn($ids);
-			$this->render('editContacts', array(
+			$this->render('contacts/edit', array(
 				'contacts' => $contacts,
 			));
 		}
@@ -97,7 +88,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				header('Location: ' . $this->generateUrl('contacts'));
 				return false;
 			}
 
@@ -130,7 +121,7 @@
 			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')']);
 
 			$_SESSION['successmessage'] = 'Le contact a bien été créé.';
-			header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+			header('Location: ' . $this->generateUrl('contacts'));
 			return true;
 		}
 
@@ -146,7 +137,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				header('Location: ' . $this->generateUrl('contacts'));
 			}
 
 			global $db;
@@ -169,11 +160,11 @@
 			if (count($errors))
 			{
 				$_SESSION['errormessage'] = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
-				return header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+				return header('Location: ' . $this->generateUrl('contacts'));
 			}
 
 			$_SESSION['successmessage'] = 'Tous les contacts ont été modifiés avec succès.';
-			return header('Location: ' . $this->generateUrl('contacts', 'showAll'));
+			return header('Location: ' . $this->generateUrl('contacts'));
 		}
 
 		/**

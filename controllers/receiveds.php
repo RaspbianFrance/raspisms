@@ -40,7 +40,7 @@
 			//Récupération des SMS envoyés triés par date, du plus récent au plus ancien, par paquets de $limit, en ignorant les $offset premiers
 			$receiveds = $db->getFromTableWhere('receiveds', [], 'at', true, $limit, $offset);
 
-			return $this->render('receiveds', array(
+			return $this->render('receiveds/showAll', array(
 				'receiveds' => $receiveds,
 				'page' => $page,
 				'limit' => $limit,

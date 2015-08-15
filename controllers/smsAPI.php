@@ -12,14 +12,6 @@
 		
 
 		/**
-		 * Cette fonction est alias de showAll()
-		 */	
-		public function byDefault()
-		{
-			$this->send();
-		}
-
-		/**
 		 * Cette fonction permet d'envoyer un SMS, en passant simplement des arguments à l'URL (ou pas $_GET)
 		 * @param string text = Le contenu du SMS
 		 * @param mixed numbers = Les numéros auxquels envoyer les SMS. Soit un seul numéro, et il s'agit d'un string. Soit plusieurs numéros, et il s'agit d'un tableau
@@ -27,7 +19,7 @@
 		 * @param mixed groups = Les noms des groupes auxquels envoyer les SMS. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
 		 * @param optionnal string date = La date à laquelle doit être envoyé le SMS. Au format 'Y-m-d H:i'. Si non fourni, le SMS sera envoyé dans 2 minutes
 		 */
-		public function send()
+		public function byDefault()
 		{
 			global $db;
 

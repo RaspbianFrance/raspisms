@@ -15,18 +15,9 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne tous les utilisateurs, sous forme d'un tableau permettant l'administration de ces utilisateurs
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne tous les utilisateurs, sous forme d'un tableau permettant l'administration de ces utilisateurs
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
@@ -35,7 +26,7 @@
 			//Récupération des utilisateurs
 			$users = $db->getFromTableWhere('users');
 
-			$this->render('users', array(
+			$this->render('users/default', array(
 				'users' => $users,
 			));
 		}
@@ -45,7 +36,7 @@
 		 */
 		public function add()
 		{
-			$this->render('addUser');
+			$this->render('users/add');
 		}
 
 		/**
@@ -117,7 +108,7 @@
 
 			$db->insertIntoTable('events', ['type' => 'USER_ADD', 'text' => 'Ajout de l\'utilisateur : ' . $email]);
 			$_SESSION['successmessage'] = 'L\'utilisateur a bien été créé.';
-			header('Location: ' . $this->generateUrl('users', 'showAll'));
+			header('Location: ' . $this->generateUrl('users'));
 			return true;
 		}
 
@@ -133,7 +124,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('users', 'showAll'));
+				header('Location: ' . $this->generateUrl('users'));
 				return false;
 			}
 
@@ -144,7 +135,7 @@
 			if (!$_SESSION['admin'])
 			{
 				$_SESSION['errormessage'] = 'Vous devez être administrateur pour effectuer cette action.';
-				header('Location: ' . $this->generateUrl('users', 'showAll'));
+				header('Location: ' . $this->generateUrl('users'));
 				return false;
 			}
 
