@@ -15,24 +15,15 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne tous les groupes, sous forme d'un tableau permettant l'administration de ces groupes
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne tous les groupes, sous forme d'un tableau permettant l'administration de ces groupes
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
 
 			$groups = $db->getGroupsWithContactsNb();
-			$this->render('groups', array(
+			$this->render('groups/default', array(
 				'groups' => $groups,
 			));
 		}
@@ -49,7 +40,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('groups', 'showAll'));
+				header('Location: ' . $this->generateUrl('groups'));
 				return false;
 			}
 
@@ -66,7 +57,7 @@
 		 */
 		public function add()
 		{
-			$this->render('addGroup');
+			$this->render('groups/add');
 		}
 
 		/**
@@ -86,7 +77,7 @@
 				$groups[$key]['contacts'] = $db->getContactsForGroup($group['id']);	
 			}
 
-			$this->render('editGroups', array(
+			$this->render('groups/edit', array(
 				'groups' => $groups,
 			));
 		}
@@ -103,7 +94,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('groups', 'showAll'));
+				header('Location: ' . $this->generateUrl('groups'));
 				return false;
 			}
 
@@ -113,7 +104,7 @@
 			if (!$db->insertIntoTable('groups', ['name' => $nom]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de créer ce groupe.';
-				header('Location: ' . $this->generateUrl('groups', 'showAll'));
+				header('Location: ' . $this->generateUrl('groups'));
 				return false;
 			}
 
@@ -126,7 +117,7 @@
 			}
 
 			$_SESSION['successmessage'] = 'Le groupe a bien été créé.';
-			header('Location: ' . $this->generateUrl('groups', 'showAll'));
+			header('Location: ' . $this->generateUrl('groups'));
 			return true;
 		}
 
@@ -142,7 +133,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('groups', 'showAll'));
+				header('Location: ' . $this->generateUrl('groups'));
 				return false;
 			}
 
@@ -160,7 +151,7 @@
 			}
 
 			$_SESSION['successmessage'] = 'Tous les groupes ont été modifiés avec succès.';
-			header('Location: ' . $this->generateUrl('groups', 'showAll'));
+			header('Location: ' . $this->generateUrl('groups'));
 		}
 
 		/**

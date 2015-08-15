@@ -25,7 +25,7 @@
 				unset($_SESSION['successmessage']);
 			}
 
-			$this->render('head', array(
+			$this->render('internalIncs/head', array(
 				'title' => $title,
 				'author' => $author,
 				'error_message' => $error_message,
@@ -41,7 +41,7 @@
 		public function nav($page = '')
 		{
 			$email = isset($_SESSION['email']) ? $_SESSION['email'] : 'Mon compte';
-			$this->render('nav', array(
+			$this->render('internalIncs/nav', array(
 				'email' => $email,
 				'page' => $page,
 			));
@@ -49,6 +49,6 @@
 		
 		public function footer()
 		{			
-			$this->render('footer');
+			$this->render('internalIncs/footer');
 		}
 	}
