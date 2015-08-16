@@ -51,4 +51,12 @@
 		{			
 			$this->render('internalIncs/footer');
 		}
+
+		/**
+		 * Cette fonction retourne une page js avec des constantes php sous forme js
+		 */
+		public function phptojs()
+		{
+			$this->render('internalIncs/phptojs');
+		}
 	}

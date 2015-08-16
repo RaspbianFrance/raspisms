@@ -47,4 +47,28 @@
 				'nbResults' => count($receiveds),
 			));
 		}
+
+		/**
+		 * Cette fonction retourne tous les SMS reçus aujourd'hui pour la popup
+		 * @return json : Un tableau des sms
+		 */
+		public function popup ()
+		{
+			global $db;
+			$now = new DateTime();
+			$receiveds = $db->getReceivedsSince($now->format('Y-m-d'));
+									   
+			$nbReceiveds = count($receiveds);
+			
+			if (!isset($_SESSION['popup_nb_receiveds']) || ($_SESSION['popup_nb_receiveds'] > $nbReceiveds))
+			{
+				$_SESSION['popup_nb_receiveds'] = $nbReceiveds;
+			}
+
+			$newlyReceiveds = array_slice($receiveds, $_SESSION['popup_nb_receiveds']);
+
+			echo json_encode($newlyReceiveds);
+			$_SESSION['popup_nb_receiveds'] = $nbReceiveds;
+			return true;
+		}
 	}
