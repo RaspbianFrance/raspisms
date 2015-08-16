@@ -53,7 +53,7 @@
 										<label>Numéro de téléphone du contact</label>
 										<div class="form-group input-group">
 											<span class="input-group-addon"><span class="fa fa-phone"></span></span>
-											<input name="contacts[<?php secho($contact['id']); ?>][phone]" class="form-control" type="text" placeholder="Numéro du contact" pattern="((0[1-9])|(\+33( )?[0-9]))( ?)([0-9] ?){8}" required value="<?php secho($contact['number']); ?>">
+											<input name="contacts[<?php secho($contact['id']); ?>][phone]" class="form-control" type="text" placeholder="Numéro du contact" pattern="(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8}" required value="<?php secho($contact['number']); ?>">
 										</div>
 									</div>
 									<hr/>
