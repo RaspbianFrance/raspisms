@@ -95,6 +95,26 @@
 			return $this->runQuery($query, $params);
 		}
 
+		/**
+		 * Récupère les SMS reçus depuis une date
+		 * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
+		 * @return array : Tableau avec tous les SMS depuis la date
+		 */
+		public function getReceivedsSince($date)
+		{
+			$query = "
+				SELECT *
+				FROM receiveds
+				WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
+			";
+
+			$params = array(
+				'date' => $date,
+			);
+
+			return $this->runQuery($query, $params);
+		}
+
 		/********************************/
 		/* PARTIE DES REQUETES CONTACTS */
 		/********************************/

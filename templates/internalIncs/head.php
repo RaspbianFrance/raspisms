@@ -15,6 +15,10 @@
 		<link href="<?php echo HTTP_PWD; ?>font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 		<!-- Custom CSS site -->
 		<link href="<?php echo HTTP_PWD; ?>css/style.css" rel="stylesheet">
+		<?php
+			$incs = new internalIncs();
+			$incs->phptojs();
+		?>
 		<script src="<?php echo HTTP_PWD; ?>js/jquery.js"></script>
 		<script src="<?php echo HTTP_PWD; ?>js/bootstrap.min.js"></script>
 		<script src="<?php echo HTTP_PWD; ?>js/plugins/morris/raphael.min.js"></script>
@@ -58,3 +62,4 @@
 		</script>
 	</head>
 	<body>
+	<div class="popup-alerts-container"></div>
