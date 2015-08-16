@@ -248,7 +248,10 @@
 				}
 
 				//On va supprimer le mot de passe du SMS pour pouvoir l'enregistrer sans danger
-				$text = str_replace($flags['PASSWORD'], '*****', $text);
+				if (isset($flags['PASSWORD']))
+				{
+					$text = str_replace($flags['PASSWORD'], '*****', $text);
+				}
 
 				//On map les données et on créer le SMS reçu
 				$send_by = $number;
