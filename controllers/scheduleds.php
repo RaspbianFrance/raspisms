@@ -59,7 +59,7 @@
 		{
 			$now = new DateTime();
 			$babyonemoretime = new DateInterval('PT1M'); //Haha, i'm so a funny guy
-			$now->add($babyonemoretime);	
+			$now->sub($babyonemoretime);	
 			$now = $now->format('Y-m-d H:i');
 			return $this->render('scheduleds/add', array(
 				'now' => $now
