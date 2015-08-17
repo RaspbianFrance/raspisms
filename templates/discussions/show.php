@@ -71,8 +71,8 @@
 							var texte = '' +
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-received">' +
-									'<div class="discussion-message-text">' + message.text.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
-									'<div class="discussion-message-date">' + message.date.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
+									'<div class="discussion-message-text">' + message.text + '</div>' +
+									'<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
 							break;
@@ -80,8 +80,8 @@
 							var texte = '' +
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
-									'<div class="discussion-message-text">' + message.text.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
-									'<div class="discussion-message-date">' + message.date.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
+									'<div class="discussion-message-text">' + message.text + '</div>' +
+									'<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
 							break;
@@ -90,8 +90,8 @@
 								'<div class="clearfix message-container">' +
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
-										'<div class="discussion-message-text">' + message.text.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
-										'<div class="discussion-message-date">' + message.date.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</div>' +
+										'<div class="discussion-message-text">' + message.text + '</div>' +
+										'<div class="discussion-message-date">' + message.date + '</div>' +
 									'</div>' +
 								'</div>';
 							break;
