@@ -34,6 +34,9 @@
 					<li <?php echo $page == 'scheduleds' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo $this->generateUrl('scheduleds'); ?>"><i class="fa fa-fw fa-envelope"></i> SMS</a>
 					</li>
+					<li <?php echo $page == 'discussions' ? 'class="active"' : ''; ?>>
+						<a href="<?php echo $this->generateUrl('discussions'); ?>"><i class="fa fa-fw fa-comments"></i> Discussions</a>
+					</li>
 					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo $this->generateUrl('commands'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
 					</li>

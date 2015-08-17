@@ -134,7 +134,10 @@
 					$now = new DateTime();
 					$now = $now->format('Y-m-d H:i:s');
 					//On peut maintenant ajouter le SMS
-					$db->insertIntoTable('sendeds', ['at' => $now, 'number' => $number, 'content' => $scheduled['content']]);
+					if (!$db->insertIntoTable('sendeds', ['at' => $now, 'target' => $number, 'content' => $scheduled['content']]))
+					{
+						echo 'Impossible d\'inserer le sms pour le numero ' . $number . "\n";
+					}
 					$id_sended = $db->lastId();
 					
 					//Commande qui envoie le SMS

@@ -88,3 +88,103 @@ footer
     color: #fff;
 	background-color: #000;
 }
+
+.goto:hover
+{
+	cursor: pointer;
+}
+
+/** DISCUSSION **/
+.table-discussions tbody tr:hover
+{
+	cursor: pointer;
+	background-color: #999;
+}
+
+.discussion-container
+{
+	overflow: auto;
+}
+
+.discussion-message
+{
+	border-radius: 5px;
+	display: inline-block;
+	max-width: 90%;
+	padding: 10px;
+	position: relative;
+}
+
+.discussion-message-text
+{
+	font-size: 1.3em;
+}
+
+.discussion-message-date
+{
+	font-size: 0.9em;
+}
+
+.message-container
+{
+	margin-bottom: 10px;
+}
+
+.message-received
+{
+	background-color: #1abc9c;
+	float: left;
+	color: #fff;
+}
+
+.message-sended
+{
+	background-color: #ddd;
+	float: right;
+}
+
+.message-received .discussion-message-date
+{
+	color: #f0f0f0;
+}
+
+.message-sended .discussion-message-date
+{
+	text-align: right;
+	color: #888;
+}
+
+.message-input
+{
+	width: 100%;
+	max-width: 100%;
+	background-color: #ddd;
+}
+
+.message-input textarea
+{
+	width: 100%;
+	resize: none;
+	height: 6em;
+}
+
+.message-input button
+{
+	float: right;
+	margin-top: 8px;
+}
+
+.message-in-progress-hover
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 900;
+	opacity: 0.7;
+	background-color: #fff;
+	font-size: 20px;
+	text-align: center;
+	padding-top: 10px;
+}

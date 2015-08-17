@@ -33,8 +33,63 @@ function verifReceived()
 	});
 }
 
+/**
+ * Cette fonction permet de scroller au dernier message
+ */
+function scrollDownDiscussion()
+{
+	jQuery('.discussion-container').animate({scrollTop: 1000000});
+}
 
 jQuery(document).ready(function()
 {
 	var verifReceivedInterval = setInterval(verifReceived, 10000);
+
+	jQuery('body').on('click', '.goto', function (e) {
+		e.preventDefault();
+		if (jQuery(this).attr('url'))
+		{
+			if (jQuery(this).attr('target'))
+			{
+				window.open(jQuery(this).attr('url'), jQuery(this).attr('target'));
+			}
+			else
+			{
+				window.location = jQuery(this).attr('url');
+			}
+		}
+	});
+
+	jQuery('body').on('submit', '.send-message-discussion', function (e) 
+	{
+		e.preventDefault();
+
+		var form = jQuery(this);
+		var message = form.find('textarea').val();
+		var formData = new FormData(form[0]);
+		jQuery('.discussion-container').find('#send-message-spiner').remove();
+		jQuery('.discussion-container').append('<div class="text-center" id="send-message-spiner"><i class="fa fa-spinner fa-spin"></i></div>');
+		scrollDownDiscussion();
+		jQuery.ajax({
+			url: form.attr('action'),
+			type: form.attr('method'),
+			data: formData,
+			contentType: false,
+			processData: false,
+			dataType: "json",
+			success: function (data)
+			{
+				if (!data.success)
+				{
+					showMessage(data.message.replace(/</g, "&lt;").replace(/>/g, "&gt;"), 0);
+					jQuery('.discussion-container').find('#send-message-spiner').remove();
+				}
+			}
+		}).done(function()
+		{
+			form.trigger("reset");
+		});
+	});
+
+	scrollDownDiscussion();
 });

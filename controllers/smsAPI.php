@@ -120,7 +120,7 @@
 			$_POST['groups'] = $groups;
 		
 			$scheduleds = new scheduleds();
-			$success = $scheduleds->create(true);
+			$success = $scheduleds->create('', true);
 		
 			if (!$success)
 			{

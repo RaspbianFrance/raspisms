@@ -102,7 +102,7 @@
 		 * @param string $_POST['groups'] : Un tableau avec les ids des groupes auxquels envoyer le sms
 		 * @return boolean;
 		 */
-		public function create($csrf = '', $api = false)
+		public function create($csrf = '', $api = false, $discussion = false)
 		{
 			if (!$api)
 			{
@@ -145,7 +145,7 @@
 				return false;
 			}
 
-			if (!internalTools::validateDate($date, 'Y-m-d H:i'))
+			if (!internalTools::validateDate($date, 'Y-m-d H:i:s'))
 			{
 				if (!$api)
 				{
@@ -167,6 +167,13 @@
 			}
 
 			$id_scheduled = $db->lastId();
+
+			if ($discussion)
+			{
+				$_SESSION['discussion_wait_progress'] = isset($_SESSION['discussion_wait_progress']) ? $_SESSION['discussion_wait_progress'] : [];
+				$_SESSION['discussion_wait_progress'][] = $id_scheduled;
+			}
+
 			$db->insertIntoTable('events', ['type' => 'SCHEDULED_ADD', 'text' => 'Ajout d\'un SMS pour le ' . $date]);	
 			$errors = false;
 
