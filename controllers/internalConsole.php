@@ -154,6 +154,9 @@
 				echo "Tous les SMS sont en cours d'envoi.\n";
 				//Tous les SMS ont été envoyés.	
 				$db->deleteScheduledsIn($ids_scheduleds);
+
+				//On dors 2 secondes
+				sleep(2);
 			}
 		}
 
