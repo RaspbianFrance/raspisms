@@ -115,6 +115,46 @@
 			return $this->runQuery($query, $params);
 		}
 
+		/**
+		 * Récupère les SMS reçus depuis une date pour un numero
+		 * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
+		 * @param $number : Le numéro
+		 * @return array : Tableau avec tous les SMS depuis la date
+		 */
+		public function getReceivedsSinceForNumberOrderByDate($date, $number)
+		{
+			$query = "
+				SELECT *
+				FROM receiveds
+				WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
+				AND send_by = :number
+				ORDER BY at ASC
+			";
+
+			$params = array(
+				'date' => $date,
+				'number' => $number
+			);
+
+			return $this->runQuery($query, $params);
+		}
+
+		/**
+		 * Récupère les SMS reçus groupé par numéro et trié par date
+		 * @return array : Le tablea avec les sms et la date
+		 */
+		public function getDiscussions()
+		{
+			$query = "
+					SELECT MAX(at) as at, number
+					FROM (SELECT at, target as number FROM sendeds UNION (SELECT at, send_by as number FROM receiveds)) as discussions
+					GROUP BY number
+					ORDER BY at
+			";
+
+			return $this->runQuery($query);
+		}
+
 		/********************************/
 		/* PARTIE DES REQUETES CONTACTS */
 		/********************************/
@@ -380,6 +420,57 @@
 			$params = $generted_in['PARAMS'];
 
 			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
+		/**
+		 * Cette fonction retourne les sms programmés pour un numéro donné et avant une date
+		 * @param string $date : La date avant laquel on veux les  numéros (format yyyy-mm-dd hh:mm:ss)
+		 * @param string $number : Le numéro cible
+		 * @return array : Les scheduleds correspondants
+		 */
+		public function getScheduledsBeforeDateForNumber($date, $number)
+		{
+			$query = "
+				SELECT *
+				FROM scheduleds
+				WHERE at <= :date
+				AND (
+					id IN (
+						SELECT id_scheduled
+						FROM scheduleds_numbers
+						WHERE number = :number
+					)
+					OR id IN (
+						SELECT id_scheduled
+						FROM scheduleds_contacts
+						WHERE id_contact IN (
+							SELECT id
+							FROM contacts
+							WHERE number = :number
+						)
+					)
+					OR id IN (
+						SELECT id_scheduled
+						FROM scheduleds_groups
+						WHERE id_group IN (
+							SELECT id_group
+							FROM groups_contacts
+							WHERE id_contact IN (
+								SELECT id
+								FROM contacts
+								WHERE number = :number
+							)
+						)
+					)
+				)
+			";
+			
+			$params = array(
+				'date' => $date,
+				'number' => $number,
+			);
+
+			return $this->runQuery($query, $params);
 		}
 
 		/********************************/

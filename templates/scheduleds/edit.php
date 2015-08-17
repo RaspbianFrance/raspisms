@@ -102,7 +102,7 @@
 	{
 		jQuery('.form-datetime').datetimepicker(
 		{
-			format: 'yyyy-mm-dd hh:ii',
+			format: 'yyyy-mm-dd hh:ii:ss',
 			autoclose: true,
 			minuteStep: 1,
 			language: 'fr'
