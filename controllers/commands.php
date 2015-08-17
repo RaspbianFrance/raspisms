@@ -41,7 +41,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('commands', 'showAll'));
+				header('Location: ' . $this->generateUrl('commands'));
 				return false;
 			}
 
@@ -88,7 +88,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('commands', 'showAll'));
+				header('Location: ' . $this->generateUrl('commands'));
 				return true;
 			}
 
@@ -108,7 +108,7 @@
 			$db->insertIntoTable('events', ['type' => 'COMMAND_ADD', 'text' => 'Ajout commande : ' . $nom . ' => ' . $script]);
 			
 			$_SESSION['successmessage'] = 'La commande a bien été créée.';
-			header('Location: ' . $this->generateUrl('commands', 'showAll'));
+			header('Location: ' . $this->generateUrl('commands'));
 			return true;
 
 		}
@@ -124,7 +124,7 @@
 			if (!internalTools::verifyCSRF($csrf))
 			{
 				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('commands', 'showAll'));
+				header('Location: ' . $this->generateUrl('commands'));
 				return false;
 			}
 
@@ -139,6 +139,6 @@
 			}
 
 			$_SESSION['successmessage'] = 'Toutes les commandes ont été modifiées avec succès.';
-			header('Location: ' . $this->generateUrl('commands', 'showAll'));
+			header('Location: ' . $this->generateUrl('commands'));
 		}
 	}
