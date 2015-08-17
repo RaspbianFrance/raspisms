@@ -82,8 +82,8 @@
 			foreach ($sendeds as $sended)
 			{
 				$messages[] = array(
-					'date' => $sended['at'],
-					'text' => $sended['content'],
+					'date' => htmlspecialchars($sended['at']),
+					'text' => htmlspecialchars($sended['content']),
 					'type' => 'sended',
 				);
 			}
@@ -91,8 +91,8 @@
 			foreach ($receiveds as $received)
 			{
 				$messages[] = array(
-					'date' => $received['at'],
-					'text' => $received['content'],
+					'date' => htmlspecialchars($received['at']),
+					'text' => htmlspecialchars($received['content']),
 					'type' => 'received',
 				);
 			}
@@ -100,8 +100,8 @@
 			foreach ($scheduleds as $scheduled)
 			{
 				$messages[] = array(
-					'date' => $scheduled['at'],
-					'text' => $scheduled['content'],
+					'date' => htmlspecialchars($scheduled['at']),
+					'text' => htmlspecialchars($scheduled['content']),
 					'type' => 'inprogress',
 				);
 			}
@@ -110,6 +110,9 @@
 			usort($messages, function($a, $b) {
 				return strtotime($a["date"]) - strtotime($b["date"]);
 			});
+
+			//On récupère uniquement les 25 derniers messages sur l'ensemble
+			$messages = array_slice($messages, -25);
 
 			echo json_encode(['transactionId' => $transactionId, 'messages' => $messages]);
 			return true;
