@@ -52,7 +52,7 @@
 											<tr>
 												<td><?php secho($scheduled['id']); ?></td>
 												<td><?php secho($scheduled['at']); ?></td>
-												<td><?php secho($scheduled['content']); ?>...</td>
+												<td><?php secho($scheduled['content']); ?></td>
 												<td><input type="checkbox" value="<?php secho($scheduled['id']); ?>"></td>
 											</tr>
 											<?php
