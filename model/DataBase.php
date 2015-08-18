@@ -173,7 +173,7 @@
 					SELECT MAX(at) as at, number
 					FROM (SELECT at, target as number FROM sendeds UNION (SELECT at, send_by as number FROM receiveds)) as discussions
 					GROUP BY number
-					ORDER BY at
+					ORDER BY at DESC
 			";
 
 			return $this->runQuery($query);
