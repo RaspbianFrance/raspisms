@@ -760,4 +760,23 @@
 
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
+
+		/**
+		 * Supprime tous les transfers dont l'id fait partie du tableau fourni
+		 * @param $transfers_ids : Tableau des id des transfers à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteTransfersIn($transfers_ids)
+		{
+			$query = "
+				DELETE FROM transfers
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($transfers_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
 	}
