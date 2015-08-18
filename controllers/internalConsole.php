@@ -301,7 +301,6 @@
 		public function sendTransfers ()
 		{
 			global $db;
-
 			$transfers = $db->getFromTableWhere('transfers', ['progress' => false]);
 
 			$ids_transfers = [];
@@ -325,9 +324,7 @@
 					echo "Transfer d'un SMS du " . $received['send_by'] . " à l'email " . $user['email'];
 					$to = $user['email'];
 					$subject = '[RaspiSMS] - Transfert d\'un SMS du ' . $received['send_by'];
-					$message = "
-						Le numéro " . $received['send_by'] . " vous a envoyé un SMS\n
-						-----------------------------------------------------------\n" . $received['content'];
+					$message = "Le numéro " . $received['send_by'] . " vous a envoyé un SMS : \n" . $received['content'];
 					
 					$ok = mail($to, $subject, $message);
 					
