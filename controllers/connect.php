@@ -55,6 +55,7 @@
 			$_SESSION['connect'] = true;
 			$_SESSION['admin'] = $user['admin'];
 			$_SESSION['email'] = $user['email'];
+			$_SESSION['transfer'] = $user['transfer'];
 			$_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
 			header('Location: ' . $this->generateUrl(''));
 			return true;

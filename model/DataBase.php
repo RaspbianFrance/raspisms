@@ -140,6 +140,30 @@
 		}
 
 		/**
+		 * Récupère les receiveds dont l'id fait partie de la liste fournie
+		 * @param array $receiveds_ids = Tableau des id des receiveds voulus
+		 * @return array : Retourne un tableau avec les receiveds adaptés
+		 */
+		public function getReceivedsIn($receiveds_ids)
+		{
+			$query = "
+				SELECT *
+				FROM receiveds
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($receiveds_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params);
+		}
+
+		/***********************************/
+		/* PARTIE DES REQUETES DISCUSSIONS */
+		/***********************************/
+
+		/**
 		 * Récupère les SMS reçus groupé par numéro et trié par date
 		 * @return array : Le tablea avec les sms et la date
 		 */
@@ -712,4 +736,28 @@
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
+		/*********************************/
+		/* PARTIE DES REQUETES TRANSFERS */
+		/*********************************/
+
+		/**
+		 * Change le statut des tranfers dont l'id est fourni dans $transfers_id
+		 * @param array $transfers_ids = Tableau des id des transfers voulus
+		 * @return int : Retourne le nombre de lignes mises à jour
+		 */
+		public function updateProgressTransfersIn($transfers_ids, $progress)
+		{
+			$query = "
+				UPDATE transfers
+				SET progress = :progress
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($transfers_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+			$params['progress'] = (boolean)$progress;
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
 	}
