@@ -280,7 +280,7 @@
 					}
 
 					//On insert le SMS dans le tableau des sms à envoyer par mail
-					$db->insertIntoTable('transfers', ['content' => $content]);
+					$db->insertIntoTable('transfers', ['id_received' => $db->lastId(), 'progress' => false]);
 
 					//Chaque commande sera executée.
 					foreach ($found_commands as $command_name => $command)
