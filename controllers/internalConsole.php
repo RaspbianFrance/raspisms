@@ -20,6 +20,11 @@
 					),
 					'optionals' => array(),
 				),
+				'sendTransfers' => array(
+					'description' => 'Cette commande permet d\'envoyer par mails les sms à transférés.',
+					'requireds' => [],
+					'optionals' => [],
+				),
 			);
 
 			$message  = "Vous êtes ici dans l'aide de la console.\n";
@@ -274,6 +279,9 @@
 						die(7);
 					}
 
+					//On insert le SMS dans le tableau des sms à envoyer par mail
+					$db->insertIntoTable('transfers', ['content' => $content]);
+
 					//Chaque commande sera executée.
 					foreach ($found_commands as $command_name => $command)
 					{
@@ -284,6 +292,47 @@
 
 				//On attend 2 secondes
 				sleep(2);
+			}
+		}
+
+		/**
+		 * Cette fonction permet d'envoyer par mail les sms à transférer
+		 */
+		public function sendTransfers ()
+		{
+			global $db;
+
+			$transfers = $db->getFromTableWhere('transfers', ['progress' => false]);
+
+			$ids_transfers = [];
+			$ids_receiveds = [];
+			foreach ($transfers as $transfer)
+			{
+				$ids_transfers[] = $transfer['id'];
+				$ids_receiveds[] = $transfer['id_received'];
+			}
+			
+			$db->updateProgressTransfersIn($ids_transfers, true);
+			
+			$receiveds = $db->getReceivedsIn($ids_receiveds);
+
+			$users = $db->getFromTableWhere('users', ['transfer' => true]);
+
+			foreach ($users as $user)
+			{
+				foreach ($receiveds as $received)
+				{
+					echo "Transfer d'un SMS du " . $received['send_by'] . " à l'email " . $user['email'];
+					$to = $user['email'];
+					$subject = '[RaspiSMS] - Transfert d\'un SMS du ' . $received['send_by'];
+					$message = "
+						Le numéro " . $received['send_by'] . " vous a envoyé un SMS\n
+						-----------------------------------------------------------\n" . $received['content'];
+					
+					$ok = mail($to, $subject, $message);
+					
+					echo " ... " . ($ok ? 'OK' : 'KO') . "\n";
+				}
 			}
 		}
 	}
