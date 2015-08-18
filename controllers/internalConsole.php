@@ -331,5 +331,7 @@
 					echo " ... " . ($ok ? 'OK' : 'KO') . "\n";
 				}
 			}
+
+			$db->deleteTransfersIn($ids_transfers);
 		}
 	}
