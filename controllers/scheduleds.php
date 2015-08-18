@@ -145,7 +145,7 @@
 				return false;
 			}
 
-			if (!internalTools::validateDate($date, 'Y-m-d H:i:s'))
+			if (!internalTools::validateDate($date, 'Y-m-d H:i:s') && !internalTools::validateDate($date, 'Y-m-d H:i'))
 			{
 				if (!$api)
 				{
@@ -247,7 +247,7 @@
 			foreach ($_POST['scheduleds'] as $id_scheduled => $scheduled)
 			{
 				$date = $scheduled['date'];
-				if (!internalTools::validateDate($date, 'Y-m-d H:i'))
+				if (!internalTools::validateDate($date, 'Y-m-d H:i:s') && !internalTools::validateDate($date, 'Y-m-d H:i'))
 				{
 					$_SESSION['errormessage'] = 'La date renseignée pour le SMS numéro ' . $scheduled['id'] . ' est invalide.';
 					header('Location: ' . $this->generateUrl('scheduleds'));
