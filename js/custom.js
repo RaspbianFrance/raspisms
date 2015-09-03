@@ -38,7 +38,16 @@ function verifReceived()
  */
 function scrollDownDiscussion()
 {
-	jQuery('.discussion-container').animate({scrollTop: 1000000});
+	var discussion_height = jQuery('.discussion-container').innerHeight();
+	var discussion_scroll_height = jQuery('.discussion-container')[0].scrollHeight;
+	var discussion_scroll_top = jQuery('.discussion-container').scrollTop();
+	var scroll_before_end = discussion_scroll_height - (discussion_scroll_top + discussion_height);
+
+	//On scroll uniquement si on a pas remonté plus haut que la moitié de la fenetre de discussion
+	if (scroll_before_end <= discussion_height / 2)
+	{
+		jQuery('.discussion-container').animate({scrollTop: 1000000});
+	}
 }
 
 jQuery(document).ready(function()
@@ -90,6 +99,4 @@ jQuery(document).ready(function()
 			form.trigger("reset");
 		});
 	});
-
-	scrollDownDiscussion();
 });
