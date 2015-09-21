@@ -3,6 +3,14 @@
 CREATE DATABASE IF NOT EXISTS raspisms;
 USE raspisms;
 
+CREATE TABLE IF NOT EXISTS settings
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(20) NOT NULL,
+	value VARCHAR(1000) NOT NULL,
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS receiveds
 (
 	id INT NOT NULL AUTO_INCREMENT,
@@ -126,3 +134,7 @@ CREATE TABLE IF NOT EXISTS transfers
 	PRIMARY KEY (id),
 	FOREIGN KEY (id_received) REFERENCES receiveds (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+#On insert les données par défaut dans les settings
+INSERT INTO settings (name, value)
+VALUES ('transfer', '1'); 
