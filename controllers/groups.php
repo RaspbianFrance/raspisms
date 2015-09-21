@@ -34,7 +34,7 @@
 		 * @param int... $ids : Les id des groups à supprimer
 		 * @return void;
 		 */
-		public function delete($csrf, ...$ids)
+		public function delete($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF($csrf))
@@ -43,6 +43,10 @@
 				header('Location: ' . $this->generateUrl('groups'));
 				return false;
 			}
+
+			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
+			$ids = func_get_args();
+			unset($ids[0]);
 
 			//Create de l'object de base de données
 			global $db;
@@ -64,9 +68,12 @@
 		 * Cette fonction retourne la page d'édition des groupes
 		 * @param int... $ids : Les id des groups à modifier
 		 */
-		public function edit(...$ids)
+		public function edit()
 		{
 			global $db;
+
+			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
+			$ids = func_get_args();
 			
 			$groups = $db->getGroupsIn($ids);
 			$blocks = array(); //On défini la variable qui correspondra à un bloc groupe et contacts

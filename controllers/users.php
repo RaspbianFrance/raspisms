@@ -118,7 +118,7 @@
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return boolean;
 		 */
-		public function delete($csrf, ...$ids)
+		public function delete($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF($csrf))
@@ -127,6 +127,10 @@
 				header('Location: ' . $this->generateUrl('users'));
 				return false;
 			}
+
+			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
+			$ids = func_get_args();
+			unset($ids[0]);
 
 			//Create de l'object de base de données
 			global $db;
