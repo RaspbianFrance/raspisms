@@ -18,6 +18,14 @@
 	//On va appeler un modèle, est l'initialiser
 	$db = new DataBase($bdd);;
 
+	//On va ajouter les réglages globaux de RaspiSMS modifiables via l'interface
+	$settings = $db->getFromTableWhere('settings');
+	foreach ($settings as $setting)
+	{
+		define('RASPISMS_SETTINGS_' . mb_convert_case($setting['name'],  MB_CASE_UPPER), $setting['value']);
+	}
+
+
 	###########
 	# ROUTAGE #
 	###########

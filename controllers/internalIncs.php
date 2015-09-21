@@ -43,6 +43,7 @@
 			$email = isset($_SESSION['email']) ? $_SESSION['email'] : 'Mon compte';
 			$this->render('internalIncs/nav', array(
 				'email' => $email,
+				'admin' => $_SESSION['admin'],
 				'page' => $page,
 			));
 		}

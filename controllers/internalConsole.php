@@ -300,6 +300,12 @@
 		 */
 		public function sendTransfers ()
 		{
+			if (!RASPISMS_SETTINGS_TRANSFER)
+			{
+				echo "Le transfer de SMS est désactivé ! \n";
+				return false;
+			}
+
 			global $db;
 			$transfers = $db->getFromTableWhere('transfers', ['progress' => false]);
 
