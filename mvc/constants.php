@@ -31,3 +31,18 @@
 
 	//Réglages des logs
 	define('LOG_ACTIVATED', 1); //On active les logs
+
+	//Réglages du cache
+	define('ACTIVATING_CACHE', false); //On desactive le cache
+
+	//Réglages divers
+	define('WEBSITE_TITLE', 'RaspiSMS'); //Le titre du site
+	define('WEBSITE_DESCRIPTION', ''); //Description du site
+	define('WEBSITE_KEYWORDS', ''); //Mots clefs du site
+	define('WEBSITE_AUTHOR', 'Raspbian-France'); //Auteur du site
+
+	//Réglages des identifiants de base de données
+	define('DATABASE_HOST', 'localhost'); //Hote de la bdd
+	define('DATABASE_NAME', 'raspisms'); //Nom de la bdd
+	define('DATABASE_USER', 'root'); //Utilisateur de la bdd
+	define('DATABASE_PASSWORD', ''); //Password de l'utilisateur

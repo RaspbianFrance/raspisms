@@ -8,7 +8,7 @@
 
 	ARGUMENTS : 
 		Obligatoires : 
-			- string &$text_source : Une variable passé par référence qui sera utilisé comme texte source
+			- string $text_source : Une variable qui sera utilisé comme texte source
 		Optionnels : 
 			- boolean $no_nl2br : Par défaut à faux -> les retours à la lignes sont transformé en <br/>. A vrai -> ils sont conservés tels quels
 			- boolean $escape_quotes : Par défaut à faux -> les guillemets ne sont pas échappés. A vrai -> ils sont transformés en entitées HTML
@@ -17,7 +17,7 @@
 	RETOUR : Cette fonction retourne le texte transformé en cas de success, false sinon
 	*/
 
-	function secho(&$text_source, $no_nl2br = false, $escape_quotes = false, $authorize_null = true) //On utilise une reference, si la variable n'existe pas, ça ne lévera pas d'erreur
+	function secho($text_source, $no_nl2br = false, $escape_quotes = false, $authorize_null = true) //On utilise une reference, si la variable n'existe pas, ça ne lévera pas d'erreur
 	{
 		if ($authorize_null) //Si on les variables null, false ou '' doivent être prises comme définies
 		{

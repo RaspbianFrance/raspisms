@@ -49,7 +49,7 @@
 										<h4 class="panel-title"><i class="fa fa-key fa-fw"></i> Modifier mot de passe</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'changePassword', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('profile', 'changePassword', [$_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Mot de passe :</label>
 												<input name="password" type="password" class="form-control" placeholder="Nouveau mot de passe" />
@@ -64,6 +64,23 @@
 										</form>
 									</div>
 								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-trash-o fa-fw"></i> Supprimer ce compte</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('profile', 'delete', [$_SESSION['csrf']]); ?>" method="POST">
+											<div class="checkbox">
+												<label>
+													<input name="delete_account" type="checkbox" value="1" /> Je suis totalement sûr de vouloir supprimer ce compte 
+												</label>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-danger">Supprimer ce compte</button>
+											</div>
+										</form>
+									</div>
+								</div>
 							</div>
 							<div class="col-xs-12 col-md-6">
 								<div class="panel panel-default">
@@ -71,7 +88,7 @@
 										<h4 class="panel-title"><i class="fa fa-at fa-fw"></i> Modifier e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'changeEmail', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('profile', 'changeEmail', [$_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Adresse e-mail :</label>
 												<input name="mail" type="email" class="form-control" placeholder="Nouvelle adresse e-mail" />
@@ -88,17 +105,19 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-trash-o fa-fw"></i> Supprimer ce compte</h4>
+										<h4 class="panel-title"><i class="fa fa-share fa-fw"></i> Transfert des SMS par e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('profile', 'delete', array('csrf' => $_SESSION['csrf'])); ?>" method="POST">
-											<div class="checkbox">
-												<label>
-													<input name="delete_account" type="checkbox" value="1" /> Je suis totalement sûr de vouloir supprimer ce compte 
-												</label>
+										<form action="<?php echo $this->generateUrl('profile', 'changeTransfer', [$_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Transfert activé : </label>
+												<select name="transfer" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['transfer'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
 											</div>	
 											<div class="text-center">
-												<button class="btn btn-danger">Supprimer ce compte</button>
+												<button class="btn btn-success">Mettre à jour les données</button>	
 											</div>
 										</form>
 									</div>
@@ -121,7 +140,7 @@
 			var url = jQuery(this).attr('href');
 			jQuery(target).find('input:checked').each(function ()
 			{
-				url += '/users' + jQuery(this).val() + '_' + jQuery(this).val();
+				url += '/' + jQuery(this).val();
 			});
 			window.location = url;
 		});

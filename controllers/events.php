@@ -24,23 +24,22 @@
 		
 		/**
 		 * Cette fonction retourne tous les événements, sous forme d'un tableau permettant l'administration de ces événements
+		 * @param int $page : La page à consulter. Par défaut 0
 		 * @return void;
 		 */
-		public function showAll()
+		public function showAll($page = 0)
 		{
 			//Creation de l'object de base de données
 			global $db;
-			
-			
-			$page = (int)(isset($_GET['page']) ? $_GET['page'] : 0);
+
+			$page = (int)($page < 0 ? $page = 0 : $page);
 			$limit = 25;
 			$offset = $limit * $page;
 			
-
 			//Récupération des évènements triés par date, du plus récent au plus ancien, par paquets de $limit, en ignorant les $offset premiers
-			$events = $db->getAll('events', 'at', true, $limit, $offset);
+			$events = $db->getFromTableWhere('events', [], 'at', true, $limit, $offset);
 
-			$this->render('events', array(
+			$this->render('events/default', array(
 				'events' => $events,
 				'page' => $page,
 				'limit' => $limit,

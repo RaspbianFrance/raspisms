@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-terminal fa-fw"></i> Ajout d'une nouvelle commande</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('commands', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('commands', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom commande</label>
 									<div class="form-group">

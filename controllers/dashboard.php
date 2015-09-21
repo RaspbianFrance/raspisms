@@ -15,25 +15,19 @@
 		}
 
 		/**
-		 * Cette fonction retourne l'index temporaire du site
+		 * Cette fonction est un alias de show
 		 * @return void;
 		 */	
 		public function byDefault()
 		{
-			$this->show();
-		}
-
-		public function show()
-		{
 			//Creation de l'object de base de données
 			global $db;
 			
-			
 			//Recupération des nombres des 4 panneaux d'accueil
-			$nb_contacts = $db->countContacts();
-			$nb_groups = $db->countGroups();
-			$nb_scheduleds = $db->countScheduleds();
-			$nb_commands = $db->countCommands();
+			$nb_contacts = $db->countTable('contacts');;
+			$nb_groups = $db->countTable('groups');
+			$nb_scheduleds = $db->countTable('scheduleds');
+			$nb_commands = $db->countTable('commands');
 
 			//Création de la date d'il y a une semaine
 			$now = new DateTime();
@@ -42,9 +36,9 @@
 			$formated_date = $date->format('Y-m-d');
 
 			//Récupération des 10 derniers SMS envoyés, SMS reçus et evenements enregistrés. Par date.
-			$sendeds = $db->getAll('sendeds', 'at', true, 10);
-			$receiveds = $db->getAll('receiveds', 'at', true, 10);
-			$events = $db->getAll('events', 'at', true, 10);	
+			$sendeds = $db->getFromTableWhere('sendeds', [], 'at', true, 10);
+			$receiveds = $db->getFromTableWhere('receiveds', [], 'at', true, 10);
+			$events = $db->getFromTableWhere('events', [], 'at', true, 10);	
 
 			//Récupération du nombre de SMS envoyés et reçus depuis les 7 derniers jours
 			$nb_sendeds = $db->getNbSendedsSinceGroupDay($formated_date);
@@ -98,7 +92,7 @@
 			$array_area_chart = array_values($array_area_chart);
 
 
-			$this->render('dashboard', array(
+			$this->render('dashboard/default', array(
 				'nb_contacts' => $nb_contacts,
 				'nb_groups' => $nb_groups,
 				'nb_scheduleds' => $nb_scheduleds,

@@ -9,6 +9,8 @@
 	 */
 	function autoloader($class)
 	{
+		$class = str_replace('\\', '/', $class); #Gestion des namespaces
+
 		if (file_exists(PWD_CONTROLLER . $class . '.php'))
 		{
 			require_once(PWD_CONTROLLER . $class . '.php');
@@ -16,6 +18,10 @@
 		else if (file_exists(PWD_MODEL . $class . '.php'))
 		{
 			require_once(PWD_MODEL . $class . '.php');
+		}
+		else if (file_exists(PWD . 'mvc/modules/' . $class . '.php'))
+		{
+			require_once(PWD . 'mvc/modules/' . $class . '.php');
 		}
 	}
 	

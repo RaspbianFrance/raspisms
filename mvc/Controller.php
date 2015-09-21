@@ -53,7 +53,7 @@
 			$chemin_template = PWD_TEMPLATES . $template . '.php';
 			if(file_exists($chemin_template))
 			{
-				require_once($chemin_template);
+				require($chemin_template);
 				unset($chemin_template);
 				return true;
 			}
@@ -65,18 +65,30 @@
 		 * Cette fonction permet de générer une adresse URL interne au site
 		 * @param string $controller : Nom du controleur à employer (par défaut vide)
 		 * @param string $method : Nom de la méthode à employer (par défaut vide)
-		 * @param string $params : Tableau des paramètres $_GET à employer au format 'nom' => valeur (par défaut array())
+		 * @param string $params : Tableau des paramètres à passer à la fonction, sous forme de tableau, sans clefs
+		 * @param string $getParams : Tableau des paramètres $_GET à employer au format 'nom' => valeur (par défaut array())
 		 * @return string, Url générée
 		 */ 
-		protected function generateUrl($controller = '', $method = '', $params = array())
+		protected function generateUrl($controller = '', $method = '', $params = array(), $getParams = array())
 		{
 			$url = HTTP_PWD;
 			$url .= ($controller ? $controller . '/' : '');
 			$url .= ($method ? $method . '/' : '');
-			foreach ($params as $clef => $valeur)
+		
+			//On ajoute les paramètres framework	
+			foreach ($params as $valeur)
 			{
-				$url .= $clef . '_' . rawurlencode($valeur) . '/';	
+				$url .= rawurlencode($valeur) . '/';	
 			}
+
+			//On calcul puis ajoute les paramètres get
+			$paramsToJoins = array();
+			foreach ($getParams as $clef => $valeur)
+			{
+				$paramsToJoins[] = $clef . '=' . rawurlencode($valeur);
+			}
+
+			$url .= count($getParams) ? '?' . implode('&', $paramsToJoins) : '';
 
 			return $url;
 		}

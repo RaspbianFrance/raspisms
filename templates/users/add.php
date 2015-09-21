@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-user fa-fw"></i> Ajout d'un utilisateur</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('users', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('users', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Adresse e-mail</label>
 									<div class="form-group input-group">

@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification des SMS programmés</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('scheduleds', 'update', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('scheduleds', 'update', [$_SESSION['csrf']]);?>" method="POST">
 							<?php
 								foreach ($scheduleds as $scheduled)
 								{
@@ -102,7 +102,7 @@
 	{
 		jQuery('.form-datetime').datetimepicker(
 		{
-			format: 'yyyy-mm-dd hh:ii',
+			format: 'yyyy-mm-dd hh:ii:ss',
 			autoclose: true,
 			minuteStep: 1,
 			language: 'fr'

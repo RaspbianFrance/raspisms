@@ -15,51 +15,43 @@
 		}
 
 		/**
-		 * Cette fonction est alias de showAll()
+		 * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts
 		 */	
 		public function byDefault()
-		{
-			$this->showAll();
-		}
-		
-		/**
-		 * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts
-		 * @return void;
-		 */
-		public function showAll()
 		{
 			//Creation de l'object de base de données
 			global $db;
 			
 			//Recupération des nombres des 4 panneaux d'accueil
-			$contacts = $db->getAll('contacts');
+			$contacts = $db->getFromTableWhere('contacts');
 
-			$this->render('contacts', array(
+			$this->render('contacts/default', array(
 				'contacts' => $contacts,
 			));
-			
 		}
 
 		/**
 		 * Cette fonction supprimer une liste de contacts
-		 * @return void;
+		 * @param $csrf : Le jeton CSRF
+		 * @param int... $ids : Les id des commandes à supprimer
+		 * @return Boolean;
 		 */
-		public function delete()
+		public function delete($csrf, ...$ids)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts'));
+				return false;
 			}
 
 			//Create de l'object de base de données
 			global $db;
 			
-			$contacts_ids = $_GET;
-			$db->deleteContactsIn($contacts_ids);
-			header('Location: ' . $this->generateUrl('contacts'));		
+			$db->deleteContactsIn($ids);
+			header('Location: ' . $this->generateUrl('contacts'));
+			return true;
 		}
 
 		/**
@@ -67,110 +59,112 @@
 		 */
 		public function add()
 		{
-			$this->render('addContact');
+			$this->render('contacts/add');
 		}
 
 		/**
 		 * Cette fonction retourne la page d'édition des contacts
+		 * @param int... $ids : Les id des commandes à supprimer
 		 */
-		public function edit()
+		public function edit(...$ids)
 		{
 			global $db;
 			
-
-			$contacts = $db->getContactsIn($_GET);
-			$this->render('editContacts', array(
+			$contacts = $db->getContactsIn($ids);
+			$this->render('contacts/edit', array(
 				'contacts' => $contacts,
 			));
 		}
 
 		/**
 		 * Cette fonction insert un nouveau contact
+		 * @param $csrf : Le jeton CSRF
+		 * @param string $_POST['name'] : Le nom du contact
+		 * @param string $_POST['phone'] : Le numero de téléphone du contact
 		 */
-		public function create()
+		public function create($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts'));
+				return false;
 			}
 
 			global $db;
-			
+
+			if (empty($_POST['name']) || empty($_POST['phone']))
+			{
+				$_SESSION['errormessage'] = 'Des champs sont manquants.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
+			}
 
 			$nom = $_POST['name'];
 			$phone = $_POST['phone'];
-			if ($phone = internalTools::parsePhone($phone))
+
+			if (!$phone = internalTools::parsePhone($phone))
 			{
-				if ($db->createContact($nom, $phone))
-				{
-					$db->createEvent('CONTACT_ADD', 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')');
-					header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-						'successmessage' => 'Le contact a bien été créé.'
-					)));
-
-					return true;
-				}
-
-				header('Location: ' . $this->generateUrl('contacts', 'add', array(
-					'errormessage' => 'Impossible créer ce contact.'
-				)));
-				return true;
+				$_SESSION['errormessage'] = 'Numéro de téléphone incorrect.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
 			}
 
-			header('Location: ' . $this->generateUrl('contacts', 'add', array(
-				'errormessage' => 'Numéro de téléphone incorrect.'
-			)));
+			if (!$db->insertIntoTable('contacts', ['name' => $nom, 'number' => $phone]))
+			{
+				$_SESSION['errormessage'] = 'Impossible créer ce contact.';
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
+			}
+
+			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')']);
+
+			$_SESSION['successmessage'] = 'Le contact a bien été créé.';
+			header('Location: ' . $this->generateUrl('contacts'));
+			return true;
 		}
 
 		/**
 		 * Cette fonction met à jour une liste de contacts
+		 * @param $csrf : Le jeton CSRF
+		 * @param array $_POST['contacts'] : Un tableau des contacts avec leur nouvelle valeurs
+		 * @return boolean;
 		 */
-		public function update()
+		public function update($csrf)
 		{
 			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF())
+			if (!internalTools::verifyCSRF($csrf))
 			{
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => 'Jeton CSRF invalide !'
-				)));
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('contacts'));
 			}
 
 			global $db;
-			
 
 			$errors = array(); //On initialise le tableau qui contiendra les erreurs rencontrés
 			//Pour chaque contact reçu, on boucle en récupérant son id (la clef), et le contact lui-même (la value)
 
 			foreach ($_POST['contacts'] as $id => $contact)
 			{
-				if ($number = internalTools::parsePhone($contact['phone']))
-				{
-					$db->updateContact($id, $contact['name'], $number);
-				}
-				else
+				if (!$number = internalTools::parsePhone($contact['phone']))
 				{
 					$errors[] = $contact['id'];
+					continue;
 				}
+
+				$db->updateTableWhere('contacts', ['name' => $contact['name'], 'number' => $number], ['id' => $id]);
 			}
 
 			//Si on a eu des erreurs
 			if (count($errors))
 			{
-				$message = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'errormessage' => $message,
-				)));
+				$_SESSION['errormessage'] = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
+				return header('Location: ' . $this->generateUrl('contacts'));
 			}
-			else
-			{
-				$message = 'Tous les contacts ont été modifiés avec succès.';
-				header('Location: ' . $this->generateUrl('contacts', 'showAll', array(
-					'successmessage' => $message,
-				)));
-			}
+
+			$_SESSION['successmessage'] = 'Tous les contacts ont été modifiés avec succès.';
+			return header('Location: ' . $this->generateUrl('contacts'));
 		}
 
 		/**
@@ -180,6 +174,6 @@
 		{
 			global $db;
 			
-			echo json_encode($db->getAll('contacts'));
+			echo json_encode($db->getFromTableWhere('contacts'));
 		}
 	}

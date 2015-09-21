@@ -8,13 +8,24 @@
 		 */
 		public function head($title = '')
 		{
-			$title = (!empty($title)) ? $title . ' - RaspiSMS' : 'RaspiSMS';	
-			$author = 'Ajani';
+			$title = (!empty($title)) ? $title . ' - ' . WEBSITE_TITLE : WEBSITE_TITLE;	
+			$author = WEBSITE_AUTHOR;
 
-			$error_message = (isset($_GET['errormessage'])) ? $_GET['errormessage'] : '';
-			$success_message = (isset($_GET['successmessage'])) ? $_GET['successmessage'] : '';
+			$error_message = false;
+			$success_message = false;
+			if (isset($_SESSION['errormessage']))
+			{
+				$error_message = $_SESSION['errormessage'];
+				unset($_SESSION['errormessage']);
+			}
 
-			$this->render('head', array(
+			if (isset($_SESSION['successmessage']))
+			{
+				$success_message = $_SESSION['successmessage'];
+				unset($_SESSION['successmessage']);
+			}
+
+			$this->render('internalIncs/head', array(
 				'title' => $title,
 				'author' => $author,
 				'error_message' => $error_message,
@@ -30,7 +41,7 @@
 		public function nav($page = '')
 		{
 			$email = isset($_SESSION['email']) ? $_SESSION['email'] : 'Mon compte';
-			$this->render('nav', array(
+			$this->render('internalIncs/nav', array(
 				'email' => $email,
 				'page' => $page,
 			));
@@ -38,6 +49,14 @@
 		
 		public function footer()
 		{			
-			$this->render('footer');
+			$this->render('internalIncs/footer');
+		}
+
+		/**
+		 * Cette fonction retourne une page js avec des constantes php sous forme js
+		 */
+		public function phptojs()
+		{
+			$this->render('internalIncs/phptojs');
 		}
 	}

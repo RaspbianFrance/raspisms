@@ -12,14 +12,6 @@
 		
 
 		/**
-		 * Cette fonction est alias de showAll()
-		 */	
-		public function byDefault()
-		{
-			$this->send();
-		}
-
-		/**
 		 * Cette fonction permet d'envoyer un SMS, en passant simplement des arguments à l'URL (ou pas $_GET)
 		 * @param string text = Le contenu du SMS
 		 * @param mixed numbers = Les numéros auxquels envoyer les SMS. Soit un seul numéro, et il s'agit d'un string. Soit plusieurs numéros, et il s'agit d'un tableau
@@ -27,7 +19,7 @@
 		 * @param mixed groups = Les noms des groupes auxquels envoyer les SMS. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
 		 * @param optionnal string date = La date à laquelle doit être envoyé le SMS. Au format 'Y-m-d H:i'. Si non fourni, le SMS sera envoyé dans 2 minutes
 		 */
-		public function send()
+		public function byDefault()
 		{
 			global $db;
 
@@ -82,27 +74,25 @@
 			//Pour chaque contact, on récupère l'id du contact
 			foreach ($contacts as $key => $name)
 			{
-				if ($contact = $db->getContactFromName($name))
-				{
-					$contacts[$key] = $contact['id'];
-				}
-				else
+				if (!$contact = $db->getFromTableWhere('contacts', ['name' => $name]))
 				{
 					unset($contacts[$key]);
+					continue;
 				}
+
+				$contacts[$key] = $contact['id'];
 			}
 
 			//Pour chaque groupe, on récupère l'id du groupe
 			foreach ($groups as $key => $name)
 			{
-				if ($group = $db->getGroupFromName($name))
-				{
-					$groups[$key] = $group['id'];
-				}
-				else
+				if ($group = $db->getFromTableWhere('groups', ['name' => $name]))
 				{
 					unset($groups[$key]);
+					continue;
 				}
+
+				$groups[$key] = $group['id'];
 			}
 
 			//Si la date n'est pas définie, on la met à la date du jour
@@ -118,8 +108,9 @@
 				echo json_encode(array(
 					'error' => self::API_ERROR_MISSING_FIELD,
 				));
-				return true;
-			}		
+				return false;
+			}
+
 			//On assigne les variable POST (après avoir vidé $_POST) en prévision de la création du SMS
 			$_POST = array();
 			$_POST['content'] = $text;
@@ -129,19 +120,20 @@
 			$_POST['groups'] = $groups;
 		
 			$scheduleds = new scheduleds();
-			$success = $scheduleds->create(true);
+			$success = $scheduleds->create('', true);
 		
-			if ($success)
-			{
-				echo json_encode(array(
-					'error' => self::API_ERROR_NO,
-				));
-			}
-			else
+			if (!$success)
 			{
 				echo json_encode(array(
 					'error' => self::API_ERROR_CREATION_FAILED,
 				));
+
+				return false;
 			}
+			
+			echo json_encode(array(
+				'error' => self::API_ERROR_NO,
+			));
+			return true;
 		}
 	}	

@@ -5,22 +5,11 @@
 	class connect extends Controller
 	{
 		/**
-		 * Cette fonction est alias de login()
+		 * Cette fonction retourne la fenetre de connexion
 		 */	
 		public function byDefault()
 		{
-			$this->login();
-		}
-		
-		/**
-		 * Cette fonction retourne la fenetre de connexion
-		 * @return void;
-		 */
-		public function login()
-		{
-			//Creation de l'object de base de données
-			global $db;
-			$this->render('login');
+			$this->render('connect/login');
 		}
 
 		/**
@@ -29,10 +18,6 @@
 		 */
 		public function forgetPassword()
 		{
-			//Creation de l'object de base de données
-			global $db;
-			
-			
 			$this->render('forgetPassword');
 		}
 	
@@ -48,32 +33,32 @@
 			//Creation de l'object de base de données
 			global $db;
 			
-			
 			$email = $_POST['mail'];
 			$password = $_POST['password'];
 
-			if ($user = $db->getUserFromEmail($email))
+			if (!$users = $db->getFromTableWhere('users', ['email' => $email]))
 			{
-				if (sha1($password) == $user['password'])
-				{
-					$_SESSION['connect'] = true;
-					$_SESSION['admin'] = $user['admin'];
-					$_SESSION['email'] = $user['email'];
-					$_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
-					header('Location: ' . $this->generateUrl(''));
-					return true;
-				}
-
-				header('Location: ' . $this->generateUrl('connect', 'login', array(
-					'errormessage' => 'Identifiants incorrects.'
-				)));
+				$_SESSION['errormessage'] = 'Identifiants incorrects.';
+				header('Location: ' . $this->generateUrl('connect', 'login'));
 				return false;
 			}
 
-			header('Location: ' . $this->generateUrl('connect', 'login', array(
-				'errormessage' => 'Cet e-mail n\'existe pas.'
-			)));
-			return false;	
+			$user = $users[0];
+
+			if (sha1($password) != $user['password'])
+			{
+				$_SESSION['errormessage'] = 'Cet e-mail n\'existe pas.';
+				header('Location: ' . $this->generateUrl('connect', 'login'));
+				return false;	
+			}
+
+			$_SESSION['connect'] = true;
+			$_SESSION['admin'] = $user['admin'];
+			$_SESSION['email'] = $user['email'];
+			$_SESSION['transfer'] = $user['transfer'];
+			$_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
+			header('Location: ' . $this->generateUrl(''));
+			return true;
 		}
 
 		/**
@@ -86,38 +71,40 @@
 			//Creation de l'object de base de données
 			global $db;
 			
-			
 			$email = $_POST['mail'];
 
-			if ($user = $db->getUserFromEmail($email))
+			if (!$users = $db->getFromTableWhere('users', ['email' => $email]))
 			{
-				$password = internalTools::generatePassword(rand(8,12));
-				$message  = "Vous avez demandé un nouveau mot de passe pour le site " . HTTP_PWD . ".\n";
-				$message  = "Votre nouveau mot de passe a été généré aléatoirement, et n'est connu que de vous. Le voici : \n";
-				$message .= "Nouveau mot de passe : " . $password . "\n\n";
-				$message .= "-------------------------------------\n";
-				$message .= "Pour plus d'informations sur le système RaspiSMS, rendez-vous sur le site http://raspbian-france.fr\n";
-				if (mail($email, 'RaspiSMS - Recuperation de mot de passe', $message))
-				{
-					$new_password = sha1($password);
-					if ($db->updateUser($user['id'], $user['email'], $new_password, $user['admin']))
-					{
-						header('Location: ' . $this->generateUrl('connect', 'login', array(
-							'successmessage' => 'Un nouveau mot de passe vous a été envoyé par mail.'
-						)));
-						return true;
-					}
-				}
-
-				header('Location: ' . $this->generateUrl('connect', 'forgetPassword', array(
-					'errormessage' => 'Impossible d\'envoyer les nouveaux identifiants.'
-				)));
+				$_SESSION['errormessage'] = 'Cet e-mail n\'existe pas.';
+				header('Location: ' . $this->generateUrl('connect', 'forgetPassword'));
 				return false;
 			}
-			header('Location: ' . $this->generateUrl('connect', 'forgetPassword', array(
-				'errormessage' => 'Cet e-mail n\'existe pas.'
-			)));
-			return false;
+
+			$password = internalTools::generatePassword(rand(8,12));
+			$message  = "Vous avez demandé un nouveau mot de passe pour le site " . HTTP_PWD . ".\n";
+			$message  = "Votre nouveau mot de passe a été généré aléatoirement, et n'est connu que de vous. Le voici : \n";
+			$message .= "Nouveau mot de passe : " . $password . "\n\n";
+			$message .= "-------------------------------------\n";
+			$message .= "Pour plus d'informations sur le système RaspiSMS, rendez-vous sur le site http://raspbian-france.fr\n";
+			if (!mail($email, 'RaspiSMS - Recuperation de mot de passe', $message))
+			{
+				$_SESSION['errormessage'] = 'Impossible d\'envoyer les nouveaux identifiants.';
+				header('Location: ' . $this->generateUrl('connect', 'forgetPassword'));
+				return false;
+			}
+
+			$new_password = sha1($password);
+			if (!$db->updateTableWhere('users', ['email' => $user['email'], 'password' => $new_password, 'admin' => $user['admin']], ['id' => $user['id']]))
+			{
+				$_SESSION['errormessage'] = 'Impossible de mettre à jour le mot de passe.';
+				header('Location: ' . $this->generateUrl('connect', 'login'));
+				return false;
+			}
+
+			$_SESSION['successmessage'] = 'Un nouveau mot de passe vous a été envoyé par mail.';
+			header('Location: ' . $this->generateUrl('connect', 'login'));
+			return true;
+
 		}
 
 		/**

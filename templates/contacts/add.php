@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-user fa-fw"></i> Ajout d'un contact</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo $this->generateUrl('contacts', 'create', array('csrf' => $_SESSION['csrf']));?>" method="POST">
+							<form action="<?php echo $this->generateUrl('contacts', 'create', [$_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom contact</label>
 									<div class="form-group input-group">
@@ -49,7 +49,7 @@
 									<label>Numéro de téléphone du contact</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-phone"></span></span>
-										<input name="phone" class="form-control" type="text" placeholder="Numéro du contact" pattern="0[1-9]([0-9] ?){8}" required>
+											<input name="phone" class="form-control" type="text" placeholder="Numéro du contact" pattern="(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8}" required>
 									</div>
 								</div>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('contacts'); ?>">Annuler</a>
