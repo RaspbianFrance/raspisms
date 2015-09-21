@@ -67,6 +67,16 @@
 			global $db;
 			$now = new DateTime();
 			$receiveds = $db->getReceivedsSince($now->format('Y-m-d'));
+
+			foreach ($receiveds as $key => $received)
+			{
+				if (!$contacts = $db->getFromTableWhere('contacts', ['number' => $received['send_by']]))
+				{
+					continue;
+				}	
+
+				$receiveds[$key]['send_by'] = $contacts[0]['name'] . ' (' . $received['send_by'] . ')';
+			}
 									   
 			$nbReceiveds = count($receiveds);
 			
