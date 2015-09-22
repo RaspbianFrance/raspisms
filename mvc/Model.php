@@ -131,9 +131,11 @@
 			foreach ($fields as $field)
 			{
 				$fieldInfo = array();
+				$fieldInfo['NAME'] = $field['Field'];
 				$fieldInfo['NULL'] = $field['Null'] == 'NO' ? false : true;
 				$fieldInfo['AUTO_INCREMENT'] = $field['Extra'] == 'auto_increment' ? true : false;
 				$fieldInfo['PRIMARY'] = $field['Key'] == 'PRI' ? true : false;
+				$fieldInfo['FOREIGN'] = $field['Key'] == 'MUL' ? true : false;
 				$fieldInfo['UNIQUE'] = $field['Key'] == 'UNI' ? true : false;
 				$fieldInfo['TYPE'] = mb_convert_case(preg_replace('#[^a-z]#ui', '', $field['Type']), MB_CASE_UPPER);
 				$fieldInfo['SIZE'] = filter_var($field['Type'], FILTER_SANITIZE_NUMBER_INT);
@@ -143,6 +145,53 @@
 			}
 
 			return $return;
+		}
+
+		/**
+		 * Cette finction retourne la table et le champs référent pour un champ avec une foreign key
+		 * @param string $table : Le nom de la table qui contient le champ
+		 * @param string $field : Le nom du champ
+		 * @return mixed : False en cas d'erreur, un tableau avec 'table' en index pour la table et 'field' pour le champ
+		 */
+		public function getReferenceForForeign ($table, $field)
+		{
+			if (!$this->fieldExist($field, $table))
+			{
+				return false;
+			}
+
+			$query = 'SELECT referenced_table_name as table_name, referenced_column_name as field_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name = :table AND column_name = :field AND referenced_table_name IS NOT NULL';
+			
+			$params = array(
+				'table' => $table,
+				'field' => $field,
+			);
+
+			return $this->runQuery($query, $params, self::FETCH);
+		}
+
+		/**
+		 * Cette fonction retourne les valeurs possibles pour un champ muni d'une clef étrangère
+		 * @param string $table : Le nom de la table qui contient le champ
+		 * @param string $field : Le nom du champ
+		 * @return mixed : Retourne les valeurs possible sous forme d'un tableau
+		 */
+		public function getPossibleValuesForForeign ($table, $field)
+		{
+			if (!$this->fieldExist($field, $table))
+			{
+				return false;
+			}
+
+			//On recupère le champs référence pour la foreign key
+			if (!$reference = $this->getReferenceForForeign($table, $field))
+			{
+				return false;
+			}
+
+			//On recupère les valeurs possible de la table
+			$query = 'SELECT DISTINCT ' . $reference['field_name'] . ' as possible_value FROM ' . $reference['table_name'];
+			return $this->runQuery($query);
 		}
 
 		/**
@@ -246,8 +295,8 @@
 		/**
 		 * Cette fonction permet de récupérer des lignes en fonction de restrictions
 		 * @param string $table : Le nom de la table dans laquelle on veux recuperer la ligne
-		 * @param array $restrictions : Les restrictions que l'on veux appliquer
-		 * @param string $order_by : Le nom de la colonne par laquelle on veux trier les résultats. Si non fourni, tri automatique
+		 * @param array $restrictions : Les restrictions sous la forme "label" => "valeur". Un operateur '<, >, <=, >=, !' peux précder le label pour modifier l'opérateur par défaut (=)
+		 * @param mixed $order_by : Le nom de la colonne par laquelle on veux trier les résultats ou son numero. Si non fourni, tri automatique
 		 * @param string $desc : L'ordre de tri (asc ou desc). Si non défini, ordre par défaut (ASC)
 		 * @param string $limit : Le nombre maximum de résultats à récupérer (par défaut pas le limite)
 		 * @param string $offset : Le nombre de résultats à ignorer (par défaut pas de résultats ignorés)
@@ -266,27 +315,66 @@
 			//On gère les restrictions
 			$wheres = array();
 			$params = array();
-
+			$i = 0;
 			foreach ($restrictions as $label => $value)
 			{
+				//Pour chaque restriction, on essaye de detecter un "! ou < ou > ou <= ou >="
+				$first_char = mb_substr($label, 0, 1);
+				$second_char = mb_substr($label, 1, 1);
+
+				switch(true)
+				{
+					//Important de traiter <= & >= avant < & >
+					case ('<=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '<=';
+						break;
+
+					case ('>=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '>=';
+						break;
+
+					case ('!' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '!=';
+						break;
+
+					case ('<' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '<';
+						break;
+
+					case ('>' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '>';
+						break;
+
+					default :
+						$trueLabel = $label;
+						$operator = '=';
+				}
+
 				//Si le champs pour la restriction n'existe pas on retourne false
-				if (!array_key_exists($label, $fields))
+				if (!array_key_exists($trueLabel, $fields))
 				{
 					return false;
 				}
-				
+
 				//On ajoute la restriction au WHERE
-				$params['where_' . $label] = $value;
-				$wheres[] = $label . ' = :where_' . $label . ' ';
+				$params['where_' . $trueLabel . $i] = $value;
+				$wheres[] = $trueLabel . ' ' . $operator . ' :where_' . $trueLabel . $i . ' ';
+				$i++;
 			}
 
-			$query = "SELECT " . $this->getColumnsForTable($table) . " FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
+			$query = "SELECT * FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
 
 			if ($order_by)
 			{
-				if ($this->fieldExist($order_by, $table))
+				//Si le champs existe ou si c'est un numeric inférieur ou egale au nombre  de champs dispo
+				if (array_key_exists($order_by, $fields) || (is_numeric($order_by) && $order_by <= count($fields)))
 				{
-					$query .= ' ORDER BY '. $order_by;
+					$query .= ' ORDER BY ' . $order_by;
 					if ($desc) 
 					{
 						$query .= ' DESC';
@@ -307,9 +395,11 @@
 
 			if ($limit !== false)
 			{
+				$limit = (int)$limit;
 				$req->bindParam(':limit', $limit, PDO::PARAM_INT);
 				if ($offset !== false)
 				{
+					$offset = (int)$offset;
 					$req->bindParam(':offset', $offset, PDO::PARAM_INT);
 				}
 			}
@@ -322,6 +412,7 @@
 
 			$req->setFetchMode(PDO::FETCH_ASSOC);
 			$req->execute();
+
 			return $req->fetchAll();
 		}
 
@@ -330,7 +421,7 @@
 		 * @param string $table : Le nom de la table dans laquelle on veux insérer des données
 		 * @param string $primary : La clef primaire qui sert à identifier la ligne a modifier
 		 * @param array $datas : Les données à insérer au format "champ" => "valeur"
-		 * @param array $restrictions : Un tableau des restrictions à appliquer sous forme "champ" => "valeur". Par défaut un tableau vide
+		 * @param array $restrictions : Les restrictions pour la mise à jour sous la forme "label" => "valeur". Un operateur '<, >, <=, >=, !' peux précder le label pour modifier l'opérateur par défaut (=)
 		 * @return mixed : False en cas d'erreur, sinon le nombre de lignes modifiées
 		 */
 		public function updateTableWhere ($table, $datas, $restrictions = array())
@@ -365,17 +456,56 @@
 
 			//On gère les restrictions
 			$wheres = array();
+			$i = 0;
 			foreach ($restrictions as $label => $value)
 			{
+				//Pour chaque restriction, on essaye de detecter un "! ou < ou > ou <= ou >="
+				$first_char = mb_substr($label, 0, 1);
+				$second_char = mb_substr($label, 1, 1);
+
+				switch(true)
+				{
+					//Important de traiter <= & >= avant < & >
+					case ('<=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '<=';
+						break;
+
+					case ('>=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '>=';
+						break;
+
+					case ('!' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '!=';
+						break;
+
+					case ('<' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '<';
+						break;
+
+					case ('>' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '>';
+						break;
+
+					default :
+						$trueLabel = $label;
+						$operator = '=';
+				}
+
 				//Si le champs pour la restriction n'existe pas on retourne false
-				if (!array_key_exists($label, $fields))
+				if (!array_key_exists($trueLabel, $fields))
 				{
 					return false;
 				}
-				
+
 				//On ajoute la restriction au WHERE
-				$params['where_' . $label] = $value;
-				$wheres[] = $label . ' = :where_' . $label . ' ';
+				$params['where_' . $trueLabel . $i] = $value;
+				$wheres[] = $trueLabel . ' ' . $operator . ' :where_' . $trueLabel . $i . ' ';
+				$i++;
 			}
 
 			//On fabrique la requete
@@ -388,7 +518,7 @@
 		/**
 		 * Cette fonction permet de supprimer des lignes d'une table en fonctions de restrictions
 		 * @param string $table : Le nom de la table dans laquelle on veux supprimer la ligne
-		 * @param array $restrictions : Les restrictions pour la suppression sous la forme "label" => "valeur"
+		 * @param array $restrictions : Les restrictions pour la suppression sous la forme "label" => "valeur". Un operateur '<, >, <=, >=, !' peux précder le label pour modifier l'opérateur par défaut (=)
 		 * @return mixed : False en cas d'erreur, sinon le nombre de lignes supprimées
 		 */
 		public function deleteFromTableWhere($table, $restrictions = array())
@@ -403,22 +533,59 @@
 			//On gère les restrictions
 			$wheres = array();
 			$params = array();
-
+			$i = 0;
 			foreach ($restrictions as $label => $value)
 			{
+				//Pour chaque restriction, on essaye de detecter un "! ou < ou > ou <= ou >="
+				$first_char = mb_substr($label, 0, 1);
+				$second_char = mb_substr($label, 1, 1);
+
+				switch(true)
+				{
+					//Important de traiter <= & >= avant < & >
+					case ('<=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '<=';
+						break;
+
+					case ('>=' == $first_char . $second_char) :
+						$trueLabel = mb_substr($label, 2);
+						$operator = '>=';
+						break;
+
+					case ('!' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '!=';
+						break;
+
+					case ('<' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '<';
+						break;
+
+					case ('>' == $first_char) :
+						$trueLabel = mb_substr($label, 1);
+						$operator = '>';
+						break;
+
+					default :
+						$trueLabel = $label;
+						$operator = '=';
+				}
+
 				//Si le champs pour la restriction n'existe pas on retourne false
-				if (!array_key_exists($label, $fields))
+				if (!array_key_exists($trueLabel, $fields))
 				{
 					return false;
 				}
-				
+
 				//On ajoute la restriction au WHERE
-				$params['where_' . $label] = $value;
-				$wheres[] = $label . ' = :where_' . $label . ' ';
+				$params['where_' . $trueLabel . $i] = $value;
+				$wheres[] = $trueLabel . ' ' . $operator . ' :where_' . $trueLabel . $i . ' ';
+				$i++;
 			}
 
 			$query = "DELETE FROM " . $table . " WHERE 1 AND " . implode('AND ', $wheres);
-
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
