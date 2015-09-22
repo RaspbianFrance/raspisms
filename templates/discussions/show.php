@@ -65,6 +65,9 @@
 
 				$.each(data.messages, function(key, message) {
 
+					//On ajoute la detection de lien dans le texte du message
+					message.text = Autolinker.link(message.text, {newWindow:true});
+
 					switch (message.type)
 					{
 						case 'received' :
