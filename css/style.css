@@ -8,6 +8,16 @@
 	padding: 0 !important;
 }
 
+.small-text
+{
+	font-size: 0.7em;
+}
+
+.italic
+{
+	font-style: italic;
+}
+
 /** POPUPS ALERT **/
 .popup-alerts-container
 {
