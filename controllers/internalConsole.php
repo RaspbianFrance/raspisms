@@ -131,9 +131,26 @@
 							$numbers[] = $contact['number'];
 						}
 					}
+
+					$smsStops = $db->getFromTableWhere('sms_stop');
 					
 					foreach ($numbers as $number)
 					{
+						//Si les SMS STOP sont activés, on passe au numéro suivant si le numéro actuelle fait parti des SMS STOP
+						if (RASPISMS_SETTINGS_SMS_STOP)
+						{
+							foreach ($smsStops as $smsStop)
+							{
+								if (!($number == $smsStop['number']))
+								{
+									continue;
+								}
+
+								echo "Un SMS destiné au " . $number . " a été bloqué par SMS STOP\n";
+								continue(2); //On passe au numéro suivant !
+							}
+						}
+
 						echo "	Envoi d'un SMS au " . $number . "\n";
 						//On ajoute le SMS aux SMS envoyés
 						//Pour plus de précision, on remet la date à jour en réinstanciant l'objet DateTime (et on reformatte la date, bien entendu)
@@ -183,6 +200,8 @@
 						continue;
 					}				
 
+					echo "Analyse du SMS " . $dir . "\n";
+
 					//On récupère la date du SMS à la seconde près grâce au nom du fichier (Cf. parseSMS.sh)
 					//Il faut mettre la date au format Y-m-d H:i:s
 					$date = substr($dir, 0, 4) . '-' . substr($dir, 4, 2) . '-' . substr($dir, 6, 2) . ' ' . substr($dir, 8, 2) . ':' . substr($dir, 10, 2) . ':' . substr($dir, 12, 2);
@@ -217,6 +236,14 @@
 					$number = internalTools::parsePhone($number);
 					$text = $content_file[1];
 
+					//On gère les SMS STOP
+					if (trim($text) == 'STOP')
+					{
+						echo 'STOP SMS detected ' . $number;
+						$this->wlog('STOP SMS detected ' . $number);
+						$db->insertIntoTable('sms_stop', ['number' => $number]);
+						continue;
+					}
 
 					if (!$number)
 					{
