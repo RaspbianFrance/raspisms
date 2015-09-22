@@ -23,6 +23,7 @@
 		<script src="<?php echo HTTP_PWD; ?>js/bootstrap.min.js"></script>
 		<script src="<?php echo HTTP_PWD; ?>js/plugins/morris/raphael.min.js"></script>
 		<script src="<?php echo HTTP_PWD; ?>js/plugins/morris/morris.min.js"></script>
+		<script src="<?php echo HTTP_PWD; ?>js/Autolinker.min.js"></script>
 		<!-- Magic Suggest JS and CSS -->
 		<script src="<?php echo HTTP_PWD; ?>js/magicsuggest.min.js"></script>
 		<link href="<?php echo HTTP_PWD; ?>css/magicsuggest.css" rel="stylesheet">
