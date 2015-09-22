@@ -86,7 +86,7 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
-									'<div class="discussion-message-date">' + message.date + '</div>' +
+									'<div class="discussion-message-date">' + message.date + (message.delivered ? ' <span class="fa fa-check-circle fa-fw text-success"></span>' : '' ) + '</div>' +
 								'</div>' +
 							'</div>';
 							break;
