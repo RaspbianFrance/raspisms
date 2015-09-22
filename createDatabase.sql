@@ -135,6 +135,15 @@ CREATE TABLE IF NOT EXISTS transfers
 	FOREIGN KEY (id_received) REFERENCES receiveds (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS sms_stop
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	number VARCHAR(12) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (number)
+);
+
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
-VALUES ('transfer', '1'); 
+VALUES ('transfer', '1'),
+VALUES ('sms_stop', '1'); 
