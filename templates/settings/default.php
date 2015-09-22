@@ -54,6 +54,25 @@
 										</form>
 									</div>
 								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Détection des URL dans les discussions</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('settings', 'changeDetectionUrl', [$_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Détection activé : </label>
+												<select name="detect_url" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo RASPISMS_SETTINGS_DETECT_URL ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
 							</div>
 							<div class="col-xs-12 col-md-6">
 								<div class="panel panel-default">

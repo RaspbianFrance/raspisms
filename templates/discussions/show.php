@@ -65,8 +65,10 @@
 
 				$.each(data.messages, function(key, message) {
 
-					//On ajoute la detection de lien dans le texte du message
-					message.text = Autolinker.link(message.text, {newWindow:true});
+					<?php if (RASPISMS_SETTINGS_DETECT_URL) { ?>
+						//On ajoute la detection de lien dans le texte du message
+						message.text = Autolinker.link(message.text, {newWindow:true});
+					<?php } ?>
 
 					switch (message.type)
 					{

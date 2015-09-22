@@ -106,4 +106,44 @@
 			header('Location: ' . $this->generateUrl('settings'));
 			return true;
 		}
+
+		/**
+		 * Cette fonction permet de mettre à jour l'activation ou la désactivation de la detection d'URL dans les discussions
+		 * @param $csrf : Le jeton CSRF
+		 * @param string $_POST['detect_url'] : Le nouveau stop
+		 * @return void;
+		 */
+		public function changeDetectionUrl($csrf)
+		{
+			//On vérifie que le jeton csrf est bon
+			if (!internalTools::verifyCSRF($csrf))
+			{
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('settings'));
+				return false;
+			}
+
+			//Creation de l'object de base de données
+			global $db;
+			
+			if (!isset($_POST['detect_url']))
+			{
+				$_SESSION['errormessage'] = 'Vous devez renseigner un valeur';
+				header('Location: ' . $this->generateUrl('settings'));
+				return false;
+			}
+
+			$detectUrl = (int)$_POST['detect_url'];
+
+			if (!$db->updateTableWhere('settings', ['value' => $detectUrl], ['name' => 'detect_url']))
+			{
+				$_SESSION['errormessage'] = 'Impossible de mettre les données à jour.';
+				header('Location: ' . $this->generateUrl('settings'));
+				return false;
+			}
+
+			$_SESSION['successmessage'] = 'Les données ont été mises à jour.';
+			header('Location: ' . $this->generateUrl('settings'));
+			return true;
+		}
 	}

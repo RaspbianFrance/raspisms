@@ -146,4 +146,5 @@ CREATE TABLE IF NOT EXISTS sms_stop
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
 VALUES ('transfer', '1'),
-VALUES ('sms_stop', '1'); 
+('sms_stop', '1'),
+('detect_url', '1'); 
