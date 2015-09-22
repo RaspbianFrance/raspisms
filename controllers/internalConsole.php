@@ -156,11 +156,13 @@
 						//Pour plus de précision, on remet la date à jour en réinstanciant l'objet DateTime (et on reformatte la date, bien entendu)
 						$now = new DateTime();
 						$now = $now->format('Y-m-d H:i:s');
+
 						//On peut maintenant ajouter le SMS
-						if (!$db->insertIntoTable('sendeds', ['at' => $now, 'target' => $number, 'content' => $scheduled['content']]))
+						if (!$db->insertIntoTable('sendeds', ['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content'])/160)]))
 						{
 							echo 'Impossible d\'inserer le sms pour le numero ' . $number . "\n";
 						}
+
 						$id_sended = $db->lastId();
 						
 						//Commande qui envoie le SMS
@@ -246,23 +248,42 @@
 					}
 
 					//On gère les accusés de reception
-					if (trim($text) == 'Delivered')
+					if (trim($text) == 'Delivered' || trim($text) == 'Failed')
 					{
-						echo 'Delivered SMS for ' . $number . "\n";
-						$this->wlog('Delivered SMS for ' . $number);
+						echo 'Delivered or Failed SMS for ' . $number . "\n";
+						$this->wlog('Delivered or Failed SMS for ' . $number);
 
-						//On récupère les SMS par encore validé, uniquement sur les dernières 24h
+						//On récupère les SMS pas encore validé, uniquement sur les dernières 12h
 						$now = new DateTime();
-						$interval = new DateInterval('P1D');
+						$interval = new DateInterval('P12H');
 						$sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
 	
-						if (!$sendeds = $db->getFromTableWhere('sendeds', ['target' => $number, 'delivered' => false, '>at' => $sinceDate], 'at', false, 1))
+						if (!$sendeds = $db->getFromTableWhere('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
 						{
 							continue;
 						}
 
-						$db->updateTableWhere('sendeds', ['delivered' => true], ['id' => $sendeds[0]['id']]);
-						echo "Sended SMS id " . $sendeds[0]['id'] . " to delivered status\n";
+						$sended = $sendeds[0];
+
+						//On gère les echecs
+						if (trim($text) == 'Failed')
+						{
+							$db->updateTableWhere('sendeds', ['before_delivered' => 0, 'failed' => true], ['id' => $sended['id']]);
+							echo "Sended SMS id " . $sended['id'] . " pass to failed status\n";
+							continue;
+						}
+
+						//On gère le cas des messages de plus de 160 caractères, lesquels impliquent plusieurs accusés
+						if ($sended['before_delivered'] > 1)
+						{
+							$db->updateTableWhere('sendeds', ['before_delivered' => $sended['before_delivered'] - 1], ['id' => $sended['id']]);
+							echo "Sended SMS id " . $sended['id'] . " before_delivered decrement\n";
+							continue;
+						}
+
+						//Si tout est bon, que nous avons assez d'accusés, nous validons !
+						$db->updateTableWhere('sendeds', ['before_delivered' => 0, 'delivered' => true], ['id' => $sended['id']]);
+						echo "Sended SMS id " . $sended['id'] . " to delivered status\n";
 						continue;
 					}
 					
