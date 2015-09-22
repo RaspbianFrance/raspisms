@@ -72,7 +72,7 @@
 										<input name="scheduleds[<?php secho($scheduled['id']); ?>][date]" class="form-control form-datetime" type="text" value="<?php secho($scheduled['at']); ?>" readonly>
 									</div>	
 									<div class="form-group">
-										<label>Numéros cibles</label>
+										<label>Numéros cibles <span class="italic small-text text-danger"> - Vous devriez utiliser un numéro international (Ex. : +33612345678)</span></label>
 										<input class="add-numbers form-control" name="scheduleds[<?php secho($scheduled['id']); ?>][numbers][]" value="<?php secho($numbers); ?>"/>
 									</div>
 									<div class="form-group">
