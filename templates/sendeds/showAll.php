@@ -42,6 +42,7 @@
 											<th>Numéro</th>
 											<th>Message</th>
 											<th>Date</th>
+											<th>Delivré</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -54,6 +55,7 @@
 												<td><?php secho($send['target']); ?></td>
 												<td><?php secho($send['content']); ?></td>
 												<td><?php secho($send['at']); ?></td>
+												<td><?php secho($send['delivered'] ? 'Oui' : 'Non'); ?></td>
 											</tr>
 											<?php
 										}

@@ -239,12 +239,33 @@
 					//On gère les SMS STOP
 					if (trim($text) == 'STOP')
 					{
-						echo 'STOP SMS detected ' . $number;
+						echo 'STOP SMS detected ' . $number . "\n";
 						$this->wlog('STOP SMS detected ' . $number);
 						$db->insertIntoTable('sms_stop', ['number' => $number]);
 						continue;
 					}
 
+					//On gère les accusés de reception
+					if (trim($text) == 'Delivered')
+					{
+						echo 'Delivered SMS for ' . $number . "\n";
+						$this->wlog('Delivered SMS for ' . $number);
+
+						//On récupère les SMS par encore validé, uniquement sur les dernières 24h
+						$now = new DateTime();
+						$interval = new DateInterval('P1D');
+						$sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
+	
+						if (!$sendeds = $db->getFromTableWhere('sendeds', ['target' => $number, 'delivered' => false, '>at' => $sinceDate], 'at', false, 1))
+						{
+							continue;
+						}
+
+						$db->updateTableWhere('sendeds', ['delivered' => true], ['id' => $sendeds[0]['id']]);
+						echo "Sended SMS id " . $sendeds[0]['id'] . " to delivered status\n";
+						continue;
+					}
+					
 					if (!$number)
 					{
 						$this->wlog('Invalid phone number in file "' . $dir);
