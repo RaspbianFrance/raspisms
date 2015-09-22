@@ -36,7 +36,7 @@
 		 * @param int... $ids : Les id des commandes à supprimer
 		 * @return boolean;
 		 */
-		public function delete($csrf, ...$ids)
+		public function delete($csrf)
 		{
 			if (!internalTools::verifyCSRF($csrf))
 			{
@@ -44,6 +44,10 @@
 				header('Location: ' . $this->generateUrl('commands'));
 				return false;
 			}
+
+			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
+			$ids = func_get_args();
+			unset($ids[0]);
 
 			//Create de l'object de base de données
 			global $db;
@@ -65,9 +69,10 @@
 		 * Cette fonction retourne la page d'édition des commandes
 		 * @param int... $ids : Les id des commandes à editer
 		 */
-		public function edit(...$ids)
+		public function edit()
 		{
 			global $db;
+			$ids = func_get_args();
 
 			$commands = $db->getCommandsIn($ids);
 			$this->render('commands/edit', array(
