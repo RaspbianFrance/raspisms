@@ -164,7 +164,7 @@
 						$id_sended = $db->lastId();
 						
 						//Commande qui envoie le SMS
-						$commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
+						$commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -report -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
 						//Commande qui s'assure de passer le SMS dans ceux envoyés, et de lui donner le bon statut
 
 						//On va liée les deux commandes pour envoyer le SMS puis le passer en echec
