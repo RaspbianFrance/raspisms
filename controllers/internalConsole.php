@@ -255,7 +255,7 @@
 
 						//On récupère les SMS pas encore validé, uniquement sur les dernières 12h
 						$now = new DateTime();
-						$interval = new DateInterval('P12H');
+						$interval = new DateInterval('PT12H');
 						$sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
 	
 						if (!$sendeds = $db->getFromTableWhere('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
