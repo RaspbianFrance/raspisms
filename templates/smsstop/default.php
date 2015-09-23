@@ -1,11 +1,11 @@
 <?php
 	//Template dashboard
 	$incs = new internalIncs();
-	$incs->head('Sendeds - Show All');
+	$incs->head('SMS STOP - Show All');
 ?>
 <div id="wrapper">
 <?php
-	$incs->nav('sendeds');
+	$incs->nav('smsstop');
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -13,14 +13,14 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Dashboard <small>SMS envoyés</small>
+						Dashboard <small>SMS STOP</small>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
 							<i class="fa fa-dashboard"></i> <a href="<?php echo $this->generateUrl('dashboard'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-send"></i> SMS envoyés
+							<i class="fa fa-ban"></i> SMS STOP
 						</li>
 					</ol>
 				</div>
@@ -31,31 +31,25 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> Liste des SMS envoyés</h3>
+							<h3 class="panel-title"><i class="fa fa-ban fa-fw"></i> Liste SMS STOP</h3>
 						</div>
 						<div class="panel-body">
-							<div class="table-sendeds">
-								<table class="table table-bordered table-hover table-striped" id="table-sendeds">
+							<div class="table-events">
+								<table class="table table-bordered table-hover table-striped" id="table-sms-stop">
 									<thead>
 										<tr>
 											<th>#</th>
 											<th>Numéro</th>
-											<th>Message</th>
-											<th>Date</th>
-											<th>Delivré</th>
 										</tr>
 									</thead>
 									<tbody>
 									<?php
-										foreach ($sendeds as $send)
+										foreach ($smsStops as $smsStop)
 										{
 											?>
 											<tr>
-												<td><?php secho($send['id']); ?></td>
-												<td><?php secho($send['target']); ?></td>
-												<td><?php secho($send['content']); ?></td>
-												<td><?php secho($send['at']); ?></td>
-												<td><?php secho($send['delivered'] ? 'Oui' : 'Non'); ?></td>
+												<td><?php secho($smsStop['id']); ?></td>
+												<td><?php secho($smsStop['number']); ?></td>
 											</tr>
 											<?php
 										}
@@ -69,7 +63,7 @@
 										if ($page)
 										{
 										?>
-											<li><a href="<?php echo $this->generateUrl('sendeds', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+											<li><a href="<?php echo $this->generateUrl('smsstop', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
 										<?php
 										}
 
@@ -79,7 +73,7 @@
 										if ($limit == $nbResults)
 										{
 										?>
-											<li><a href="<?php echo $this->generateUrl('sendeds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+											<li><a href="<?php echo $this->generateUrl('smsstop', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
 										<?php
 										}
 									?>

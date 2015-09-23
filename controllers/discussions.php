@@ -85,6 +85,7 @@
 					'date' => htmlspecialchars($sended['at']),
 					'text' => htmlspecialchars($sended['content']),
 					'type' => 'sended',
+					'status' => ($sended['delivered'] ? 'delivered' : ($sended['failed'] ? 'failed' : '')),
 				);
 			}
 

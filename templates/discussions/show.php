@@ -65,6 +65,11 @@
 
 				$.each(data.messages, function(key, message) {
 
+					<?php if (RASPISMS_SETTINGS_DETECT_URL) { ?>
+						//On ajoute la detection de lien dans le texte du message
+						message.text = Autolinker.link(message.text, {newWindow:true});
+					<?php } ?>
+
 					switch (message.type)
 					{
 						case 'received' :
@@ -81,7 +86,7 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
-									'<div class="discussion-message-date">' + message.date + '</div>' +
+									'<div class="discussion-message-date">' + message.date + (message.status ? (message.status == 'delivered' ? ' <span class="fa fa-check-circle fa-fw text-success"></span>' : '<span class="fa fa-times-circle fa-fw text-danger"></span>' ) : '' ) + '</div>' +
 								'</div>' +
 							'</div>';
 							break;

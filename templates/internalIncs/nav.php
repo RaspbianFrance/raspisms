@@ -60,6 +60,9 @@
 							<li <?php echo $page == 'receiveds' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('receiveds'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>
 							</li>
+							<li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
+								<a href="<?php echo $this->generateUrl('smsstop'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
+							</li>
 							<li <?php echo $page == 'events' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo $this->generateUrl('events'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>
 							</li>

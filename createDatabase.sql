@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS sendeds
 	at DATETIME NOT NULL,
 	target VARCHAR(12) NOT NULL,
 	content VARCHAR(1000) NOT NULL,
+	before_delivered INT NOT NULL,
+	delivered BOOLEAN NOT NULL DEFAULT FALSE,
+	failed BOOLEAN NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (id)
 );
 
@@ -135,6 +138,16 @@ CREATE TABLE IF NOT EXISTS transfers
 	FOREIGN KEY (id_received) REFERENCES receiveds (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS sms_stop
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	number VARCHAR(12) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (number)
+);
+
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
-VALUES ('transfer', '1'); 
+VALUES ('transfer', '1'),
+('sms_stop', '1'),
+('detect_url', '1'); 

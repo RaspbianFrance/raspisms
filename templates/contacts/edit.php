@@ -50,7 +50,7 @@
 										</div>
 									</div>	
 									<div class="form-group">
-										<label>Numéro de téléphone du contact</label>
+										<label>Numéro de téléphone du contact<span class="italic small-text text-danger"> - Vous devriez utiliser un numéro international (Ex. : +33612345678)</span></label>
 										<div class="form-group input-group">
 											<span class="input-group-addon"><span class="fa fa-phone"></span></span>
 											<input name="contacts[<?php secho($contact['id']); ?>][phone]" class="form-control" type="text" placeholder="Numéro du contact" pattern="(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8}" required value="<?php secho($contact['number']); ?>">
