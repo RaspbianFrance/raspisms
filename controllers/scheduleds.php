@@ -88,9 +88,26 @@
 				$date = new DateTime($scheduled['at']);
 				$scheduleds[$key]['at'] = $date->format('Y-m-d H:i');
 
-				$scheduleds[$key]['numbers'] = $db->getNumbersForScheduled($scheduled['id']);	
-				$scheduleds[$key]['contacts'] = $db->getContactsForScheduled($scheduled['id']);	
-				$scheduleds[$key]['groups'] = $db->getGroupsForScheduled($scheduled['id']);	
+				$scheduleds[$key]['numbers'] = [];
+				$numbers = $db->getNumbersForScheduled($scheduled['id']);
+				foreach ($numbers as $number)
+				{
+					$scheduleds[$key]['numbers'][] = $number['number'];
+				}
+
+				$scheduleds[$key]['contacts'] = [];
+				$contacts = $db->getContactsForScheduled($scheduled['id']);
+				foreach ($contacts as $contact)
+				{
+					$scheduleds[$key]['contacts'][] = (int)$contact['id'];
+				}
+
+				$scheduleds[$key]['groups'] = [];
+				$groups = $db->getGroupsForScheduled($scheduled['id']);
+				foreach ($groups as $group)
+				{
+					$scheduleds[$key]['groups'][] = (int)$group['id'];
+				}
 			}
 
 			$this->render('scheduleds/edit', array(

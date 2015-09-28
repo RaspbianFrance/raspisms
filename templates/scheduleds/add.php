@@ -47,8 +47,15 @@
 									<input name="date" class="form-control form-datetime" type="text" value="<?php secho($now); ?>" readonly>
 								</div>	
 								<div class="form-group">
-									<label>Numéros cibles <span class="italic small-text text-danger"> - Vous devriez utiliser un numéro international (Ex. : +33612345678)</span></label>
-									<input class="add-numbers form-control" name="numbers[]"/>
+									<label>Numéros cibles</label>
+									<div class="form-group scheduleds-number-group-container">
+										<div class="form-group scheduleds-number-group">
+											<input name="" class="form-control phone-international-input" type="tel" >
+											<span class="remove-scheduleds-number fa fa-times"></span>
+											<input name="numbers[]" type="hidden" class="phone-hidden-input">
+										</div>
+										<div class="add-number-button fa fa-plus-circle"></div>
+									</div>
 								</div>
 								<div class="form-group">
 									<label>Contacts cibles</label>
@@ -71,19 +78,6 @@
 <script>
 	jQuery(document).ready(function()
 	{
-		jQuery('.form-datetime').datetimepicker(
-		{
-			format: 'yyyy-mm-dd hh:ii:ss',
-			autoclose: true,
-			minuteStep: 1,
-			language: 'fr'
-		});
-
-		jQuery('.add-numbers').each(function()
-		{
-			jQuery(this).magicSuggest();
-		});
-
 		jQuery('.add-contacts').each(function()
 		{
 			jQuery(this).magicSuggest({
@@ -100,6 +94,59 @@
 				valueField: 'id',
 				displayField: 'name',
 			});
+		});
+
+		jQuery('.phone-international-input').intlTelInput({
+			defaultCountry: 'fr',
+			preferredCountries: ['fr', 'be', 'ca'],
+			nationalMode: true,
+			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
+		});
+
+		jQuery('body').on('click', '.remove-scheduleds-number', function(e)
+		{
+			jQuery(this).parents('.scheduleds-number-group').remove();
+		});
+
+		jQuery('body').on('click', '.add-number-button', function(e)
+		{
+			var newScheduledsNumberGroup = '' +
+			'<div class="form-group scheduleds-number-group">' +
+				'<input name="" class="form-control phone-international-input" type="tel" >' +
+				'<span class="remove-scheduleds-number fa fa-times"></span>' +
+				'<input name="numbers[]" type="hidden" class="phone-hidden-input">' +
+			'</div>';
+
+			jQuery(this).before(newScheduledsNumberGroup);
+
+			jQuery('.phone-international-input').intlTelInput({
+				defaultCountry: 'fr',
+				preferredCountries: ['fr', 'be', 'ca'],
+				nationalMode: true,
+				utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
+			});
+
+		});
+
+		jQuery('.form-datetime').datetimepicker(
+		{
+			format: 'yyyy-mm-dd hh:ii:ss',
+			autoclose: true,
+			minuteStep: 1,
+			language: 'fr'
+		});
+
+
+		jQuery('form').on('submit', function(e)
+		{
+			e.preventDefault();
+			jQuery('.phone-international-input').each(function(key, value)
+			{
+				var container = jQuery(this).parents('.scheduleds-number-group');
+				container.find('.phone-hidden-input').val(jQuery(this).intlTelInput("getNumber"));
+			});
+			
+			this.submit();
 		});
 	});
 </script>

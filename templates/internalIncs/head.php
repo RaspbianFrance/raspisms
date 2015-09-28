@@ -31,6 +31,10 @@
 		<script src="<?php echo HTTP_PWD; ?>js/bootstrap-datetimepicker.min.js"></script>
 		<script src="<?php echo HTTP_PWD; ?>js/locales/bootstrap-datetimepicker.fr.js"></script>
 		<link href="<?php echo HTTP_PWD; ?>css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+		<!-- International Phone Number, JS and CSS -->
+		<script src="<?php echo HTTP_PWD; ?>js/intlTelInput/intlTelInput.min.js"></script>
+		<link href="<?php echo HTTP_PWD; ?>css/intlTelInput.css" rel="stylesheet">
+		
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD; ?>js/custom.js"></script>
 
