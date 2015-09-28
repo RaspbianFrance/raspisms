@@ -28,12 +28,13 @@
 		}
 
 		/**
-		 * Cette fonction permet de mettre à jour l'activation ou la désactivation du transfer des SMS
+		 * Cette fonction permet de mettre à jour un réglage
+		 * @param string $settingName : Le nom du réglage à modifier
 		 * @param $csrf : Le jeton CSRF
-		 * @param string $_POST['transfer'] : Le nouveau transfer
-		 * @return void;
+		 * @param string $_POST['settingValue'] : La nouvelle valeur du réglage
+		 * @return boolean
 		 */
-		public function changeTransfer($csrf)
+		public function change($settingName, $csrf)
 		{
 			//On vérifie que le jeton csrf est bon
 			if (!internalTools::verifyCSRF($csrf))
@@ -43,99 +44,17 @@
 				return false;
 			}
 
-			//Creation de l'object de base de données
+			//On vérifie que la valeur est définie
+			if (!isset($_POST['settingValue']))
+			{
+				$_SESSION['errormessage'] = 'Vous devez fournir une valeur pour le réglage !';
+				header('Location: ' . $this->generateUrl('settings'));
+				return false;
+			}
+
 			global $db;
-			
-			if (!isset($_POST['transfer']))
-			{
-				$_SESSION['errormessage'] = 'Vous devez renseigner un valeur';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
 
-			$transfer = (int)$_POST['transfer'];
-
-			if (!$db->updateTableWhere('settings', ['value' => $transfer], ['name' => 'transfer']))
-			{
-				$_SESSION['errormessage'] = 'Impossible de mettre les données à jour.';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			$_SESSION['successmessage'] = 'Les données ont été mises à jour.';
-			header('Location: ' . $this->generateUrl('settings'));
-			return true;
-		}
-
-		/**
-		 * Cette fonction permet de mettre à jour l'activation ou la désactivation de SMS-STOP
-		 * @param $csrf : Le jeton CSRF
-		 * @param string $_POST['stop'] : Le nouveau stop
-		 * @return void;
-		 */
-		public function changeSmsStop($csrf)
-		{
-			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF($csrf))
-			{
-				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			//Creation de l'object de base de données
-			global $db;
-			
-			if (!isset($_POST['sms_stop']))
-			{
-				$_SESSION['errormessage'] = 'Vous devez renseigner un valeur';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			$stop = (int)$_POST['sms_stop'];
-
-			if (!$db->updateTableWhere('settings', ['value' => $stop], ['name' => 'sms_stop']))
-			{
-				$_SESSION['errormessage'] = 'Impossible de mettre les données à jour.';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			$_SESSION['successmessage'] = 'Les données ont été mises à jour.';
-			header('Location: ' . $this->generateUrl('settings'));
-			return true;
-		}
-
-		/**
-		 * Cette fonction permet de mettre à jour l'activation ou la désactivation de la detection d'URL dans les discussions
-		 * @param $csrf : Le jeton CSRF
-		 * @param string $_POST['detect_url'] : Le nouveau stop
-		 * @return void;
-		 */
-		public function changeDetectionUrl($csrf)
-		{
-			//On vérifie que le jeton csrf est bon
-			if (!internalTools::verifyCSRF($csrf))
-			{
-				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			//Creation de l'object de base de données
-			global $db;
-			
-			if (!isset($_POST['detect_url']))
-			{
-				$_SESSION['errormessage'] = 'Vous devez renseigner un valeur';
-				header('Location: ' . $this->generateUrl('settings'));
-				return false;
-			}
-
-			$detectUrl = (int)$_POST['detect_url'];
-
-			if (!$db->updateTableWhere('settings', ['value' => $detectUrl], ['name' => 'detect_url']))
+			if (!$db->updateTableWhere('settings', ['value' => $_POST['settingValue']], ['name' => $settingName]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de mettre les données à jour.';
 				header('Location: ' . $this->generateUrl('settings'));
