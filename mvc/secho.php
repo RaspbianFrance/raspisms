@@ -12,7 +12,7 @@
 	function secho($text, $nl2br = true, $escapeQuotes = true, $echo = true)
 	{
 		//On echappe le html, potentiellement avec les quotes
-		$text = $escapeQuotes ? htmlspecialchars($text, ENT_QUOTES) : htmlspecialchars($text);
+		$text = $escapeQuotes ? htmlspecialchars($text, ENT_QUOTES) : htmlspecialchars($text, ENT_NOQUOTES);
 
 		//On transforme les "\n" en <br/>
 		$text = $nl2br ? nl2br($text) : $text;
