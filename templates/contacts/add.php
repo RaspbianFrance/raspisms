@@ -47,9 +47,9 @@
 								</div>	
 								<div class="form-group">
 									<label>Numéro de téléphone du contact<span class="italic small-text text-danger"> - Vous devriez utiliser un numéro international (Ex. : +33612345678)</span></label>
-									<div class="form-group input-group">
-										<span class="input-group-addon"><span class="fa fa-phone"></span></span>
-											<input name="phone" class="form-control" type="text" placeholder="Numéro du contact" pattern="(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8}" required>
+									<div class="form-group">
+										<input name="" class="form-control" type="tel" id="phone-international-input">
+										<input name="phone" type="hidden" id="phone-hidden-input" required>
 									</div>
 								</div>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('contacts'); ?>">Annuler</a>
@@ -62,5 +62,23 @@
 		</div>
 	</div>
 </div>
+<script>
+	jQuery('document').ready(function($)
+	{
+		jQuery('#phone-international-input').intlTelInput({
+			defaultCountry: 'fr',
+			preferredCountries: ['fr', 'be', 'ca'],
+			nationalMode: true,
+			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
+		});
+
+		jQuery('form').on('submit', function(e)
+		{
+			e.preventDefault();
+			jQuery('#phone-hidden-input').val(jQuery('#phone-international-input').intlTelInput("getNumber"));
+			this.submit();
+		});
+	});
+</script>
 <?php
 	$incs->footer();

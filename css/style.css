@@ -198,3 +198,45 @@ footer
 	text-align: center;
 	padding-top: 10px;
 }
+
+/* SCHEDULEDS */
+.add-number-button
+{
+	display: inline-block;
+	color: #DADFE1;
+	font-size: 35px;
+	vertical-align: top;
+}
+
+.add-number-button:hover
+{
+	color: #3498DB;
+	cursor: pointer;
+}
+
+.scheduleds-number-group
+{
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+	margin-right: 20px;
+	margin-bottom: 0;
+}
+
+.remove-scheduleds-number
+{
+	display: inline-block;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	color: #bbbbbb;
+	font-size: 15px;
+	z-index: 999;
+}
+
+.remove-scheduleds-number:hover
+{
+	color: #aaaaaa;
+	cursor: pointer;
+}
+
