@@ -115,8 +115,8 @@
 		});
 
 		jQuery('.phone-international-input').intlTelInput({
-			defaultCountry: 'fr',
-			preferredCountries: ['fr', 'be', 'ca'],
+			defaultCountry: '<?php secho(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+			preferredCountries: <?php secho(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
 		});
@@ -139,8 +139,8 @@
 			jQuery(this).before(newScheduledsNumberGroup);
 
 			jQuery('.phone-international-input').intlTelInput({
-				defaultCountry: 'fr',
-				preferredCountries: ['fr', 'be', 'ca'],
+				defaultCountry: '<?php secho(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+				preferredCountries: <?php secho(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
 			});

@@ -6,7 +6,7 @@ USE raspisms;
 CREATE TABLE IF NOT EXISTS settings
 (
 	id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(20) NOT NULL,
+	name VARCHAR(50) NOT NULL,
 	value VARCHAR(1000) NOT NULL,
 	PRIMARY KEY (id),
 	UNIQUE (name)
@@ -151,4 +151,6 @@ CREATE TABLE IF NOT EXISTS sms_stop
 INSERT INTO settings (name, value)
 VALUES ('transfer', '1'),
 ('sms_stop', '1'),
-('detect_url', '1'); 
+('detect_url', '1'),
+('default_phone_country', 'fr'), 
+('preferred_phone_country', 'fr,be,ca'); 

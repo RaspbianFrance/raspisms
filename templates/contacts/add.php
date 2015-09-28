@@ -46,7 +46,7 @@
 									</div>
 								</div>	
 								<div class="form-group">
-									<label>Numéro de téléphone du contact<span class="italic small-text text-danger"> - Vous devriez utiliser un numéro international (Ex. : +33612345678)</span></label>
+									<label>Numéro de téléphone du contact</label>
 									<div class="form-group">
 										<input name="" class="form-control" type="tel" id="phone-international-input">
 										<input name="phone" type="hidden" id="phone-hidden-input" required>
@@ -66,8 +66,8 @@
 	jQuery('document').ready(function($)
 	{
 		jQuery('#phone-international-input').intlTelInput({
-			defaultCountry: 'fr',
-			preferredCountries: ['fr', 'be', 'ca'],
+			defaultCountry: '<?php secho(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+			preferredCountries: <?php secho(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
 		});

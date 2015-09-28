@@ -40,10 +40,10 @@
 										<h4 class="panel-title"><i class="fa fa-share fa-fw"></i> Transfert des SMS par e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('settings', 'changeTransfer', [$_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['transfer', $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Transfert activé : </label>
-												<select name="transfer" class="form-control">
+												<select name="settingValue" class="form-control">
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_TRANSFER ? 'selected' : ''; ?>>Oui</option>
 												</select>
@@ -59,13 +59,29 @@
 										<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Détection des URL dans les discussions</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('settings', 'changeDetectionUrl', [$_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['detection_url', $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Détection activé : </label>
-												<select name="detect_url" class="form-control">
+												<select name="settingValue" class="form-control">
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_DETECT_URL ? 'selected' : ''; ?>>Oui</option>
 												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-phone fa-fw"></i> Pays préférés numéros internationaux</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['preferred_phone_country', $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules : </label>
+												<input name="settingValue" class="form-control" value="<?php secho(RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY); ?>" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
@@ -80,13 +96,29 @@
 										<h4 class="panel-title"><i class="fa fa-ban fa-fw"></i> Activation de SMS-STOP</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('settings', 'changeSmsStop', [$_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['sms_stop', $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>SMS STOP activé : </label>
-												<select name="sms_stop" class="form-control">
+												<select name="settingValue" class="form-control">
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_STOP ? 'selected' : ''; ?>>Oui</option>
 												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-phone fa-fw"></i> Pays par défaut numéros internationaux</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['default_phone_country', $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Code du pays (norme ISO 3166-1 alpha-2) : </label>
+												<input name="settingValue" class="form-control" value="<?php secho(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
