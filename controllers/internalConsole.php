@@ -310,7 +310,7 @@
 						{
 							$this->wlog('Password is valid');
 							//On va passer en revue toutes les commandes, pour voir si on en trouve dans ce message
-							$commands = $db->getAll('commands');
+							$commands = $db->getFromTableWhere('commands');
 
 							$this->wlog('We found ' . count($commands) . ' commands');
 							foreach ($commands as $command)
