@@ -39,7 +39,7 @@
 			//Récupération des sms-stop, par paquets de $limit, en ignorant les $offset premiers
 			$smsStops = $db->getFromTableWhere('sms_stop', [], false, true, $limit, $offset);
 
-			$this->render('smsstop/default', array(
+			$this->render('smsstop/showAll', array(
 				'smsStops' => $smsStops,
 				'page' => $page,
 				'limit' => $limit,
