@@ -35,11 +35,12 @@
 						</div>
 						<div class="panel-body">
 							<div class="table-events">
-								<table class="table table-bordered table-hover table-striped" id="table-sms-stop">
+								<table class="table table-bordered table-hover table-striped" id="table-smsstop">
 									<thead>
 										<tr>
 											<th>#</th>
 											<th>Numéro</th>
+											<th>Sélectionner</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -50,6 +51,7 @@
 											<tr>
 												<td><?php secho($smsStop['id']); ?></td>
 												<td><?php secho($smsStop['number']); ?></td>
+												<td><input type="checkbox" value="<?php secho($smsStop['id']); ?>"></td>
 											</tr>
 											<?php
 										}
@@ -58,6 +60,15 @@
 								</table>
 							</div>
 							<nav>
+								<div class="text-right col-xs-12 no-padding">
+									<strong>Action groupée :</strong> 
+									<div class="btn-group action-dropdown" target="#table-smsstop">
+										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
+										<ul class="dropdown-menu pull-right" role="menu">
+											<li><a href="<?php echo $this->generateUrl('smsstop', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+										</ul>
+									</div>
+								</div>
 								<ul class="pager">
 									<?php
 										if ($page)
@@ -79,7 +90,6 @@
 									?>
 								</ul>
 							</nav>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -87,5 +97,21 @@
 		</div>
 	</div>
 </div>
+<script>
+	jQuery(document).ready(function ()
+	{
+		jQuery('.action-dropdown a').on('click', function (e)
+		{
+			e.preventDefault();
+			var target = jQuery(this).parents('.action-dropdown').attr('target');
+			var url = jQuery(this).attr('href');
+			jQuery(target).find('input:checked').each(function ()
+			{
+				url += '/' + jQuery(this).val();
+			});
+			window.location = url;
+		});
+	});
+</script>
 <?php
 	$incs->footer();

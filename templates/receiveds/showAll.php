@@ -43,6 +43,7 @@
 											<th>Message</th>
 											<th>Date</th>
 											<th>Commande</th>
+											<th>Sélectionner</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -56,6 +57,7 @@
 												<td><?php secho($received['content']); ?></td>
 												<td><?php secho($received['at']); ?></td>
 												<td><?php echo $received['is_command'] ? 'Oui' : 'Non'; ?></td>
+												<td><input type="checkbox" value="<?php secho($received['id']); ?>"></td>
 											</tr>
 											<?php
 										}
@@ -64,6 +66,15 @@
 								</table>
 							</div>
 							<nav>
+								<div class="text-right col-xs-12 no-padding">
+									<strong>Action groupée :</strong> 
+									<div class="btn-group action-dropdown" target="#table-receiveds">
+										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
+										<ul class="dropdown-menu pull-right" role="menu">
+											<li><a href="<?php echo $this->generateUrl('receiveds', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+										</ul>
+									</div>
+								</div>
 								<ul class="pager">
 									<?php
 										if ($page)
@@ -93,5 +104,21 @@
 		</div>
 	</div>
 </div>
+<script>
+	jQuery(document).ready(function ()
+	{
+		jQuery('.action-dropdown a').on('click', function (e)
+		{
+			e.preventDefault();
+			var target = jQuery(this).parents('.action-dropdown').attr('target');
+			var url = jQuery(this).attr('href');
+			jQuery(target).find('input:checked').each(function ()
+			{
+				url += '/' + jQuery(this).val();
+			});
+			window.location = url;
+		});
+	});
+</script>
 <?php
 	$incs->footer();

@@ -61,19 +61,18 @@
 									</tbody>
 								</table>
 							</div>
-								<div>
-									<div class="col-xs-6 no-padding">
-										<a class="btn btn-success" href="<?php echo $this->generateUrl('groups', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
-									</div>
-									<div class="text-right col-xs-6 no-padding">
-										<strong>Action groupée :</strong> 
-										<div class="btn-group action-dropdown" target="#table-groups">
-											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
-											<ul class="dropdown-menu pull-right" role="menu">
-												<li><a href="<?php echo $this->generateUrl('groups', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-												<li><a href="<?php echo $this->generateUrl('groups', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
-											</ul>
-										</div>
+							<div>
+								<div class="col-xs-6 no-padding">
+									<a class="btn btn-success" href="<?php echo $this->generateUrl('groups', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
+								</div>
+								<div class="text-right col-xs-6 no-padding">
+									<strong>Action groupée :</strong> 
+									<div class="btn-group action-dropdown" target="#table-groups">
+										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
+										<ul class="dropdown-menu pull-right" role="menu">
+											<li><a href="<?php echo $this->generateUrl('groups', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
+											<li><a href="<?php echo $this->generateUrl('groups', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+										</ul>
 									</div>
 								</div>
 							</div>
