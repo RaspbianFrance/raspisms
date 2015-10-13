@@ -39,7 +39,7 @@
 			//Récupération des évènements triés par date, du plus récent au plus ancien, par paquets de $limit, en ignorant les $offset premiers
 			$events = $db->getFromTableWhere('events', [], 'at', true, $limit, $offset);
 
-			$this->render('events/default', array(
+			$this->render('events/showAll', array(
 				'events' => $events,
 				'page' => $page,
 				'limit' => $limit,
