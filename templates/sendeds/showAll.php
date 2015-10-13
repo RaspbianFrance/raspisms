@@ -43,7 +43,7 @@
 											<th>Message</th>
 											<th>Date</th>
 											<th>Statut</th>
-											<th>Sélectionner</th>
+											<?php if ($_SESSION['admin']) { ?><th>Sélectionner</th><?php } ?>
 										</tr>
 									</thead>
 									<tbody>
@@ -57,7 +57,7 @@
 												<td><?php secho($sended['content']); ?></td>
 												<td><?php secho($sended['at']); ?></td>
 												<td><?php secho($sended['delivered'] ? 'Délivré' : ($sended['failed'] ? 'Échoué' : 'Inconnu')); ?></td>
-												<td><input type="checkbox" value="<?php secho($sended['id']); ?>"></td>
+												<?php if ($_SESSION['admin']) { ?><td><input type="checkbox" value="<?php secho($sended['id']); ?>"></td><?php } ?>
 											</tr>
 											<?php
 										}
@@ -66,15 +66,17 @@
 								</table>
 							</div>
 							<nav>
-								<div class="text-right col-xs-12 no-padding">
-									<strong>Action groupée :</strong> 
-									<div class="btn-group action-dropdown" target="#table-sendeds">
-										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
-										<ul class="dropdown-menu pull-right" role="menu">
-											<li><a href="<?php echo $this->generateUrl('sendeds', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
-										</ul>
+								<?php if ($_SESSION['admin']) { ?>
+									<div class="text-right col-xs-12 no-padding">
+										<strong>Action groupée :</strong> 
+										<div class="btn-group action-dropdown" target="#table-sendeds">
+											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
+											<ul class="dropdown-menu pull-right" role="menu">
+												<li><a href="<?php echo $this->generateUrl('sendeds', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+											</ul>
+										</div>
 									</div>
-								</div>
+								<?php } ?>
 								<ul class="pager">
 									<?php
 										if ($page)
