@@ -45,6 +45,25 @@
 			return $this->runQuery($query, $params);
 		}
 
+		/**
+		 * Supprime tous les sendeds dont l'id fait partie du tableau fourni
+		 * @param $sendeds_ids : Tableau des id des sendeds à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteSendedsIn($sendeds_ids)
+		{
+			$query = "
+				DELETE FROM sendeds
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($sendeds_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
 		/*********************************/
 		/* PARTIE DES REQUETES RECEIVEDS */
 		/*********************************/
@@ -157,6 +176,25 @@
 			$params = $generted_in['PARAMS'];
 
 			return $this->runQuery($query, $params);
+		}
+
+		/**
+		 * Supprime tous les receivedss dont l'id fait partie du tableau fourni
+		 * @param $receiveds_ids : Tableau des id des receiveds à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteReceivedsIn($receiveds_ids)
+		{
+			$query = "
+				DELETE FROM receiveds
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($receiveds_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
 		/***********************************/
@@ -779,4 +817,51 @@
 
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
+
+		/******************************/
+		/* PARTIE DES REQUETES EVENTS */
+		/******************************/
+
+		/**
+		 * Supprime tous les events dont l'id fait partie du tableau fourni
+		 * @param $events_ids : Tableau des id des events à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteEventsIn($events_ids)
+		{
+			$query = "
+				DELETE FROM events
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($events_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
+		/********************************/
+		/* PARTIE DES REQUETES SMS STOP */
+		/********************************/
+
+		/**
+		 * Supprime tous les sms_stops dont l'id fait partie du tableau fourni
+		 * @param $sms_stops_ids : Tableau des id des sms_stops à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteSmsStopsIn($sms_stops_ids)
+		{
+			$query = "
+				DELETE FROM sms_stop
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($sms_stops_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
 	}

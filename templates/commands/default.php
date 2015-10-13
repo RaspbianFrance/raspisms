@@ -63,19 +63,18 @@
 									</tbody>
 								</table>
 							</div>
-								<div>
-									<div class="col-xs-6 no-padding">
-										<a class="btn btn-success" href="<?php echo $this->generateUrl('commands', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter une commande</a>
-									</div>
-									<div class="text-right col-xs-6 no-padding">
-										<strong>Action groupée :</strong> 
-										<div class="btn-group action-dropdown" target="#table-commands">
-											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
-											<ul class="dropdown-menu pull-right" role="menu">
-												<li><a href="<?php echo $this->generateUrl('commands', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-												<li><a href="<?php echo $this->generateUrl('commands', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
-											</ul>
-										</div>
+							<div>
+								<div class="col-xs-6 no-padding">
+									<a class="btn btn-success" href="<?php echo $this->generateUrl('commands', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter une commande</a>
+								</div>
+								<div class="text-right col-xs-6 no-padding">
+									<strong>Action groupée :</strong> 
+									<div class="btn-group action-dropdown" target="#table-commands">
+										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
+										<ul class="dropdown-menu pull-right" role="menu">
+											<li><a href="<?php echo $this->generateUrl('commands', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
+											<li><a href="<?php echo $this->generateUrl('commands', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+										</ul>
 									</div>
 								</div>
 							</div>

@@ -46,4 +46,40 @@
 				'nbResults' => count($smsStops),
 			));
 		}
+
+		/**
+		 * Cette fonction supprimer une liste de sms stop
+		 * @param $csrf : Le jeton CSRF
+		 * @param int... $ids : Les id des sms à supprimer
+		 * @return boolean;
+		 */
+		public function delete($csrf)
+		{
+			//On vérifie que le jeton csrf est bon
+			if (!internalTools::verifyCSRF($csrf))
+			{
+				$_SESSION['errormessage'] = 'Jeton CSRF invalide !';
+				header('Location: ' . $this->generateUrl('smsstop'));
+				return false;
+			}
+
+			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
+			$ids = func_get_args();
+			unset($ids[0]);
+
+			//Create de l'object de base de données
+			global $db;
+			
+			//Si on est pas admin
+			if (!$_SESSION['admin'])
+			{
+				$_SESSION['errormessage'] = 'Vous devez être administrateur pour effectuer cette action.';
+				header('Location: ' . $this->generateUrl('smsstop'));
+				return false;
+			}
+
+			$db->deleteSmsStopsIn($ids);
+			header('Location: ' . $this->generateUrl('smsstop'));
+			return true;
+		}
 	}
