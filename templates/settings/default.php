@@ -126,6 +126,25 @@
 										</form>
 									</div>
 								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-flash fa-fw"></i> Support des SMS Flash</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['sms_flash', $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>SMS Flash activé : </label>
+												<select name="settingValue" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_FLASH ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

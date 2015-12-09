@@ -52,21 +52,15 @@
 										<input name="email_confirm" class="form-control" type="email" placeholder="Confirmer l'adresse e-mail de l'utilisateur" required>
 									</div>
 								</div>
-								<?php
-									if (isset($_SESSION['admin']) && $_SESSION['admin'])
-									{
-									?>
+								<?php if (isset($_SESSION['admin']) && $_SESSION['admin']) { ?>
+									<div class="form-group">
+										<label>Niveau administrateur : </label>
 										<div class="form-group">
-											<label>Niveau administrateur : </label>
-											<div class="form-group">
-												<input name="admin" type="radio" value="1" required /> Oui 
-												<input name="admin" type="radio" value="0" required /> Non
-											</div>
+											<input name="admin" type="radio" value="1" required /> Oui 
+											<input name="admin" type="radio" value="0" required /> Non
 										</div>
-									<?php	
-									}
-	
-								?>	
+									</div>
+								<?php } ?>	
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('users'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le user" /> 	
 							</form>

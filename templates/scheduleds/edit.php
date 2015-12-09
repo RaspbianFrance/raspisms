@@ -71,6 +71,15 @@
 										<label>Groupes cibles</label>
 										<input class="add-groups form-control" name="scheduleds[<?php secho($scheduled['id']); ?>][groups][]" value="<?php secho(json_encode($scheduled['groups'])); ?>" />
 									</div>
+									<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
+										<div class="form-group">
+											<label>Envoyer comme un SMS Flash : </label>
+											<div class="form-group">
+												<input name="admin" type="radio" value="1" required <?php echo ($scheduled['flash'] ? 'checked' : ''); ?> /> Oui
+												<input name="admin" type="radio" value="0" required <?php echo ($scheduled['flash'] ? '' : 'checked'); ?> /> Non
+											</div>
+										</div>
+									<?php } ?>
 									<hr/>
 								<?php
 								}

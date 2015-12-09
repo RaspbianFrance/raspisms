@@ -102,6 +102,7 @@
 				{
 					$id_scheduled = $scheduled['id'];
 					$text_sms = escapeshellarg($scheduled['content']);
+					$flash = $scheduled['flash'];
 	 
 					//On initialise les numéros auxquelles envoyer le SMS
 					$numbers = array();
@@ -167,6 +168,12 @@
 						
 						//Commande qui envoie le SMS
 						$commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -report -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
+
+						if (RASPISMS_SETTINGS_SMS_FLASH && $flash)
+						{
+							$commande_send_sms .= ' -flash';
+						}
+
 						//Commande qui s'assure de passer le SMS dans ceux envoyés, et de lui donner le bon statut
 
 						//On va liée les deux commandes pour envoyer le SMS puis le passer en echec

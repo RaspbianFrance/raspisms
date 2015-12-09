@@ -65,6 +65,15 @@
 									<label>Groupes cibles</label>
 									<input class="add-groups form-control" name="groups[]"/>
 								</div>
+								<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
+									<div class="form-group">
+										<label>Envoyer comme un SMS Flash : </label>
+										<div class="form-group">
+											<input name="admin" type="radio" value="1" required /> Oui 
+											<input name="admin" type="radio" value="0" required checked/> Non
+										</div>
+									</div>
+								<?php } ?>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('scheduleds'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
 							</form>
