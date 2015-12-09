@@ -49,6 +49,9 @@
 </div>
 <script>
 	jQuery(document).ready(function () {
+
+		var alreadyReceivedMessages = [];
+
 		/**
 		 * Cette fonction vérifie régulièrement les sms pour mettre à jour l'affichage
 		 */
@@ -80,7 +83,13 @@
 									'<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
-							playReceptionSound();
+
+							if (alreadyReceivedMessages.indexOf(message.md5) == -1)
+							{
+								playReceptionSound();
+								alreadyReceivedMessages.push(message.md5);
+							}
+
 							break;
 						case 'sended' :
 							var texte = '' +
