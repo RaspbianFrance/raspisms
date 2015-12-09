@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS scheduleds
 	id INT NOT NULL AUTO_INCREMENT,
 	at DATETIME NOT NULL,
 	content VARCHAR(1000) NOT NULL,
+	flash BOOLEAN NOT NULL DEFAULT 0,
 	progress BOOLEAN NOT NULL DEFAULT 0,
 	PRIMARY KEY (id)
 );
@@ -153,4 +154,5 @@ VALUES ('transfer', '1'),
 ('sms_stop', '1'),
 ('detect_url', '1'),
 ('default_phone_country', 'fr'), 
-('preferred_phone_country', 'fr,be,ca'); 
+('preferred_phone_country', 'fr,be,ca'),
+('sms_flash', '0');
