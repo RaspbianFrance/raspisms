@@ -95,7 +95,7 @@
 					'date' => htmlspecialchars($received['at']),
 					'text' => htmlspecialchars($received['content']),
 					'type' => 'received',
-					'md5'  => md5($received),
+					'md5'  => md5($received['at'] . $received['content']),
 				);
 			}
 
