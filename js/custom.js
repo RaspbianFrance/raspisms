@@ -29,6 +29,7 @@ function verifReceived()
 	jQuery.getJSON(HTTP_PWD + "/receiveds/popup", function( data ) {
 		$.each(data, function(key, val) {
 			showMessage('SMS reçu du ' + val.send_by.replace(/</g, "&lt;").replace(/>/g, "&gt;") + ' : ' + val.content.replace(/</g, "&lt;").replace(/>/g, "&gt;"), 1);
+			playReceptionSound();
 		});
 	});
 }
@@ -48,6 +49,14 @@ function scrollDownDiscussion()
 	{
 		jQuery('.discussion-container').animate({scrollTop: 1000000});
 	}
+}
+
+/**
+ * Cette fonction jou le son de reception d'un SMS
+ */
+function playReceptionSound ()
+{
+	jQuery('body').find('#reception-sound').play();
 }
 
 jQuery(document).ready(function()

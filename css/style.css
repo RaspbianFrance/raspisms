@@ -240,3 +240,8 @@ footer
 	cursor: pointer;
 }
 
+/* AUDIO RECEPTION MESSAGE */
+#reception-sound
+{
+	display: none;
+}
