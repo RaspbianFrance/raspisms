@@ -155,4 +155,5 @@ VALUES ('transfer', '1'),
 ('detect_url', '1'),
 ('default_phone_country', 'fr'), 
 ('preferred_phone_country', 'fr,be,ca'),
-('sms_flash', '0');
+('sms_flash', '0'),
+('sms_reception_sound', '1');
