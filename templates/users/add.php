@@ -52,6 +52,20 @@
 										<input name="email_confirm" class="form-control" type="email" placeholder="Confirmer l'adresse e-mail de l'utilisateur" required>
 									</div>
 								</div>
+								<div class="form-group">
+									<label>Mot de passe (laissez vide pour générer le mot de passe automatiquement)</label>
+									<div class="form-group input-group">
+										<span class="input-group-addon"><span class="fa fa-lock"></span></span>
+										<input name="password" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur" >
+									</div>
+								</div>
+								<div class="form-group">
+									<label>Confirmer le mot de passe</label>
+									<div class="form-group input-group">
+										<span class="input-group-addon"><span class="fa fa-lock"></span></span>
+										<input name="password_confirm" class="form-control" type="password" placeholder="Confirmer le mot de passe de l'utilisateur" >
+									</div>
+								</div>
 								<?php if (isset($_SESSION['admin']) && $_SESSION['admin']) { ?>
 									<div class="form-group">
 										<label>Niveau administrateur : </label>

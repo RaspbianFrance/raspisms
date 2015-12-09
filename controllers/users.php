@@ -44,6 +44,8 @@
 		 * @param $csrf : Le jeton CSRF
 		 * @param string $_POST['email'] : L'email de l'utilisateur
 		 * @param string $_POST['email_confirm'] : Confirmation de l'email de l'utilisateur
+		 * @param string $_POST['password'] : Le mot de passe de l'utilisateur (si vide, générer automatiquement)
+		 * @param string $_POST['password_confirm'] : Confirmation du mot de passe de l'utilisateur
 		 * @param boolean $_POST['admin'] : Optionnel : Si l'utilisateur est admin. Par défaut non
 		 */
 		public function create($csrf)
@@ -66,7 +68,21 @@
 			}
 
 			$email = $_POST['email'];
+			
 			$no_crypt_password = internalTools::generatePassword(rand(8,12));
+
+			if ($_POST['password'])
+			{
+				if ($_POST['password'] != $_POST['password_confirm'])
+				{
+					$_SESSION['errormessage'] = 'Les mots de passes fournis ne correspondent pas.';
+					header('Location: ' . $this->generateUrl('users', 'add'));
+					return false;
+				}
+
+				$no_crypt_password = $_POST['password'];
+			}
+
 			$password = sha1($no_crypt_password);
 
 			if (!filter_var($email, FILTER_VALIDATE_EMAIL))
