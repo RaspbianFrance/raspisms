@@ -80,6 +80,7 @@
 									'<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
+							playReceptionSound();
 							break;
 						case 'sended' :
 							var texte = '' +
