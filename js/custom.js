@@ -57,7 +57,7 @@ function scrollDownDiscussion()
 function playReceptionSound ()
 {
 	var receptionSound = jQuery('body').find('#reception-sound');
-	if (receptionSound)
+	if (receptionSound.length)
 	{
 		receptionSound[0].play();
 	}
