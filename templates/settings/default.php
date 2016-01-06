@@ -59,7 +59,7 @@
 										<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Détection des URL dans les discussions</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo $this->generateUrl('settings', 'change', ['detection_url', $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['detect_url', $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Détection activé : </label>
 												<select name="settingValue" class="form-control">
