@@ -18,7 +18,7 @@
 		 */
 		public function forgetPassword()
 		{
-			$this->render('forgetPassword');
+			$this->render('connect/forgetPassword');
 		}
 	
 		/**
