@@ -578,6 +578,49 @@
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
+		/********************************/
+		/* PARTIE DES REQUETES WEBHOOKS */
+		/********************************/
+
+		/**
+		 * Récupère les webhooks dont l'id fait partie de la liste fournie
+		 * @param array $webhooks_ids = Tableau des id des webhooks voulus
+		 * @return array : Retourne un tableau avec les webhooks adaptés
+		 */
+		public function getWebhooksIn($webhooks_ids)
+		{
+			$query = "
+				SELECT *
+				FROM webhooks
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($webhooks_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params);
+		}
+
+		/**
+		 * Supprime tous les webhooks dont l'id fait partie du tableau fourni
+		 * @param $webhooks_ids : Tableau des id des webhooks à supprimer
+		 * @return int : Nombre de lignes supprimées
+		 */
+		public function deleteWebhooksIn($webhooks_ids)
+		{
+			$query = "
+				DELETE FROM webhooks
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($webhooks_ids);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
 		/*******************************************/
 		/* PARTIE DES REQUETES SCHEDULEDS_CONTACTS */
 		/*******************************************/

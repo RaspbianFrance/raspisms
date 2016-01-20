@@ -72,6 +72,9 @@
 						<a href="<?php echo $this->generateUrl('users'); ?>"><i class="fa fa-fw fa-user"></i> Utilisateurs</a>
 					</li>
 					<?php if ($admin) { ?>
+						<li <?php echo $page == 'webhooks' ? 'class="active"' : ''; ?>>
+							<a href="<?php echo $this->generateUrl('webhooks'); ?>"><i class="fa fa-fw fa-plug"></i> Webhooks</a>
+						</li>
 						<li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
 							<a href="<?php echo $this->generateUrl('settings'); ?>"><i class="fa fa-fw fa-cogs"></i> Réglages</a>
 						</li>

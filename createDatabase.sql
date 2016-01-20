@@ -148,6 +148,14 @@ CREATE TABLE IF NOT EXISTS sms_stop
 	UNIQUE (number)
 );
 
+CREATE TABLE IF NOT EXISTS webhooks
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	url VARCHAR(250) NOT NULL,
+	type INT NOT NULL,
+	PRIMARY KEY (id)
+);
+
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
 VALUES ('transfer', '1'),
