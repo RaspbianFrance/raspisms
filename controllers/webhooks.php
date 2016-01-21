@@ -173,7 +173,7 @@
 		{
 			global $db;
 
-			if (!$db->insertIntoTable('webhook_queries', ['url' => $url, ['datas' => json_encode($datas)]]))
+			if (!$db->insertIntoTable('webhook_queries', ['url' => $url, 'datas' => json_encode($datas)]))
 			{
 				return false;
 			}
