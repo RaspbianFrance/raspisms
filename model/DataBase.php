@@ -602,6 +602,31 @@
 			return $this->runQuery($query, $params);
 		}
 
+		/***************************************/
+		/* PARTIE DES REQUETES WEBHOOK_QUERIES */
+		/***************************************/
+
+		/**
+		 * Change le statut des webhook_queries dont l'id est fourni dans $webhookQueriesId
+		 * @param array $webhookQueriesId = Tableau des id des webhook_queries voulus
+		 * @return int : Retourne le nombre de lignes mises à jour
+		 */
+		public function updateWebhookQueriesIn($webhookQueriesId, $progress)
+		{
+			$query = "
+				UPDATE webhook_queries
+				SET progress = :progress
+				WHERE id ";
+		
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+			$generted_in = $this->generateInFromArray($webhookQueriesId);
+			$query .= $generted_in['QUERY'];
+			$params = $generted_in['PARAMS'];
+			$params['progress'] = (boolean)$progress;
+
+			return $this->runQuery($query, $params, self::ROWCOUNT);
+		}
+
 		/**
 		 * Supprime tous les webhooks dont l'id fait partie du tableau fourni
 		 * @param $webhooks_ids : Tableau des id des webhooks à supprimer

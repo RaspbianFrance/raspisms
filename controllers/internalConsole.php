@@ -436,4 +436,38 @@
 
 			$db->deleteTransfersIn($ids_transfers);
 		}
+
+		/**
+		 * Cette fonction permet d'envoyer toutes les requêtes des Webhook_queries
+		 */
+		public function sendWebhookQueries ()
+		{
+			global $db;
+			
+			$webhookQueries = $db->getFromTableWhere('webhook_queries', ['progress' => false]);
+			$webhookQueriesIds = [];
+			foreach ($webhookQueries as $webhookQuerie)
+			{
+				$webhookQueriesIds[] = $webhookQuerie['id'];
+			}
+
+			$db->updateProgressWebhookQueries($webhookQueriesIds, true);
+
+			foreach ($webhookQueries as $webhookQuerie)
+			{
+				//On remap les datas
+				$datas = json_decode($webhookQuerie['datas'], true);
+				$datas = http_build_query($datas);
+
+				//On fait la requete
+				$curl = curl_init();
+				curl_setopt($curl, CURLOPT_URL, $webhookQuerie['url']);
+				curl_setopt($curl, CURLOPT_POST, 1);
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
+				curl_exec($curl);
+				curl_close($curl); //On ferme CURL
+
+				echo "Query do to " . $webhookQuerie['url'] . " with datas " . $datas . "\n";
+			}
+		}
 	}
