@@ -156,6 +156,15 @@ CREATE TABLE IF NOT EXISTS webhooks
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS webhook_queries
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	url VARCHAR(250) NOT NULL,
+	datas VARCHAR(10000) NOT NULL,
+	progress BOOLEAN NOT NULL DEFAULT FALSE,
+	PRIMARY KEY (id)
+);
+
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
 VALUES ('transfer', '1'),

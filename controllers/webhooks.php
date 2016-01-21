@@ -146,13 +146,38 @@
 		}
 
 		/**
+		 * Cette méthode permet d'ajouter d'un coup toutes les requête d'un webhook à la queue des requête pour un type de webhook
+		 * @param int $webhookType : Le type de webhook (une constante issue de internalConstants::WEBHOOK_TYPE)
+		 * @param array $datas : Les données à envoyer avec la requête (si non définie, [])
+		 * @return void
+		 */
+		public function _addWebhooksForType ($webhookType, $datas = [])
+		{
+			global $db;
+
+			$webhooks = $db->getFromTableWhere('webhooks', ['type' => $webhookType]);
+
+			foreach ($webhooks as $webhook)
+			{
+				$this->addWebhookQuery($webhook['url'], $datas);
+			}
+		}
+
+		/**
 		 * Cette méthode est appelée pour ajouter une requête issue d'un webhook à la queue
 		 * @param string $url : L'url à laquelle envoyer la requête
 		 * @param array $datas : Les données à envoyer avec la requête (si non définie, [])
 		 * @return boolean : true si on reussi à l'ajouter, false sinon
 		 */
-		public function _enqueueQuery ($url, $datas = [])
+		private function addWebhookQuery ($url, $datas = [])
 		{
-			return false;
+			global $db;
+
+			if (!$db->insertIntoTable('webhook_queries', ['url' => $url, ['datas' => json_encode($datas)]]))
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}

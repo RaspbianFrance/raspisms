@@ -179,6 +179,15 @@
 						//On va liée les deux commandes pour envoyer le SMS puis le passer en echec
 						$commande = '(' . $commande_send_sms . ') >/dev/null 2>/dev/null &';
 						exec($commande); //On execute la commande d'envoie d'un SMS
+
+						$datas = array(
+							'number' => $number,
+							'text' => $scheduled['content'],
+							'flash' => $scheduled['flash'],
+						);
+						
+						$webhooks = new webhooks();
+						$webhooks->_addWebhooksForType(internalConstants::WEBHOOK_TYPE['SEND_SMS'], $datas);
 					}
 				}
 
@@ -348,12 +357,23 @@
 					$send_by = $number;
 					$content = $text;
 					$is_command = count($found_commands);
-					if (!$db->insertIntoTable('receiveds', ['at' => $date, 'send_by' => $send_by, 'content' => $content, 'is_command' => $is_command]))
+
+					$received = array(
+						'at' => $date,
+						'send_by' => $send_by,
+						'content' => $content,
+						'is_command' => $is_command,
+					);
+
+					if (!$db->insertIntoTable('receiveds', $received))
 					{
 						echo "Erreur lors de l'enregistrement du SMS\n";
 						$this->wlog('Unable to process the SMS in file "' . $dir);
 						die(7);
 					}
+
+					$webhooks = new webhooks();
+					$webhooks->_addWebhooksForType(internalConstants::WEBHOOK_TYPE['RECEIVE_SMS'], $received);
 
 					//On insert le SMS dans le tableau des sms à envoyer par mail
 					$db->insertIntoTable('transfers', ['id_received' => $db->lastId(), 'progress' => false]);
