@@ -451,7 +451,7 @@
 				$webhookQueriesIds[] = $webhookQuerie['id'];
 			}
 
-			$db->updateProgressWebhookQueries($webhookQueriesIds, true);
+			$db->updateProgressWebhookQueriesIn($webhookQueriesIds, true);
 
 			foreach ($webhookQueries as $webhookQuerie)
 			{

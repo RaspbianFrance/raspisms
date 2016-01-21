@@ -611,7 +611,7 @@
 		 * @param array $webhookQueriesId = Tableau des id des webhook_queries voulus
 		 * @return int : Retourne le nombre de lignes mises à jour
 		 */
-		public function updateWebhookQueriesIn($webhookQueriesId, $progress)
+		public function updateProgressWebhookQueriesIn($webhookQueriesId, $progress)
 		{
 			$query = "
 				UPDATE webhook_queries
