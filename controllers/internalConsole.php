@@ -444,30 +444,36 @@
 		{
 			global $db;
 			
-			$webhookQueries = $db->getFromTableWhere('webhook_queries', ['progress' => false]);
-			$webhookQueriesIds = [];
-			foreach ($webhookQueries as $webhookQuerie)
-			{
-				$webhookQueriesIds[] = $webhookQuerie['id'];
-			}
+			for ($i = 0; $i < 30; $i++)
+			{			
+				$webhookQueries = $db->getFromTableWhere('webhook_queries', ['progress' => false]);
+				$webhookQueriesIds = [];
+				foreach ($webhookQueries as $webhookQuerie)
+				{
+					$webhookQueriesIds[] = $webhookQuerie['id'];
+				}
 
-			$db->updateProgressWebhookQueriesIn($webhookQueriesIds, true);
+				$db->updateProgressWebhookQueriesIn($webhookQueriesIds, true);
 
-			foreach ($webhookQueries as $webhookQuerie)
-			{
-				//On remap les datas
-				$datas = json_decode($webhookQuerie['datas'], true);
-				$datas = http_build_query($datas);
+				foreach ($webhookQueries as $webhookQuerie)
+				{
+					//On remap les datas
+					$datas = json_decode($webhookQuerie['datas'], true);
+					$datas = http_build_query($datas);
 
-				//On fait la requete
-				$curl = curl_init();
-				curl_setopt($curl, CURLOPT_URL, $webhookQuerie['url']);
-				curl_setopt($curl, CURLOPT_POST, 1);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
-				curl_exec($curl);
-				curl_close($curl); //On ferme CURL
+					//On fait la requete
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, $webhookQuerie['url']);
+					curl_setopt($curl, CURLOPT_POST, 1);
+					curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
+					curl_exec($curl);
+					curl_close($curl); //On ferme CURL
 
-				echo "Query do to " . $webhookQuerie['url'] . " with datas " . $datas . "\n";
+					echo "Query do to " . $webhookQuerie['url'] . " with datas " . $datas . "\n";
+				}
+
+				//On attend 2 secondes
+				sleep(2);
 			}
 		}
 	}
