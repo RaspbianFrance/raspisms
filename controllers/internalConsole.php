@@ -1,73 +1,6 @@
 <?php
 	class internalConsole extends Controller
 	{
-
-		/**
-		 * Cette fonction retourne l'aide de la console
-		 */
-		public function help()
-		{
-			//On définit les commandes disponibles
-			$commands = array(
-				'sendScheduleds' => array(
-					'description' => 'Cette commande permet d\'envoyer les SMS programmés qui doivent l\'êtres.',
-					'requireds' => array(),
-					'optionals' => array(),
-				),
-				'parseReceivedSMS' => array(
-					'description' => 'Cette commande permet d\'enregistrer un SMS, et de l\'analyser pour voir s\'il contient une commande. Pour cela, il analyse le dossier PWD_RECEIVEDS',
-					'requireds' => array(
-					),
-					'optionals' => array(),
-				),
-				'sendTransfers' => array(
-					'description' => 'Cette commande permet d\'envoyer par mails les sms à transférés.',
-					'requireds' => [],
-					'optionals' => [],
-				),
-			);
-
-			$message  = "Vous êtes ici dans l'aide de la console.\n";
-			$message .= "Voici la liste des commandes disponibles : \n";
-
-			//On écrit les texte pour la liste des commandes dispos
-			foreach ($commands as $name => $value)
-			{
-				$requireds = isset($value['requireds']) ? $value['requireds'] : array();
-				$optionals = isset($value['optionals']) ? $value['optionals'] : array();
-
-				$message .= '	' . $name . ' : ' . $value['description'] . "\n";
-				$message .= "		Arguments obligatoires : \n";
-				if (!count($requireds))
-				{
-					$message .= "			Pas d'argument\n";
-				}
-				else
-				{
-					foreach ($requireds as $argument => $desc)
-					{
-						$message .= '				- ' . $argument . ' : ' . $desc . "\n";
-					}
-				}
-
-				$message .= "		Arguments optionnels : \n";
-				
-				if (!count($optionals))
-				{
-					$message .= "			Pas d'argument\n";
-				}
-				else
-				{
-					foreach ($optionals as $argument => $desc)
-					{
-						$message .= '				- ' . $argument . ' : ' . $desc . "\n";
-					}
-				}
-			}
-
-			echo $message;
-		}
-
 		/**
 		 * Cette fonction envoie tous les SMS programmés qui doivent l'être
 		 */
@@ -471,6 +404,8 @@
 
 					echo "Query do to " . $webhookQuerie['url'] . " with datas " . $datas . "\n";
 				}
+
+				$db->deleteWebhookQueriesIn($webhookQueriesIds);
 
 				//On attend 2 secondes
 				sleep(2);

@@ -51,6 +51,9 @@
 				case 'COMMAND_ADD' :
 					$logo = 'fa-terminal';
 					break;
+				case 'WEBHOOK_ADD' :
+					$logo = 'fa-plug';
+					break;
 				default :
 					$logo = 'fa-question';
 			}

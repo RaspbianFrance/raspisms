@@ -9,6 +9,7 @@
 	require_once('./mvc/conn_bdd.php');
 	require_once('./mvc/secho.php');
 	require_once('./mvc/Controller.php');
+	require_once('./mvc/ApiController.php');
 	require_once('./mvc/Router.php');
 	require_once('./mvc/Model.php');
 

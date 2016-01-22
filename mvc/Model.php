@@ -637,7 +637,7 @@
 			}
 
 			//On fabrique la requete
-			$query = "INSERT INTO " . $table . "(" . implode(', ', $fieldNames) . ") VALUES(:" . implode(', :', $fieldNames) . ")";
+			$query = "INSERT INTO " . $table . " (" . implode(', ', $fieldNames) . ") VALUES(:" . implode(', :', $fieldNames) . ")";
 
 			//On retourne le nombre de lignes insérées
 			return $this->runQuery($query, $params, self::ROWCOUNT);

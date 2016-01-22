@@ -108,7 +108,7 @@
 				return false;
 			}
 
-			$db->insertIntoTable('events', ['type' => 'WEBHOOKS_ADD', 'text' => 'Ajout webhook : ' . $type . ' => ' . $url]);
+			$db->insertIntoTable('events', ['type' => 'WEBHOOK_ADD', 'text' => 'Ajout webhook : ' . array_search($type, internalConstants::WEBHOOK_TYPE) . ' (' . $url . ')']);
 			
 			$_SESSION['successmessage'] = 'Le webhook a bien été créé.';
 			header('Location: ' . $this->generateUrl('webhooks'));
