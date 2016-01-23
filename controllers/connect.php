@@ -9,7 +9,7 @@
 		 */	
 		public function byDefault()
 		{
-			$this->render('connect/login');
+			$this->render('connect/default');
 		}
 
 		/**
@@ -39,7 +39,7 @@
 			if (!$users = $db->getFromTableWhere('users', ['email' => $email]))
 			{
 				$_SESSION['errormessage'] = 'Identifiants incorrects.';
-				header('Location: ' . $this->generateUrl('connect', 'login'));
+				header('Location: ' . $this->generateUrl('connect'));
 				return false;
 			}
 
@@ -48,7 +48,7 @@
 			if (sha1($password) != $user['password'])
 			{
 				$_SESSION['errormessage'] = 'Cet e-mail n\'existe pas.';
-				header('Location: ' . $this->generateUrl('connect', 'login'));
+				header('Location: ' . $this->generateUrl('connect'));
 				return false;	
 			}
 
@@ -97,12 +97,12 @@
 			if (!$db->updateTableWhere('users', ['email' => $user['email'], 'password' => $new_password, 'admin' => $user['admin']], ['id' => $user['id']]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de mettre à jour le mot de passe.';
-				header('Location: ' . $this->generateUrl('connect', 'login'));
+				header('Location: ' . $this->generateUrl('connect'));
 				return false;
 			}
 
 			$_SESSION['successmessage'] = 'Un nouveau mot de passe vous a été envoyé par mail.';
-			header('Location: ' . $this->generateUrl('connect', 'login'));
+			header('Location: ' . $this->generateUrl('connect'));
 			return true;
 
 		}
