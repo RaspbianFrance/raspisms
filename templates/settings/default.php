@@ -47,9 +47,9 @@
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_TRANSFER ? 'selected' : ''; ?>>Oui</option>
 												</select>
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -66,9 +66,9 @@
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_DETECT_URL ? 'selected' : ''; ?>>Oui</option>
 												</select>
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -82,9 +82,9 @@
 											<div class="form-group">
 												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules : </label>
 												<input name="settingValue" class="form-control" value="<?php secho(RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY); ?>" />
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -101,9 +101,9 @@
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_RECEPTION_SOUND ? 'selected' : ''; ?>>Oui</option>
 												</select>
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -122,9 +122,9 @@
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_STOP ? 'selected' : ''; ?>>Oui</option>
 												</select>
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -138,9 +138,9 @@
 											<div class="form-group">
 												<label>Code du pays (norme ISO 3166-1 alpha-2) : </label>
 												<input name="settingValue" class="form-control" value="<?php secho(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>" />
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
@@ -157,9 +157,28 @@
 													<option value="0">Non</option>
 													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_FLASH ? 'selected' : ''; ?>>Oui</option>
 												</select>
-											</div>	
+											</div>
 											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
+												<button class="btn btn-success">Mettre à jour les données</button>
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-user fa-fw"></i> Informations de contacts avancées</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo $this->generateUrl('settings', 'change', ['extended_contacts_infos', $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Gérer plus d'informations sur les contacts : </label>
+												<select name="settingValue" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>
 											</div>
 										</form>
 									</div>
