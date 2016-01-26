@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS scheduleds
 
 CREATE TABLE IF NOT EXISTS contacts
 (
-	
+
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) NOT NULL,
 	number VARCHAR(20) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS events
 	id INT NOT NULL AUTO_INCREMENT,
 	type VARCHAR(25) NOT NULL,
 	at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	text VARCHAR(255) NOT NULL,	
+	text VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id)
 );
 
@@ -148,12 +148,27 @@ CREATE TABLE IF NOT EXISTS sms_stop
 	UNIQUE (number)
 );
 
+CREATE TABLE IF NOT EXISTS contacts_infos
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_contact INT NOT NULL,
+	civility INT NOT NULL,
+	first_name VARCHAR(100),
+	last_name VARCHAR(100) NOT NULL,
+	birthday DATE,
+	love_situation INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_contact) REFERENCES contacts (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	UNIQUE (first_name, last_name),
+);
+
 #On insert les données par défaut dans les settings
 INSERT INTO settings (name, value)
 VALUES ('transfer', '1'),
 ('sms_stop', '1'),
 ('detect_url', '1'),
-('default_phone_country', 'fr'), 
+('default_phone_country', 'fr'),
 ('preferred_phone_country', 'fr,be,ca'),
 ('sms_flash', '0'),
-('sms_reception_sound', '1');
+('sms_reception_sound', '1'),
+('extended_contacts_infos', '0');
