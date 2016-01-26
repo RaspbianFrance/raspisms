@@ -37,7 +37,7 @@
 				SELECT *
 				FROM sendeds
 				WHERE id = :id";
-		
+
 			$params = array(
 				'id' => $id
 			);
@@ -55,8 +55,8 @@
 			$query = "
 				DELETE FROM sendeds
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($sendeds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -169,8 +169,8 @@
 				SELECT *
 				FROM receiveds
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($receiveds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -188,8 +188,8 @@
 			$query = "
 				DELETE FROM receiveds
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($receiveds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -220,7 +220,7 @@
 		/********************************/
 		/* PARTIE DES REQUETES CONTACTS */
 		/********************************/
-		
+
 		/**
 		 * Supprime tous les contacts dont l'id fait partie du tableau fourni
 		 * @param $contacts_ids : Tableau des id des contacts à supprimer
@@ -231,8 +231,8 @@
 			$query = "
 				DELETE FROM contacts
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($contacts_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -243,16 +243,27 @@
 		/**
 		 * Récupère les contacts dont l'id fait partie de la liste fournie
 		 * @param array $contacts_ids = Tableau des id des contacts voulus
+		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Retourne un tableau avec les contacts adaptés
 		 */
-		public function getContactsIn($contacts_ids)
+		public function getContactsIn($contacts_ids, $extended_contact = false)
 		{
+			if ($extended_contact) {
+				$extended_contact_join = '
+					LEFT JOIN contacts_infos as inf
+					ON (inf.id_contact = contacts.id)
+				';
+			} else {
+				$extended_contact_join = '';
+			}
+
 			$query = "
 				SELECT *
 				FROM contacts
+				".$extended_contact_join."
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($contacts_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -294,8 +305,8 @@
 				SELECT *
 				FROM groups
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($groups_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -313,8 +324,8 @@
 			$query = "
 				DELETE FROM groups
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($groups_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -329,15 +340,28 @@
 		/**
 		 * Retourne tous les contacts pour un groupe donnée
 		 * @param int $id_group : L'id du groupe
+		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Tous les contacts compris dans le groupe
 		 */
-		public function getContactsForGroup($id_group)
+		public function getContactsForGroup($id_group, $extended_contact = false)
 		{
+			if ($extended_contact) {
+				$contact_fields = 'inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
+				$extended_contact_join = '
+					LEFT JOIN contacts_infos as inf
+					ON (inf.id_contact = con.id)
+				';
+			} else {
+				$contact_fields = 'con.name as name';
+				$extended_contact_join = '';
+			}
+
 			$query = '
-				SELECT con.id as id, con.name as name, con.number as number
+				SELECT con.id as id, ' . $contact_fields . ', con.number as number
 				FROM groups_contacts as g_c
 				JOIN contacts as con
 				ON (g_c.id_contact = con.id)
+				'.$extended_contact_join.'
 				WHERE(g_c.id_group = :id_group)
 			';
 
@@ -367,7 +391,7 @@
 				if($this->fieldExist($order_by, 'contacts'))
 				{
 					$query .= ' ORDER BY '. $order_by;
-					if ($desc) 
+					if ($desc)
 					{
 						$query .= ' DESC';
 					}
@@ -413,8 +437,8 @@
 				SELECT *
 				FROM scheduleds
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($scheduleds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -475,8 +499,8 @@
 			$query = "
 				DELETE FROM scheduleds
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($scheduleds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -526,7 +550,7 @@
 					)
 				)
 			";
-			
+
 			$params = array(
 				'date' => $date,
 				'number' => $number,
@@ -550,8 +574,8 @@
 				SELECT *
 				FROM commands
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($commands_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -569,8 +593,8 @@
 			$query = "
 				DELETE FROM commands
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($commands_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -581,19 +605,32 @@
 		/*******************************************/
 		/* PARTIE DES REQUETES SCHEDULEDS_CONTACTS */
 		/*******************************************/
-		
+
 		/**
 		 * Retourne tous les contacts pour un sms programmé donnée
 		 * @param int $id_sms : L'id du sms
+		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Tous les contacts compris dans le schedulede
 		 */
-		public function getContactsForScheduled($id_scheduled)
+		public function getContactsForScheduled($id_scheduled, $extended_contact = false)
 		{
+			$contact_fields = '';
+			$extended_contact_join = '';
+
+			if ($extended_contact) {
+				$contact_fields = ' inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
+				$extended_contact_join = '
+					LEFT JOIN contacts_infos as inf
+					ON (inf.id_contact = con.id)
+				';
+			}
+
 			$query = '
-				SELECT con.id as id, con.name as name, con.number as number
+				SELECT con.id as id, con.name as name, con.number as number'.$contact_fields.'
 				FROM scheduleds_contacts as s_c
 				JOIN contacts as con
 				ON (s_c.id_contact = con.id)
+				'.$extended_contact_join.'
 				WHERE(s_c.id_scheduled = :id_scheduled)
 			';
 
@@ -634,8 +671,8 @@
 				UPDATE scheduleds
 				SET progress = :progress
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($scheduleds_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -647,7 +684,7 @@
 		/******************************************/
 		/* PARTIE DES REQUETES SCHEDULEDS_NUMBERS */
 		/******************************************/
-		
+
 		/**
 		 * Supprime tous les scheduleds_numbers pour un sms donné
 		 * @param int $id_scheduled : L'id du sms pour lequel on doit supprimer les scheduleds_numbers
@@ -690,7 +727,7 @@
 		/*****************************************/
 		/* PARTIE DES REQUETES SCHEDULEDS_GROUPS */
 		/*****************************************/
-		
+
 		/**
 		 * Supprime tous les scheduleds_groups pour un sms donné
 		 * @param int $id_scheduled : L'id du sms pour lequel on doit supprimer les scheduleds_groups
@@ -735,7 +772,7 @@
 		/*****************************/
 		/* PARTIE DES REQUETES USERS */
 		/*****************************/
-	
+
 		/**
 		 * Récupère un utilisateur à partir de son email
 		 * @param string $email = L'email de l'utilisateur
@@ -747,7 +784,7 @@
 				SELECT *
 				FROM users
 				WHERE email = :email";
-		
+
 			$params = array(
 				'email' => $email
 			);
@@ -765,8 +802,8 @@
 			$query = "
 				DELETE FROM users
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($users_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -789,8 +826,8 @@
 				UPDATE transfers
 				SET progress = :progress
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($transfers_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -809,8 +846,8 @@
 			$query = "
 				DELETE FROM transfers
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($transfers_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -832,8 +869,8 @@
 			$query = "
 				DELETE FROM events
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($events_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
@@ -855,8 +892,8 @@
 			$query = "
 				DELETE FROM sms_stop
 				WHERE id ";
-		
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id	
+
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($sms_stops_ids);
 			$query .= $generted_in['QUERY'];
 			$params = $generted_in['PARAMS'];
