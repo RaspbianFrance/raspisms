@@ -243,12 +243,11 @@
 		/**
 		 * Récupère les contacts dont l'id fait partie de la liste fournie
 		 * @param array $contacts_ids = Tableau des id des contacts voulus
-		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Retourne un tableau avec les contacts adaptés
 		 */
-		public function getContactsIn($contacts_ids, $extended_contact = false)
+		public function getContactsIn($contacts_ids)
 		{
-			if ($extended_contact) {
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
 				$extended_contact_join = '
 					LEFT JOIN contacts_infos as inf
 					ON (inf.id_contact = contacts.id)
@@ -340,12 +339,11 @@
 		/**
 		 * Retourne tous les contacts pour un groupe donnée
 		 * @param int $id_group : L'id du groupe
-		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Tous les contacts compris dans le groupe
 		 */
-		public function getContactsForGroup($id_group, $extended_contact = false)
+		public function getContactsForGroup($id_group)
 		{
-			if ($extended_contact) {
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
 				$contact_fields = 'inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
 				$extended_contact_join = '
 					LEFT JOIN contacts_infos as inf
@@ -609,15 +607,14 @@
 		/**
 		 * Retourne tous les contacts pour un sms programmé donnée
 		 * @param int $id_sms : L'id du sms
-		 * @param boolean $extended_contact : Mode de gestion des contacts avancés activé
 		 * @return array : Tous les contacts compris dans le schedulede
 		 */
-		public function getContactsForScheduled($id_scheduled, $extended_contact = false)
+		public function getContactsForScheduled($id_scheduled)
 		{
 			$contact_fields = '';
 			$extended_contact_join = '';
 
-			if ($extended_contact) {
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
 				$contact_fields = ' inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
 				$extended_contact_join = '
 					LEFT JOIN contacts_infos as inf
