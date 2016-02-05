@@ -5,7 +5,7 @@
 	class contacts extends Controller
 	{
 		/**
-		 * Cette fonction est appelée avant toute les autres : 
+		 * Cette fonction est appelée avant toute les autres :
 		 * Elle vérifie que l'utilisateur est bien connecté
 		 * @return void;
 		 */
@@ -16,14 +16,18 @@
 
 		/**
 		 * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts
-		 */	
+		 */
 		public function byDefault()
 		{
 			//Creation de l'object de base de données
 			global $db;
-			
+
 			//Recupération des nombres des 4 panneaux d'accueil
-			$contacts = $db->getFromTableWhere('contacts');
+			$contacts = $db->getFromTableWhere('contacts', array(), '', false, false, false, array(array(
+				'table' => 'contacts_infos',
+				'type' => 'LEFT',
+				'on' => 'contacts_infos.id_contact = contacts.id'
+			)));
 
 			$this->render('contacts/default', array(
 				'contacts' => $contacts,
@@ -52,7 +56,7 @@
 
 			//Create de l'object de base de données
 			global $db;
-			
+
 			$db->deleteContactsIn($ids);
 			header('Location: ' . $this->generateUrl('contacts'));
 			return true;
@@ -76,7 +80,7 @@
 
 			//On récupère les ids comme étant tous les arguments de la fonction
 			$ids = func_get_args();
-			
+
 			$contacts = $db->getContactsIn($ids);
 			$this->render('contacts/edit', array(
 				'contacts' => $contacts,
@@ -180,7 +184,7 @@
 		public function jsonGetContacts()
 		{
 			global $db;
-			
+
 			echo json_encode($db->getFromTableWhere('contacts'));
 		}
 	}

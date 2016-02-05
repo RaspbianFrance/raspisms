@@ -39,8 +39,17 @@
 									<thead>
 										<tr>
 											<th>#</th>
-											<th>Nom</th>
-											<th>Numéro</th>
+											<?php if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) { ?>
+												<th>Civilité</th>
+												<th>Prénom</th>
+												<th>Nom</th>
+												<th>Numéro</th>
+												<th>Date de naissance</th>
+												<th>Situation</th>
+											<?php } else { ?>
+												<th>Nom</th>
+												<th>Numéro</th>
+											<?php } ?>
 											<th style="width:5%;">Sélectionner</th>
 										</tr>
 									</thead>
@@ -51,8 +60,17 @@
 											?>
 											<tr>
 												<td><?php secho($contact['id']); ?></td>
-												<td><?php secho($contact['name']); ?></td>
-												<td><?php secho($contact['number']); ?></td>
+												<?php if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) { ?>
+													<td><?php secho($contact['civility']); ?></td>
+													<td><?php secho($contact['first_name']); ?></td>
+													<td><?php secho($contact['last_name'] ? $contact['last_name'] : $contact['name']); ?></td>
+													<td><?php secho($contact['number']); ?></td>
+													<td><?php secho($contact['birthday']); ?></td>
+													<td><?php secho($contact['love_situation']); ?></td>
+												<?php } else { ?>
+													<td><?php secho($contact['name']); ?></td>
+													<td><?php secho($contact['number']); ?></td>
+												<?php } ?>
 												<td><input type="checkbox" value="<?php secho($contact['id']); ?>"></td>
 											</tr>
 											<?php
@@ -66,7 +84,7 @@
 									<a class="btn btn-success" href="<?php echo $this->generateUrl('contacts', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un contact</a>
 								</div>
 								<div class="text-right col-xs-6 no-padding">
-									<strong>Action groupée :</strong> 
+									<strong>Action groupée :</strong>
 									<div class="btn-group action-dropdown" target="#table-contacts">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
 										<ul class="dropdown-menu pull-right" role="menu">
