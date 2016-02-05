@@ -11,8 +11,8 @@
 		const FETCHALL = 2; //Retour de type fetchall
 		const ROWCOUNT = 3; //Retour de type rowCount()
 
-		protected $bdd; //L'instance de PDO à employer	
-	
+		protected $bdd; //L'instance de PDO à employer
+
 		public function __construct(PDO $bdd)
 		{
 			//Si $bdd est bien une instance de PDO
@@ -21,7 +21,7 @@
 
 		public function getBdd()
 		{
-			return $this->bdd;	
+			return $this->bdd;
 		}
 
 		public function setBdd(PDO $bdd)
@@ -52,7 +52,7 @@
 		*/
 		public function fieldExist($field, $table)
 		{
-			$fields = $this->getColumnsForTable($table);	
+			$fields = $this->getColumnsForTable($table);
 			$fields = $fields ? explode(', ', $fields) : array();
 			return in_array($field, $fields);
 		}
@@ -95,9 +95,9 @@
 			if ($this->tableExist($table))
 			{
 				$query = 'SHOW COLUMNS FROM ' . $table;
-				
+
 				$datas = array();
-				
+
 				$fields = $this->runQuery($query, $datas, self::FETCHALL);
 				$fieldsName = array();
 				foreach ($fields as $field)
@@ -113,35 +113,42 @@
 
 		/**
 		 * Cette fonction décrit une table et retourne un tableau sur cette description
-		 * @param string $table : Le nom de la table a analyser
+		 * @param string $tables : Le nom de la ou des tables a analyser séparées par une virgule
 		 * @return mixed : Si la table existe un tableau la décrivant, sinon false
 		 */
-		public function describeTable($table)
+		public function describeTable($tables)
 		{
-			if (!$this->tableExist($table))
-			{
-				return false;
-			}
-
-			//On recupere tous les champs pour pouvoir apres les analyser
-			$query = 'DESCRIBE ' . $table;
-			$fields = $this->runQuery($query);
-
+			$tableArray = explode(',', $tables);
 			$return = array();
-			foreach ($fields as $field)
-			{
-				$fieldInfo = array();
-				$fieldInfo['NAME'] = $field['Field'];
-				$fieldInfo['NULL'] = $field['Null'] == 'NO' ? false : true;
-				$fieldInfo['AUTO_INCREMENT'] = $field['Extra'] == 'auto_increment' ? true : false;
-				$fieldInfo['PRIMARY'] = $field['Key'] == 'PRI' ? true : false;
-				$fieldInfo['FOREIGN'] = $field['Key'] == 'MUL' ? true : false;
-				$fieldInfo['UNIQUE'] = $field['Key'] == 'UNI' ? true : false;
-				$fieldInfo['TYPE'] = mb_convert_case(preg_replace('#[^a-z]#ui', '', $field['Type']), MB_CASE_UPPER);
-				$fieldInfo['SIZE'] = filter_var($field['Type'], FILTER_SANITIZE_NUMBER_INT);
-				$fieldInfo['HAS_DEFAULT'] = $field['Default'] !== NULL ? true : false;
-				$fieldInfo['DEFAULT'] = $field['Default'];
-				$return[$field['Field']] = $fieldInfo;
+			foreach ($tableArray as $key => $table) {
+				if (!$this->tableExist($table))
+				{
+					return false;
+				}
+
+				//On recupere tous les champs pour pouvoir apres les analyser
+				$query = 'DESCRIBE ' . $table;
+				$fields = $this->runQuery($query);
+
+				foreach ($fields as $field)
+				{
+					$fieldInfo = array();
+					$fieldInfo['NAME'] = $field['Field'];
+					$fieldInfo['NULL'] = $field['Null'] == 'NO' ? false : true;
+					$fieldInfo['AUTO_INCREMENT'] = $field['Extra'] == 'auto_increment' ? true : false;
+					$fieldInfo['PRIMARY'] = $field['Key'] == 'PRI' ? true : false;
+					$fieldInfo['FOREIGN'] = $field['Key'] == 'MUL' ? true : false;
+					$fieldInfo['UNIQUE'] = $field['Key'] == 'UNI' ? true : false;
+					$fieldInfo['TYPE'] = mb_convert_case(preg_replace('#[^a-z]#ui', '', $field['Type']), MB_CASE_UPPER);
+					$fieldInfo['SIZE'] = filter_var($field['Type'], FILTER_SANITIZE_NUMBER_INT);
+					$fieldInfo['HAS_DEFAULT'] = $field['Default'] !== NULL ? true : false;
+					$fieldInfo['DEFAULT'] = $field['Default'];
+					if (sizeof($tableArray) == 1) {
+						$return[$field['Field']] = $fieldInfo;
+					} else {
+						$return[$table.'.'.$field['Field']] = $fieldInfo;
+					}
+				}
 			}
 
 			return $return;
@@ -161,7 +168,7 @@
 			}
 
 			$query = 'SELECT referenced_table_name as table_name, referenced_column_name as field_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_name = :table AND column_name = :field AND referenced_table_name IS NOT NULL';
-			
+
 			$params = array(
 				'table' => $table,
 				'field' => $field,
@@ -207,10 +214,10 @@
 			}
 
 			$query = "SELECT COUNT(*) as nb_lignes FROM " . $table;
-			
+
 			$return = $this->runQuery($query, array(), self::FETCH);
 			return $return['nb_lignes'];
-		}	 
+		}
 
 		/*
 			Fonctions d'execution des requetes ou de génération
@@ -240,27 +247,27 @@
 			{
 				case self::NO :
 					$return = NULL;
-					break; 
+					break;
 
 				case self::FETCH :
 					$return = $req->fetch();
-					break; 
+					break;
 
 				case self::FETCHALL :
 					$return = $req->fetchAll();
-					break; 
-				
-				case self::ROWCOUNT : 
+					break;
+
+				case self::ROWCOUNT :
 					$return = $req->rowCount();
 					break;
-			
+
 				default : //Par défaut on récupère via fetchAll
 					$return = $req->fetchAll();
 			}
 
 			return $return;
 		}
-		
+
 		/**
 		* Cette fonction permet de récupérer les éléments necessaires à une requete 'IN' depuis un tableau php
 		* @param string $values : Tableau PHP des valeurs
@@ -272,17 +279,17 @@
 				'QUERY' => '',
 				'PARAMS' => array(),
 			);
-			
+
 			$flags = array();
 
 			$values = count($values) ? $values : array();
-			
+
 			foreach ($values as $clef => $value)
 			{
 				$return['PARAMS']['in_value_' . $clef] = $value;
 				$flags[] = ':in_value_' . $clef;
-			}		
-				
+			}
+
 			$return['QUERY'] .= ' IN(' . implode(', ', $flags) . ')';
 			return $return;
 		}
@@ -300,13 +307,27 @@
 		 * @param string $desc : L'ordre de tri (asc ou desc). Si non défini, ordre par défaut (ASC)
 		 * @param string $limit : Le nombre maximum de résultats à récupérer (par défaut pas le limite)
 		 * @param string $offset : Le nombre de résultats à ignorer (par défaut pas de résultats ignorés)
+		 * @param string $joinConditions : Les tables à joindre avec leurs conditions (par défaut pas de jointure)
 		 * @return mixed : False en cas d'erreur, sinon les lignes retournées
 		 */
-		public function getFromTableWhere($table, $restrictions = array(), $order_by = '', $desc = false, $limit = false, $offset = false)
+		public function getFromTableWhere($table, $restrictions = array(), $order_by = '', $desc = false, $limit = false, $offset = false, $joinConditions = array())
 		{
 			$restrictions = !is_array($restrictions) ? array() : $restrictions;
+			$tableToDescribe = $table;
 
-			$fields = $this->describeTable($table);
+			// on gère les jointures et récupère toutes les tables
+			$join = ' ';
+			foreach ($joinConditions as $joinCondition) {
+				if (array_key_exists('table', $joinCondition)) {
+					$tableJointure = $joinCondition['table'];
+					$tableToDescribe .= ',' . $tableJointure;
+					$onCondition = array_key_exists('on', $joinCondition) ? " ON " . $joinCondition['on'] : '';
+					$type = array_key_exists('type', $joinCondition) ? $joinCondition['type'] : '';
+					$join .= $type . " JOIN " . $tableJointure . $onCondition . " ";
+				}
+			}
+
+			$fields = $this->describeTable($tableToDescribe);
 			if (!$fields)
 			{
 				return false;
@@ -367,7 +388,7 @@
 				$i++;
 			}
 
-			$query = "SELECT * FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
+			$query = "SELECT * FROM " . $table . $join . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
 
 			if ($order_by)
 			{
@@ -375,7 +396,7 @@
 				if (array_key_exists($order_by, $fields) || (is_numeric($order_by) && $order_by <= count($fields)))
 				{
 					$query .= ' ORDER BY ' . $order_by;
-					if ($desc) 
+					if ($desc)
 					{
 						$query .= ' DESC';
 					}
@@ -431,7 +452,7 @@
 			{
 				return false;
 			}
-			
+
 			$params = array();
 			$sets = array();
 
@@ -443,7 +464,7 @@
 				{
 					return false;
 				}
-				
+
 				//Si le champs est Nullable est qu'on à reçu une chaine vide, on passe à null plutot qu'à chaine vide
 				if ($fields[$label]['NULL'] && $value === '')
 				{
@@ -602,7 +623,7 @@
 			{
 				return false;
 			}
-			
+
 			$params = array();
 			$fieldNames = array();
 
@@ -614,12 +635,12 @@
 					continue;
 				}
 
-				//Si il manque un champs qui peux être NULL ou qu'il est rempli avec une chaine vide ou null, on passe au suivant				
+				//Si il manque un champs qui peux être NULL ou qu'il est rempli avec une chaine vide ou null, on passe au suivant
 				if ((!isset($datas[$nom]) || $datas[$nom] === NULL || $datas[$nom] === '') && $field['NULL'])
 				{
 					continue;
 				}
-				
+
 				//Si il manque un champs qui a une valeur par défaut
 				if (!isset($datas[$nom]) && $field['HAS_DEFAULT'])
 				{
@@ -643,4 +664,4 @@
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
 
-	} 
+	}
