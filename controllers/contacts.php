@@ -105,7 +105,7 @@
 
 			global $db;
 
-			if (empty($_POST['name']) || empty($_POST['phone']))
+			if (empty($_POST['name']) || empty($_POST['phone']) || (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS && empty($_POST['civility'])))
 			{
 				$_SESSION['errormessage'] = 'Des champs sont manquants.';
 				header('Location: ' . $this->generateUrl('contacts', 'add'));
@@ -114,6 +114,12 @@
 
 			$nom = $_POST['name'];
 			$phone = $_POST['phone'];
+			// on enregistre les infos si elles ont été saisies par l'utilisateur
+			$civility = isset($_POST['civility']) ? $_POST['civility'] : null;
+			$prenom = isset($_POST['firstName']) ? $_POST['firstName'] : null;
+			$birthday = isset($_POST['birthday']) ? $_POST['birthday'] : null;
+			$loveSituation = isset($_POST['loveSituation']) ? $_POST['loveSituation'] : null;
+			$nomComplet = $prenom ? $prenom.' '.$nom : $nom;
 
 			if (!$phone = internalTools::parsePhone($phone))
 			{
@@ -122,14 +128,32 @@
 				return false;
 			}
 
-			if (!$db->insertIntoTable('contacts', ['name' => $nom, 'number' => $phone]))
+			if (!$db->insertIntoTable('contacts', ['name' => $nomComplet, 'number' => $phone]))
 			{
 				$_SESSION['errormessage'] = 'Impossible créer ce contact.';
 				header('Location: ' . $this->generateUrl('contacts', 'add'));
 				return false;
 			}
 
-			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nom . ' (' . internalTools::phoneAddSpace($phone) . ')']);
+			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nomComplet . ' (' . internalTools::phoneAddSpace($phone) . ')']);
+
+			if (!RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS)
+			{
+				$_SESSION['successmessage'] = 'Le contact a bien été créé.';
+				header('Location: ' . $this->generateUrl('contacts'));
+				return true;
+			}
+
+			$id_contact = $db->lastId();
+
+			if (!$db->insertIntoTable('contacts_infos', ['id_contact' => $id_contact, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation]))
+			{
+				$_SESSION['errormessage'] = "Le contact a bien été créé, mais certaines informations n'ont pas pu être enregistrées.";
+				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				return false;
+			}
+
+			$db->insertIntoTable('events', ['type' => 'CONTACT_EXTENTED_ADD', 'text' => 'Ajout infos pour le contact : ' . $nomComplet . ' (' . internalTools::phoneAddSpace($phone) . ')']);
 
 			$_SESSION['successmessage'] = 'Le contact a bien été créé.';
 			header('Location: ' . $this->generateUrl('contacts'));
