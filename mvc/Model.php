@@ -388,7 +388,12 @@
 				$i++;
 			}
 
-			$query = "SELECT * FROM " . $table . $join . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
+			// liste les champs disponibles pour ajouter des alias et éviter des problèmes en cas de colonnes avec le même nom
+			$fieldNames = array_keys($fields);
+			foreach ($fieldNames as $key => $fieldName) {
+				$fieldNames[$key] = $fieldName . " AS '" . $fieldName . "'";
+			}
+			$query = "SELECT " . implode(', ', $fieldNames) . " FROM " . $table . $join . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode('AND ', $wheres);
 
 			if ($order_by)
 			{
