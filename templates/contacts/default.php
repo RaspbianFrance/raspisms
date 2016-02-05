@@ -59,19 +59,25 @@
 										{
 											?>
 											<tr>
-												<td><?php secho($contact['id']); ?></td>
 												<?php if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) { ?>
-													<td><?php secho($contact['civility']); ?></td>
-													<td><?php secho($contact['first_name']); ?></td>
-													<td><?php secho($contact['last_name'] ? $contact['last_name'] : $contact['name']); ?></td>
-													<td><?php secho($contact['number']); ?></td>
-													<td><?php secho($contact['birthday']); ?></td>
-													<td><?php secho($contact['love_situation']); ?></td>
+													<td><?php secho($contact['contacts.id']); ?></td>
+													<td><?php if ($contact['contacts_infos.civility'] != null) {
+														secho($contact['contacts_infos.civility'] ? 'Monsieur' : 'Madame');
+														} ?></td>
+													<td><?php secho($contact['contacts_infos.first_name']); ?></td>
+													<td><?php secho($contact['contacts_infos.last_name'] ? $contact['contacts_infos.last_name'] : $contact['contacts.name']); ?></td>
+													<td><?php secho($contact['contacts.number']); ?></td>
+													<td><?php secho($contact['contacts_infos.birthday']); ?></td>
+													<td><?php if ($contact['contacts_infos.love_situation'] != null) {
+														secho($contact['contacts_infos.love_situation'] ? 'En couple' : 'Célibataire');
+														} ?></td>
+													<td><input type="checkbox" value="<?php secho($contact['contacts.id']); ?>"></td>
 												<?php } else { ?>
+													<td><?php secho($contact['id']); ?></td>
 													<td><?php secho($contact['name']); ?></td>
 													<td><?php secho($contact['number']); ?></td>
+													<td><input type="checkbox" value="<?php secho($contact['id']); ?>"></td>
 												<?php } ?>
-												<td><input type="checkbox" value="<?php secho($contact['id']); ?>"></td>
 											</tr>
 											<?php
 										}
