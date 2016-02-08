@@ -249,18 +249,27 @@
 		{
 			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
 				$extended_contact_join = '
-					LEFT JOIN contacts_infos as inf
-					ON (inf.id_contact = contacts.id)
+					LEFT JOIN contacts_infos
+					ON (contacts_infos.id_contact = contacts.id)
 				';
+				$tableToDescribe = "contacts,contacts_infos";
 			} else {
 				$extended_contact_join = '';
+				$tableToDescribe = "contacts";
 			}
 
-			$query = "
-				SELECT *
+			$fields = $this->describeTable($tableToDescribe);
+
+			// liste les champs disponibles pour ajouter des alias et éviter des problèmes en cas de colonnes avec le même nom
+			$fieldNames = array_keys($fields);
+			foreach ($fieldNames as $key => $fieldName) {
+				$fieldNames[$key] = $fieldName . " AS '" . $fieldName . "'";
+			}
+
+			$query = "SELECT " . implode(', ', $fieldNames) . "
 				FROM contacts
 				".$extended_contact_join."
-				WHERE id ";
+				WHERE contacts.id ";
 
 			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
 			$generted_in = $this->generateInFromArray($contacts_ids);

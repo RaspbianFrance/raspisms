@@ -41,27 +41,65 @@
 							<?php
 								foreach ($contacts as $contact)
 								{
-									?>
-									<div class="form-group">
-										<label>Nom contact</label>
-										<div class="form-group input-group">
-											<span class="input-group-addon"><span class="fa fa-user"></span></span>
-											<input name="contacts[<?php secho($contact['id']); ?>][name]" class="form-control" type="text" placeholder="Nom contact" autofocus required value="<?php secho($contact['name']); ?>">
-										</div>
-									</div>	
-									<div class="form-group">
+									if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) { ?>
+	                                    <div class="form-group">
+	                                        <label>Civilité du contact</label>
+	                                        <div class="form-group">
+	                                            <input name="contacts[<?php secho($contact['contacts.id']); ?>][civility]" type="radio" value="1" required <?php echo ($contact['contacts_infos.civility']==='1' ? 'checked' : ''); ?>/> Monsieur
+	                                            <input name="contacts[<?php secho($contact['contacts.id']); ?>][civility]" type="radio" value="0" required <?php echo ($contact['contacts_infos.civility']==='0' ? 'checked' : ''); ?>/> Madame
+	                                        </div>
+	                                    </div>
+	                                    <div class="form-group">
+	                                        <label>Prénom du contact (facultatif)</label>
+	                                        <div class="form-group input-group">
+	                                            <span class="input-group-addon"><span class="fa fa-user"></span></span>
+	                                            <input name="contacts[<?php secho($contact['contacts.id']); ?>][first_name]" class="form-control" type="text" placeholder="Prénom du contact (facultatif)" value="<?php secho($contact['contacts_infos.first_name']); ?>">
+	                                        </div>
+	                                    </div>
+	                                <?php } ?>
+	                                <?php
+	                                	if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+	                                		$name = ($contact['contacts_infos.last_name'] != '') ? $contact['contacts_infos.last_name'] : $contact['contacts.name'];
+	                                		$tableAlias = "contacts.";
+	                                	} else {
+	                                		$name = $contact['name'];
+	                                		$tableAlias = '';
+	                                	}
+	                                ?>
+	                                <div class="form-group">
+	                                    <label>Nom du contact</label>
+	                                    <div class="form-group input-group">
+	                                        <span class="input-group-addon"><span class="fa fa-user"></span></span>
+	                                        <input name="contacts[<?php secho($contact[$tableAlias.'id']); ?>][name]" class="form-control" type="text" placeholder="Nom du contact" required value="<?php secho($name); ?>">
+	                                    </div>
+	                                </div>
+	                                <div class="form-group">
 										<label>Numéro de téléphone du contact</label>
 										<div class="form-group">
-											<input name="" class="form-control phone-international-input" type="tel" contact-id="<?php secho($contact['id']); ?>" value="<?php secho($contact['number']); ?>">
-											<input name="contacts[<?php secho($contact['id']); ?>][phone]" type="hidden" id="phone-hidden-input-<?php secho($contact['id']); ?>" required>
+											<input name="" class="form-control phone-international-input" type="tel" contact-id="<?php secho($contact[$tableAlias.'id']); ?>" value="<?php secho($contact[$tableAlias.'number']); ?>">
+											<input name="contacts[<?php secho($contact[$tableAlias.'id']); ?>][phone]" type="hidden" id="phone-hidden-input-<?php secho($contact[$tableAlias.'id']); ?>" required>
 										</div>
 									</div>
+	                                <?php if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) { ?>
+                                        <input name="contacts[<?php secho($contact['contacts.id']); ?>][contacts_infos_id]" type="hidden" value="<?php secho($contact['contacts_infos.id']); ?>">
+	                                    <div class="form-group">
+	                                        <label>Date de naissance du contact (facultatif)</label>
+	                                        <input name="contacts[<?php secho($contact['contacts.id']); ?>][birthday]" class="form-control form-date" type="text" readonly value="<?php secho($contact['contacts_infos.birthday']); ?>">
+	                                    </div>
+	                                    <div class="form-group">
+	                                        <label>Situation amoureuse du contact (facultatif)</label>
+	                                        <div class="form-group">
+	                                            <input name="contacts[<?php secho($contact['contacts.id']); ?>][love_situation]" type="radio" value="0" <?php echo ($contact['contacts_infos.love_situation']==='0' ? 'checked' : ''); ?>/> Célibataire
+	                                            <input name="contacts[<?php secho($contact['contacts.id']); ?>][love_situation]" type="radio" value="1" <?php echo ($contact['contacts_infos.love_situation']==='1' ? 'checked' : ''); ?>/> En couple
+	                                        </div>
+	                                    </div>
+	                                <?php } ?>
 									<hr/>
 									<?php
 								}
 							?>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('contacts'); ?>">Annuler</a>
-								<input type="submit" class="btn btn-success" value="Enregistrer le contact" /> 	
+								<input type="submit" class="btn btn-success" value="Enregistrer le contact" />
 							</form>
 						</div>
 					</div>
@@ -80,6 +118,15 @@
 			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
 		});
 
+        jQuery('.form-date').datepicker(
+        {
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            minuteStep: 1,
+            startView: 3,
+            language: 'fr'
+        });
+
 		jQuery('form').on('submit', function(e)
 		{
 			e.preventDefault();
@@ -87,7 +134,7 @@
 			{
 				jQuery('#phone-hidden-input-' +  jQuery(this).attr('contact-id')).val(jQuery(this).intlTelInput("getNumber"));
 			});
-			
+
 			this.submit();
 		});
 	});

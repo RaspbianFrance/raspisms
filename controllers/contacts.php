@@ -182,13 +182,42 @@
 
 			foreach ($_POST['contacts'] as $id => $contact)
 			{
-				if (!$number = internalTools::parsePhone($contact['phone']))
+				if (!isset($contact['name']) || !isset($contact['phone']) || (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS && !isset($contact['civility'])))
 				{
-					$errors[] = $contact['id'];
+					$errors[] = $id;
 					continue;
 				}
 
-				$db->updateTableWhere('contacts', ['name' => $contact['name'], 'number' => $number], ['id' => $id]);
+				$nom = $contact['name'];
+				$phone = $contact['phone'];
+				// on enregistre les infos si elles ont été saisies par l'utilisateur
+				$civility = isset($contact['civility']) ? $contact['civility'] : null;
+				$prenom = isset($contact['first_name']) ? $contact['first_name'] : null;
+				$birthday = isset($contact['birthday']) ? $contact['birthday'] : null;
+				$loveSituation = isset($contact['love_situation']) ? $contact['love_situation'] : null;
+				$nomComplet = $prenom ? $prenom.' '.$nom : $nom;
+
+				if (!$number = internalTools::parsePhone($contact['phone']))
+				{
+					$errors[] = $id;
+					continue;
+				}
+
+				$db->updateTableWhere('contacts', ['name' => $nomComplet, 'number' => $number], ['id' => $id]);
+
+				if (!isset($contact['contacts_infos_id'])) {
+					if (!$db->insertIntoTable('contacts_infos', ['id_contact' => $id, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation]))
+					{
+						$errors[] = $id;
+						continue;
+					}
+				}
+
+				if (!$db->updateTableWhere('contacts_infos', ['id_contact' => $id, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation], ['id' => $contact['contacts_infos_id']]))
+				{
+					$errors[] = $id;
+					continue;
+				}
 			}
 
 			//Si on a eu des erreurs
