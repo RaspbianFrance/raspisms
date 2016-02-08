@@ -23,11 +23,16 @@
 			global $db;
 
 			//Recupération des nombres des 4 panneaux d'accueil
-			$contacts = $db->getFromTableWhere('contacts', array(), '', false, false, false, array(array(
-				'table' => 'contacts_infos',
-				'type' => 'LEFT',
-				'on' => 'contacts_infos.id_contact = contacts.id'
-			)));
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS)
+			{
+				$contacts = $db->getFromTableWhere('contacts', array(), '', false, false, false, array(array(
+					'table' => 'contacts_infos',
+					'type' => 'LEFT',
+					'on' => 'contacts_infos.id_contact = contacts.id'
+				)));
+			} else {
+				$contacts = $db->getFromTableWhere('contacts');
+			}
 
 			$this->render('contacts/default', array(
 				'contacts' => $contacts,
