@@ -243,6 +243,17 @@
 		{
 			global $db;
 
-			echo json_encode($db->getFromTableWhere('contacts'));
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS)
+			{
+				$contacts = $db->getFromTableWhere('contacts', array(), '', false, false, false, array(array(
+					'table' => 'contacts_infos',
+					'type' => 'LEFT',
+					'on' => 'contacts_infos.id_contact = contacts.id'
+				)));
+			} else {
+				$contacts = $db->getFromTableWhere('contacts');
+			}
+
+			echo json_encode($contacts);
 		}
 	}

@@ -228,14 +228,25 @@
 		 */
 		public function deleteContactsIn($contacts_ids)
 		{
+			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
+			$generted_in = $this->generateInFromArray($contacts_ids);
+			$params = $generted_in['PARAMS'];
+
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+				$query = "
+					DELETE FROM contacts_infos
+					WHERE id_contact ";
+
+				$query .= $generted_in['QUERY'];
+
+				$this->runQuery($query, $params, self::ROWCOUNT);
+			}
+
 			$query = "
 				DELETE FROM contacts
 				WHERE id ";
 
-			//On génère la clause IN et les paramètres adaptés depuis le tableau des id
-			$generted_in = $this->generateInFromArray($contacts_ids);
 			$query .= $generted_in['QUERY'];
-			$params = $generted_in['PARAMS'];
 
 			return $this->runQuery($query, $params, self::ROWCOUNT);
 		}
