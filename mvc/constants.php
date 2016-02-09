@@ -4,8 +4,8 @@
 	*/
 
 	//On définit les chemins
-        define('PWD', '/var/www/RaspiSMS/'); //On défini le chemin de base du site
-	define('HTTP_PWD', (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . '/RaspiSMS/'); //On défini l'adresse url du site
+    define('PWD', '/Users/Romain/Sites/RaspiSMS/'); //On défini le chemin de base du site
+	define('HTTP_PWD', (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . '/'); //On défini l'adresse url du site
 
 	define('PWD_IMG', PWD . 'img/'); //Chemin dossier des images
 	define('HTTP_PWD_IMG', HTTP_PWD . 'img/'); //URL dossier des images
@@ -19,7 +19,7 @@
 	define('PWD_CONTROLLER', PWD . 'controllers/'); //Dossier des controllers
 	define('PWD_MODEL', PWD . 'model/'); //Dossier des models
 	define('PWD_TEMPLATES', PWD . 'templates/'); //Dossier des templates
-	
+
 	define('PWD_SCRIPTS', PWD . 'scripts/'); //URL dossier des scripts appelables via les commandes
 	define('PWD_RECEIVEDS', PWD . 'receiveds/'); //URL dossier des sms reçus via les commandes
 
@@ -45,4 +45,4 @@
 	define('DATABASE_HOST', 'localhost'); //Hote de la bdd
 	define('DATABASE_NAME', 'raspisms'); //Nom de la bdd
 	define('DATABASE_USER', 'root'); //Utilisateur de la bdd
-	define('DATABASE_PASSWORD', ''); //Password de l'utilisateur
+	define('DATABASE_PASSWORD', 'root'); //Password de l'utilisateur

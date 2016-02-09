@@ -154,7 +154,7 @@
 			if (!$db->insertIntoTable('contacts_infos', ['id_contact' => $id_contact, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation]))
 			{
 				$_SESSION['errormessage'] = "Le contact a bien été créé, mais certaines informations n'ont pas pu être enregistrées.";
-				header('Location: ' . $this->generateUrl('contacts', 'add'));
+				header('Location: ' . $this->generateUrl('contacts'));
 				return false;
 			}
 
@@ -210,15 +210,18 @@
 
 				$db->updateTableWhere('contacts', ['name' => $nomComplet, 'number' => $number], ['id' => $id]);
 
-				if (!isset($contact['contacts_infos_id'])) {
+				// si l'option des infos contacts n'est pas activée, on sort de la boucle
+				if (!RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+					continue;
+				}
+
+				if (empty($contact['contacts_infos_id'])) {
 					if (!$db->insertIntoTable('contacts_infos', ['id_contact' => $id, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation]))
 					{
 						$errors[] = $id;
 						continue;
 					}
-				}
-
-				if (!$db->updateTableWhere('contacts_infos', ['id_contact' => $id, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation], ['id' => $contact['contacts_infos_id']]))
+				} elseif (!$db->updateTableWhere('contacts_infos', ['id_contact' => $id, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation], ['id' => $contact['contacts_infos_id']]))
 				{
 					$errors[] = $id;
 					continue;
@@ -229,6 +232,7 @@
 			if (count($errors))
 			{
 				$_SESSION['errormessage'] = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
+				// die();
 				return header('Location: ' . $this->generateUrl('contacts'));
 			}
 
