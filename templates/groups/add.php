@@ -44,13 +44,13 @@
 										<span class="input-group-addon"><span class="fa fa-users"></span></span>
 										<input name="name" class="form-control" type="text" placeholder="Nom groupe" autofocus required>
 									</div>
-								</div>	
+								</div>
 								<div class="form-group">
 									<label>Contacts au groupe</label>
 									<input class="add-contacts form-control" name="contacts[]"/>
 								</div>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('groups'); ?>">Annuler</a>
-								<input type="submit" class="btn btn-success" value="Enregistrer le contact" /> 	
+								<input type="submit" class="btn btn-success" value="Enregistrer le contact" />
 							</form>
 						</div>
 					</div>
@@ -66,8 +66,8 @@
 		{
 			jQuery(this).magicSuggest({
 				data: '<?php echo $this->generateUrl('contacts', 'jsonGetContacts'); ?>',
-				valueField: 'id',
-				displayField: 'name',
+				valueField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>id',
+				displayField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>name',
 				name: 'contacts[]'
 			});
 		});

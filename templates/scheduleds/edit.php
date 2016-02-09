@@ -49,7 +49,7 @@
 									<div class="form-group">
 										<label>Date d'envoi du SMS</label>
 										<input name="scheduleds[<?php secho($scheduled['id']); ?>][date]" class="form-control form-datetime" type="text" value="<?php secho($scheduled['at']); ?>" readonly>
-									</div>	
+									</div>
 									<div class="form-group">
 										<label>Numéros cibles</label>
 										<div class="form-group scheduleds-number-group-container" scheduled-id="<?php secho($scheduled['id']); ?>" >
@@ -85,7 +85,7 @@
 								}
 							?>
 								<a class="btn btn-danger" href="<?php echo $this->generateUrl('scheduleds'); ?>">Annuler</a>
-								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
+								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" />
 							</form>
 						</div>
 					</div>
@@ -109,8 +109,8 @@
 		{
 			jQuery(this).magicSuggest({
 				data: '<?php echo $this->generateUrl('contacts', 'jsonGetContacts'); ?>',
-				valueField: 'id',
-				displayField: 'name',
+				valueField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>id',
+				displayField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>name',
 			});
 		});
 
@@ -173,7 +173,7 @@
 				var container = jQuery(this).parents('.scheduleds-number-group');
 				container.find('.phone-hidden-input').val(jQuery(this).intlTelInput("getNumber"));
 			});
-			
+
 			this.submit();
 		});
 	});
