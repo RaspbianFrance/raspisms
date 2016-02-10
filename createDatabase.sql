@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS contacts_infos
 	love_situation INT,
 	PRIMARY KEY (id),
 	FOREIGN KEY (id_contact) REFERENCES contacts (id) ON DELETE CASCADE ON UPDATE CASCADE,
-	UNIQUE (first_name, last_name),
+	UNIQUE (first_name, last_name)
 );
 
 #On insert les données par défaut dans les settings
