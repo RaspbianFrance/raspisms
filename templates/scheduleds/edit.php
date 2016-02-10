@@ -105,14 +105,36 @@
 			language: 'fr'
 		});
 
+		<?php
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+				$magicSuggestRenderer = "(data['contacts_infos.civility']!=null ? (data['contacts_infos.civility']==1 ? 'M. ' : 'Mme ') : '')";
+				$magicSuggestRenderer .= " + data['contacts.name']";
+				$magicSuggestRenderer .= " + (data['contacts_infos.birthday']!=null ? ' (' + age(data['contacts_infos.birthday']) + ' ans)' : '')";
+			} else {
+				$magicSuggestRenderer = "data['name']";
+			}
+		?>
+
+		// Affiche plus d'infos que le nom du contact si on est en mode infos contacts
 		jQuery('.add-contacts').each(function()
 		{
 			jQuery(this).magicSuggest({
 				data: '<?php echo $this->generateUrl('contacts', 'jsonGetContacts'); ?>',
 				valueField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>id',
 				displayField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>name',
+				name: 'contacts[]',
+				allowFreeEntries: false, // évite que l'utilisateur ne saisisse autre chose qu'un contact de la liste
+				renderer: function(data) {
+		            return <?php echo $magicSuggestRenderer; ?>;
+		        }
 			});
 		});
+
+		function age(birthday)
+		{
+		  	birthday = new Date(birthday);
+		  	return new Number((new Date().getTime() - birthday.getTime()) / 31536000000).toFixed(0);
+		}
 
 		jQuery('.add-groups').each(function()
 		{
