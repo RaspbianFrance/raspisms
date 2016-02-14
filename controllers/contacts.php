@@ -110,7 +110,7 @@
 
 			global $db;
 
-			if (empty($_POST['name']) || empty($_POST['phone']) || (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS && empty($_POST['civility'])))
+			if (!isset($_POST['name']) || !isset($_POST['phone']) || (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS && !isset($_POST['civility'])))
 			{
 				$_SESSION['errormessage'] = 'Des champs sont manquants.';
 				header('Location: ' . $this->generateUrl('contacts', 'add'));
@@ -140,6 +140,8 @@
 				return false;
 			}
 
+			$id_contact = $db->lastId();
+
 			$db->insertIntoTable('events', ['type' => 'CONTACT_ADD', 'text' => 'Ajout contact : ' . $nomComplet . ' (' . internalTools::phoneAddSpace($phone) . ')']);
 
 			if (!RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS)
@@ -148,8 +150,6 @@
 				header('Location: ' . $this->generateUrl('contacts'));
 				return true;
 			}
-
-			$id_contact = $db->lastId();
 
 			if (!$db->insertIntoTable('contacts_infos', ['id_contact' => $id_contact, 'civility' => $civility, 'first_name' => $prenom, 'last_name' => $nom, 'birthday' => $birthday, 'love_situation' => $loveSituation]))
 			{
