@@ -7,7 +7,7 @@
 
 		/**
 		 * Récupère les SMS envoyés depuis une date
-		 * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25)
+		 * @param $date : La date depuis laquelle on veugx les SMS (au format 2014-10-25)
 		 * @return array : Tableau avec tous les SMS depuis la date
 		 */
 		public function getNbSendedsSinceGroupDay($date)
@@ -635,7 +635,7 @@
 			$extended_contact_join = '';
 
 			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
-				$contact_fields = ' inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
+				$contact_fields = ', inf.civility as civility, inf.first_name as first_name, inf.last_name as last_name, inf.birthday as birthday, inf.love_situation as love_situation';
 				$extended_contact_join = '
 					LEFT JOIN contacts_infos as inf
 					ON (inf.id_contact = con.id)
