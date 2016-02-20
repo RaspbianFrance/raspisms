@@ -232,7 +232,6 @@
 			if (count($errors))
 			{
 				$_SESSION['errormessage'] = 'Certains contacts n\'ont pas pu êtres mis à jour. Voici leurs identifiants : ' . implode(', ', $errors);
-				// die();
 				return header('Location: ' . $this->generateUrl('contacts'));
 			}
 
