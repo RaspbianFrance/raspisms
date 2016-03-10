@@ -94,7 +94,7 @@
 			}
 
 			$new_password = sha1($password);
-			if (!$db->updateTableWhere('users', ['email' => $user['email'], 'password' => $new_password, 'admin' => $user['admin']], ['id' => $user['id']]))
+			if (!$db->updateTableWhere('users', ['email' => $user['email'], 'password' => $new_password, 'admin' => $user['admin'], ['id' => $user['id']]))
 			{
 				$_SESSION['errormessage'] = 'Impossible de mettre à jour le mot de passe.';
 				header('Location: ' . $this->generateUrl('connect'));
