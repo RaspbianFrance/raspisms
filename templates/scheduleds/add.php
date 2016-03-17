@@ -105,6 +105,7 @@
 				valueField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>id',
 				displayField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>name',
 				name: 'contacts[]',
+				maxSelection: null, //autorise plus de 10 sélections
 				allowFreeEntries: false, // évite que l'utilisateur ne saisisse autre chose qu'un contact de la liste
 				renderer: function(data) {
 		            return <?php echo $magicSuggestRenderer; ?>;
@@ -124,6 +125,7 @@
 				data: '<?php echo $this->generateUrl('groups', 'jsonGetGroups'); ?>',
 				valueField: 'id',
 				displayField: 'name',
+				maxSelection: null, //autorise plus de 10 sélections
 			});
 		});
 
