@@ -5,7 +5,7 @@
 	class scheduleds extends Controller
 	{
 		/**
-		 * Cette fonction est appelée avant toute les autres : 
+		 * Cette fonction est appelée avant toute les autres :
 		 * Elle vérifie que l'utilisateur est bien connecté
 		 * @return void;
 		 */
@@ -16,7 +16,7 @@
 
 		/**
 		 * Cette fonction retourne tous les sms programmés, sous forme d'un tableau permettant l'administration de ces sms
-		 */	
+		 */
 		public function byDefault()
 		{
 			//Creation de l'object de base de données
@@ -50,7 +50,7 @@
 
 			//Create de l'object de base de données
 			global $db;
-			
+
 			$db->deleteScheduledsIn($ids);
 			header('Location: ' . $this->generateUrl('scheduleds'));
 			return true;
@@ -63,7 +63,7 @@
 		{
 			$now = new DateTime();
 			$babyonemoretime = new DateInterval('PT1M'); //Haha, i'm so a funny guy
-			$now->sub($babyonemoretime);	
+			$now->sub($babyonemoretime);
 			$now = $now->format('Y-m-d H:i');
 			return $this->render('scheduleds/add', array(
 				'now' => $now
@@ -80,7 +80,7 @@
 
 			//On récupère les ids comme étant tous les arguments de la fonction et on supprime le premier (csrf)
 			$ids = func_get_args();
-			
+
 			$scheduleds = $db->getScheduledsIn($ids);
 			//Pour chaque groupe, on récupère les contacts liés
 			foreach ($scheduleds as $key => $scheduled)
@@ -178,7 +178,7 @@
 				}
 
 				return false;
-			}		
+			}
 
 			if (!$db->insertIntoTable('scheduleds', ['at' => $date, 'content' => $content, 'progress' => false]))
 			{
@@ -198,7 +198,7 @@
 				$_SESSION['discussion_wait_progress'][] = $id_scheduled;
 			}
 
-			$db->insertIntoTable('events', ['type' => 'SCHEDULED_ADD', 'text' => 'Ajout d\'un SMS pour le ' . $date]);	
+			$db->insertIntoTable('events', ['type' => 'SCHEDULED_ADD', 'text' => 'Ajout d\'un SMS pour le ' . $date]);
 			$errors = false;
 
 			foreach ($numbers as $number)
@@ -265,7 +265,7 @@
 			}
 
 			global $db;
-			
+
 			$errors = false;
 			//Pour chaque SMS programmé reçu, on boucle en récupérant son id (la clef), et sont contenu
 			foreach ($_POST['scheduleds'] as $id_scheduled => $scheduled)
@@ -276,9 +276,9 @@
 					$_SESSION['errormessage'] = 'La date renseignée pour le SMS numéro ' . $scheduled['id'] . ' est invalide.';
 					header('Location: ' . $this->generateUrl('scheduleds'));
 					return false;
-				}		
+				}
 
-				//Si la date fournie est passée, on la change pour dans 2 minutes	
+				//Si la date fournie est passée, on la change pour dans 2 minutes
 				$objectDate = DateTime::createFromFormat('Y-m-d H:i', $date);
 
 				$db->updateTableWhere('scheduleds', ['content' => $scheduled['content'], 'at' => $date], ['id' => $id_scheduled]);
@@ -287,37 +287,43 @@
 				$db->deleteScheduleds_contactsForScheduled($id_scheduled); //On supprime tous les contacts pour ce SMS
 				$db->deleteScheduleds_GroupsForScheduled($id_scheduled); //On supprime tous les groupes pour ce SMS
 
-				foreach ($scheduled['numbers'] as $number)
-				{
-					if (!$number = internalTools::parsePhone($number))
+				if (array_key_exists('numbers', $scheduled)) {
+					foreach ($scheduled['numbers'] as $number)
 					{
-						$errors = true;
-						continue;
-					}
+						if (!$number = internalTools::parsePhone($number))
+						{
+							$errors = true;
+							continue;
+						}
 
-					if (!$db->insertIntoTable('scheduleds_numbers', ['id_scheduled' => $id_scheduled, 'number' => $number]))
-					{
-						$errors = true;
-					}
-				}
-
-				foreach ($scheduled['contacts'] as $id_contact)
-				{
-					if (!$db->insertIntoTable('scheduleds_contacts', ['id_scheduled' => $id_scheduled, 'id_contact' => $id_contact]))
-					{
-						$errors = true;
+						if (!$db->insertIntoTable('scheduleds_numbers', ['id_scheduled' => $id_scheduled, 'number' => $number]))
+						{
+							$errors = true;
+						}
 					}
 				}
 
-				foreach ($scheduled['groups'] as $id_group)
-				{
-					if (!$db->insertIntoTable('scheduleds_groups', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]))
+				if (array_key_exists('contacts', $scheduled)) {
+					foreach ($scheduled['contacts'] as $id_contact)
 					{
-						$errors = true;
+						if (!$db->insertIntoTable('scheduleds_contacts', ['id_scheduled' => $id_scheduled, 'id_contact' => $id_contact]))
+						{
+							$errors = true;
+						}
+					}
+				}
+
+				if (array_key_exists('groups', $scheduled)) {
+					foreach ($scheduled['groups'] as $id_group)
+					{
+						if (!$db->insertIntoTable('scheduleds_groups', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]))
+						{
+							$errors = true;
+						}
 					}
 				}
 			}
-			
+
 			if ($errors)
 			{
 				$_SESSION['errormessage'] = 'Tous les SMS ont été modifiés mais certaines données incorrects ont été ignorées.';
