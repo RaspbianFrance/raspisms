@@ -146,6 +146,7 @@
 			$numbers = (isset($_POST['numbers'])) ? $_POST['numbers'] : array();
 			$contacts = (isset($_POST['contacts'])) ? $_POST['contacts'] : array();
 			$groups = (isset($_POST['groups'])) ? $_POST['groups'] : array();
+			$allContacts = (isset($_POST['all-contacts'])) ? $_POST['all-contacts'] : false;
 
 			//Si pas de contenu dans le SMS
 			if (!$content)
@@ -159,7 +160,7 @@
 			}
 
 			//Si pas numéros, contacts, ou groupes cibles
-			if (!$numbers && !$contacts && !$groups)
+			if (!$numbers && !$contacts && !$groups && !$allContacts)
 			{
 				if (!$api)
 				{
@@ -212,6 +213,13 @@
 				if (!$db->insertIntoTable('scheduleds_numbers', ['id_scheduled' => $id_scheduled, 'number' => $number]))
 				{
 					$errors = true;
+				}
+			}
+
+			if ($allContacts) {
+				$contacts = $db->getFromTableWhere('contacts');
+				foreach ($contacts as $key => $contact) {
+					$contacts[$key] = $contact['id'];
 				}
 			}
 

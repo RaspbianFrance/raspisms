@@ -57,6 +57,11 @@
 										<div class="add-number-button fa fa-plus-circle"></div>
 									</div>
 								</div>
+								<div class="checkbox">
+								    <label>
+								    	<input type="checkbox" id="all-contacts" name="all-contacts" value=1> <strong>Envoyer à tout le répertoire</strong>
+								    </label>
+							  	</div>
 								<div class="form-group">
 									<label>Contacts cibles</label>
 									<input class="add-contacts form-control" name="contacts[]"/>
@@ -100,7 +105,7 @@
 		// Affiche plus d'infos que le nom du contact si on est en mode infos contacts
 		jQuery('.add-contacts').each(function()
 		{
-			jQuery(this).magicSuggest({
+			magicContacts = jQuery(this).magicSuggest({
 				data: '<?php echo $this->generateUrl('contacts', 'jsonGetContacts'); ?>',
 				valueField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>id',
 				displayField: '<?php echo RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS ? 'contacts.' : ''; ?>name',
@@ -121,7 +126,7 @@
 
 		jQuery('.add-groups').each(function()
 		{
-			jQuery(this).magicSuggest({
+			magicGroups = jQuery(this).magicSuggest({
 				data: '<?php echo $this->generateUrl('groups', 'jsonGetGroups'); ?>',
 				valueField: 'id',
 				displayField: 'name',
@@ -181,6 +186,16 @@
 
 			this.submit();
 		});
+
+		$("#all-contacts").on('change', function() {
+			if ($(this).is(':checked')) {
+				magicContacts.disable();
+				magicGroups.disable();
+			} else {
+				magicContacts.enable();
+				magicGroups.enable();
+			}
+		})
 	});
 </script>
 <?php
