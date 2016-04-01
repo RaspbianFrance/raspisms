@@ -20,7 +20,7 @@
 	# MODEL #
 	#########
 	//On va appeler un modèle, est l'initialiser
-	$db = new DataBase($bdd);;
+	$db = new DataBase($bdd);
 
 	//On va ajouter les réglages globaux de RaspiSMS modifiables via l'interface
 	$settings = $db->getFromTableWhere('settings');
