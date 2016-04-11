@@ -290,6 +290,44 @@
 			return $this->runQuery($query, $params);
 		}
 
+		/**
+		 * Récupère le contact avec le numéro fourni
+		 * @param $number : Le numéro
+		 * @return string : Retourne le nom du contact ou null si il n'est pas trouvé
+		 */
+		public function getContactFromNumber($number)
+		{
+			if (RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+				$extended_contact_join = '
+					LEFT JOIN contacts_infos
+					ON (contacts_infos.id_contact = contacts.id)
+				';
+				$tableToDescribe = "contacts,contacts_infos";
+			} else {
+				$extended_contact_join = '';
+				$tableToDescribe = "contacts";
+			}
+
+			$fields = $this->describeTable($tableToDescribe);
+
+			// liste les champs disponibles pour ajouter des alias et éviter des problèmes en cas de colonnes avec le même nom
+			$fieldNames = array_keys($fields);
+			foreach ($fieldNames as $key => $fieldName) {
+				$fieldNames[$key] = $fieldName . " AS '" . $fieldName . "'";
+			}
+
+			$query = "SELECT " . implode(', ', $fieldNames) . "
+				FROM contacts
+				".$extended_contact_join."
+				WHERE contacts.number = (:number)";
+
+			$params = array(
+				'number' => $number,
+			);
+
+			return $this->runQuery($query, $params);
+		}
+
 		/******************************/
 		/* PARTIE DES REQUETES GROUPS */
 		/******************************/

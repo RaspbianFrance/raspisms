@@ -403,9 +403,22 @@
 			{
 				foreach ($receiveds as $received)
 				{
-					echo "Transfer d'un SMS du " . $received['send_by'] . " à l'email " . $user['email'];
+					// vérifie en base si le numéro est trouvé parmis les contacts
+					$contact = $db->getContactFromNumber($received['send_by']);
+					$contact = $contact ? $contact[0] : null;
+					// si un contact a été trouvé et que l'option des informations de contact avancé est active
+					if ($contact && RASPISMS_SETTINGS_EXTENDED_CONTACTS_INFOS) {
+						$expediteur = "de ";
+						$expediteur .= $contact['contacts_infos.first_name'] ? $contact['contacts_infos.first_name']." " : "";
+						$expediteur .= $contact['contacts_infos.last_name'] ? $contact['contacts_infos.last_name'] : $contact['contacts.name'];
+						$expediteur .= " (" . $received['send_by'] .")";
+					} else {
+						$expediteur = $contact ? sprintf("de %s (%s)", $contact['name'], $received['send_by']) : sprintf("du %s", $received['send_by']);
+					}
+					echo "Transfer d'un SMS " . $expediteur . " à l'email " . $user['email'];
+
 					$to = $user['email'];
-					$subject = '[RaspiSMS] - Transfert d\'un SMS du ' . $received['send_by'];
+					$subject = '[RaspiSMS] - Transfert d\'un SMS ' . $expediteur;
 					$message = "Le numéro " . $received['send_by'] . " vous a envoyé un SMS : \n" . $received['content'];
 
 					$ok = mail($to, $subject, $message);
