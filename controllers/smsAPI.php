@@ -79,8 +79,8 @@
 					unset($contacts[$key]);
 					continue;
 				}
-				$contact = $contact[0];
 
+				$contact = $contact[0];
 				$contacts[$key] = $contact['id'];
 			}
 
@@ -92,8 +92,8 @@
 					unset($groups[$key]);
 					continue;
 				}
-				$group = $group[0];
 
+				$group = $group[0];
 				$groups[$key] = $group['id'];
 			}
 
