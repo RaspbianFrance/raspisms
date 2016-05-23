@@ -79,6 +79,7 @@
 					unset($contacts[$key]);
 					continue;
 				}
+				$contact = $contact[0];
 
 				$contacts[$key] = $contact['id'];
 			}
@@ -86,11 +87,12 @@
 			//Pour chaque groupe, on récupère l'id du groupe
 			foreach ($groups as $key => $name)
 			{
-				if ($group = $db->getFromTableWhere('groups', ['name' => $name]))
+				if (!$group = $db->getFromTableWhere('groups', ['name' => $name]))
 				{
 					unset($groups[$key]);
 					continue;
 				}
+				$group = $group[0];
 
 				$groups[$key] = $group['id'];
 			}
