@@ -4,9 +4,10 @@
 	*/
 
 	//On définit les chemins
-        define('PWD', '/var/www/RaspiSMS/'); //On défini le chemin de base du site
-        define('HTTP_ROOT', '/RaspiSMS/'); //On défini la racine d'accès (selon notre vhost)
-	define('HTTP_PWD', (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . HTTP_ROOT); //On défini l'adresse url du site
+    define('PWD', '/var/www/html/RaspiSMS/'); //On définit le chemin de base du site
+	define('HTTP_ROOT', '/RaspiSMS/'); //On définit la racine d'accès (selon nore vhost)
+	define('HTTP_PORT', '80'); //On définit le port sur lequel est raspisms
+	define('HTTP_PWD', (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . ( ((HTTP_PORT != 443 AND isset($_SERVER['HTTPS'])) OR (HTTP_PORT != 80 AND !isset($_SERVER['HTTPS']))) ? ':'. HTTP_PORT : '') . HTTP_ROOT); //On défini l'adresse url du site
 
 	define('PWD_IMG', PWD . 'img/'); //Chemin dossier des images
 	define('HTTP_PWD_IMG', HTTP_PWD . 'img/'); //URL dossier des images
