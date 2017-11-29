@@ -9,7 +9,7 @@
 		public static function parsePhone($number)
 		{
 			$number = preg_replace('#[^-0-9+]#', '', $number);
-			if (preg_match('#^(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8}$#', $number))
+			if (preg_match('#^(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8,10}$#', $number))
 			{
 				return $number;
 			}
