@@ -51,5 +51,5 @@
 		exit(2); //Sorti avec erreur
 	}
 
-	$controller->$options['c'](); //On appel la fonction
+	$controller->{$options['c']}(); //On appel la fonction
 
