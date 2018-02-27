@@ -204,7 +204,7 @@
 				foreach (scandir(PWD_RECEIVEDS) as $dir)
 				{
 					//Si le fichier est un fichier système, on passe à l'itération suivante
-					if ($dir == '.' || $dir == '..')
+					if ($dir == '.' || $dir == '..' || $dir == '.tokeep')
 					{
 						continue;
 					}				
