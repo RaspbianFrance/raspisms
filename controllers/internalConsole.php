@@ -81,8 +81,6 @@
 				$now = new DateTime();
 				$now = $now->format('Y-m-d H:i:s');
 
-				echo "Début de l'envoi des SMS programmés\n";
-
 				$scheduleds = $db->getScheduledsNotInProgressBefore($now);
 
 				$ids_scheduleds = array();
@@ -93,7 +91,12 @@
 					$ids_scheduleds[] = $scheduled['id'];
 				}
 
-				echo count($ids_scheduleds) . " SMS à envoyer ont été trouvés et ajoutés à la liste des SMS en cours d'envoi.\n";
+				$nb_ids_scheduleds = count($ids_scheduleds);
+				if ($nb_ids_scheduleds > 0)
+				{
+					echo "Début de l'envoi des SMS programmés\n";
+					echo $nb_ids_scheduleds . " SMS à envoyer ont été trouvés et ajoutés à la liste des SMS en cours d'envoi.\n";
+				}
 
 				$db->updateProgressScheduledsIn($ids_scheduleds, true);
 
@@ -182,7 +185,7 @@
 					}
 				}
 
-				echo "Tous les SMS sont en cours d'envoi.\n";
+				if ($nb_ids_scheduleds > 0) echo "Tous les SMS sont en cours d'envoi.\n";
 				//Tous les SMS ont été envoyés.	
 				$db->deleteScheduledsIn($ids_scheduleds);
 
