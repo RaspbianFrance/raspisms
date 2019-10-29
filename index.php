@@ -1,13 +1,5 @@
 <?php
-    ###############
-    # ENVIRONMENT #
-    ###############
-    require_once(__DIR__ . '/descartes/load-environment.php');
-
-    ###########
-    # ROUTING #
-    ###########
-    require_once(PWD . '/routes.php'); //Include routes
+    require_once(__DIR__ . '/descartes/load.php');
 
     ############
     # SESSIONS #
@@ -21,15 +13,10 @@
         $_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
     }
 
-    ##############
-    # INCLUDE    #
-    ##############
-    //Use autoload
-    require_once(PWD . '/descartes/autoload.php');
-    require_once(PWD . '/vendor/autoload.php');
-
-    #Define raspisms settings
-    $bdd = Model::connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+    #####################
+    # RASPISMS SETTINGS #
+    #####################
+    $bdd = descartes\Model::connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
     $internal_setting = new \controllers\internals\Setting($bdd);
     
     $settings = $internal_setting->all();
@@ -39,4 +26,4 @@
 	}
 
     //Routing current query
-    Router::route(ROUTES, $_SERVER['REQUEST_URI']);
+    descartes\Router::route(ROUTES, $_SERVER['REQUEST_URI']);
