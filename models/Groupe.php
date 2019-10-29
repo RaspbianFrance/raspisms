@@ -1,18 +1,19 @@
 <?php
-	namespace models;
-	/**
+    namespace models;
+
+    /**
      * Cette classe gère les accès bdd pour les groupes
-	 */
-	class Groupe extends \Model
+     */
+    class Groupe extends \descartes\Model
     {
         /**
          * Retourne une entrée par son id
          * @param int $id : L'id de l'entrée
          * @return array : L'entrée
          */
-        public function get_by_id ($id)
+        public function get_by_id($id)
         {
-            $groupes = $this->select('groupe', ['id' => $id]);
+            $groupes = $this->_select('groupe', ['id' => $id]);
             return isset($groupes[0]) ? $groupes[0] : false;
         }
         
@@ -21,60 +22,60 @@
          * @param string $name : Le numéro de tél
          * @return array : L'entrée
          */
-        public function get_by_name ($name)
+        public function get_by_name($name)
         {
-            $groupes = $this->select('groupe', ['name' => $name]);
+            $groupes = $this->_select('groupe', ['name' => $name]);
             return isset($groupes[0]) ? $groupes[0] : false;
         }
 
-		/**
-		 * Retourne une liste de groupes sous forme d'un tableau
+        /**
+         * Retourne une liste de groupes sous forme d'un tableau
          * @param int $limit : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
-		 */
-		public function get_list ($limit, $offset)
+         */
+        public function get_list($limit, $offset)
         {
-            $groupes = $this->select('groupe', [], '', false, $limit, $offset);
+            $groupes = $this->_select('groupe', [], '', false, $limit, $offset);
 
-	    	return $groupes;
-		}
+            return $groupes;
+        }
         
         /**
-		 * Retourne une liste de groupes sous forme d'un tableau
+         * Retourne une liste de groupes sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
          * @return array : La liste des entrées
-		 */
-        public function get_by_ids ($ids)
+         */
+        public function get_by_ids($ids)
         {
-			$query = " 
+            $query = " 
                 SELECT * FROM groupe
                 WHERE id ";
      
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id 
-            $generated_in = $this->generateInFromArray($ids);
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
 
         /**
-		 * Retourne une liste de groupes sous forme d'un tableau
+         * Retourne une liste de groupes sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à supprimer
          * @return int : Le nombre de lignes supprimées
-		 */
-        public function delete_by_ids ($ids)
+         */
+        public function delete_by_ids($ids)
         {
-			$query = " 
+            $query = " 
                 DELETE FROM groupe
                 WHERE id ";
      
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id 
-            $generated_in = $this->generateInFromArray($ids);
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
 
-            return $this->runQuery($query, $params, self::ROWCOUNT);
+            return $this->_run_query($query, $params, self::ROWCOUNT);
         }
         
         /**
@@ -82,9 +83,9 @@
          * @param int $id_groupe : L'id du groupe pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_groupe_contact ($id_groupe)
+        public function delete_groupe_contact($id_groupe)
         {
-            return $this->deleteFromTableWhere('groupe_contact', ['id_groupe' => $id_groupe]);
+            return $this->_delete('groupe_contact', ['id_groupe' => $id_groupe]);
         }
 
         /**
@@ -92,16 +93,15 @@
          * @param array $groupe : La groupe à insérer avec les champs name, script, admin & admin
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
-        public function insert ($groupe)
+        public function insert($groupe)
         {
-            $result = $this->insertIntoTable('groupe', $groupe);
+            $result = $this->_insert('groupe', $groupe);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
         
         /**
@@ -110,16 +110,15 @@
          * @param int $id_contact : L'id du contact à liéer
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
-        public function insert_groupe_contact ($id_groupe, $id_contact)
+        public function insert_groupe_contact($id_groupe, $id_contact)
         {
-            $result = $this->insertIntoTable('groupe_contact', ['id_groupe' => $id_groupe, 'id_contact' => $id_contact]);
+            $result = $this->_insert('groupe_contact', ['id_groupe' => $id_groupe, 'id_contact' => $id_contact]);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
 
         /**
@@ -128,26 +127,26 @@
          * @param array $groupe : Les données à mettre à jour pour la groupe
          * @return int : le nombre de ligne modifiées
          */
-        public function update ($id, $groupe)
+        public function update($id, $groupe)
         {
-            return $this->updateTableWhere('groupe', $groupe, ['id' => $id]);
+            return $this->_update('groupe', $groupe, ['id' => $id]);
         }
         
         /**
          * Compte le nombre d'entrées dans la table
          * @return int : Le nombre d'entrées
          */
-        public function count ()
+        public function count()
         {
-            return $this->countTable('groupe');
+            return $this->_count('groupe');
         }
         
         /**
          * Cette fonction retourne les contact pour un groupe
          * @param string $id : L'id du groupe
          * @return array : Un tableau avec les contact
-         */	
-        public function get_contact ($id)
+         */
+        public function get_contact($id)
         {
             $query = "
                 SELECT * 
@@ -159,6 +158,6 @@
                 'id' => $id,
             );
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
     }

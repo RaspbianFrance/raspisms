@@ -1,61 +1,62 @@
 <?php
-	namespace models;
-	/**
+    namespace models;
+
+    /**
      * Cette classe gère les accès bdd pour les scheduledes
-	 */
-	class Scheduled extends \Model
+     */
+    class Scheduled extends \descartes\Model
     {
         /**
          * Retourne une entrée par son id
          * @param int $id : L'id de l'entrée
          * @return array : L'entrée
          */
-        public function get_by_id ($id)
+        public function get_by_id($id)
         {
-            $scheduleds = $this->select('scheduled', ['id' => $id]);
+            $scheduleds = $this->_select('scheduled', ['id' => $id]);
             return isset($scheduleds[0]) ? $scheduleds[0] : false;
         }
 
-		/**
-		 * Retourne une liste de scheduledes sous forme d'un tableau
+        /**
+         * Retourne une liste de scheduledes sous forme d'un tableau
          * @param int $limit : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
-		 */
-		public function get_list ($limit, $offset)
+         */
+        public function get_list($limit, $offset)
         {
-            $scheduleds = $this->select('scheduled', [], '', false, $limit, $offset);
+            $scheduleds = $this->_select('scheduled', [], '', false, $limit, $offset);
 
-	    	return $scheduleds;
-		}
+            return $scheduleds;
+        }
         
         /**
-		 * Retourne une liste de scheduledes sous forme d'un tableau
+         * Retourne une liste de scheduledes sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
          * @return array : La liste des entrées
-		 */
-        public function get_by_ids ($ids)
+         */
+        public function get_by_ids($ids)
         {
-			$query = " 
+            $query = " 
                 SELECT * FROM scheduled
                 WHERE id ";
      
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id 
-            $generated_in = $this->generateInFromArray($ids);
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
 
-		/** 
+        /**
          * Cette fonction retourne les messages programmés avant une date et pour un numéro
          * @param \DateTime $date : La date avant laquelle on veux le message
          * @param string $number : Le numéro
          * @return array : Les messages programmés avant la date
          */
-        public function get_before_date_for_number ($date, $number)
-        {   
-			$query = " 
+        public function get_before_date_for_number($date, $number)
+        {
+            $query = " 
                 SELECT *
                 FROM scheduled
                 WHERE at <= :date
@@ -95,24 +96,24 @@
                 'number' => $number,
             );
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
 
         /**
-		 * Retourne une liste de scheduledes sous forme d'un tableau
+         * Retourne une liste de scheduledes sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à supprimer
          * @return int : Le nombre de lignes supprimées
-		 */
-        public function delete_by_id ($id)
+         */
+        public function delete_by_id($id)
         {
-			$query = " 
+            $query = " 
                 DELETE FROM scheduled
                 WHERE id = :id";
      
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id 
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
             $params = ['id' => $id];
 
-            return $this->runQuery($query, $params, self::ROWCOUNT);
+            return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
         /**
@@ -120,16 +121,15 @@
          * @param array $scheduled : La schedulede à insérer avec les champs name, script, admin & admin
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
-        public function insert ($scheduled)
+        public function insert($scheduled)
         {
-            $result = $this->insertIntoTable('scheduled', $scheduled);
+            $result = $this->_insert('scheduled', $scheduled);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
 
         /**
@@ -138,18 +138,18 @@
          * @param array $scheduled : Les données à mettre à jour pour la schedulede
          * @return int : le nombre de ligne modifiées
          */
-        public function update ($id, $scheduled)
+        public function update($id, $scheduled)
         {
-            return $this->updateTableWhere('scheduled', $scheduled, ['id' => $id]);
+            return $this->_update('scheduled', $scheduled, ['id' => $id]);
         }
         
         /**
          * Compte le nombre d'entrées dans la table
          * @return int : Le nombre d'entrées
          */
-        public function count ()
+        public function count()
         {
-            return $this->countTable('scheduled');
+            return $this->_count('scheduled');
         }
         
         /**
@@ -157,9 +157,9 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
          * @return array : Les numéros des scheduled
          */
-        public function get_number ($id_scheduled)
+        public function get_number($id_scheduled)
         {
-            return $this->select('scheduled_number', ['id_scheduled' => $id_scheduled]);
+            return $this->_select('scheduled_number', ['id_scheduled' => $id_scheduled]);
         }
         
         /**
@@ -167,13 +167,13 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
          * @return array : Les contact du scheduled
          */
-        public function get_contact ($id_scheduled)
+        public function get_contact($id_scheduled)
         {
             $query = 'SELECT * FROM contact WHERE id IN (SELECT id_contact FROM scheduled_contact WHERE id_scheduled = :id_scheduled)';
 
             $params = ['id_scheduled' => $id_scheduled];
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
         
         /**
@@ -181,13 +181,13 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
          * @return array : Les groupes du scheduled
          */
-        public function get_groupe ($id_scheduled)
+        public function get_groupe($id_scheduled)
         {
             $query = 'SELECT * FROM groupe WHERE id IN (SELECT id_group FROM scheduled_groupe WHERE id_scheduled = :id_scheduled)';
 
             $params = ['id_scheduled' => $id_scheduled];
 
-            return $this->runQuery($query, $params);
+            return $this->_run_query($query, $params);
         }
         
         /**
@@ -196,16 +196,15 @@
          * @param string $number : Le numéro à lier
          * @return int : le nombre d'entrées
          */
-        public function insert_scheduled_number ($id_scheduled, $number)
+        public function insert_scheduled_number($id_scheduled, $number)
         {
-            $result = $this->insertIntoTable('scheduled_number', ['id_scheduled' => $id_scheduled, 'number' => $number]);
+            $result = $this->_insert('scheduled_number', ['id_scheduled' => $id_scheduled, 'number' => $number]);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
 
         /**
@@ -214,16 +213,15 @@
          * @param int $id_contact : L'id du contact
          * @return int : le nombre d'entrées
          */
-        public function insert_scheduled_contact ($id_scheduled, $id_contact)
+        public function insert_scheduled_contact($id_scheduled, $id_contact)
         {
-            $result = $this->insertIntoTable('scheduled_contact', ['id_scheduled' => $id_scheduled, 'id_contact' => $id_contact]);
+            $result = $this->_insert('scheduled_contact', ['id_scheduled' => $id_scheduled, 'id_contact' => $id_contact]);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
         
         /**
@@ -232,16 +230,15 @@
          * @param int $id_group : L'id du group
          * @return int : le nombre d'entrées
          */
-        public function insert_scheduled_groupe ($id_scheduled, $id_group)
+        public function insert_scheduled_groupe($id_scheduled, $id_group)
         {
-            $result = $this->insertIntoTable('scheduled_groupe', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]);
+            $result = $this->_insert('scheduled_groupe', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]);
 
-            if (!$result)
-            {
+            if (!$result) {
                 return false;
             }
 
-            return $this->lastId();
+            return $this->_last_id();
         }
 
         /**
@@ -249,9 +246,9 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_number ($id_scheduled)
+        public function delete_scheduled_number($id_scheduled)
         {
-            return $this->deleteFromTableWhere('scheduled_number', ['id_scheduled' => $id_scheduled]);
+            return $this->_delete('scheduled_number', ['id_scheduled' => $id_scheduled]);
         }
         
         /**
@@ -259,9 +256,9 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_contact ($id_scheduled)
+        public function delete_scheduled_contact($id_scheduled)
         {
-            return $this->deleteFromTableWhere('scheduled_contact', ['id_scheduled' => $id_scheduled]);
+            return $this->_delete('scheduled_contact', ['id_scheduled' => $id_scheduled]);
         }
         
         /**
@@ -269,8 +266,8 @@
          * @param int $id_scheduled : L'id du scheduled pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_groupe ($id_scheduled)
+        public function delete_scheduled_groupe($id_scheduled)
         {
-            return $this->deleteFromTableWhere('scheduled_groupe', ['id_scheduled' => $id_scheduled]);
+            return $this->_delete('scheduled_groupe', ['id_scheduled' => $id_scheduled]);
         }
     }
