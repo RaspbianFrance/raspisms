@@ -7,7 +7,7 @@
              'Args :' . "\n" .
              '    - help : Show help  message.' . "\n" .
              '    - lint : Show coding standards to fix.' . "\n" .
-             '    - help : Fix coding standards.' . "\n";
+             '    - fix : Fix coding standards.' . "\n";
 
         exit(100);
     }
