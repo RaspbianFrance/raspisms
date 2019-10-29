@@ -2,7 +2,7 @@
 <?php
     function help ()
     {
-        echo 'Usage : ' . __FILE__ . ' <arg>' . "\n" .
+        echo 'Usage : ' . __FILE__ . ' <arg> [level 0-7]' . "\n" .
              'Args :' . "\n" .
              '    - help : Show help  message.' . "\n" .
              '    - analyse : Analyse code with phpstan.' . "\n";
@@ -30,6 +30,11 @@
 
         foreach ($analyse_commands as $analyse_command)
         {
+            if (isset($argv[2]))
+            {
+                $analyse_command .= ' --level=' . $argv[2];
+            }
+
             echo "Run : " . $analyse_command . " \n";
             $return = shell_exec($analyse_command);
             echo $return;
