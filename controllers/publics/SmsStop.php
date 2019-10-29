@@ -1,8 +1,19 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace controllers\publics;
 
     /**
-     * Page des smsstops
+     * Page des smsstops.
      */
     class SmsStop extends \descartes\Controller
     {
@@ -10,7 +21,8 @@ namespace controllers\publics;
 
         /**
          * Cette fonction est appelée avant toute les autres :
-         * Elle vérifie que l'utilisateur est bien connecté
+         * Elle vérifie que l'utilisateur est bien connecté.
+         *
          * @return void;
          */
         public function __construct()
@@ -22,35 +34,45 @@ namespace controllers\publics;
         }
 
         /**
-         * Cette fonction retourne tous les smsstops, sous forme d'un tableau permettant l'administration de ces smsstops
+         * Cette fonction retourne tous les smsstops, sous forme d'un tableau permettant l'administration de ces smsstops.
+         *
+         * @param mixed $page
          */
         public function list($page = 0)
         {
             $page = (int) $page;
             $limit = 25;
             $smsstops = $this->internal_sms_stop->get_list($limit, $page);
-            $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => count($smsstops)]);
+            $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => \count($smsstops)]);
         }
-        
+
         /**
-         * Cette fonction va supprimer une liste de smsstops
+         * Cette fonction va supprimer une liste de smsstops.
+         *
          * @param array int $_GET['ids'] : Les id des smsstopes à supprimer
+         * @param mixed     $csrf
+         *
          * @return boolean;
          */
         public function delete($csrf)
         {
-            if (!$this->verify_csrf($csrf)) {
+            if (!$this->verify_csrf($csrf))
+            {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
-            if (!\controllers\internals\Tool::is_admin()) {
+            if (!\controllers\internals\Tool::is_admin())
+            {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP Sms" !');
+
                 return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
-            foreach ($ids as $id) {
+            foreach ($ids as $id)
+            {
                 $this->internal_sms_stop->delete($id);
             }
 

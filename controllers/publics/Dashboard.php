@@ -1,8 +1,19 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace controllers\publics;
 
     /**
-     * Page d'index, qui gère l'affichage par défaut temporairement
+     * Page d'index, qui gère l'affichage par défaut temporairement.
      */
     class Dashboard extends \descartes\Controller
     {
@@ -16,13 +27,14 @@ namespace controllers\publics;
 
         /**
          * Cette fonction est appelée avant toute les autres :
-         * Elle vérifie que l'utilisateur est bien connecté
+         * Elle vérifie que l'utilisateur est bien connecté.
+         *
          * @return void;
          */
         public function __construct()
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
-            
+
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
@@ -30,19 +42,20 @@ namespace controllers\publics;
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_command = new \controllers\internals\Command($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
-            
+
             \controllers\internals\Tool::verifyconnect();
         }
 
         /**
-         * Cette fonction est un alias de show
+         * Cette fonction est un alias de show.
+         *
          * @return void;
          */
         public function show()
         {
             //Creation de l'object de base de données
             global $db;
-            
+
             //Recupération des nombres des 4 panneaux d'accueil
             $nb_contacts = $this->internal_contact->count();
             $nb_groups = $this->internal_group->count();
@@ -67,35 +80,38 @@ namespace controllers\publics;
             $nb_receiveds_by_day = $this->internal_received->count_by_day_since($formated_date);
 
             //On va traduire ces données pour les afficher en graphique
-            $array_area_chart = array();
-            
+            $array_area_chart = [];
+
             $today_less_7_day = new \DateTime();
             $today_less_7_day->sub(new \DateInterval('P7D'));
             $increment_day = new \DateInterval('P1D');
             $i = 0;
 
             //On va construire un tableau avec la date en clef, et les données pour chaque date
-            while ($i < 7) {
+            while ($i < 7)
+            {
                 $today_less_7_day->add($increment_day);
-                $i ++;
+                ++$i;
                 $date_f = $today_less_7_day->format('Y-m-d');
-                $array_area_chart[$date_f] = array(
+                $array_area_chart[$date_f] = [
                     'period' => $date_f,
                     'sendeds' => 0,
                     'receiveds' => 0,
-                );
+                ];
             }
 
             $total_sendeds = 0;
             $total_receiveds = 0;
 
             //0n remplie le tableau avec les données adaptées
-            foreach ($nb_sendeds_by_day as $date => $nb_sended) {
+            foreach ($nb_sendeds_by_day as $date => $nb_sended)
+            {
                 $array_area_chart[$date]['sendeds'] = $nb_sended;
                 $total_sendeds += $nb_sended;
             }
 
-            foreach ($nb_receiveds_by_day as $date => $nb_received) {
+            foreach ($nb_receiveds_by_day as $date => $nb_received)
+            {
                 $array_area_chart[$date]['receiveds'] = $nb_received;
                 $total_receiveds += $nb_received;
             }
@@ -105,8 +121,7 @@ namespace controllers\publics;
 
             $array_area_chart = array_values($array_area_chart);
 
-
-            $this->render('dashboard/show', array(
+            $this->render('dashboard/show', [
                 'nb_contacts' => $nb_contacts,
                 'nb_groups' => $nb_groups,
                 'nb_scheduleds' => $nb_scheduleds,
@@ -119,6 +134,6 @@ namespace controllers\publics;
                 'receiveds' => $receiveds,
                 'events' => $events,
                 'datas_area_chart' => json_encode($array_area_chart),
-            ));
+            ]);
         }
     }

@@ -1,8 +1,19 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace controllers\internals;
 
     /**
-     * Classe des smsstopes
+     * Classe des smsstopes.
      */
     class SmsStop extends \descartes\InternalController
     {
@@ -14,9 +25,11 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des smsstopes sous forme d'un tableau
+         * Cette fonction retourne une liste des smsstopes sous forme d'un tableau.
+         *
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page : Le numéro de page en cours
+         * @param mixed(int|bool) $page     : Le numéro de page en cours
+         *
          * @return array : La liste des smsstopes
          */
         public function get_list($nb_entry = false, $page = false)
@@ -26,8 +39,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des smsstopes sous forme d'un tableau
+         * Cette fonction retourne une liste des smsstopes sous forme d'un tableau.
+         *
          * @param array int $ids : Les ids des entrées à retourner
+         *
          * @return array : La liste des smsstopes
          */
         public function get_by_ids($ids)
@@ -35,10 +50,12 @@ namespace controllers\internals;
             //Recupération des smsstopes
             return $this->model_sms_stop->get_by_ids($ids);
         }
-        
+
         /**
-         * Cette fonction retourne un smsstop par son numéro de tel
+         * Cette fonction retourne un smsstop par son numéro de tel.
+         *
          * @param string $number : Le numéro du smsstop
+         *
          * @return array : Le smsstop
          */
         public function get_by_number($number)
@@ -46,10 +63,10 @@ namespace controllers\internals;
             //Recupération des smsstopes
             return $this->model_sms_stop->get_by_number($number);
         }
-        
 
         /**
-         * Cette fonction permet de compter le nombre de smsstops
+         * Cette fonction permet de compter le nombre de smsstops.
+         *
          * @return int : Le nombre d'entrées dans la table
          */
         public function count()
@@ -58,8 +75,11 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction va supprimer une liste de smsstops
+         * Cette fonction va supprimer une liste de smsstops.
+         *
          * @param array $ids : Les id des smsstopes à supprimer
+         * @param mixed $id
+         *
          * @return int : Le nombre de smsstopes supprimées;
          */
         public function delete($id)
@@ -68,8 +88,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction insert une nouvelle smsstope
+         * Cette fonction insert une nouvelle smsstope.
+         *
          * @param array $smsstop : Un tableau représentant la smsstope à insérer
+         *
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle smsstope insérée
          */
         public function create($smsstop)
@@ -78,20 +100,25 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction met à jour une série de smsstopes
+         * Cette fonction met à jour une série de smsstopes.
+         *
+         * @param mixed $smsstops
+         *
          * @return int : le nombre de ligne modifiées
          */
         public function update($smsstops)
         {
             $nb_update = 0;
-            foreach ($smsstops as $smsstop) {
+            foreach ($smsstops as $smsstop)
+            {
                 $result = $this->model_sms_stop->update($smsstop['id'], $smsstop);
 
-                if ($result) {
-                    $nb_update ++;
+                if ($result)
+                {
+                    ++$nb_update;
                 }
             }
-        
+
             return $nb_update;
         }
     }

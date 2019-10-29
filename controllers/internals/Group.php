@@ -1,8 +1,19 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace controllers\internals;
 
     /**
-     * Classe des groups
+     * Classe des groups.
      */
     class Group extends \descartes\InternalController
     {
@@ -16,9 +27,11 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des groups sous forme d'un tableau
+         * Cette fonction retourne une liste des groups sous forme d'un tableau.
+         *
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page : Le numéro de page en cours
+         * @param mixed(int|bool) $page     : Le numéro de page en cours
+         *
          * @return array : La liste des groups
          */
         public function get_list($nb_entry = false, $page = false)
@@ -28,8 +41,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des groups sous forme d'un tableau
+         * Cette fonction retourne une liste des groups sous forme d'un tableau.
+         *
          * @param array int $ids : Les ids des entrées à retourner
+         *
          * @return array : La liste des groups
          */
         public function get_by_ids($ids)
@@ -37,10 +52,12 @@ namespace controllers\internals;
             //Recupération des groups
             return $this->model_group->get_by_ids($ids);
         }
-        
+
         /**
-         * Cette fonction retourne un group par son name
+         * Cette fonction retourne un group par son name.
+         *
          * @param string $name : Le name du group
+         *
          * @return array : Le group
          */
         public function get_by_name($name)
@@ -50,7 +67,8 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction permet de compter le nombre de group
+         * Cette fonction permet de compter le nombre de group.
+         *
          * @return int : Le nombre d'entrées dans la table
          */
         public function count()
@@ -59,8 +77,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction va supprimer une liste de group
+         * Cette fonction va supprimer une liste de group.
+         *
          * @param array $ids : Les id des groups à supprimer
+         *
          * @return int : Le nombre de groups supprimées;
          */
         public function delete($ids)
@@ -69,9 +89,11 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction insert une nouvelle group
-         * @param array $name : le nom du group
+         * Cette fonction insert une nouvelle group.
+         *
+         * @param array $name         : le nom du group
          * @param array $contacts_ids : Un tableau des ids des contact du group
+         *
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle group insérée
          */
         public function create($name, $contacts_ids)
@@ -81,24 +103,28 @@ namespace controllers\internals;
             ];
 
             $id_group = $this->model_group->insert($group);
-            if (!$id_group) {
+            if (!$id_group)
+            {
                 return false;
             }
 
-            foreach ($contacts_ids as $contact_id) {
+            foreach ($contacts_ids as $contact_id)
+            {
                 $this->model_group->insert_group_contact($id_group, $contact_id);
             }
 
-            $this->internal_event->create('GROUP_ADD', 'Ajout group : ' . $name);
+            $this->internal_event->create('GROUP_ADD', 'Ajout group : '.$name);
 
             return $id_group;
         }
 
         /**
-         * Cette fonction met à jour un group
-         * @param int $id : L'id du group à update
-         * @param string $name : Le nom du group à update
+         * Cette fonction met à jour un group.
+         *
+         * @param int    $id           : L'id du group à update
+         * @param string $name         : Le nom du group à update
          * @param string $contacts_ids : Les ids des contact du group
+         *
          * @return bool : True if all update ok, false else
          */
         public function update($id, $name, $contacts_ids)
@@ -112,22 +138,27 @@ namespace controllers\internals;
             $this->model_group->delete_group_contact($id);
 
             $nb_contact_insert = 0;
-            foreach ($contacts_ids as $contact_id) {
-                if ($this->model_group->insert_group_contact($id, $contact_id)) {
-                    $nb_contact_insert ++;
+            foreach ($contacts_ids as $contact_id)
+            {
+                if ($this->model_group->insert_group_contact($id, $contact_id))
+                {
+                    ++$nb_contact_insert;
                 }
             }
 
-            if (!$result && $nb_contact_insert != count($contacts_ids)) {
+            if (!$result && $nb_contact_insert !== \count($contacts_ids))
+            {
                 return false;
             }
 
             return true;
         }
-        
+
         /**
-         * Cette fonction retourne les contact pour un group
+         * Cette fonction retourne les contact pour un group.
+         *
          * @param string $id : L'id du group
+         *
          * @return array : Un tableau avec les contact
          */
         public function get_contact($id)

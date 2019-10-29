@@ -1,8 +1,19 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace controllers\internals;
 
     /**
-     * Classe des commandes
+     * Classe des commandes.
      */
     class Command extends \descartes\InternalController
     {
@@ -15,11 +26,12 @@ namespace controllers\internals;
             $this->internal_event = new \controllers\internals\Event($bdd);
         }
 
-
         /**
-         * Return the list of commands as an array
+         * Return the list of commands as an array.
+         *
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page : Le numéro de page en cours
+         * @param mixed(int|bool) $page     : Le numéro de page en cours
+         *
          * @return array : La liste des commandes
          */
         public function list($nb_entry = false, $page = false)
@@ -28,8 +40,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des commandes sous forme d'un tableau
+         * Cette fonction retourne une liste des commandes sous forme d'un tableau.
+         *
          * @param array int $ids : Les ids des entrées à retourner
+         *
          * @return array : La liste des commandes
          */
         public function get_by_ids($ids)
@@ -39,7 +53,8 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction permet de compter le nombre de scheduleds
+         * Cette fonction permet de compter le nombre de scheduleds.
+         *
          * @return int : Le nombre d'entrées dans la table
          */
         public function count()
@@ -48,8 +63,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction va supprimer une commande
+         * Cette fonction va supprimer une commande.
+         *
          * @param array $id : L'id de la commande à supprimer
+         *
          * @return int : Le nombre de commandes supprimées;
          */
         public function delete($id)
@@ -58,8 +75,13 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction insert une nouvelle commande
+         * Cette fonction insert une nouvelle commande.
+         *
          * @param array $command : La commande à insérer
+         * @param mixed $name
+         * @param mixed $script
+         * @param mixed $admin
+         *
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle commande insérée
          */
         public function create($name, $script, $admin)
@@ -72,16 +94,24 @@ namespace controllers\internals;
 
             $result = $this->model_command->insert($command);
 
-            if (!$result) {
+            if (!$result)
+            {
                 return false;
             }
 
-            $this->internal_event->create('COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
+            $this->internal_event->create('COMMAND_ADD', 'Ajout commande : '.$name.' => '.$script);
+
             return $result;
         }
 
         /**
-         * Cette fonction met à jour un commande
+         * Cette fonction met à jour un commande.
+         *
+         * @param mixed $id
+         * @param mixed $name
+         * @param mixed $script
+         * @param mixed $admin
+         *
          * @return int : le nombre de ligne modifiées
          */
         public function update($id, $name, $script, $admin)
@@ -92,8 +122,6 @@ namespace controllers\internals;
                 'admin' => $admin,
             ];
 
-            $result = $this->model_command->update($id, $command);
-        
-            return $result;
+            return $this->model_command->update($id, $command);
         }
     }

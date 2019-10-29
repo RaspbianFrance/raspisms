@@ -1,67 +1,88 @@
 <?php
-    namespace models;
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace models;
 
     /**
-     * Cette classe gère les accès bdd pour les contactes
+     * Cette classe gère les accès bdd pour les contactes.
      */
     class Contact extends \descartes\Model
     {
         /**
-         * Retourne une entrée par son id
+         * Retourne une entrée par son id.
+         *
          * @param int $id : L'id de l'entrée
+         *
          * @return array : L'entrée
          */
         public function get_by_id($id)
         {
             $contacts = $this->_select('contact', ['id' => $id]);
+
             return isset($contacts[0]) ? $contacts[0] : false;
         }
-        
+
         /**
-         * Retourne une entrée par son numéro de tel
+         * Retourne une entrée par son numéro de tel.
+         *
          * @param string $number : Le numéro de tél
+         *
          * @return array : L'entrée
          */
         public function get_by_number($number)
         {
             $contacts = $this->_select('contact', ['number' => $number]);
+
             return isset($contacts[0]) ? $contacts[0] : false;
         }
-        
+
         /**
-         * Retourne une entrée par son numéro de tel
+         * Retourne une entrée par son numéro de tel.
+         *
          * @param string $name : Le numéro de tél
+         *
          * @return array : L'entrée
          */
         public function get_by_name($name)
         {
             $contacts = $this->_select('contact', ['name' => $name]);
+
             return isset($contacts[0]) ? $contacts[0] : false;
         }
 
         /**
-         * Retourne une liste de contactes sous forme d'un tableau
-         * @param int $limit : Nombre de résultat maximum à retourner
+         * Retourne une liste de contactes sous forme d'un tableau.
+         *
+         * @param int $limit  : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
          */
         public function get_list($limit, $offset)
         {
-            $contacts = $this->_select('contact', [], '', false, $limit, $offset);
-
-            return $contacts;
+            return $this->_select('contact', [], '', false, $limit, $offset);
         }
-        
+
         /**
-         * Retourne une liste de contactes sous forme d'un tableau
+         * Retourne une liste de contactes sous forme d'un tableau.
+         *
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
+         *
          * @return array : La liste des entrées
          */
         public function get_by_ids($ids)
         {
-            $query = " 
+            $query = ' 
                 SELECT * FROM contact
-                WHERE id ";
-     
+                WHERE id ';
+
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
@@ -71,30 +92,36 @@
         }
 
         /**
-         * Supprimer un contact par son id
+         * Supprimer un contact par son id.
+         *
          * @param array $id : un ou plusieurs id d'entrées à supprimer
+         *
          * @return int : Le nombre de lignes supprimées
          */
         public function delete_by_id($id)
         {
-            $query = " 
+            $query = ' 
                 DELETE FROM contact
-                WHERE id = :id";
-     
+                WHERE id = :id';
+
             $params = ['id' => $id];
+
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
         /**
-         * Insert une contacte
+         * Insert une contacte.
+         *
          * @param array $contact : La contacte à insérer avec les champs name, script, admin & admin
+         *
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
         public function insert($contact)
         {
             $result = $this->_insert('contact', $contact);
 
-            if (!$result) {
+            if (!$result)
+            {
                 return false;
             }
 
@@ -102,9 +129,11 @@
         }
 
         /**
-         * Met à jour une contacte par son id
-         * @param int $id : L'id de la contact à modifier
+         * Met à jour une contacte par son id.
+         *
+         * @param int   $id      : L'id de la contact à modifier
          * @param array $contact : Les données à mettre à jour pour la contacte
+         *
          * @return int : le nombre de ligne modifiées
          */
         public function update($id, $contact)
@@ -113,7 +142,8 @@
         }
 
         /**
-         * Compte le nombre d'entrées dans la table contact
+         * Compte le nombre d'entrées dans la table contact.
+         *
          * @return int : Le nombre de contact
          */
         public function count()
