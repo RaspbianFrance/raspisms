@@ -1,0 +1,4 @@
+.gitignore
+.git
+.php_cs.cache
+vendor/
