@@ -1,4 +1,6 @@
 <?php
+    namespace descartes;
+
     /**
      * Cette classe sert de mère à tous les modèles, elle permet de gérer l'ensemble des fonction necessaires aux requetes en base de données
      * @param $pdo : Une instance de PDO
@@ -31,7 +33,7 @@
          * @param string $password : Le mot de passe à employer
          * @return mixed : Un objet PDO ou false en cas d'erreur
          */
-        public static function connect ($host, $dbname, $user, $password, ?string $charset = 'UTF8', ?array $options = null)
+        public static function _connect ($host, $dbname, $user, $password, ?string $charset = 'UTF8', ?array $options = null)
         {
             $options = $options ?? [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -58,7 +60,7 @@
          * @param boolean $debug : If we must return debug info instead of data, by default false
          * @return mixed : Result of query, depend of $return_type | null | array | object | int
          */
-        public function run_query (string $query, array $datas = array(), int $return_type = self::FETCHALL, int $fetch_mode = PDO::FETCH_ASSOC, bool $debug = false)
+        protected function _run_query (string $query, array $datas = array(), int $return_type = self::FETCHALL, int $fetch_mode = PDO::FETCH_ASSOC, bool $debug = false)
         {
             $query = $this->pdo->prepare($query);
             $query->setFetchMode($return_type);
@@ -98,7 +100,7 @@
          * Return last inserted id
          * return int : Last inserted id
          */
-        public function last_id() : int
+        protected function _last_id() : int
         {
             return $this->pdo->lastInsertId();
         }
@@ -113,7 +115,7 @@
          * @param string $values : Values to generate in array from
          * @return array : Array ['QUERY' => string 'IN(...)', 'PARAMS' => [parameters to pass to execute]]
         */
-        public function generate_in_from_array ($values)
+        protected function _generate_in_from_array ($values)
         {
             $return = array(
                 'QUERY' => '',
@@ -141,7 +143,7 @@
          * @param $value : value of field
          * @return array : array with QUERY and PARAMS
          */
-        public function evaluate_condition (string $fieldname, $value) : array
+        protected function _evaluate_condition (string $fieldname, $value) : array
         {
             $first_char = mb_substr($fieldname, 0, 1);
             $second_char = mb_substr($fieldname, 1, 1);
@@ -206,13 +208,13 @@
          * @param string $offset : Le nombre de résultats à ignorer (par défaut pas de résultats ignorés)
          * @return mixed : False en cas d'erreur, sinon les lignes retournées
          */
-        public function select (string $table, array $conditions = [], ?string $order_by = null, bool $desc = false, ?int $limit = null, ?int $offset = null)
+        protected function _select (string $table, array $conditions = [], ?string $order_by = null, bool $desc = false, ?int $limit = null, ?int $offset = null)
         {
             $wheres = array();
             $params = array();
             foreach ($conditions as $label => $value)
             {
-                $condition = $this->evaluate_condition($label, $value);
+                $condition = $this->_evaluate_condition($label, $value);
                 $wheres[] = $condition['QUERY'];
                 $params = array_merge($params, $condition['PARAM']);
             }
@@ -267,9 +269,9 @@
          * Get one line from table, posssibly with some conditions
          * see get
          */
-        public function select_one (string $table, array $conditions = [], ?string $order_by = null, bool $desc = false, ?int $limit = null, ?int $offset = null)
+        protected function _select_one (string $table, array $conditions = [], ?string $order_by = null, bool $desc = false, ?int $limit = null, ?int $offset = null)
         {
-            $result = $this->select($table, $conditions, $order_by, $desc, $limit, $offset);
+            $result = $this->_select($table, $conditions, $order_by, $desc, $limit, $offset);
 
             if (empty($result[0]))
             {
@@ -283,13 +285,13 @@
          * Count line from table, posssibly with some conditions
          * @param array $conditions : conditions of query Les conditions pour la mise à jour sous la forme "label" => "valeur". Un operateur '<, >, <=, >=, !' peux précder le label pour modifier l'opérateur par défaut (=)
          */
-        public function count (string $table, array $conditions = []) : int
+        protected function _count (string $table, array $conditions = []) : int
         {
             $wheres = array();
             $params = array();
             foreach ($conditions as $label => $value)
             {
-                $condition = $this->evaluate_condition($label, $value);
+                $condition = $this->_evaluate_condition($label, $value);
                 $wheres[] = $condition['QUERY'];
                 $params = array_merge($params, $condition['PARAM']);
             }
@@ -318,7 +320,7 @@
          * @param array $conditions : conditions to use, format 'fieldname' => 'value', fieldname can be preceed by operator '<, >, <=, >=, ! or = (by default)' to adapt comparaison operator
          * @return mixed : Number of line modified
          */
-        public function update (string $table, array $datas, array $conditions = array()) : int
+        protected function _update (string $table, array $datas, array $conditions = array()) : int
         {
             $params = array();
             $sets = array();
@@ -334,14 +336,14 @@
             $wheres = array();
             foreach ($conditions as $label => $value)
             {
-                $condition = $this->evaluate_condition($label, $value);
+                $condition = $this->_evaluate_condition($label, $value);
                 $wheres[] = $condition['QUERY'];
                 $params = array_merge($params, $condition['PARAM']);
             }
 
 
             $query = "UPDATE `" . $table . "` SET " . implode(', ', $sets) . " WHERE 1 AND " . implode(' AND ', $wheres);
-            return $this->run_query($query, $params, self::ROWCOUNT);
+            return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
         /**
@@ -350,20 +352,20 @@
          * @param array $conditions : conditions to use, format 'fieldname' => 'value', fieldname can be preceed by operator '<, >, <=, >=, ! or = (by default)' to adapt comparaison operator
          * @return mixed : Number of line deleted
          */
-        public function delete (string $table, array $conditions = []) : int
+        protected function _delete (string $table, array $conditions = []) : int
         {
             //On gère les conditions
             $wheres = array();
             $params = array();
             foreach ($conditions as $label => $value)
             {
-                $condition = $this->evaluate_condition($label, $value);
+                $condition = $this->_evaluate_condition($label, $value);
                 $wheres[] = $condition['QUERY'];
                 $params = array_merge($params, $condition['PARAM']);
             }
 
             $query = "DELETE FROM `" . $table . "` WHERE 1 AND " . implode(' AND ', $wheres);
-            return $this->run_query($query, $params, self::ROWCOUNT);
+            return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
         /**
@@ -372,7 +374,7 @@
          * @param array $datas : new datas
          * @return mixed : null on error, number of line inserted else
          */
-        public function insert (string $table, array $datas) : ?int
+        protected function _insert (string $table, array $datas) : ?int
         {
             $params = array();
             $field_names = array();
@@ -386,7 +388,7 @@
             $query = "INSERT INTO `" . $table . "` (`" . implode('`, `', $field_names) . "`) VALUES(:" . implode(', :', $field_names) . ")";
 
             //On retourne le nombre de lignes insérées
-            return $this->run_query($query, $params, self::ROWCOUNT);
+            return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
     } 

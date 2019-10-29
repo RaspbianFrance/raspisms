@@ -1,11 +1,21 @@
 <?php
+    namespace descartes;
+
+    function define_array ($array)
+    {
+        foreach ($array as $key => $value)
+        {
+            define(mb_strtoupper($key), $value);
+        }
+    }
 
     function load_env ()
     {
+
+        ### DESCARTES ENV ###
         $environment = [];
         $env = [];
-
-        //Load descartes global env
+        
         require_once(__DIR__ . '/env.php');
         $environment = array_merge($environment, $env);
 
@@ -15,21 +25,23 @@
             require_once(__DIR__ . '/../env.descartes.php');
             $environment = array_merge($environment, $env);
         }
-        
-        //Load user defined global env
+
+        //Define all Descartes constants 
+        define_array($environment);
+
+        ### GLOBAL ENV ###
+        $environment = [];
+        $env = [];
         if (file_exists(__DIR__ . '/../env.php'))
         {
             require_once(__DIR__ . '/../env.php');
             $environment = array_merge($environment, $env);
         }
 
-        //Define all constants 
-        foreach ($environment as $name => $value)
-        {
-            define(mb_strtoupper($name), $value);
-        }
+        define_array($environment);
 
-        //Load user defined env specific env
+
+        ### SPECIFIC ENV ###
         $environment = [];
         $env = [];
         
@@ -39,11 +51,7 @@
             $environment = array_merge($environment, $env);
         }
 
-        //Define env specific constants
-        foreach ($environment as $name => $value)
-        {
-            define(mb_strtoupper($name), $value);
-        }
+        define_array($environment);
     }
 
     load_env();

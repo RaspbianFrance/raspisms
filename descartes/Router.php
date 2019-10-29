@@ -1,5 +1,7 @@
 <?php
-	/**
+    namespace descartes;
+
+    /**
 	 * Cette classe gère l'appel des ressources
 	 */
 	class Router
@@ -18,12 +20,12 @@
 
             if (!array_key_exists($controller, ROUTES))
             {
-                throw new DescartesExceptionRouterUrlGenerationError('Try to generate url for controller ' . $controller . ' that did not exist.');
+                throw new \descartes\exceptions\DescartesExceptionRouterUrlGenerationError('Try to generate url for controller ' . $controller . ' that did not exist.');
             }
 
             if (!array_key_exists($method, ROUTES[$controller]))
             {
-                throw new DescartesExceptionRouterUrlGenerationError('Try to generate url for method ' . $controller . '::' . $method . ' that did not exist.');
+                throw new \descartes\exceptions\DescartesExceptionRouterUrlGenerationError('Try to generate url for method ' . $controller . '::' . $method . ' that did not exist.');
             }
 
             $get_params = http_build_query($get_params);
@@ -57,7 +59,7 @@
                 return $url . $route . ($get_params ? '?' . $get_params : '');
             }
 
-            throw new DescartesExceptionRouterUrlGenerationError('Cannot find any route for ' . $controller . '::' . $method . ' with parameters ' . print_r($params, true));
+            throw new \descartes\exceptions\DescartesExceptionRouterUrlGenerationError('Cannot find any route for ' . $controller . '::' . $method . ' with parameters ' . print_r($params, true));
         }
 
 
@@ -175,7 +177,7 @@
          */
         protected static function compute_method (string $controller, string $method)
         {
-            if (is_subclass_of($controller, 'ApiController'))
+            if (is_subclass_of($controller, 'descartes\ApiController'))
             {
 				//On va choisir le type à employer
 				$http_method = $_SERVER['REQUEST_METHOD'];
@@ -224,7 +226,7 @@
          */
         protected static function compute_params (string $controller, string $method, array $params) : array
         {
-            $reflection = new ReflectionMethod($controller, $method);
+            $reflection = new \ReflectionMethod($controller, $method);
             $method_arguments = [];
 
 			foreach ($reflection->getParameters() as $parameter)
@@ -286,7 +288,7 @@
          */
         public static function error_404 () : void
         {
-            throw new DescartesException404();
+            throw new \descartes\exceptions\DescartesException404();
         }
 
 
@@ -312,19 +314,19 @@
             $controller = static::compute_controller($computed_url['controller']);
             if (!$controller)
             {
-                throw new DescartesExceptionRouterInvocationError('Try to call controller ' . $computed_url['controller'] . ' that did not exists.');
+                throw new \descartes\exceptions\DescartesExceptionRouterInvocationError('Try to call controller ' . $computed_url['controller'] . ' that did not exists.');
             }
 
             $method = static::compute_method($controller, $computed_url['method']);
             if (!$method)
             {
-                throw new DescartesExceptionRouterInvocationError('Try to call the method ' . $computed_url['method'] . ' that did not exists from controller ' . $controller . '.');
+                throw new \descartes\exceptions\DescartesExceptionRouterInvocationError('Try to call the method ' . $computed_url['method'] . ' that did not exists from controller ' . $controller . '.');
             }
 
             $compute_params_result = static::compute_params($controller, $method, $params);
             if (!$compute_params_result['success'])
             {
-                throw new DescartesExceptionRouterInvocationError($compute_params_result['message']);
+                throw new \descartes\exceptions\DescartesExceptionRouterInvocationError($compute_params_result['message']);
             }
 
             $method_arguments = $compute_params_result['method_arguments'];

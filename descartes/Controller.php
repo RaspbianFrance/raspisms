@@ -1,4 +1,5 @@
 <?php
+    namespace descartes;
     /**
      * This class is the parent of all controllers
 	 */

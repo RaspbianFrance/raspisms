@@ -1,4 +1,6 @@
 <?php
+    namespace descartes;
+
     /*
      * Define Descartes env
      */
@@ -6,6 +8,18 @@
     $http_protocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://';
     $http_server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
     $http_server_port = isset($_SERVER['SERVER_PORT']) ? ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'] : '';
+    $https = $_SERVER['HTTPS'] ?? false;
+
+    if ( !isset($_SERVER['SERVER_PORT']) || ($_SERVER['SERVER_PORT'] == 80 && !$https) || ($_SERVER['SERVER_PORT'] === 443 && $https) )
+    {
+        $http_server_port = '';
+    }
+    else
+    {
+        $http_server_port = ':' . $_SERVER['SERVER_PORT'];
+    }
+
+
     $pwd = substr(__DIR__, 0, strrpos(__DIR__, '/'));
     $http_pwd = $http_protocol . $http_server_name . $http_server_port . $http_dir_path;
 

@@ -1,4 +1,5 @@
 <?php
+    namespace descartes;
 	/**
 	 * Cette classe sert de mère à tous les controlleurs destiné à la création d'API. Elle hérite de toutes les infos d'un controller standard, mais elle embarque en plus des mécanismes propres aux api REST, etc.
 	 */
