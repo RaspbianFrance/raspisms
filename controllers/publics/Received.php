@@ -1,16 +1,17 @@
 <?php
 namespace controllers\publics;
-	/**
-	 * Page des receiveds
-	 */
-	class Received extends \Controller
-	{
-		/**
-		 * Cette fonction est appelée avant toute les autres : 
-		 * Elle vérifie que l'utilisateur est bien connecté
-		 * @return void;
-		 */
-		public function _before()
+
+    /**
+     * Page des receiveds
+     */
+    class Received extends \descartes\Controller
+    {
+        /**
+         * Cette fonction est appelée avant toute les autres :
+         * Elle vérifie que l'utilisateur est bien connecté
+         * @return void;
+         */
+        public function _before()
         {
             global $bdd;
             $this->bdd = $bdd;
@@ -18,22 +19,20 @@ namespace controllers\publics;
             $this->internalReceived = new \controllers\internals\Received($this->bdd);
             $this->internalContact = new \controllers\internals\Contact($this->bdd);
 
-			\controllers\internals\Tool::verify_connect();
+            \controllers\internals\Tool::verify_connect();
         }
 
-		/**
-		 * Cette fonction retourne tous les receiveds, sous forme d'un tableau permettant l'administration de ces receiveds
-		 */	
-        public function list ($page = 0)
+        /**
+         * Cette fonction retourne tous les receiveds, sous forme d'un tableau permettant l'administration de ces receiveds
+         */
+        public function list($page = 0)
         {
             $page = (int) $page;
             $limit = 25;
             $receiveds = $this->internalReceived->get_list($limit, $page);
 
-            foreach ($receiveds as $key => $received)
-            {
-                if (!$contact = $this->internalContact->get_by_number($received['origin']))
-                {
+            foreach ($receiveds as $key => $received) {
+                if (!$contact = $this->internalContact->get_by_number($received['origin'])) {
                     continue;
                 }
 
@@ -41,21 +40,19 @@ namespace controllers\publics;
             }
 
             $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => count($receiveds)]);
-        }    
+        }
 
         /**
          * Cette fonction retourne tous les SMS reçus aujourd'hui pour la popup
          * @return json : Un tableau des SMS reçus
          */
-        public function popup ()
+        public function popup()
         {
             $now = new \DateTime();
             $receiveds = $this->internalReceived->get_since_by_date($now->format('Y-m-d'));
         
-            foreach ($receiveds as $key => $received)
-            {
-                if (!$contact = $this->internalContact->get_by_number($received['origin']))
-                {
+            foreach ($receiveds as $key => $received) {
+                if (!$contact = $this->internalContact->get_by_number($received['origin'])) {
                     continue;
                 }
 
@@ -64,8 +61,7 @@ namespace controllers\publics;
         
             $nb_received = count($receiveds);
 
-            if (!isset($_SESSION['popup_nb_receiveds']) || $_SESSION['popup_nb_receiveds'] > $nb_receiveds)
-            {
+            if (!isset($_SESSION['popup_nb_receiveds']) || $_SESSION['popup_nb_receiveds'] > $nb_receiveds) {
                 $_SESSION['popup_nb_receiveds'] = $nb_received;
             }
 
@@ -77,31 +73,28 @@ namespace controllers\publics;
             return true;
         }
 
-		/**
+        /**
          * Cette fonction va supprimer une liste de receiveds
          * @param array int $_GET['ids'] : Les id des receivedes à supprimer
          * @return boolean;
          */
-        public function delete ($csrf)
+        public function delete($csrf)
         {
-            if (!$this->verifyCSRF($csrf))
-            {
+            if (!$this->verifyCSRF($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \Router::url('Received', 'list'));
+                return header('Location: ' . \descartes\Router::url('Received', 'list'));
             }
 
-            if (!\controllers\internals\Tool::is_admin())
-            {
+            if (!\controllers\internals\Tool::is_admin()) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour effectuer cette action.');
-                return header('Location: ' . \Router::url('Received', 'list'));
+                return header('Location: ' . \descartes\Router::url('Received', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
-            foreach ($ids as $id)
-            {
+            foreach ($ids as $id) {
                 $this->internalReceived->delete($id);
             }
 
-            return header('Location: ' . \Router::url('Received', 'list'));
+            return header('Location: ' . \descartes\Router::url('Received', 'list'));
         }
-	}
+    }

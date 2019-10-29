@@ -3,7 +3,7 @@ namespace controllers\internals;
 	/**
 	 * Classe des commandes
 	 */
-	class Command extends \InternalController
+	class Command extends \descartes\InternalController
 	{
 
 		public function populate_database ($nb_entry = false, $page = false)
@@ -19,7 +19,7 @@ namespace controllers\internals;
                 $contact = [
                     'name' => 'Contact N°' . $i,
                     'number' => '06' . rand(10,99) . rand(10,99) . rand(10,99) . rand(10,99),
-                ]
+                ];
 
                 if (!$id_contact = $internalContact->create($contact))
                 {
