@@ -1,0 +1,5 @@
+{
+    "require": {
+        "ingenerator/tokenista": "^1.1"
+    }
+}

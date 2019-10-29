@@ -1,0 +1,176 @@
+#Ce fichier contient la base de données à créer
+
+CREATE DATABASE IF NOT EXISTS raspisms;
+USE raspisms;
+
+CREATE TABLE IF NOT EXISTS setting
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(50) NOT NULL,
+	value VARCHAR(1000) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS scheduled
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	at DATETIME NOT NULL,
+    text VARCHAR(1000) NOT NULL,
+    flash BOOLEAN NOT NULL DEFAULT 0,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS received
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	at DATETIME NOT NULL,
+    text VARCHAR(1000) NOT NULL,
+    origin VARCHAR(20) NOT NULL,
+    destination VARCHAR(20),
+	command BOOLEAN NOT NULL DEFAULT 0,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS sent
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	at DATETIME NOT NULL,
+    text VARCHAR(1000) NOT NULL,
+    origin VARCHAR(20) NOT NULL,
+    destination VARCHAR(20),
+    flash BOOLEAN NOT NULL DEFAULT 0,
+	PRIMARY KEY (id)
+);
+
+
+CREATE TABLE IF NOT EXISTS contact
+(
+	
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(100) NOT NULL,
+	number VARCHAR(20) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS groupe
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(100) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS groupe_contact
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_groupe INT NOT NULL,
+	id_contact INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_groupe) REFERENCES groupe (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (id_contact) REFERENCES contact (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS scheduled_contact
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_scheduled INT NOT NULL,
+	id_contact INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_scheduled) REFERENCES scheduled (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (id_contact) REFERENCES contact (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS scheduled_groupe
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_scheduled INT NOT NULL,
+	id_groupe INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_scheduled) REFERENCES scheduled (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (id_groupe) REFERENCES groupe (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS scheduled_number
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_scheduled INT NOT NULL,
+	number VARCHAR(20) NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_scheduled) REFERENCES scheduled (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS command
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(25) NOT NULL,
+	script VARCHAR(100) NOT NULL,
+	admin BOOLEAN NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS event
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	type VARCHAR(25) NOT NULL,
+	at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	text VARCHAR(255) NOT NULL,	
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS user
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	email VARCHAR(150) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	admin BOOLEAN NOT NULL DEFAULT FALSE,
+	transfer BOOLEAN NOT NULL DEFAULT FALSE,
+	PRIMARY KEY (id),
+	UNIQUE (email)
+);
+
+CREATE TABLE IF NOT EXISTS transfer
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_received INT NOT NULL,
+	progress BOOLEAN NOT NULL DEFAULT 0,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_received) REFERENCES received (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS smsstop
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	number VARCHAR(20) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (number)
+);
+
+CREATE TABLE IF NOT EXISTS webhook
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	url VARCHAR(250) NOT NULL,
+	type INT NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_querie
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	url VARCHAR(250) NOT NULL,
+	datas VARCHAR(10000) NOT NULL,
+	progress BOOLEAN NOT NULL DEFAULT FALSE,
+	PRIMARY KEY (id)
+);
+
+#On insert les données par défaut dans les settings
+INSERT INTO setting (name, value)
+VALUES ('transfer', '1'),
+('smsstops', '1'),
+('detect_url', '1'),
+('default_phone_country', 'fr'), 
+('preferred_phone_country', 'fr,be,ca'),
+('sms_flash', '0'),
+('sms_reception_sound', '1');

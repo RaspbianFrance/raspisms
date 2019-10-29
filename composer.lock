@@ -1,0 +1,72 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "a1268b58d2498b20008fffcaec529e24",
+    "content-hash": "865bbe9b68621affffbd85b40e2cf26d",
+    "packages": [
+        {
+            "name": "ingenerator/tokenista",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ingenerator/tokenista.git",
+                "reference": "e579ff4c747c114cdef18dd967a92ff0e73b9797"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ingenerator/tokenista/zipball/e579ff4c747c114cdef18dd967a92ff0e73b9797",
+                "reference": "e579ff4c747c114cdef18dd967a92ff0e73b9797",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "lib-openssl": "*",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Ingenerator": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Coulton",
+                    "email": "andrew@ingenerator.com",
+                    "homepage": "http://www.ingenerator.com"
+                }
+            ],
+            "description": "Simple signed and expiring token generator and validator - for password reset, CSRF, authentication, whatever",
+            "homepage": "https://github.com/ingenerator/tokenista",
+            "keywords": [
+                "auth",
+                "csrf",
+                "token"
+            ],
+            "time": "2018-02-26 14:16:22"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
