@@ -6,6 +6,12 @@
      */
     class Event extends \descartes\InternalController
     {
+        private $model_event;
+
+        public function __construct(\PDO $bdd)
+        {
+            $this->model_event = new \models\Event($bdd);
+        }
 
         /**
          * Cette fonction retourne une liste des events sous forme d'un tableau
@@ -17,8 +23,7 @@
         public function get_list($nb_entry = false, $page = false)
         {
             //Recupération des events
-            $modelEvent = new \models\Event($this->bdd);
-            return $modelEvent->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_event->get_list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -28,8 +33,7 @@
          */
         public function get_lasts_by_date($nb_entry = false)
         {
-            $modelEvent = new \models\Event($this->bdd);
-            return $modelEvent->get_lasts_by_date($nb_entry);
+            return $this->model_event->get_lasts_by_date($nb_entry);
         }
 
         /**
@@ -39,8 +43,7 @@
          */
         public function delete($id)
         {
-            $modelEvent = new \models\Event($this->bdd);
-            return $modelEvent->delete_by_id($id);
+            return $this->model_event->delete_by_id($id);
         }
 
         /**
@@ -50,13 +53,11 @@
          */
         public function create($type, $text)
         {
-            $modelEvent = new \models\Event($this->bdd);
-
             $event = [
                 'type' => $type,
                 'text' => $text,
             ];
 
-            return $modelEvent->insert($event);
+            return $this->model_event->insert($event);
         }
     }

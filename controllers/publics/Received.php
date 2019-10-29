@@ -6,20 +6,21 @@ namespace controllers\publics;
      */
     class Received extends \descartes\Controller
     {
+        private $internal_received;
+        private $internal_contact;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * Elle vérifie que l'utilisateur est bien connecté
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            $this->bdd = $bdd;
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            $this->internal_received = new \controllers\internals\Received($bdd);
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
 
-            $this->internalReceived = new \controllers\internals\Received($this->bdd);
-            $this->internalContact = new \controllers\internals\Contact($this->bdd);
-
-            \controllers\internals\Tool::verify_connect();
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -29,10 +30,10 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $receiveds = $this->internalReceived->get_list($limit, $page);
+            $receiveds = $this->internal_received->get_list($limit, $page);
 
             foreach ($receiveds as $key => $received) {
-                if (!$contact = $this->internalContact->get_by_number($received['origin'])) {
+                if (!$contact = $this->internal_contact->get_by_number($received['origin'])) {
                     continue;
                 }
 
@@ -43,16 +44,16 @@ namespace controllers\publics;
         }
 
         /**
-         * Cette fonction retourne tous les SMS reçus aujourd'hui pour la popup
-         * @return json : Un tableau des SMS reçus
+         * Cette fonction retourne tous les Sms reçus aujourd'hui pour la popup
+         * @return string : A JSON Un tableau des Sms reçus
          */
         public function popup()
         {
             $now = new \DateTime();
-            $receiveds = $this->internalReceived->get_since_by_date($now->format('Y-m-d'));
+            $receiveds = $this->internal_received->get_since_by_date($now->format('Y-m-d'));
         
             foreach ($receiveds as $key => $received) {
-                if (!$contact = $this->internalContact->get_by_number($received['origin'])) {
+                if (!$contact = $this->internal_contact->get_by_number($received['origin'])) {
                     continue;
                 }
 
@@ -61,13 +62,13 @@ namespace controllers\publics;
         
             $nb_received = count($receiveds);
 
-            if (!isset($_SESSION['popup_nb_receiveds']) || $_SESSION['popup_nb_receiveds'] > $nb_receiveds) {
+            if (!isset($_SESSION['popup_nb_receiveds']) || $_SESSION['popup_nb_receiveds'] > $nb_received) {
                 $_SESSION['popup_nb_receiveds'] = $nb_received;
             }
 
             $newly_receiveds = array_slice($receiveds, $_SESSION['popup_nb_receiveds']);
             
-            $_SESSION['popup_nb_receiveds'] = $nb_receiveds;
+            $_SESSION['popup_nb_receiveds'] = $nb_received;
 
             echo json_encode($newly_receiveds);
             return true;
@@ -80,21 +81,21 @@ namespace controllers\publics;
          */
         public function delete($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('Received', 'list'));
+                return $this->redirect(\descartes\Router::url('Received', 'list'));
             }
 
             if (!\controllers\internals\Tool::is_admin()) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour effectuer cette action.');
-                return header('Location: ' . \descartes\Router::url('Received', 'list'));
+                return $this->redirect(\descartes\Router::url('Received', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id) {
-                $this->internalReceived->delete($id);
+                $this->internal_received->delete($id);
             }
 
-            return header('Location: ' . \descartes\Router::url('Received', 'list'));
+            return $this->redirect(\descartes\Router::url('Received', 'list'));
         }
     }

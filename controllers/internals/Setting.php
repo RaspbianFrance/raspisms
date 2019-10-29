@@ -22,7 +22,7 @@
         /**
          * Update a setting by his name
          */
-        public function update(string $name, $value) : boolean
+        public function update(string $name, $value) : bool
         {
             return (bool) $this->model_setting->update($name, $value);
         }

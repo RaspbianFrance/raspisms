@@ -7,6 +7,7 @@ namespace controllers\internals;
     class Command extends \descartes\InternalController
     {
         private $model_command;
+        private $internal_event;
 
         public function __construct(\PDO $bdd)
         {
@@ -23,9 +24,7 @@ namespace controllers\internals;
          */
         public function list($nb_entry = false, $page = false)
         {
-            //Recupération des commandes
-            $model_command = new \models\Command($this->bdd);
-            return $model_command->list($nb_entry, $nb_entry * $page);
+            return $this->model_command->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -36,8 +35,7 @@ namespace controllers\internals;
         public function get_by_ids($ids)
         {
             //Recupération des commandes
-            $modelCommand = new \models\Command($this->bdd);
-            return $modelCommand->get_by_ids($ids);
+            return $this->model_command->get_by_ids($ids);
         }
 
         /**
@@ -46,8 +44,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            $modelCommand = new \models\Command($this->bdd);
-            return $modelCommand->count();
+            return $this->model_command->count();
         }
 
         /**
@@ -57,8 +54,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            $modelCommand = new \models\Command($this->bdd);
-            return $modelCommand->delete_by_id($id);
+            return $this->model_command->delete_by_id($id);
         }
 
         /**
@@ -74,15 +70,13 @@ namespace controllers\internals;
                 'admin' => $admin,
             ];
 
-            $modelCommand = new \models\Command($this->bdd);
-            $result = $modelCommand->insert($command);
+            $result = $this->model_command->insert($command);
 
             if (!$result) {
                 return false;
             }
 
-            $internalEvent = new \controllers\internals\Event($this->bdd);
-            $internalEvent->create('COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
+            $this->internal_event->create('COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
             return $result;
         }
 
@@ -92,15 +86,13 @@ namespace controllers\internals;
          */
         public function update($id, $name, $script, $admin)
         {
-            $modelCommand = new \models\Command($this->bdd);
-
             $command = [
                 'name' => $name,
                 'script' => $script,
                 'admin' => $admin,
             ];
 
-            $result = $modelCommand->update($id, $command);
+            $result = $this->model_command->update($id, $command);
         
             return $result;
         }

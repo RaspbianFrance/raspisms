@@ -6,18 +6,19 @@
      */
     class Connect extends \descartes\Controller
     {
+        private $internal_user;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            global $model;
-            $this->bdd = $bdd;
-            $this->model = $model;
-
-            $this->internal_user = new \controllers\internals\User($this->bdd);
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            
+            $this->internal_user = new \controllers\internals\User($bdd);
+            
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -42,14 +43,14 @@
             $user = $this->internal_user->check_credentials($email, $password);
             if (!$user) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Email ou mot de passe invalide.');
-                return header('Location: ' . \descartes\Router::url('Connect', 'login'));
+                return $this->redirect(\descartes\Router::url('Connect', 'login'));
             }
 
             $_SESSION['connect'] = true;
             $_SESSION['user'] = $user;
             $_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
             
-            return header('Location: ' . \descartes\Router::url('Dashboard', 'show'));
+            return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
         }
 
 
@@ -69,9 +70,9 @@
          */
         public function send_reset_password($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                header('Location: ' . \descartes\Router::url('Connect', 'forget_password'));
+                $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
                 return false;
             }
 
@@ -80,7 +81,7 @@
 
             if (!$email || !$user) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Aucun utilisateur n\'existe pour cette adresse mail.');
-                header('Location: ' . \descartes\Router::url('Connect', 'forget_password'));
+                $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
                 return false;
             }
 
@@ -126,6 +127,6 @@
         {
             session_unset();
             session_destroy();
-            header('Location: ' . \descartes\Router::url('Connect', 'login'));
+            $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
     }

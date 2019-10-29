@@ -3,66 +3,8 @@ namespace controllers\internals;
 
 class Console extends \descartes\InternalController
 {
-
     /**
-     * Cette fonction retourne l'aide de la console
-     */
-    public function help()
-    {
-        //On définit les commandes disponibles
-        $commands = array(
-            'sendScheduled' => array(
-                'description' => 'Cette commande permet d\'envoyer les SMS programmés qui doivent l\'êtres.',
-                'requireds' => array(),
-                'optionals' => array(),
-            ),
-            'parseReceivedSMS' => array(
-                'description' => 'Cette commande permet d\'enregistrer un SMS, et de l\'analyser pour voir s\'il contient une commande. Pour cela, il analyse le dossier PWD_RECEIVEDS',
-                'requireds' => array(
-                ),
-                'optionals' => array(),
-            ),
-            'sendTransfers' => array(
-                'description' => 'Cette commande permet d\'envoyer par mails les sms à transférés.',
-                'requireds' => [],
-                'optionals' => [],
-            ),
-        );
-
-        $message  = "Vous êtes ici dans l'aide de la console.\n";
-        $message .= "Voici la liste des commandes disponibles : \n";
-
-        //On écrit les texte pour la liste des commandes dispos
-        foreach ($commands as $name => $value) {
-            $requireds = isset($value['requireds']) ? $value['requireds'] : array();
-            $optionals = isset($value['optionals']) ? $value['optionals'] : array();
-
-            $message .= '	' . $name . ' : ' . $value['description'] . "\n";
-            $message .= "		Arguments obligatoires : \n";
-            if (!count($requireds)) {
-                $message .= "			Pas d'argument\n";
-            } else {
-                foreach ($requireds as $argument => $desc) {
-                    $message .= '				- ' . $argument . ' : ' . $desc . "\n";
-                }
-            }
-
-            $message .= "		Arguments optionnels : \n";
-            
-            if (!count($optionals)) {
-                $message .= "			Pas d'argument\n";
-            } else {
-                foreach ($optionals as $argument => $desc) {
-                    $message .= '				- ' . $argument . ' : ' . $desc . "\n";
-                }
-            }
-        }
-
-        echo $message;
-    }
-
-    /**
-     * Cette fonction envoie tous les SMS programmés qui doivent l'être
+     * Cette fonction envoie tous les Sms programmés qui doivent l'être
      */
     public function sendScheduled()
     {
@@ -73,31 +15,31 @@ class Console extends \descartes\InternalController
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
-            echo "Début de l'envoi des SMS programmés\n";
+            echo "Début de l'envoi des Sms programmés\n";
 
             $scheduleds = $db->getScheduledNotInProgressBefore($now);
 
             $ids_scheduleds = array();
 
-            //On passe en cours de progression tous les SMS
+            //On passe en cours de progression tous les Sms
             foreach ($scheduleds as $scheduled) {
                 $ids_scheduleds[] = $scheduled['id'];
             }
 
-            echo count($ids_scheduleds) . " SMS à envoyer ont été trouvés et ajoutés à la liste des SMS en cours d'envoi.\n";
+            echo count($ids_scheduleds) . " Sms à envoyer ont été trouvés et ajoutés à la liste des Sms en cours d'envoi.\n";
 
             $db->updateProgressScheduledIn($ids_scheduleds, true);
 
-            //Pour chaque SMS à envoyer
+            //Pour chaque Sms à envoyer
             foreach ($scheduleds as $scheduled) {
                 $id_scheduled = $scheduled['id'];
                 $text_sms = escapeshellarg($scheduled['content']);
                 $flash = $scheduled['flash'];
  
-                //On initialise les numéros auxquelles envoyer le SMS
+                //On initialise les numéros auxquelles envoyer le Sms
                 $numbers = array();
 
-                //On récupère les numéros pour le SMS et on les ajoute
+                //On récupère les numéros pour le Sms et on les ajoute
                 $target_numbers = $db->getNumbersForScheduled($id_scheduled);
                 foreach ($target_numbers as $target_number) {
                     $numbers[] = $target_number['number'];
@@ -109,11 +51,11 @@ class Console extends \descartes\InternalController
                     $numbers[] = $contact['number'];
                 }
 
-                //On récupère les groupes
-                $groupes = $db->getGroupeForScheduled($id_scheduled);
-                foreach ($groupes as $groupe) {
-                    //On récupère les contacts du groupe et on les ajoute aux numéros
-                    $contacts = $db->getContactForGroupe($groupe['id']);
+                //On récupère les groups
+                $groups = $db->getGroupForScheduled($id_scheduled);
+                foreach ($groups as $group) {
+                    //On récupère les contacts du group et on les ajoute aux numéros
+                    $contacts = $db->getContactForGroup($group['id']);
                     foreach ($contacts as $contact) {
                         $numbers[] = $contact['number'];
                     }
@@ -122,48 +64,48 @@ class Console extends \descartes\InternalController
                 $smsStops = $db->getFromTableWhere('smsstop');
                 
                 foreach ($numbers as $number) {
-                    //Si les SMS STOP sont activés, on passe au numéro suivant si le numéro actuelle fait parti des SMS STOP
-                    if (RASPISMS_SETTINGS_SMSSTOPS) {
+                    //Si les Sms STOP sont activés, on passe au numéro suivant si le numéro actuelle fait parti des Sms STOP
+                    if (RASPISms_SETTINGS_SmsSTOPS) {
                         foreach ($smsStops as $smsStop) {
                             if (!($number == $smsStop['number'])) {
                                 continue;
                             }
 
-                            echo "Un SMS destiné au " . $number . " a été bloqué par SMS STOP\n";
+                            echo "Un Sms destiné au " . $number . " a été bloqué par Sms STOP\n";
                             continue(2); //On passe au numéro suivant !
                         }
                     }
 
-                    echo "	Envoi d'un SMS au " . $number . "\n";
-                    //On ajoute le SMS aux SMS envoyés
+                    echo "	Envoi d'un Sms au " . $number . "\n";
+                    //On ajoute le Sms aux Sms envoyés
                     //Pour plus de précision, on remet la date à jour en réinstanciant l'objet \DateTime (et on reformatte la date, bien entendu)
                     $now = new \DateTime();
                     $now = $now->format('Y-m-d H:i:s');
 
-                    //On peut maintenant ajouter le SMS
+                    //On peut maintenant ajouter le Sms
                     if (!$db->insertIntoTable('sendeds', ['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content'])/160)])) {
                         echo 'Impossible d\'inserer le sms pour le numero ' . $number . "\n";
                     }
 
                     $id_sended = $db->lastId();
                     
-                    //Commande qui envoie le SMS
+                    //Commande qui envoie le Sms
                     $commande_send_sms = 'gammu-smsd-inject TEXT ' . escapeshellarg($number) . ' -report -len ' . mb_strlen($text_sms) . ' -text ' . $text_sms;
 
-                    if (RASPISMS_SETTINGS_SMS_FLASH && $flash) {
+                    if (RASPISms_SETTINGS_Sms_FLASH && $flash) {
                         $commande_send_sms .= ' -flash';
                     }
 
-                    //Commande qui s'assure de passer le SMS dans ceux envoyés, et de lui donner le bon statut
+                    //Commande qui s'assure de passer le Sms dans ceux envoyés, et de lui donner le bon statut
 
-                    //On va liée les deux commandes pour envoyer le SMS puis le passer en echec
+                    //On va liée les deux commandes pour envoyer le Sms puis le passer en echec
                     $commande = '(' . $commande_send_sms . ') >/dev/null 2>/dev/null &';
-                    exec($commande); //On execute la commande d'envoie d'un SMS
+                    exec($commande); //On execute la commande d'envoie d'un Sms
                 }
             }
 
-            echo "Tous les SMS sont en cours d'envoi.\n";
-            //Tous les SMS ont été envoyés.
+            echo "Tous les Sms sont en cours d'envoi.\n";
+            //Tous les Sms ont été envoyés.
             $db->deleteScheduledIn($ids_scheduleds);
 
             //On dors 2 secondes
@@ -172,9 +114,9 @@ class Console extends \descartes\InternalController
     }
 
     /**
-     * Cette fonction reçoit un SMS, et l'enregistre, en essayant dde trouver une commande au passage.
+     * Cette fonction reçoit un Sms, et l'enregistre, en essayant dde trouver une commande au passage.
      */
-    public function parseReceivedSMS()
+    public function parseReceivedSms()
     {
         //On créer l'objet de base de données
         global $db;
@@ -186,9 +128,9 @@ class Console extends \descartes\InternalController
                     continue;
                 }
 
-                echo "Analyse du SMS " . $dir . "\n";
+                echo "Analyse du Sms " . $dir . "\n";
 
-                //On récupère la date du SMS à la seconde près grâce au nom du fichier (Cf. parseSMS.sh)
+                //On récupère la date du Sms à la seconde près grâce au nom du fichier (Cf. parseSms.sh)
                 //Il faut mettre la date au format Y-m-d H:i:s
                 $date = substr($dir, 0, 4) . '-' . substr($dir, 4, 2) . '-' . substr($dir, 6, 2) . ' ' . substr($dir, 8, 2) . ':' . substr($dir, 10, 2) . ':' . substr($dir, 12, 2);
 
@@ -197,13 +139,13 @@ class Console extends \descartes\InternalController
 
                 //Si on peux pas ouvrir le fichier, on quitte en logant une erreur
                 if ($content_file == false) {
-                    $this->wlog('Unable to read file "' . $dir);
+                    error_log('Unable to read file "' . $dir);
                     die(4);
                 }
 
                 //On supprime le fichier. Si on n'y arrive pas, alors on log
                 if (!unlink(PWD_RECEIVEDS . $dir)) {
-                    $this->wlog('Unable to delete file "' . $dir);
+                    error_log('Unable to delete file "' . $dir);
                     die(8);
                 }
 
@@ -211,28 +153,28 @@ class Console extends \descartes\InternalController
 
                 //Si on a pas passé de numéro ou de message, alors on lève une erreur
                 if (!isset($content_file[0], $content_file[1])) {
-                    $this->wlog('Missing params in file "' . $dir);
+                    error_log('Missing params in file "' . $dir);
                     die(5);
                 }
 
                 $number = $content_file[0];
-                $number = internalTool::parse_phone($number);
+                $number = \controllers\internals\Tool::parse_phone($number);
                 $text = $content_file[1];
 
-                //On gère les SMS STOP
+                //On gère les Sms STOP
                 if (trim($text) == 'STOP') {
-                    echo 'STOP SMS detected ' . $number . "\n";
-                    $this->wlog('STOP SMS detected ' . $number);
+                    echo 'STOP Sms detected ' . $number . "\n";
+                    error_log('STOP Sms detected ' . $number);
                     $db->insertIntoTable('smsstop', ['number' => $number]);
                     continue;
                 }
 
                 //On gère les accusés de reception
                 if (trim($text) == 'Delivered' || trim($text) == 'Failed') {
-                    echo 'Delivered or Failed SMS for ' . $number . "\n";
-                    $this->wlog('Delivered or Failed SMS for ' . $number);
+                    echo 'Delivered or Failed Sms for ' . $number . "\n";
+                    error_log('Delivered or Failed Sms for ' . $number);
 
-                    //On récupère les SMS pas encore validé, uniquement sur les dernières 12h
+                    //On récupère les Sms pas encore validé, uniquement sur les dernières 12h
                     $now = new \DateTime();
                     $interval = new \DateInterval('PT12H');
                     $sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
@@ -246,30 +188,30 @@ class Console extends \descartes\InternalController
                     //On gère les echecs
                     if (trim($text) == 'Failed') {
                         $db->updateTableWhere('sendeds', ['before_delivered' => 0, 'failed' => true], ['id' => $sended['id']]);
-                        echo "Sended SMS id " . $sended['id'] . " pass to failed status\n";
+                        echo "Sended Sms id " . $sended['id'] . " pass to failed status\n";
                         continue;
                     }
 
                     //On gère le cas des messages de plus de 160 caractères, lesquels impliquent plusieurs accusés
                     if ($sended['before_delivered'] > 1) {
                         $db->updateTableWhere('sendeds', ['before_delivered' => $sended['before_delivered'] - 1], ['id' => $sended['id']]);
-                        echo "Sended SMS id " . $sended['id'] . " before_delivered decrement\n";
+                        echo "Sended Sms id " . $sended['id'] . " before_delivered decrement\n";
                         continue;
                     }
 
                     //Si tout est bon, que nous avons assez d'accusés, nous validons !
                     $db->updateTableWhere('sendeds', ['before_delivered' => 0, 'delivered' => true], ['id' => $sended['id']]);
-                    echo "Sended SMS id " . $sended['id'] . " to delivered status\n";
+                    echo "Sended Sms id " . $sended['id'] . " to delivered status\n";
                     continue;
                 }
                 
                 if (!$number) {
-                    $this->wlog('Invalid phone number in file "' . $dir);
+                    error_log('Invalid phone number in file "' . $dir);
                     die(6);
                 }
             
                 //On va vérifier si on a reçu une commande, et des identifiants
-                $flags = internalTool::parse_for_flag($text);
+                $flags = \controllers\internals\Tool::parse_for_flag($text);
 
                 //On créer le tableau qui permettra de stocker les commandes trouvées
 
@@ -279,21 +221,21 @@ class Console extends \descartes\InternalController
                 if (array_key_exists('LOGIN', $flags) && array_key_exists('PASSWORD', $flags)) {
                     //Si on a bien un utilisateur avec les identifiants reçus
                     $user = $db->getUserFromEmail($flags['LOGIN']);
-                    $this->wlog('We found ' . count($user) . ' users');
+                    error_log('We found ' . count($user) . ' users');
                     if ($user && $user['password'] == sha1($flags['PASSWORD'])) {
-                        $this->wlog('Password is valid');
+                        error_log('Password is valid');
                         //On va passer en revue toutes les commandes, pour voir si on en trouve dans ce message
                         $commands = $db->getFromTableWhere('commands');
 
-                        $this->wlog('We found ' . count($commands) . ' commands');
+                        error_log('We found ' . count($commands) . ' commands');
                         foreach ($commands as $command) {
                             $command_name = mb_strtoupper($command['name']);
                             if (array_key_exists($command_name, $flags)) {
-                                $this->wlog('We found command ' . $command_name);
+                                error_log('We found command ' . $command_name);
                                 
                                 //Si la commande ne nécessite pas d'être admin, ou si on est admin
                                 if (!$command['admin'] || $user['admin']) {
-                                    $this->wlog('And the count is ok');
+                                    error_log('And the count is ok');
                                     $found_commands[$command_name] = PWD_SCRIPTS . $command['script'] . escapeshellcmd($flags[$command_name]);
                                 }
                             }
@@ -301,22 +243,22 @@ class Console extends \descartes\InternalController
                     }
                 }
 
-                //On va supprimer le mot de passe du SMS pour pouvoir l'enregistrer sans danger
+                //On va supprimer le mot de passe du Sms pour pouvoir l'enregistrer sans danger
                 if (isset($flags['PASSWORD'])) {
                     $text = str_replace($flags['PASSWORD'], '*****', $text);
                 }
 
-                //On map les données et on créer le SMS reçu
+                //On map les données et on créer le Sms reçu
                 $send_by = $number;
                 $content = $text;
                 $is_command = count($found_commands);
                 if (!$db->insertIntoTable('receiveds', ['at' => $date, 'send_by' => $send_by, 'content' => $content, 'is_command' => $is_command])) {
-                    echo "Erreur lors de l'enregistrement du SMS\n";
-                    $this->wlog('Unable to process the SMS in file "' . $dir);
+                    echo "Erreur lors de l'enregistrement du Sms\n";
+                    error_log('Unable to process the Sms in file "' . $dir);
                     die(7);
                 }
 
-                //On insert le SMS dans le tableau des sms à envoyer par mail
+                //On insert le Sms dans le tableau des sms à envoyer par mail
                 $db->insertIntoTable('transfers', ['id_received' => $db->lastId(), 'progress' => false]);
 
                 //Chaque commande sera executée.
@@ -336,8 +278,8 @@ class Console extends \descartes\InternalController
      */
     public function sendTransfers()
     {
-        if (!RASPISMS_SETTINGS_TRANSFER) {
-            echo "Le transfer de SMS est désactivé ! \n";
+        if (!RASPISms_SETTINGS_TRANSFER) {
+            echo "Le transfer de Sms est désactivé ! \n";
             return false;
         }
 
@@ -359,10 +301,10 @@ class Console extends \descartes\InternalController
 
         foreach ($users as $user) {
             foreach ($receiveds as $received) {
-                echo "Transfer d'un SMS du " . $received['send_by'] . " à l'email " . $user['email'];
+                echo "Transfer d'un Sms du " . $received['send_by'] . " à l'email " . $user['email'];
                 $to = $user['email'];
-                $subject = '[RaspiSMS] - Transfert d\'un SMS du ' . $received['send_by'];
-                $message = "Le numéro " . $received['send_by'] . " vous a envoyé un SMS : \n" . $received['content'];
+                $subject = '[RaspiSms] - Transfert d\'un Sms du ' . $received['send_by'];
+                $message = "Le numéro " . $received['send_by'] . " vous a envoyé un Sms : \n" . $received['content'];
                 
                 $ok = mail($to, $subject, $message);
                 

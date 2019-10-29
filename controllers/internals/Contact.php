@@ -6,6 +6,14 @@ namespace controllers\internals;
      */
     class Contact extends \descartes\InternalController
     {
+        private $model_contact;
+        private $internal_event;
+
+        public function __construct(\PDO $bdd)
+        {
+            $this->model_contact = new \models\Contact($bdd);
+            $this->internal_event = new \controllers\internals\Event($bdd);
+        }
 
         /**
          * Cette fonction retourne une liste des contactes sous forme d'un tableau
@@ -16,8 +24,7 @@ namespace controllers\internals;
         public function get_list($nb_entry = false, $page = false)
         {
             //Recupération des contactes
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_contact->get_list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -28,8 +35,7 @@ namespace controllers\internals;
         public function get_by_ids($ids)
         {
             //Recupération des contactes
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->get_by_ids($ids);
+            return $this->model_contact->get_by_ids($ids);
         }
         
         /**
@@ -40,8 +46,7 @@ namespace controllers\internals;
         public function get_by_number($number)
         {
             //Recupération des contactes
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->get_by_number($number);
+            return $this->model_contact->get_by_number($number);
         }
         
         /**
@@ -52,8 +57,7 @@ namespace controllers\internals;
         public function get_by_name($name)
         {
             //Recupération des contactes
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->get_by_name($name);
+            return $this->model_contact->get_by_name($name);
         }
         
 
@@ -63,8 +67,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->count();
+            return $this->model_contact->count();
         }
 
         /**
@@ -74,8 +77,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            $modelContact = new \models\Contact($this->bdd);
-            return $modelContact->delete_by_id($id);
+            return $this->model_contact->delete_by_id($id);
         }
 
         /**
@@ -90,15 +92,12 @@ namespace controllers\internals;
                 'name' => $name,
             ];
 
-            $modelContact = new \models\Contact($this->bdd);
-            
-            $result = $modelContact->insert($contact);
+            $result = $this->model_contact->insert($contact);
             if (!$result) {
                 return $result;
             }
 
-            $internalEvent = new \controllers\internals\Event($this->bdd);
-            $internalEvent->create('CONTACT_ADD', 'Ajout contact : ' . $name . ' (' . \controllers\internals\Tool::phone_add_space($number) . ')');
+            $this->internal_event->create('CONTACT_ADD', 'Ajout contact : ' . $name . ' (' . \controllers\internals\Tool::phone_add_space($number) . ')');
 
             return $result;
         }
@@ -109,13 +108,11 @@ namespace controllers\internals;
          */
         public function update($id, $number, $name)
         {
-            $modelContact = new \models\Contact($this->bdd);
-
             $contact = [
                 'number' => $number,
                 'name' => $name,
             ];
         
-            return $modelContact->update($id, $contact);
+            return $this->model_contact->update($id, $contact);
         }
     }

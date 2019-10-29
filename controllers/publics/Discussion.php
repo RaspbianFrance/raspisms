@@ -6,24 +6,26 @@ namespace controllers\publics;
      */
     class Discussion extends \descartes\Controller
     {
+        private $internal_sended;
+        private $internal_scheduled;
+        private $internal_received;
+        private $internal_contact;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * Elle vérifie que l'utilisateur est bien connecté
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            global $model;
-            $this->bdd = $bdd;
-            $this->model = $model;
-
-            $this->internalSended = new \controllers\internals\Sended($this->bdd);
-            $this->internalScheduled = new \controllers\internals\Scheduled($this->bdd);
-            $this->internalReceived = new \controllers\internals\Received($this->bdd);
-            $this->internalContact = new \controllers\internals\Contact($this->bdd);
-
-            \controllers\internals\Tool::verify_connect();
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            
+            $this->internal_sended = new \controllers\internals\Sended($bdd);
+            $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
+            $this->internal_received = new \controllers\internals\Received($bdd);
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
+            
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -31,10 +33,10 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $discussions = $this->internalReceived->get_discussions();
+            $discussions = $this->internal_received->get_discussions();
 
             foreach ($discussions as $key => $discussion) {
-                if (!$contact = $this->internalContact->get_by_number($discussion['number'])) {
+                if (!$contact = $this->internal_contact->get_by_number($discussion['number'])) {
                     continue;
                 }
 
@@ -52,7 +54,7 @@ namespace controllers\publics;
          */
         public function show($number)
         {
-            $contact = $this->internalContact->get_by_number($number);
+            $contact = $this->internal_contact->get_by_number($number);
 
 
             $this->render('discussion/show', array(
@@ -71,9 +73,9 @@ namespace controllers\publics;
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
-            $sendeds = $this->internalSended->get_by_target($number);
-            $receiveds = $this->internalReceived->get_by_send_by($number);
-            $scheduleds = $this->internalScheduled->get_before_date_for_number($now, $number);
+            $sendeds = $this->internal_sended->get_by_target($number);
+            $receiveds = $this->internal_received->get_by_send_by($number);
+            $scheduleds = $this->internal_scheduled->get_before_date_for_number($now, $number);
 
             $messages = [];
 
@@ -118,16 +120,16 @@ namespace controllers\publics;
         /**
          * Cette fonction permet d'envoyer facilement un sms à un numéro donné
          * @param string $csrf : Le jeton csrf
-         * @param string $_POST['content'] : Le contenu du SMS
+         * @param string $_POST['content'] : Le contenu du Sms
          * @param string $_POST['numbers'] : Un tableau avec le numero des gens auxquel envoyer le sms
-         * @return json : Le statut de l'envoi
+         * @return string : json string Le statut de l'envoi
          */
         public function send($csrf)
         {
             $return = ['success' => true, 'message' => ''];
 
             //On vérifie que le jeton csrf est bon
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 $return['success'] = false;
                 $return['message'] = 'Jeton CSRF invalide';
                 echo json_encode($return);
@@ -149,9 +151,9 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$this->internalScheduled->create($scheduled, $numbers)) {
+            if (!$this->internal_scheduled->create($scheduled, $numbers)) {
                 $return['success'] = false;
-                $return['message'] = 'Impossible de créer le SMS';
+                $return['message'] = 'Impossible de créer le Sms';
                 echo json_encode($return);
                 return false;
             }
@@ -162,27 +164,27 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne les id des sms qui sont envoyés
-         * @return json : Tableau des ids des sms qui sont envoyés
+         * @return string : json string Tableau des ids des sms qui sont envoyés
          */
         public function checksendeds()
         {
             $_SESSION['discussion_wait_progress'] = isset($_SESSION['discussion_wait_progress']) ? $_SESSION['discussion_wait_progress'] : [];
 
-            $scheduleds = $this->internalScheduled->get_by_ids($_SESSION['discussion_wait_progress']);
+            $scheduleds = $this->internal_scheduled->get_by_ids($_SESSION['discussion_wait_progress']);
 
             //On va chercher à chaque fois si on a trouvé le sms. Si ce n'est pas le cas c'est qu'il a été envoyé
             $sendeds = [];
             foreach ($_SESSION['discussion_wait_progress'] as $key => $id_scheduled) {
                 $found = false;
                 foreach ($scheduleds as $scheduled) {
-                    if ($id == $scheduled['id']) {
+                    if ($id_scheduled == $scheduled['id']) {
                         $found = true;
                     }
                 }
 
                 if (!$found) {
                     unset($_SESSION['discussion_wait_progress'][$key]);
-                    $sendeds[] = $id;
+                    $sendeds[] = $id_scheduled;
                 }
             }
 
@@ -193,7 +195,7 @@ namespace controllers\publics;
         /**
          * Cette fonction retourne les messages reçus pour un numéro après la date $_SESSION['discussion_last_checkreceiveds']
          * @param string $number : Le numéro de téléphone pour lequel on veux les messages
-         * @return json : Un tableau avec les messages
+         * @return string : json string Un tableau avec les messages
          */
         public function checkreceiveds($number)
         {
@@ -202,7 +204,7 @@ namespace controllers\publics;
             
             $_SESSION['discussion_last_checkreceiveds'] = isset($_SESSION['discussion_last_checkreceiveds']) ? $_SESSION['discussion_last_checkreceiveds'] : $now;
 
-            $receiveds = $internalReceived->get_since_for_number_by_date($_SESSION['discussion_last_checkreceiveds'], $number);
+            $receiveds = $this->internal_received->get_since_for_number_by_date($_SESSION['discussion_last_checkreceiveds'], $number);
 
             //On va gérer le cas des messages en double en stockant ceux déjà reçus et en eliminant les autres
             $_SESSION['discussion_already_receiveds'] = isset($_SESSION['discussion_already_receiveds']) ? $_SESSION['discussion_already_receiveds'] : [];

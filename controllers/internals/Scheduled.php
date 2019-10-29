@@ -6,7 +6,15 @@ namespace controllers\internals;
      */
     class Scheduled extends \descartes\InternalController
     {
-        
+        private $model_scheduled;
+        private $internal_event;
+
+        public function __construct(\PDO $bdd)
+        {
+            $this->model_scheduled = new \models\Scheduled($bdd);
+            $this->internal_event = new \controllers\internals\Event($bdd);
+        }
+            
         /**
          * Cette fonction retourne une liste des scheduledes sous forme d'un tableau
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
@@ -16,8 +24,7 @@ namespace controllers\internals;
         public function get_list($nb_entry = false, $page = false)
         {
             //Recupération des scheduledes
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_scheduled->get_list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -28,8 +35,7 @@ namespace controllers\internals;
         public function get_by_ids($ids)
         {
             //Recupération des scheduledes
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_by_ids($ids);
+            return $this->model_scheduled->get_by_ids($ids);
         }
 
         /**
@@ -40,8 +46,7 @@ namespace controllers\internals;
          */
         public function get_before_date_for_number($date, $number)
         {
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_before_date_for_number($date, $number);
+            return $this->model_scheduled->get_before_date_for_number($date, $number);
         }
 
         /**
@@ -50,8 +55,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->count();
+            return $this->model_scheduled->count();
         }
 
         /**
@@ -61,8 +65,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->delete_by_id($id);
+            return $this->model_scheduled->delete_by_id($id);
         }
 
         /**
@@ -70,30 +73,28 @@ namespace controllers\internals;
          * @param array $scheduled : Le scheduled à créer avec at, content, flash, progress
          * @param array $numbers : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
-         * @param array $groupes_ids : Les ids des groupe auxquels envoyer le scheduled
+         * @param array $groups_ids : Les ids des group auxquels envoyer le scheduled
          * @return mixed bool|int : false si echec, sinon l'id du nouveau scheduled inséré
          */
-        public function create($scheduled, $numbers = [], $contacts_ids = [], $groupes_ids = [])
+        public function create($scheduled, $numbers = [], $contacts_ids = [], $groups_ids = [])
         {
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            
-            if (!$id_scheduled = $modelScheduled->insert($scheduled)) {
-                $internalEvent = new \controllers\internals\Event($this->bdd);
-                $internalEvent->create('SCHEDULED_ADD', 'Ajout d\'un SMS pour le ' . $date . '.');
+            if (!$id_scheduled = $this->model_scheduled->insert($scheduled)) {
+                $date = date("Y-m-d H:i:s");
+                $this->internal_event->create('SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
 
                 return false;
             }
 
             foreach ($numbers as $number) {
-                $modelScheduled->insert_scheduled_number($id_scheduled, $number);
+                $this->model_scheduled->insert_scheduled_number($id_scheduled, $number);
             }
 
             foreach ($contacts_ids as $contact_id) {
-                $modelScheduled->insert_scheduled_contact($id_scheduled, $contact_id);
+                $this->model_scheduled->insert_scheduled_contact($id_scheduled, $contact_id);
             }
             
-            foreach ($groupes_ids as $groupe_id) {
-                $modelScheduled->insert_scheduled_groupe($id_scheduled, $groupe_id);
+            foreach ($groups_ids as $group_id) {
+                $this->model_scheduled->insert_scheduled_group($id_scheduled, $group_id);
             }
 
             return $id_scheduled;
@@ -101,34 +102,32 @@ namespace controllers\internals;
 
         /**
          * Cette fonction met à jour une série de scheduledes
-         * @param array $scheduleds : Un tableau de scheduled à modifier avec at, content, flash, progress + pour chaque scheduled number, contact_ids, groupe_ids
+         * @param array $scheduleds : Un tableau de scheduled à modifier avec at, content, flash, progress + pour chaque scheduled number, contact_ids, group_ids
          * @param array $numbers : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
-         * @param array $groupes_ids : Les ids des groupe auxquels envoyer le scheduled
+         * @param array $groups_ids : Les ids des group auxquels envoyer le scheduled
          * @return int : le nombre de ligne modifiées
          */
         public function update($scheduleds)
         {
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            
             $nb_update = 0;
             foreach ($scheduleds as $scheduled) {
-                $result = $modelScheduled->update($scheduled['scheduled']['id'], $scheduled['scheduled']);
+                $result = $this->model_scheduled->update($scheduled['scheduled']['id'], $scheduled['scheduled']);
 
-                $modelScheduled->delete_scheduled_number($scheduled['scheduled']['id']);
-                $modelScheduled->delete_scheduled_contact($scheduled['scheduled']['id']);
-                $modelScheduled->delete_scheduled_groupe($scheduled['scheduled']['id']);
+                $this->model_scheduled->delete_scheduled_number($scheduled['scheduled']['id']);
+                $this->model_scheduled->delete_scheduled_contact($scheduled['scheduled']['id']);
+                $this->model_scheduled->delete_scheduled_group($scheduled['scheduled']['id']);
 
                 foreach ($scheduled['number'] as $number) {
-                    $modelScheduled->insert_scheduled_number($scheduled['scheduled']['id'], $number);
+                    $this->model_scheduled->insert_scheduled_number($scheduled['scheduled']['id'], $number);
                 }
 
                 foreach ($scheduled['contact_ids'] as $contact_id) {
-                    $modelScheduled->insert_scheduled_contact($scheduled['scheduled']['id'], $contact_id);
+                    $this->model_scheduled->insert_scheduled_contact($scheduled['scheduled']['id'], $contact_id);
                 }
                 
-                foreach ($scheduled['groupe_ids'] as $groupe_id) {
-                    $modelScheduled->insert_scheduled_groupe($scheduled['scheduled']['id'], $groupe_id);
+                foreach ($scheduled['group_ids'] as $group_id) {
+                    $this->model_scheduled->insert_scheduled_group($scheduled['scheduled']['id'], $group_id);
                 }
                 
 
@@ -146,8 +145,7 @@ namespace controllers\internals;
         public function get_number($id_scheduled)
         {
             //Recupération des scheduledes
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_number($id_scheduled);
+            return $this->model_scheduled->get_number($id_scheduled);
         }
 
         /**
@@ -158,19 +156,17 @@ namespace controllers\internals;
         public function get_contact($id_scheduled)
         {
             //Recupération des scheduledes
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_contact($id_scheduled);
+            return $this->model_scheduled->get_contact($id_scheduled);
         }
         
         /**
-         * Cette fonction retourne une liste de groupe pour un scheduled
+         * Cette fonction retourne une liste de group pour un scheduled
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
-         * @return array : La liste des groupe
+         * @return array : La liste des group
          */
-        public function get_groupe($id_scheduled)
+        public function get_group($id_scheduled)
         {
             //Recupération des scheduledes
-            $modelScheduled = new \models\Scheduled($this->bdd);
-            return $modelScheduled->get_groupe($id_scheduled);
+            return $this->model_scheduled->get_group($id_scheduled);
         }
     }

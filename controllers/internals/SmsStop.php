@@ -4,8 +4,15 @@ namespace controllers\internals;
     /**
      * Classe des smsstopes
      */
-    class SMSStop extends \descartes\InternalController
+    class SmsStop extends \descartes\InternalController
     {
+        private $model_sms_stop;
+
+        public function __construct(\PDO $bdd)
+        {
+            $this->model_sms_stop = new \models\SmsStop($bdd);
+        }
+
         /**
          * Cette fonction retourne une liste des smsstopes sous forme d'un tableau
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
@@ -15,8 +22,7 @@ namespace controllers\internals;
         public function get_list($nb_entry = false, $page = false)
         {
             //Recupération des smsstopes
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_sms_stop->get_list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -27,8 +33,7 @@ namespace controllers\internals;
         public function get_by_ids($ids)
         {
             //Recupération des smsstopes
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->get_by_ids($ids);
+            return $this->model_sms_stop->get_by_ids($ids);
         }
         
         /**
@@ -39,8 +44,7 @@ namespace controllers\internals;
         public function get_by_number($number)
         {
             //Recupération des smsstopes
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->get_by_number($number);
+            return $this->model_sms_stop->get_by_number($number);
         }
         
 
@@ -50,8 +54,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->count();
+            return $this->model_sms_stop->count();
         }
 
         /**
@@ -61,8 +64,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->delete_by_id($id);
+            return $this->model_sms_stop->delete_by_id($id);
         }
 
         /**
@@ -72,8 +74,7 @@ namespace controllers\internals;
          */
         public function create($smsstop)
         {
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            return $modelSMSStop->insert($smsstop);
+            return $this->model_sms_stop->insert($smsstop);
         }
 
         /**
@@ -82,11 +83,9 @@ namespace controllers\internals;
          */
         public function update($smsstops)
         {
-            $modelSMSStop = new \models\SMSStop($this->bdd);
-            
             $nb_update = 0;
             foreach ($smsstops as $smsstop) {
-                $result = $modelSMSStop->update($smsstop['id'], $smsstop);
+                $result = $this->model_sms_stop->update($smsstop['id'], $smsstop);
 
                 if ($result) {
                     $nb_update ++;

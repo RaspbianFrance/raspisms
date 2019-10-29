@@ -4,21 +4,21 @@ namespace controllers\publics;
     /**
      * Page des smsstops
      */
-    class SMSStop extends \descartes\Controller
+    class SmsStop extends \descartes\Controller
     {
+        private $internal_sms_stop;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * Elle vérifie que l'utilisateur est bien connecté
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            $this->bdd = $bdd;
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            $this->internal_sms_stop = new \controllers\internals\SmsStop($bdd);
 
-            $this->internalSMSStop = new \controllers\internals\SMSStop($this->bdd);
-
-            \controllers\internals\Tool::verify_connect();
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -28,7 +28,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $smsstops = $this->internalSMSStop->get_list($limit, $page);
+            $smsstops = $this->internal_sms_stop->get_list($limit, $page);
             $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => count($smsstops)]);
         }
         
@@ -39,21 +39,21 @@ namespace controllers\publics;
          */
         public function delete($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('SMSStop', 'list'));
+                return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
             if (!\controllers\internals\Tool::is_admin()) {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP SMS" !');
-                return header('Location: ' . \descartes\Router::url('SMSStop', 'list'));
+                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP Sms" !');
+                return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id) {
-                $this->internalSMSStop->delete($id);
+                $this->internal_sms_stop->delete($id);
             }
 
-            return header('Location: ' . \descartes\Router::url('SMSStop', 'list'));
+            return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
         }
     }

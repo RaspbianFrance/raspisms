@@ -2,9 +2,9 @@
     namespace models;
 
     /**
-     * Cette classe gère les accès bdd pour les groupes
+     * Cette classe gère les accès bdd pour les groups
      */
-    class Groupe extends \descartes\Model
+    class Group extends \descartes\Model
     {
         /**
          * Retourne une entrée par son id
@@ -13,8 +13,8 @@
          */
         public function get_by_id($id)
         {
-            $groupes = $this->_select('groupe', ['id' => $id]);
-            return isset($groupes[0]) ? $groupes[0] : false;
+            $groups = $this->_select('group', ['id' => $id]);
+            return isset($groups[0]) ? $groups[0] : false;
         }
         
         /**
@@ -24,31 +24,31 @@
          */
         public function get_by_name($name)
         {
-            $groupes = $this->_select('groupe', ['name' => $name]);
-            return isset($groupes[0]) ? $groupes[0] : false;
+            $groups = $this->_select('group', ['name' => $name]);
+            return isset($groups[0]) ? $groups[0] : false;
         }
 
         /**
-         * Retourne une liste de groupes sous forme d'un tableau
+         * Retourne une liste de groups sous forme d'un tableau
          * @param int $limit : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
          */
         public function get_list($limit, $offset)
         {
-            $groupes = $this->_select('groupe', [], '', false, $limit, $offset);
+            $groups = $this->_select('group', [], '', false, $limit, $offset);
 
-            return $groupes;
+            return $groups;
         }
         
         /**
-         * Retourne une liste de groupes sous forme d'un tableau
+         * Retourne une liste de groups sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
          * @return array : La liste des entrées
          */
         public function get_by_ids($ids)
         {
             $query = " 
-                SELECT * FROM groupe
+                SELECT * FROM group
                 WHERE id ";
      
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
@@ -60,14 +60,14 @@
         }
 
         /**
-         * Retourne une liste de groupes sous forme d'un tableau
+         * Retourne une liste de groups sous forme d'un tableau
          * @param array $ids : un ou plusieurs id d'entrées à supprimer
          * @return int : Le nombre de lignes supprimées
          */
         public function delete_by_ids($ids)
         {
             $query = " 
-                DELETE FROM groupe
+                DELETE FROM group
                 WHERE id ";
      
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
@@ -79,23 +79,23 @@
         }
         
         /**
-         * Supprime les liens groupe/contact pour un groupe précis
-         * @param int $id_groupe : L'id du groupe pour lequel supprimer
+         * Supprime les liens group/contact pour un group précis
+         * @param int $id_group : L'id du group pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_groupe_contact($id_groupe)
+        public function delete_group_contact($id_group)
         {
-            return $this->_delete('groupe_contact', ['id_groupe' => $id_groupe]);
+            return $this->_delete('group_contact', ['id_group' => $id_group]);
         }
 
         /**
-         * Insert une groupe
-         * @param array $groupe : La groupe à insérer avec les champs name, script, admin & admin
+         * Insert une group
+         * @param array $group : La group à insérer avec les champs name, script, admin & admin
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
-        public function insert($groupe)
+        public function insert($group)
         {
-            $result = $this->_insert('groupe', $groupe);
+            $result = $this->_insert('group', $group);
 
             if (!$result) {
                 return false;
@@ -105,14 +105,14 @@
         }
         
         /**
-         * Insert un lien groupe/contact
-         * @param int $id_groupe : L'id du groupe à liéer
+         * Insert un lien group/contact
+         * @param int $id_group : L'id du group à liéer
          * @param int $id_contact : L'id du contact à liéer
          * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
          */
-        public function insert_groupe_contact($id_groupe, $id_contact)
+        public function insert_group_contact($id_group, $id_contact)
         {
-            $result = $this->_insert('groupe_contact', ['id_groupe' => $id_groupe, 'id_contact' => $id_contact]);
+            $result = $this->_insert('group_contact', ['id_group' => $id_group, 'id_contact' => $id_contact]);
 
             if (!$result) {
                 return false;
@@ -122,14 +122,14 @@
         }
 
         /**
-         * Met à jour une groupe par son id
-         * @param int $id : L'id de la groupe à modifier
-         * @param array $groupe : Les données à mettre à jour pour la groupe
+         * Met à jour une group par son id
+         * @param int $id : L'id de la group à modifier
+         * @param array $group : Les données à mettre à jour pour la group
          * @return int : le nombre de ligne modifiées
          */
-        public function update($id, $groupe)
+        public function update($id, $group)
         {
-            return $this->_update('groupe', $groupe, ['id' => $id]);
+            return $this->_update('group', $group, ['id' => $id]);
         }
         
         /**
@@ -138,12 +138,12 @@
          */
         public function count()
         {
-            return $this->_count('groupe');
+            return $this->_count('group');
         }
         
         /**
-         * Cette fonction retourne les contact pour un groupe
-         * @param string $id : L'id du groupe
+         * Cette fonction retourne les contact pour un group
+         * @param string $id : L'id du group
          * @return array : Un tableau avec les contact
          */
         public function get_contact($id)
@@ -151,7 +151,7 @@
             $query = "
                 SELECT * 
                 FROM contact
-                WHERE id IN (SELECT id_contact FROM groupe_contact WHERE id_groupe = :id)
+                WHERE id IN (SELECT id_contact FROM group_contact WHERE id_group = :id)
             ";
 
             $params = array(

@@ -6,19 +6,20 @@ namespace controllers\publics;
      */
     class Event extends \descartes\Controller
     {
+        private $internal_event;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * Elle vérifie que l'utilisateur est bien connecté
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            $this->bdd = $bdd;
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            
+            $this->internal_event = new \controllers\internals\Event($bdd);
 
-            $this->internalEvent = new \controllers\internals\Event($this->bdd);
-
-            \controllers\internals\Tool::verify_connect();
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -28,7 +29,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $events = $this->internalEvent->get_list($limit, $page);
+            $events = $this->internal_event->get_list($limit, $page);
             $this->render('event/list', ['events' => $events, 'limit' => $limit, 'page' => $page, 'nb_results' => count($events)]);
         }
         
@@ -39,21 +40,21 @@ namespace controllers\publics;
          */
         public function delete($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('Event', 'list'));
+                return $this->redirect(\descartes\Router::url('Event', 'list'));
             }
             
             if (!\controllers\internals\Tool::is_admin()) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être admin pour pouvoir supprimer des events.');
-                return header('Location: ' . \descartes\Router::url('Event', 'list'));
+                return $this->redirect(\descartes\Router::url('Event', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id) {
-                $this->internalEvent->delete($id);
+                $this->internal_event->delete($id);
             }
 
-            return header('Location: ' . \descartes\Router::url('Event', 'list'));
+            return $this->redirect(\descartes\Router::url('Event', 'list'));
         }
     }

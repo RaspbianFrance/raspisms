@@ -6,6 +6,13 @@ namespace controllers\internals;
  */
 class Received extends \descartes\InternalController
 {
+    private $model_received;
+
+    public function __construct(\PDO $bdd)
+    {
+        $this->model_received = new \models\Received($bdd);
+    }
+
 
     /**
      * Cette fonction retourne une liste des receivedes sous forme d'un tableau
@@ -16,8 +23,7 @@ class Received extends \descartes\InternalController
     public function get_list($nb_entry = false, $page = false)
     {
         //Recupération des receivedes
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_list($nb_entry, $nb_entry * $page);
+        return $this->model_received->get_list($nb_entry, $nb_entry * $page);
     }
     
 
@@ -29,8 +35,7 @@ class Received extends \descartes\InternalController
     public function get_by_ids($ids)
     {
         //Recupération des receivedes
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_by_ids($ids);
+        return $this->model_received->get_by_ids($ids);
     }
     
     /**
@@ -40,8 +45,7 @@ class Received extends \descartes\InternalController
      */
     public function get_lasts_by_date($nb_entry = false)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_lasts_by_date($nb_entry);
+        return $this->model_received->get_lasts_by_date($nb_entry);
     }
     
     /**
@@ -51,31 +55,28 @@ class Received extends \descartes\InternalController
      */
     public function get_by_origin($origin)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_by_origin($origin);
+        return $this->model_received->get_by_origin($origin);
     }
 
     /**
-     * Récupère les SMS reçus depuis une date
-     * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
-     * @return array : Tableau avec tous les SMS depuis la date
+     * Récupère les Sms reçus depuis une date
+     * @param $date : La date depuis laquelle on veux les Sms (au format 2014-10-25 20:10:05)
+     * @return array : Tableau avec tous les Sms depuis la date
      */
     public function get_since_by_date($date)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_since_by_date($date, $number);
+        return $this->model_received->get_since_by_date($date);
     }
 
     /**
-     * Récupère les SMS reçus depuis une date pour un numero
-     * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
+     * Récupère les Sms reçus depuis une date pour un numero
+     * @param $date : La date depuis laquelle on veux les Sms (au format 2014-10-25 20:10:05)
      * @param $number : Le numéro
-     * @return array : Tableau avec tous les SMS depuis la date
+     * @return array : Tableau avec tous les Sms depuis la date
      */
     public function get_since_for_number_by_date($date, $number)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_since_for_number_by_date($date, $number);
+        return $this->model_received->get_since_for_number_by_date($date, $number);
     }
 
     /**
@@ -85,8 +86,7 @@ class Received extends \descartes\InternalController
      */
     public function delete($id)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->delete_by_id($id);
+        return $this->model_received->delete_by_id($id);
     }
 
     /**
@@ -103,8 +103,7 @@ class Received extends \descartes\InternalController
             'is_command' => $is_command,
         ];
 
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->create($received);
+        return $this->model_received->create($received);
     }
 
     /**
@@ -113,8 +112,6 @@ class Received extends \descartes\InternalController
      */
     public function update($id, $at, $origin, $content, $is_command)
     {
-        $modelReceived = new \models\Received($this->bdd);
-        
         $received = [
             'at' => $at,
             'origin' => $origin,
@@ -122,7 +119,7 @@ class Received extends \descartes\InternalController
             'is_command' => $is_command,
         ];
 
-        return $modelReceived->update($id, $received);
+        return $this->model_received->update($id, $received);
     }
 
     /**
@@ -131,8 +128,7 @@ class Received extends \descartes\InternalController
      */
     public function count()
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->count();
+        return $this->model_received->count();
     }
 
     /**
@@ -141,9 +137,7 @@ class Received extends \descartes\InternalController
      */
     public function count_by_day_since($date)
     {
-        $modelReceived = new \models\Received($this->bdd);
-
-        $counts_by_day = $modelReceived->count_by_day_since($date);
+        $counts_by_day = $this->model_received->count_by_day_since($date);
         $return = [];
         
         foreach ($counts_by_day as $count_by_day) {
@@ -159,7 +153,6 @@ class Received extends \descartes\InternalController
      */
     public function get_discussions()
     {
-        $modelReceived = new \models\Received($this->bdd);
-        return $modelReceived->get_discussions();
+        return $this->model_received->get_discussions();
     }
 }

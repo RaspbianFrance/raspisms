@@ -77,10 +77,10 @@
                     )
                     OR id IN (
                         SELECT id_scheduled
-                        FROM scheduled_groupe
+                        FROM scheduled_group
                         WHERE id_group IN (
                             SELECT id_group
-                            FROM groupe_contact
+                            FROM group_contact
                             WHERE id_contact IN (
                                 SELECT id
                                 FROM contact
@@ -177,13 +177,13 @@
         }
         
         /**
-         * Cette fonction retourne une liste de groupes pour un scheduled
+         * Cette fonction retourne une liste de groups pour un scheduled
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
-         * @return array : Les groupes du scheduled
+         * @return array : Les groups du scheduled
          */
-        public function get_groupe($id_scheduled)
+        public function get_group($id_scheduled)
         {
-            $query = 'SELECT * FROM groupe WHERE id IN (SELECT id_group FROM scheduled_groupe WHERE id_scheduled = :id_scheduled)';
+            $query = 'SELECT * FROM group WHERE id IN (SELECT id_group FROM scheduled_group WHERE id_scheduled = :id_scheduled)';
 
             $params = ['id_scheduled' => $id_scheduled];
 
@@ -230,9 +230,9 @@
          * @param int $id_group : L'id du group
          * @return int : le nombre d'entrées
          */
-        public function insert_scheduled_groupe($id_scheduled, $id_group)
+        public function insert_scheduled_group($id_scheduled, $id_group)
         {
-            $result = $this->_insert('scheduled_groupe', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]);
+            $result = $this->_insert('scheduled_group', ['id_scheduled' => $id_scheduled, 'id_group' => $id_group]);
 
             if (!$result) {
                 return false;
@@ -262,12 +262,12 @@
         }
         
         /**
-         * Supprime les liens scheduled/groupe pour un scheduled précis
+         * Supprime les liens scheduled/group pour un scheduled précis
          * @param int $id_scheduled : L'id du scheduled pour lequel supprimer
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_groupe($id_scheduled)
+        public function delete_scheduled_group($id_scheduled)
         {
-            return $this->_delete('scheduled_groupe', ['id_scheduled' => $id_scheduled]);
+            return $this->_delete('scheduled_group', ['id_scheduled' => $id_scheduled]);
         }
     }

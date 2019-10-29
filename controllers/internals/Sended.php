@@ -6,6 +6,12 @@ namespace controllers\internals;
      */
     class Sended extends \descartes\InternalController
     {
+        private $model_sended;
+
+        public function __construct(\PDO $bdd)
+        {
+            $this->model_sended = new \models\Sended($bdd);
+        }
 
         /**
          * Cette fonction retourne une liste des sendedes sous forme d'un tableau
@@ -16,8 +22,7 @@ namespace controllers\internals;
         public function get_list($nb_entry = false, $page = false)
         {
             //Recupération des sendedes
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_sended->get_list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -28,8 +33,7 @@ namespace controllers\internals;
         public function get_by_ids($ids)
         {
             //Recupération des sendedes
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->get_by_ids($ids);
+            return $this->model_sended->get_by_ids($ids);
         }
 
         /**
@@ -39,8 +43,7 @@ namespace controllers\internals;
          */
         public function get_lasts_by_date($nb_entry = false)
         {
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->get_lasts_by_date($nb_entry);
+            return $this->model_sended->get_lasts_by_date($nb_entry);
         }
         
         /**
@@ -51,8 +54,7 @@ namespace controllers\internals;
         public function get_by_target($target)
         {
             //Recupération des sendeds
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->get_by_target($target);
+            return $this->model_sended->get_by_target($target);
         }
 
 
@@ -63,8 +65,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->delete_by_id($id);
+            return $this->model_sended->delete_by_id($id);
         }
 
         /**
@@ -74,8 +75,7 @@ namespace controllers\internals;
          */
         public function create($sended)
         {
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->create($sended);
+            return $this->model_sended->create($sended);
         }
 
         /**
@@ -84,11 +84,9 @@ namespace controllers\internals;
          */
         public function update($sendeds)
         {
-            $modelSended = new \models\Sended($this->bdd);
-            
             $nb_update = 0;
             foreach ($sendeds as $sended) {
-                $result = $modelSended->update($sended['id'], $sended);
+                $result = $this->model_sended->update($sended['id'], $sended);
 
                 if ($result) {
                     $nb_update ++;
@@ -104,8 +102,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            $modelSended = new \models\Sended($this->bdd);
-            return $modelSended->count();
+            return $this->model_sended->count();
         }
 
         /**
@@ -114,9 +111,7 @@ namespace controllers\internals;
          */
         public function count_by_day_since($date)
         {
-            $modelSended = new \models\Sended($this->bdd);
-
-            $counts_by_day = $modelSended->count_by_day_since($date);
+            $counts_by_day = $this->model_sended->count_by_day_since($date);
             $return = [];
             
             foreach ($counts_by_day as $count_by_day) {

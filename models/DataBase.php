@@ -266,9 +266,9 @@
         }
 
         /**
-         * Récupère les groupes dont l'id fait partie de la liste fournie
-         * @param array $groups_ids = Tableau des id des groupes voulus
-         * @return array : Retourne un tableau avec les groupes adaptés
+         * Récupère les groups dont l'id fait partie de la liste fournie
+         * @param array $groups_ids = Tableau des id des groups voulus
+         * @return array : Retourne un tableau avec les groups adaptés
          */
         public function getGroupsIn($groups_ids)
         {
@@ -286,7 +286,7 @@
         }
 
         /**
-         * Supprime tous les groupes dont l'id fait partie du tableau fourni
+         * Supprime tous les groups dont l'id fait partie du tableau fourni
          * @param $contacts_ids : Tableau des id des groups à supprimer
          * @return int : Nombre de lignes supprimées
          */
@@ -309,9 +309,9 @@
         /***************************************/
 
         /**
-         * Retourne tous les contacts pour un groupe donnée
-         * @param int $id_group : L'id du groupe
-         * @return array : Tous les contacts compris dans le groupe
+         * Retourne tous les contacts pour un group donnée
+         * @param int $id_group : L'id du group
+         * @return array : Tous les contacts compris dans le group
          */
         public function getContactsForGroup($id_group)
         {
@@ -331,8 +331,8 @@
         }
 
         /**
-         * Récupère tout les groupes, avec le nombre de contact dans chacun
-         * @return array : Tableau avec tous les groupes et le nombre de contacts liés
+         * Récupère tout les groups, avec le nombre de contact dans chacun
+         * @return array : Tableau avec tous les groups et le nombre de contacts liés
          */
         public function getGroupsWithContactsNb($order_by = '', $desc = false, $limit = false, $offset = false)
         {
@@ -351,8 +351,7 @@
                     'number',
                 ];
 
-                if (in_array($order_by, $orders))
-                {
+                if (in_array($order_by, $orders)) {
                     $query .= ' ORDER BY '. $order_by;
                     if ($desc) {
                         $query .= ' DESC';
@@ -673,9 +672,9 @@
         }
 
         /**
-         * Retourne tous les groupes pour un scheduled donnée
+         * Retourne tous les groups pour un scheduled donnée
          * @param int $id_scheduled : L'id du schedulede
-         * @return array : Tous les groupes compris dans le scheduled
+         * @return array : Tous les groups compris dans le scheduled
          */
         public function getGroupsForScheduled($id_scheduled)
         {

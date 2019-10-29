@@ -11,9 +11,9 @@
          * @param array|null $variables : Array of variables to transfer to the template, format name => value
          * @param string $dir_template_path : Template directory path, if not defined we use PWD_TEMPLATES constant
          * @param string $extension : The extension of the template file, if not defined we use ".php"
-         * @return void
+         * @return true
 		 */
-		protected function render (string $template, ?array $variables = array(), string $dir_template_path = PWD_TEMPLATES, string $template_extension = '.php') : void
+		protected function render (string $template, ?array $variables = array(), string $dir_template_path = PWD_TEMPLATES, string $template_extension = '.php') : bool
 		{
 			foreach ($variables as $clef => $value)
 			{
@@ -28,6 +28,7 @@
             }
 
             require $template_path;
+            return true;
 		}
 
         
@@ -76,5 +77,17 @@
 			}
 			
             return true;
-		}
+        }
+
+        /**
+         * Redirect to an url
+         * @param string $url : URL to redirect to
+         * @param int $http_code : Http code to send (default 302)
+         * @return null
+         */
+        public static function redirect (string $url, int $http_code = 302)
+        {
+            header('Location: ' . $url, true, $http_code);
+            return null;
+        }
 	} 

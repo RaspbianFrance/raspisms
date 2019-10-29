@@ -4,7 +4,7 @@ namespace controllers\publics;
     /**
      * Page des smsapis
      */
-    class SMSAPI extends \descartes\Controller
+    class SmsAPI extends \descartes\Controller
     {
         //On défini les constantes qui servent pour les retours d'API
         const API_ERROR_NO = 0;
@@ -28,16 +28,16 @@ namespace controllers\publics;
             $this->internal_user = new \controllers\internals\User($this->bdd);
             $this->internalContact = new \controllers\internals\Contact($this->bdd);
 
-            \controllers\internals\Tool::verify_connect();
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
-         * Cette fonction permet d'envoyer un SMS, en passant simplement des arguments à l'URL (ou pas $_GET)
-         * @param string text = Le contenu du SMS
-         * @param mixed numbers = Les numéros auxquels envoyer les SMS. Soit un seul numéro, et il s'agit d'un string. Soit plusieurs numéros, et il s'agit d'un tableau
-         * @param mixed contacts = Les noms des contacts auxquels envoyer les SMS. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
-         * @param mixed groupes = Les noms des groupes auxquels envoyer les SMS. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
-         * @param optionnal string date = La date à laquelle doit être envoyé le SMS. Au format 'Y-m-d H:i'. Si non fourni, le SMS sera envoyé dans 2 minutes
+         * Cette fonction permet d'envoyer un Sms, en passant simplement des arguments à l'URL (ou pas $_GET)
+         * @param string text = Le contenu du Sms
+         * @param mixed numbers = Les numéros auxquels envoyer les Sms. Soit un seul numéro, et il s'agit d'un string. Soit plusieurs numéros, et il s'agit d'un tableau
+         * @param mixed contacts = Les noms des contacts auxquels envoyer les Sms. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
+         * @param mixed groupes = Les noms des groupes auxquels envoyer les Sms. Soit un seul et il s'agit d'un string. Soit plusieurs, et il s'agit d'un tableau
+         * @param optionnal string date = La date à laquelle doit être envoyé le Sms. Au format 'Y-m-d H:i'. Si non fourni, le Sms sera envoyé dans 2 minutes
          */
         public function api()
         {
@@ -122,7 +122,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            //On assigne les variable POST (après avoir vidé $_POST) en prévision de la création du SMS
+            //On assigne les variable POST (après avoir vidé $_POST) en prévision de la création du Sms
             if (!$this->internalScheduled->create(['at' => $date, 'content' => $text], $numbers, $contacts, $groupes)) {
                 echo json_encode(array(
                     'error' => self::API_ERROR_CREATION_FAILED,

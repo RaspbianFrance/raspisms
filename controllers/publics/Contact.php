@@ -6,20 +6,22 @@ namespace controllers\publics;
      */
     class Contact extends \descartes\Controller
     {
+        private $internal_contact;
+        private $internal_event;
+
         /**
          * Cette fonction est appelée avant toute les autres :
          * Elle vérifie que l'utilisateur est bien connecté
          * @return void;
          */
-        public function _before()
+        public function __construct()
         {
-            global $bdd;
-            $this->bdd = $bdd;
-
-            $this->internalContact = new \controllers\internals\Contact($this->bdd);
-            $this->internalEvent = new \controllers\internals\Event($this->bdd);
-
-            \controllers\internals\Tool::verify_connect();
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
+            $this->internal_event = new \controllers\internals\Event($bdd);
+            
+            \controllers\internals\Tool::verifyconnect();
         }
 
         /**
@@ -28,7 +30,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $contacts = $this->internalContact->get_list(25, $page);
+            $contacts = $this->internal_contact->get_list(25, $page);
             $this->render('contact/list', ['contacts' => $contacts]);
         }
         
@@ -39,17 +41,17 @@ namespace controllers\publics;
          */
         public function delete($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('Contact', 'list'));
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id) {
-                $this->internalContact->delete($id);
+                $this->internal_contact->delete($id);
             }
 
-            header('Location: ' . \descartes\Router::url('Contact', 'list'));
+            $this->redirect(\descartes\Router::url('Contact', 'list'));
             return true;
         }
 
@@ -70,7 +72,7 @@ namespace controllers\publics;
             global $db;
             $ids = $_GET['ids'] ?? [];
 
-            $contacts = $this->internalContact->get_by_ids($ids);
+            $contacts = $this->internal_contact->get_by_ids($ids);
 
             $this->render('contact/edit', array(
                 'contacts' => $contacts,
@@ -85,9 +87,9 @@ namespace controllers\publics;
          */
         public function create($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('Contact', 'add'));
+                return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
             
             $name = $_POST['name'] ?? false;
@@ -95,22 +97,22 @@ namespace controllers\publics;
 
             if (!$name || !$number) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Des champs sont manquants !');
-                return header('Location: ' . \descartes\Router::url('Contact', 'add'));
+                return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
             $number = \controllers\internals\Tool::parse_phone($number);
             if (!$number) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Numéro de téléphone incorrect.');
-                return header('Location: ' . \descartes\Router::url('Contact', 'add'));
+                return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            if (!$this->internalContact->create($number, $name)) {
+            if (!$this->internal_contact->create($number, $name)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de créer ce contact.');
-                return header('Location: ' . \descartes\Router::url('Contact', 'add'));
+                return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
             \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le contact a bien été créé.');
-            return header('Location: ' . \descartes\Router::url('Contact', 'list'));
+            return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
 
         /**
@@ -121,24 +123,24 @@ namespace controllers\publics;
          */
         public function update($csrf)
         {
-            if (!$this->verifyCSRF($csrf)) {
+            if (!$this->verify_csrf($csrf)) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                return header('Location: ' . \descartes\Router::url('Contact', 'list'));
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
             $nb_contacts_update = 0;
             
             foreach ($_POST['contacts'] as $contact) {
-                $nb_contacts_update += $this->internalContact->update($contact['id'], $contact['number'], $contact['name']);
+                $nb_contacts_update += $this->internal_contact->update($contact['id'], $contact['number'], $contact['name']);
             }
             
             if ($nb_contacts_update != count($_POST['contacts'])) {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certais contacts n\'ont pas pu êtres mis à jour.');
-                return header('Location: ' . \descartes\Router::url('Contact', 'list'));
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
             \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Tous les contacts ont été modifiés avec succès.');
-            return header('Location: ' . \descartes\Router::url('Contact', 'list'));
+            return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
 
         /**
@@ -147,6 +149,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internalContact->get_list());
+            echo json_encode($this->internal_contact->get_list());
         }
     }

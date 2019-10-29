@@ -5,6 +5,11 @@
     {
         foreach ($array as $key => $value)
         {
+            if (defined(mb_strtoupper($key)))
+            {
+                continue;
+            }
+
             define(mb_strtoupper($key), $value);
         }
     }

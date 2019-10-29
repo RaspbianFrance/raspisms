@@ -109,7 +109,7 @@
          * Cette fonction vérifie si un utilisateur et connecté, et si il ne l'est pas, redirige sur la page de connexion
          * @return void
          */
-        public static function verify_connect()
+        public static function verifyconnect()
         {
             if (!isset($_SESSION['connect']) || !$_SESSION['connect']) {
                 header('Location: /');
@@ -136,9 +136,9 @@
          * @param array $settings : Les settings du mail, type, sujet, template
          * @param array $datas : Les données à fournir au template du mail
          */
-        public function send_email($to, $settings, $datas = [])
+        public static function send_email($to, $settings, $datas = [])
         {
-            $controller = new \Controller();
+            $controller = new \descartes\Controller();
             $content = $controller->render($settings['template'], $datas, true);
             return true;#mail($to, $settings['subject'], $content);
         }

@@ -4,6 +4,7 @@
     class User extends \descartes\InternalController
     {
         private $model_user;
+        private $internal_event;
 
         public function __construct(\PDO $bdd)
         {
@@ -56,9 +57,9 @@
          * Update a user password
          * @param string $id : User id
          * @param string $password : New password
-         * @return boolean;
+         * @return bool;
          */
-        public function update_password(int $id, string $password) : boolean
+        public function update_password(int $id, string $password) : bool
         {
             $password = password_hash($password, PASSWORD_DEFAULT);
             return (bool) $this->model_user->update_password($id, $password);
@@ -70,7 +71,7 @@
          * @param string $transfer : New value of property transfer
          * @return boolean;
          */
-        public function update_transfer(int $id, int $transfer) : boolean
+        public function update_transfer(int $id, int $transfer) : bool
         {
             return (bool) $this->model_user->update_transfer($id, $transfer);
         }
@@ -93,7 +94,7 @@
          */
         public function get_by_email($email)
         {
-            return $model_user->get_by_email($email);
+            return $this->model_user->get_by_email($email);
         }
 
         /**
@@ -109,7 +110,7 @@
                 'transfer' => $transfer,
             ];
 
-            return $model_user->update($id, $user);
+            return $this->model_user->update($id, $user);
         }
         
         /**
@@ -126,13 +127,13 @@
                 'transfer' => $transfer,
             ];
 
-            $result = $model_user->insert($user);
+            $result = $this->model_user->insert($user);
 
             if (!$result) {
                 return false;
             }
 
-            $internal_event->create('CONTACT_ADD', 'Ajout de l\'utilisateur : ' . $email . '.');
+            $this->internal_event->create('CONTACT_ADD', 'Ajout de l\'utilisateur : ' . $email . '.');
             
             return $result;
         }
