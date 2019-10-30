@@ -11,8 +11,8 @@
     }
 
     $analyse_commands = [
-        'php ' . __DIR__ . '/phpstan.phar analyse --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../controllers/',
-        'php ' . __DIR__ . '/phpstan.phar analyse --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../models/',
+        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../controllers/',
+        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../models/',
     ];
 
 
@@ -20,6 +20,8 @@
     {
         help();
     }
+
+    $level = $argv[2] ?? 0;
 
     if ($argv[1] === 'analyse')
     {
@@ -30,10 +32,7 @@
 
         foreach ($analyse_commands as $analyse_command)
         {
-            if (isset($argv[2]))
-            {
-                $analyse_command .= ' --level=' . $argv[2];
-            }
+            $analyse_command .= ' --level=' . $level;
 
             echo "Run : " . $analyse_command . " \n";
             $return = shell_exec($analyse_command);

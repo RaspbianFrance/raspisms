@@ -84,7 +84,7 @@ class Console extends \descartes\InternalController
                 foreach ($numbers as $number)
                 {
                     //Si les Sms STOP sont activés, on passe au numéro suivant si le numéro actuelle fait parti des Sms STOP
-                    if (RASPISms_SETTINGS_SmsSTOPS)
+                    if (RASPISMS_SETTINGS_SMSSTOPS)
                     {
                         foreach ($smsStops as $smsStop)
                         {
@@ -116,7 +116,7 @@ class Console extends \descartes\InternalController
                     //Commande qui envoie le Sms
                     $commande_send_sms = 'gammu-smsd-inject TEXT '.escapeshellarg($number).' -report -len '.mb_strlen($text_sms).' -text '.$text_sms;
 
-                    if (RASPISms_SETTINGS_Sms_FLASH && $flash)
+                    if (RASPISMS_SETTINGS_SMS_FLASH && $flash)
                     {
                         $commande_send_sms .= ' -flash';
                     }
@@ -327,7 +327,7 @@ class Console extends \descartes\InternalController
      */
     public function sendTransfers()
     {
-        if (!RASPISms_SETTINGS_TRANSFER)
+        if (!RASPISMS_SETTINGS_TRANSFER)
         {
             echo "Le transfer de Sms est désactivé ! \n";
 
