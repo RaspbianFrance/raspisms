@@ -180,7 +180,7 @@
 				return false;
 			}		
 
-			if (!$db->insertIntoTable('scheduleds', ['at' => $date, 'content' => $content, 'progress' => false]))
+			if (!$db->insertIntoTable('scheduleds', ['at' => $date, 'content' => $content, 'progress' => 0]))
 			{
 				if (!$api)
 				{
