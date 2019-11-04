@@ -24,7 +24,7 @@ namespace models;
          *
          * @return array : L'entrée
          */
-        public function get_by_id($id)
+        public function get($id)
         {
             $commands = $this->_select('command', ['id' => $id]);
 
@@ -49,7 +49,7 @@ namespace models;
          *
          * @return array : La liste des entrées
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             $query = ' 
                 SELECT * FROM command
@@ -70,7 +70,7 @@ namespace models;
          *
          * @return int : Le nombre de lignes supprimées
          */
-        public function delete_by_id($id)
+        public function delete($id)
         {
             $query = ' 
                 DELETE FROM command

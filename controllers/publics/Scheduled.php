@@ -41,7 +41,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $scheduleds = $this->internal_scheduled->get_list(25, $page);
+            $scheduleds = $this->internal_scheduled->list(25, $page);
             $this->render('scheduled/list', ['scheduleds' => $scheduleds]);
         }
 
@@ -94,7 +94,7 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
-            $scheduleds = $this->internal_scheduled->get_by_ids($ids);
+            $scheduleds = $this->internal_scheduled->gets($ids);
 
             //Pour chaque message on ajoute les numéros, les contacts & les groups
             foreach ($scheduleds as $key => $scheduled)

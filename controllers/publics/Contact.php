@@ -44,7 +44,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $contacts = $this->internal_contact->get_list(25, $page);
+            $contacts = $this->internal_contact->list(25, $page);
             $this->render('contact/list', ['contacts' => $contacts]);
         }
 
@@ -94,7 +94,7 @@ namespace controllers\publics;
             global $db;
             $ids = $_GET['ids'] ?? [];
 
-            $contacts = $this->internal_contact->get_by_ids($ids);
+            $contacts = $this->internal_contact->gets($ids);
 
             $this->render('contact/edit', [
                 'contacts' => $contacts,
@@ -189,6 +189,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internal_contact->get_list());
+            echo json_encode($this->internal_contact->list());
         }
     }

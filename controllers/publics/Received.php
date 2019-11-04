@@ -44,7 +44,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $receiveds = $this->internal_received->get_list($limit, $page);
+            $receiveds = $this->internal_received->list($limit, $page);
 
             foreach ($receiveds as $key => $received)
             {

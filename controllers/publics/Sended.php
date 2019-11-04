@@ -42,7 +42,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $sendeds = $this->internal_sended->get_list($limit, $page);
+            $sendeds = $this->internal_sended->list($limit, $page);
             $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);
         }
 

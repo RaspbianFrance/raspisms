@@ -46,7 +46,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $groups = $this->internal_group->get_list(25, $page);
+            $groups = $this->internal_group->list(25, $page);
 
             foreach ($groups as $key => $group)
             {
@@ -100,7 +100,7 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
-            $groups = $this->internal_group->get_by_ids($ids);
+            $groups = $this->internal_group->gets($ids);
 
             foreach ($groups as $key => $group)
             {
@@ -195,6 +195,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internal_group->get_list());
+            echo json_encode($this->internal_group->list());
         }
     }

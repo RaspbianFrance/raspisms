@@ -32,10 +32,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des smsstopes
          */
-        public function get_list($nb_entry = false, $page = false)
+        public function list($nb_entry = false, $page = false)
         {
             //Recupération des smsstopes
-            return $this->model_sms_stop->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_sms_stop->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -45,10 +45,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des smsstopes
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             //Recupération des smsstopes
-            return $this->model_sms_stop->get_by_ids($ids);
+            return $this->model_sms_stop->gets($ids);
         }
 
         /**
@@ -84,7 +84,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_sms_stop->delete_by_id($id);
+            return $this->model_sms_stop->delete($id);
         }
 
         /**

@@ -46,10 +46,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des commandes
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             //Recupération des commandes
-            return $this->model_command->get_by_ids($ids);
+            return $this->model_command->gets($ids);
         }
 
         /**
@@ -71,7 +71,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_command->delete_by_id($id);
+            return $this->model_command->delete($id);
         }
 
         /**

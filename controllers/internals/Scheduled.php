@@ -34,10 +34,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des scheduledes
          */
-        public function get_list($nb_entry = false, $page = false)
+        public function list($nb_entry = false, $page = false)
         {
             //Recupération des scheduledes
-            return $this->model_scheduled->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_scheduled->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -47,10 +47,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des scheduledes
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             //Recupération des scheduledes
-            return $this->model_scheduled->get_by_ids($ids);
+            return $this->model_scheduled->gets($ids);
         }
 
         /**
@@ -85,7 +85,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_scheduled->delete_by_id($id);
+            return $this->model_scheduled->delete($id);
         }
 
         /**

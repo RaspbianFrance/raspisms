@@ -200,7 +200,7 @@ namespace controllers\publics;
         {
             $_SESSION['discussion_wait_progress'] = isset($_SESSION['discussion_wait_progress']) ? $_SESSION['discussion_wait_progress'] : [];
 
-            $scheduleds = $this->internal_scheduled->get_by_ids($_SESSION['discussion_wait_progress']);
+            $scheduleds = $this->internal_scheduled->gets($_SESSION['discussion_wait_progress']);
 
             //On va chercher à chaque fois si on a trouvé le sms. Si ce n'est pas le cas c'est qu'il a été envoyé
             $sendeds = [];

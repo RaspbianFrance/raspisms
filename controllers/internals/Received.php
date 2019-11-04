@@ -32,10 +32,10 @@ class Received extends \descartes\InternalController
      *
      * @return array : La liste des receivedes
      */
-    public function get_list($nb_entry = false, $page = false)
+    public function list($nb_entry = false, $page = false)
     {
         //Recupération des receivedes
-        return $this->model_received->get_list($nb_entry, $nb_entry * $page);
+        return $this->model_received->list($nb_entry, $nb_entry * $page);
     }
 
     /**
@@ -45,10 +45,10 @@ class Received extends \descartes\InternalController
      *
      * @return array : La liste des receivedes
      */
-    public function get_by_ids($ids)
+    public function gets($ids)
     {
         //Recupération des receivedes
-        return $this->model_received->get_by_ids($ids);
+        return $this->model_received->gets($ids);
     }
 
     /**
@@ -110,7 +110,7 @@ class Received extends \descartes\InternalController
      */
     public function delete($id)
     {
-        return $this->model_received->delete_by_id($id);
+        return $this->model_received->delete($id);
     }
 
     /**

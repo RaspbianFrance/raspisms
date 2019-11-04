@@ -24,7 +24,7 @@ namespace models;
          *
          * @return array : L'entrée
          */
-        public function get_by_id($id)
+        public function get($id)
         {
             $contacts = $this->_select('contact', ['id' => $id]);
 
@@ -65,7 +65,7 @@ namespace models;
          * @param int $limit  : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
          */
-        public function get_list($limit, $offset)
+        public function list($limit, $offset)
         {
             return $this->_select('contact', [], '', false, $limit, $offset);
         }
@@ -77,7 +77,7 @@ namespace models;
          *
          * @return array : La liste des entrées
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             $query = ' 
                 SELECT * FROM contact
@@ -98,7 +98,7 @@ namespace models;
          *
          * @return int : Le nombre de lignes supprimées
          */
-        public function delete_by_id($id)
+        public function delete($id)
         {
             $query = ' 
                 DELETE FROM contact

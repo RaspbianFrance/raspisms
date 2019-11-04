@@ -34,10 +34,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des groups
          */
-        public function get_list($nb_entry = false, $page = false)
+        public function list($nb_entry = false, $page = false)
         {
             //Recupération des groups
-            return $this->model_group->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_group->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -47,10 +47,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des groups
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             //Recupération des groups
-            return $this->model_group->get_by_ids($ids);
+            return $this->model_group->gets($ids);
         }
 
         /**
@@ -85,7 +85,7 @@ namespace controllers\internals;
          */
         public function delete($ids)
         {
-            return $this->model_group->delete_by_ids($ids);
+            return $this->model_group->deletes($ids);
         }
 
         /**

@@ -34,10 +34,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des contactes
          */
-        public function get_list($nb_entry = false, $page = false)
+        public function list($nb_entry = false, $page = false)
         {
             //Recupération des contactes
-            return $this->model_contact->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_contact->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -47,10 +47,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des contactes
          */
-        public function get_by_ids($ids)
+        public function gets($ids)
         {
             //Recupération des contactes
-            return $this->model_contact->get_by_ids($ids);
+            return $this->model_contact->gets($ids);
         }
 
         /**
@@ -98,7 +98,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_contact->delete_by_id($id);
+            return $this->model_contact->delete($id);
         }
 
         /**

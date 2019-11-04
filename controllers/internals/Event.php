@@ -33,10 +33,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des events
          */
-        public function get_list($nb_entry = false, $page = false)
+        public function list($nb_entry = false, $page = false)
         {
             //Recupération des events
-            return $this->model_event->get_list($nb_entry, $nb_entry * $page);
+            return $this->model_event->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -61,7 +61,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_event->delete_by_id($id);
+            return $this->model_event->delete($id);
         }
 
         /**

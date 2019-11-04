@@ -43,7 +43,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $events = $this->internal_event->get_list($limit, $page);
+            $events = $this->internal_event->list($limit, $page);
             $this->render('event/list', ['events' => $events, 'limit' => $limit, 'page' => $page, 'nb_results' => \count($events)]);
         }
 
