@@ -45,7 +45,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $contacts = $this->internal_contact->list(25, $page);
-            $this->render('contact/list', ['contacts' => $contacts]);
+            return $this->render('contact/list', ['contacts' => $contacts]);
         }
 
         /**
@@ -70,9 +70,7 @@ namespace controllers\publics;
                 $this->internal_contact->delete($id);
             }
 
-            $this->redirect(\descartes\Router::url('Contact', 'list'));
-
-            return true;
+            return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
 
         /**

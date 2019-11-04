@@ -23,8 +23,10 @@ class Console extends \descartes\InternalController
 
     private $internal_event;
 
-    public function __construct(\PDO $bdd)
+    public function __construct()
     {
+        $bdd = descartes\Model::connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+
         $this->model_command = new \models\Command($bdd);
         $this->model_database = new \models\DataBase($bdd);
         $this->model_sended = new \models\Sended($bdd);
