@@ -61,7 +61,6 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
@@ -91,7 +90,6 @@ namespace controllers\publics;
          */
         public function edit()
         {
-            global $db;
             $ids = $_GET['ids'] ?? [];
 
             $contacts = $this->internal_contact->gets($ids);

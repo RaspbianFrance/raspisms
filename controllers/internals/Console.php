@@ -14,14 +14,34 @@ namespace controllers\internals;
 
 class Console extends \descartes\InternalController
 {
+    private $model_command;
+    private $model_database;
+    private $model_sended;
+    private $model_smsstop;
+    private $model_received;
+    private $model_user;
+
+    private $internal_event;
+
+    public function __construct(\PDO $bdd)
+    {
+        $this->model_command = new \models\Command($bdd);
+        $this->model_database = new \models\DataBase($bdd);
+        $this->model_sended = new \models\Sended($bdd);
+        $this->model_smsstop = new \models\SmsStop($bdd);
+        $this->model_received = new \models\Received($bdd);
+        $this->model_user = new \models\User($bdd);
+
+        $this->internal_event = new \controllers\internals\Event($bdd);
+    }
+    
+    
     /**
      * Cette fonction envoie tous les Sms programmés qui doivent l'être.
      */
     public function sendScheduled()
     {
         //On créé l'objet de base de données
-        global $db;
-
         for ($i = 0; $i < 30; ++$i)
         {
             $now = new \DateTime();
@@ -29,7 +49,7 @@ class Console extends \descartes\InternalController
 
             echo "Début de l'envoi des Sms programmés\n";
 
-            $scheduleds = $db->getScheduledNotInProgressBefore($now);
+            $scheduleds = $this->model_database->getScheduledNotInProgressBefore($now);
 
             $ids_scheduleds = [];
 
@@ -41,7 +61,7 @@ class Console extends \descartes\InternalController
 
             echo \count($ids_scheduleds)." Sms à envoyer ont été trouvés et ajoutés à la liste des Sms en cours d'envoi.\n";
 
-            $db->updateProgressScheduledIn($ids_scheduleds, true);
+            $this->model_database->updateProgressScheduledIn($ids_scheduleds, true);
 
             //Pour chaque Sms à envoyer
             foreach ($scheduleds as $scheduled)
@@ -54,32 +74,32 @@ class Console extends \descartes\InternalController
                 $numbers = [];
 
                 //On récupère les numéros pour le Sms et on les ajoute
-                $target_numbers = $db->getNumbersForScheduled($id_scheduled);
+                $target_numbers = $this->model_database->getNumbersForScheduled($id_scheduled);
                 foreach ($target_numbers as $target_number)
                 {
                     $numbers[] = $target_number['number'];
                 }
 
                 //On récupère les contacts, et on ajoute les numéros
-                $contacts = $db->getContactForScheduled($id_scheduled);
+                $contacts = $this->model_database->getContactForScheduled($id_scheduled);
                 foreach ($contacts as $contact)
                 {
                     $numbers[] = $contact['number'];
                 }
 
                 //On récupère les groups
-                $groups = $db->getGroupForScheduled($id_scheduled);
+                $groups = $this->model_database->getGroupForScheduled($id_scheduled);
                 foreach ($groups as $group)
                 {
                     //On récupère les contacts du group et on les ajoute aux numéros
-                    $contacts = $db->getContactForGroup($group['id']);
+                    $contacts = $this->model_database->getContactForGroup($group['id']);
                     foreach ($contacts as $contact)
                     {
                         $numbers[] = $contact['number'];
                     }
                 }
 
-                $smsStops = $db->getFromTableWhere('smsstop');
+                $smsStops = $this->model_smsstop->_select('smsstop');
 
                 foreach ($numbers as $number)
                 {
@@ -106,12 +126,10 @@ class Console extends \descartes\InternalController
                     $now = $now->format('Y-m-d H:i:s');
 
                     //On peut maintenant ajouter le Sms
-                    if (!$db->insertIntoTable('sendeds', ['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
+                    if (!$id_sended = $this->model_sended->insert(['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
                     {
                         echo 'Impossible d\'inserer le sms pour le numero '.$number."\n";
                     }
-
-                    $id_sended = $db->lastId();
 
                     //Commande qui envoie le Sms
                     $commande_send_sms = 'gammu-smsd-inject TEXT '.escapeshellarg($number).' -report -len '.mb_strlen($text_sms).' -text '.$text_sms;
@@ -131,7 +149,7 @@ class Console extends \descartes\InternalController
 
             echo "Tous les Sms sont en cours d'envoi.\n";
             //Tous les Sms ont été envoyés.
-            $db->deleteScheduledIn($ids_scheduleds);
+            $this->model_database->deleteScheduledIn($ids_scheduleds);
 
             //On dors 2 secondes
             sleep(2);
@@ -144,8 +162,6 @@ class Console extends \descartes\InternalController
     public function parseReceivedSms()
     {
         //On créer l'objet de base de données
-        global $db;
-
         for ($i = 0; $i < 30; ++$i)
         {
             foreach (scandir(PWD_RECEIVEDS) as $dir)
@@ -197,7 +213,7 @@ class Console extends \descartes\InternalController
                 {
                     echo 'STOP Sms detected '.$number."\n";
                     error_log('STOP Sms detected '.$number);
-                    $db->insertIntoTable('smsstop', ['number' => $number]);
+                    $this->model_smsstop->insert(['number' => $number]);
 
                     continue;
                 }
@@ -213,7 +229,7 @@ class Console extends \descartes\InternalController
                     $interval = new \DateInterval('PT12H');
                     $sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
 
-                    if (!$sendeds = $db->getFromTableWhere('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
+                    if (!$sendeds = $this->model_sended->_select('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
                     {
                         continue;
                     }
@@ -223,8 +239,8 @@ class Console extends \descartes\InternalController
                     //On gère les echecs
                     if ('Failed' === trim($text))
                     {
-                        $db->updateTableWhere('sendeds', ['before_delivered' => 0, 'failed' => true], ['id' => $sended['id']]);
-                        echo 'Sended Sms id '.$sended['id']." pass to failed status\n";
+                        $this->model_sended->update($sended['id'], ['before_delivered' => 0, 'failed' => true]);
+                        echo 'Sended Sms id ' . $sended['id'] . " pass to failed status\n";
 
                         continue;
                     }
@@ -232,15 +248,15 @@ class Console extends \descartes\InternalController
                     //On gère le cas des messages de plus de 160 caractères, lesquels impliquent plusieurs accusés
                     if ($sended['before_delivered'] > 1)
                     {
-                        $db->updateTableWhere('sendeds', ['before_delivered' => $sended['before_delivered'] - 1], ['id' => $sended['id']]);
-                        echo 'Sended Sms id '.$sended['id']." before_delivered decrement\n";
+                        $this->model_database->update($sended['id'], ['before_delivered' => $sended['before_delivered'] - 1]);
+                        echo 'Sended Sms id ' . $sended['id'] . " before_delivered decrement\n";
 
                         continue;
                     }
 
                     //Si tout est bon, que nous avons assez d'accusés, nous validons !
-                    $db->updateTableWhere('sendeds', ['before_delivered' => 0, 'delivered' => true], ['id' => $sended['id']]);
-                    echo 'Sended Sms id '.$sended['id']." to delivered status\n";
+                    $this->model_database->update($sended['id'], ['before_delivered' => 0, 'delivered' => true]);
+                    echo 'Sended Sms id ' . $sended['id'] . " to delivered status\n";
 
                     continue;
                 }
@@ -262,13 +278,13 @@ class Console extends \descartes\InternalController
                 if (\array_key_exists('LOGIN', $flags) && \array_key_exists('PASSWORD', $flags))
                 {
                     //Si on a bien un utilisateur avec les identifiants reçus
-                    $user = $db->getUserFromEmail($flags['LOGIN']);
+                    $user = $this->model_database->getUserFromEmail($flags['LOGIN']);
                     error_log('We found '.\count($user).' users');
                     if ($user && $user['password'] === sha1($flags['PASSWORD']))
                     {
                         error_log('Password is valid');
                         //On va passer en revue toutes les commandes, pour voir si on en trouve dans ce message
-                        $commands = $db->getFromTableWhere('commands');
+                        $commands = $this->model_database->_select('commands');
 
                         error_log('We found '.\count($commands).' commands');
                         foreach ($commands as $command)
@@ -299,7 +315,7 @@ class Console extends \descartes\InternalController
                 $send_by = $number;
                 $content = $text;
                 $is_command = \count($found_commands);
-                if (!$db->insertIntoTable('receiveds', ['at' => $date, 'send_by' => $send_by, 'content' => $content, 'is_command' => $is_command]))
+                if (!$this->model_received->insert(['at' => $date, 'send_by' => $send_by, 'content' => $content, 'is_command' => $is_command]))
                 {
                     echo "Erreur lors de l'enregistrement du Sms\n";
                     error_log('Unable to process the Sms in file "'.$dir);
@@ -307,7 +323,7 @@ class Console extends \descartes\InternalController
                 }
 
                 //On insert le Sms dans le tableau des sms à envoyer par mail
-                $db->insertIntoTable('transfers', ['id_received' => $db->lastId(), 'progress' => false]);
+                $this->model_database->_insert('transfers', ['id_received' => $this->model_database->lastId(), 'progress' => false]);
 
                 //Chaque commande sera executée.
                 foreach ($found_commands as $command_name => $command)
@@ -334,8 +350,8 @@ class Console extends \descartes\InternalController
             return false;
         }
 
-        global $db;
-        $transfers = $db->getFromTableWhere('transfers', ['progress' => false]);
+        global $this->model_database;
+        $transfers = $this->model_database->_select('transfers', ['progress' => false]);
 
         $ids_transfers = [];
         $ids_receiveds = [];
@@ -345,11 +361,11 @@ class Console extends \descartes\InternalController
             $ids_receiveds[] = $transfer['id_received'];
         }
 
-        $db->updateProgressTransfersIn($ids_transfers, true);
+        $this->model_database->updateProgressTransfersIn($ids_transfers, true);
 
-        $receiveds = $db->getReceivedIn($ids_receiveds);
+        $receiveds = $this->model_database->getReceivedIn($ids_receiveds);
 
-        $users = $db->getFromTableWhere('users', ['transfer' => true]);
+        $users = $this->model_user->_select('users', ['transfer' => true]);
 
         foreach ($users as $user)
         {
@@ -366,6 +382,6 @@ class Console extends \descartes\InternalController
             }
         }
 
-        $db->deleteTransfersIn($ids_transfers);
+        $this->model_database->deleteTransfersIn($ids_transfers);
     }
 }

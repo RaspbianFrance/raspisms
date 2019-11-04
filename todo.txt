@@ -1,7 +1,8 @@
 Migrate to latest version of descartes. Remove all useless functions
 y  Account.php (almost done need to do user after)
 y  Command.php
-  Connect.php
+y  Connect.php
+p  Console.php
   Contact.php
   Dashboard.php
   Discussion.php

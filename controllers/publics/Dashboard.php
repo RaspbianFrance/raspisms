@@ -53,9 +53,6 @@ namespace controllers\publics;
          */
         public function show()
         {
-            //Creation de l'object de base de données
-            global $db;
-
             //Recupération des nombres des 4 panneaux d'accueil
             $nb_contacts = $this->internal_contact->count();
             $nb_groups = $this->internal_group->count();

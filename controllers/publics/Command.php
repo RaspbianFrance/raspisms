@@ -84,7 +84,6 @@ namespace controllers\publics;
          */
         public function edit()
         {
-            global $db;
             $ids = $_GET['ids'] ?? [];
 
             $commands = $this->internal_command->gets($ids);

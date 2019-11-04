@@ -62,7 +62,6 @@ namespace controllers\publics;
 
             $_SESSION['connect'] = true;
             $_SESSION['user'] = $user;
-            $_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
 
             return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
         }
@@ -88,9 +87,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-                $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
-
-                return false;
+                return $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
             }
 
             $email = $_POST['email'] ?? false;
@@ -99,9 +96,7 @@ namespace controllers\publics;
             if (!$email || !$user)
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Aucun utilisateur n\'existe pour cette adresse mail.');
-                $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
-
-                return false;
+                return $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
             }
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
@@ -149,6 +144,6 @@ namespace controllers\publics;
         {
             session_unset();
             session_destroy();
-            $this->redirect(\descartes\Router::url('Connect', 'login'));
+            return $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
     }
