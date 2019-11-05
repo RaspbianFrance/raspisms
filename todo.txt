@@ -5,8 +5,8 @@ y  Connect.php
 y  Console.php
 y  Contact.php
   Dashboard.php
-  Discussion.php
-  Event.php
+y  Discussion.php
+y  Event.php
   Groupe.php
   Received.php
   Scheduled.php
