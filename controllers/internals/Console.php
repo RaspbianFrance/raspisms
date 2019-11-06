@@ -51,7 +51,7 @@ class Console extends \descartes\InternalController
 
             echo "Début de l'envoi des Sms programmés\n";
 
-            $scheduleds = $this->model_database->getScheduledNotInProgressBefore($now);
+            $scheduleds = $this->model_database->getScheduledsNotInProgressBefore($now);
 
             $ids_scheduleds = [];
 
@@ -63,7 +63,7 @@ class Console extends \descartes\InternalController
 
             echo \count($ids_scheduleds)." Sms à envoyer ont été trouvés et ajoutés à la liste des Sms en cours d'envoi.\n";
 
-            $this->model_database->updateProgressScheduledIn($ids_scheduleds, true);
+            $this->model_database->updateProgressScheduledsIn($ids_scheduleds, true);
 
             //Pour chaque Sms à envoyer
             foreach ($scheduleds as $scheduled)
@@ -90,11 +90,11 @@ class Console extends \descartes\InternalController
                 }
 
                 //On récupère les groups
-                $groups = $this->model_database->getGroupForScheduled($id_scheduled);
+                $groups = $this->model_database->getGroupsForScheduled($id_scheduled);
                 foreach ($groups as $group)
                 {
                     //On récupère les contacts du group et on les ajoute aux numéros
-                    $contacts = $this->model_database->getContactForGroup($group['id']);
+                    $contacts = $this->model_database->getContactsForGroup($group['id']);
                     foreach ($contacts as $contact)
                     {
                         $numbers[] = $contact['number'];
@@ -151,7 +151,7 @@ class Console extends \descartes\InternalController
 
             echo "Tous les Sms sont en cours d'envoi.\n";
             //Tous les Sms ont été envoyés.
-            $this->model_database->deleteScheduledIn($ids_scheduleds);
+            $this->model_database->deleteScheduledsIn($ids_scheduleds);
 
             //On dors 2 secondes
             sleep(2);
@@ -365,7 +365,7 @@ class Console extends \descartes\InternalController
 
         $this->model_database->updateProgressTransfersIn($ids_transfers, true);
 
-        $receiveds = $this->model_database->getReceivedIn($ids_receiveds);
+        $receiveds = $this->model_database->getReceivedsIn($ids_receiveds);
 
         $users = $this->model_user->_select('users', ['transfer' => true]);
 
