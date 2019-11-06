@@ -27,7 +27,7 @@ namespace models;
          *
          * @return array : Retourne un tableau avec les receiveds adaptés
          */
-        public function getReceivedsIn($receiveds_ids)
+        public function get_receiveds_in($receiveds_ids)
         {
             $query = '
 				SELECT *
@@ -54,7 +54,7 @@ namespace models;
          *
          * @return array : Tous les contacts compris dans le group
          */
-        public function getContactsForGroup($id_group)
+        public function get_contacts_for_group($id_group)
         {
             $query = '
 				SELECT con.id as id, con.name as name, con.number as number
@@ -82,7 +82,7 @@ namespace models;
          *
          * @return array : Tableau avec les sms programmés demandés
          */
-        public function getScheduledsNotInProgressBefore($date)
+        public function get_scheduleds_not_in_progress_before($date)
         {
             $query = '
 				SELECT *
@@ -106,7 +106,7 @@ namespace models;
          *
          * @return int : Nombre de lignes supprimées
          */
-        public function deleteScheduledsIn($scheduleds_ids)
+        public function delete_scheduleds_in($scheduleds_ids)
         {
             $query = '
 				DELETE FROM scheduled
@@ -132,7 +132,7 @@ namespace models;
          *
          * @return int : Retourne le nombre de lignes mises à jour
          */
-        public function updateProgressScheduledsIn($scheduleds_ids, $progress)
+        public function update_progress_scheduleds_in($scheduleds_ids, $progress)
         {
             $query = '
 				UPDATE scheduled
@@ -159,7 +159,7 @@ namespace models;
          *
          * @return array : Tous les numéro compris dans le scheduled
          */
-        public function getNumbersForScheduled($id_scheduled)
+        public function get_numbers_for_scheduled($id_scheduled)
         {
             $query = '
 				SELECT *
@@ -185,7 +185,7 @@ namespace models;
          *
          * @return array : Tous les groups compris dans le scheduled
          */
-        public function getGroupsForScheduled($id_scheduled)
+        public function get_groups_for_scheduled($id_scheduled)
         {
             $query = '
 				SELECT gro.id as id, gro.name as name
@@ -213,7 +213,7 @@ namespace models;
          *
          * @return array : Retourne l'utilisateur
          */
-        public function getUserFromEmail($email)
+        public function get_user_from_email($email)
         {
             $query = '
 				SELECT *
@@ -239,7 +239,7 @@ namespace models;
          *
          * @return int : Retourne le nombre de lignes mises à jour
          */
-        public function updateProgressTransfersIn($transfers_ids, $progress)
+        public function update_progress_transfers_in($transfers_ids, $progress)
         {
             $query = '
 				UPDATE transfer
@@ -262,7 +262,7 @@ namespace models;
          *
          * @return int : Nombre de lignes supprimées
          */
-        public function deleteTransfersIn($transfers_ids)
+        public function delete_transfers_in($transfers_ids)
         {
             $query = '
 				DELETE FROM transfer
@@ -275,9 +275,4 @@ namespace models;
 
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
-
-        //
-        // PARTIE DES REQUETES EVENTS
-        //
-
     }
