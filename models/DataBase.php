@@ -15,61 +15,6 @@ namespace models;
     class DataBase extends \descartes\Model
     {
 
-
-        //
-        // PARTIE DES REQUETES SCHEDULEDS
-        //
-
-        /**
-         * Supprime tous les sms programmés dont l'id fait partie du tableau fourni.
-         *
-         * @param $contacts_ids : Tableau des id des sms à supprimer
-         * @param mixed $scheduleds_ids
-         *
-         * @return int : Nombre de lignes supprimées
-         */
-        public function delete_scheduleds_in($scheduleds_ids)
-        {
-            $query = '
-				DELETE FROM scheduled
-				WHERE id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generted_in = $this->_generate_in_from_array($scheduleds_ids);
-            $query .= $generted_in['QUERY'];
-            $params = $generted_in['PARAMS'];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        //
-        // PARTIE DES REQUETES SCHEDULEDS_CONTACTS
-        //
-
-        /**
-         * Change le statut des scheduleds dont l'id est fourni dans $scheduleds_id.
-         *
-         * @param array $scheduleds_ids = Tableau des id des sms voulus
-         * @param mixed $progress
-         *
-         * @return int : Retourne le nombre de lignes mises à jour
-         */
-        public function update_progress_scheduleds_in($scheduleds_ids, $progress)
-        {
-            $query = '
-				UPDATE scheduled
-				SET progress = :progress
-				WHERE id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generted_in = $this->_generate_in_from_array($scheduleds_ids);
-            $query .= $generted_in['QUERY'];
-            $params = $generted_in['PARAMS'];
-            $params['progress'] = (bool) $progress;
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
         //
         // PARTIE DES REQUETES SCHEDULEDS_NUMBERS
         //

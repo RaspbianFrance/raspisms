@@ -63,7 +63,10 @@ class Console extends \descartes\InternalController
 
             echo \count($ids_scheduleds)." Sms à envoyer ont été trouvés et ajoutés à la liste des Sms en cours d'envoi.\n";
 
-            $this->model_database->update_progress_scheduleds_in($ids_scheduleds, true);
+            foreach ($ids_scheduleds as $ids_scheduled)
+            {
+                $this->internal_scheduled->update_progress($id_scheduled, true);
+            }
 
             //Pour chaque Sms à envoyer
             foreach ($scheduleds as $scheduled)

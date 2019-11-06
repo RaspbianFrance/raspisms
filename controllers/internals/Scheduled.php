@@ -207,4 +207,14 @@ namespace controllers\internals;
             //Recupération des scheduledes
             return $this->model_scheduled->get_group($id_scheduled);
         }
+
+        /**
+         * This function update progress status of a scheduled sms
+         * @param bool $progress : Progress status
+         * @return int : Number of update
+         */
+        public function update_progress ($id_scheduled, $progress)
+        {
+            return $this->model_scheduled->update($id_scheduled, ['progress' => $progress]);
+        }
     }
