@@ -10,8 +10,7 @@ y  Event.php
 y  Group.php
 y  Received.php
 y  Scheduled.php
-  Sended.php
-y Setting.php
-  SMSAPI.php
-  SMSStop.php
+y  Sent.php
+y  Setting.php
+y  SMSStop.php
 y  User.php

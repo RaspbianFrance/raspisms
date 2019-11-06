@@ -15,13 +15,13 @@ namespace controllers\internals;
     /**
      * Classe des sendedes.
      */
-    class Sended extends \descartes\InternalController
+    class Sent extends \descartes\InternalController
     {
         private $model_sended;
 
         public function __construct(\PDO $bdd)
         {
-            $this->model_sended = new \models\Sended($bdd);
+            $this->model_sended = new \models\Sent($bdd);
         }
 
         /**
@@ -66,7 +66,7 @@ namespace controllers\internals;
         /**
          * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
          *
-         * @param string $target : Le numéro de à qui est envoyé le message
+         * @param string $target : Le numéro auquel est envoyé le message
          *
          * @return array : La liste des sendeds
          */
@@ -99,29 +99,6 @@ namespace controllers\internals;
         public function create($sended)
         {
             return $this->model_sended->create($sended);
-        }
-
-        /**
-         * Cette fonction met à jour une série de sendedes.
-         *
-         * @param mixed $sendeds
-         *
-         * @return int : le nombre de ligne modifiées
-         */
-        public function update($sendeds)
-        {
-            $nb_update = 0;
-            foreach ($sendeds as $sended)
-            {
-                $result = $this->model_sended->update($sended['id'], $sended);
-
-                if ($result)
-                {
-                    ++$nb_update;
-                }
-            }
-
-            return $nb_update;
         }
 
         /**

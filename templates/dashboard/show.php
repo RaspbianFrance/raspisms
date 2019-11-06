@@ -166,7 +166,7 @@
                                     </table>
                                 </div>
                                 <div class="text-right">
-                                    <a href="<?php echo \Router::url('Sended', 'list'); ?>">Voir tous les SMS envoyés <i class="fa fa-arrow-circle-right"></i></a>
+                                    <a href="<?php echo \Router::url('Sent', 'list'); ?>">Voir tous les SMS envoyés <i class="fa fa-arrow-circle-right"></i></a>
                                 </div>
                             <?php } ?>
 						</div>

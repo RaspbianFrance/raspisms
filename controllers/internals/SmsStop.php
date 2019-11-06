@@ -98,27 +98,4 @@ namespace controllers\internals;
         {
             return $this->model_sms_stop->insert($smsstop);
         }
-
-        /**
-         * Cette fonction met à jour une série de smsstopes.
-         *
-         * @param mixed $smsstops
-         *
-         * @return int : le nombre de ligne modifiées
-         */
-        public function update($smsstops)
-        {
-            $nb_update = 0;
-            foreach ($smsstops as $smsstop)
-            {
-                $result = $this->model_sms_stop->update($smsstop['id'], $smsstop);
-
-                if ($result)
-                {
-                    ++$nb_update;
-                }
-            }
-
-            return $nb_update;
-        }
     }

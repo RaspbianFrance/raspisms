@@ -15,7 +15,7 @@ namespace controllers\publics;
     /**
      * Page des sendeds.
      */
-    class Sended extends \descartes\Controller
+    class Sent extends \descartes\Controller
     {
         private $internal_sended;
 
@@ -28,7 +28,7 @@ namespace controllers\publics;
         public function __construct()
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
-            $this->internal_sended = new \controllers\internals\Sended($bdd);
+            $this->internal_sended = new \controllers\internals\Sent($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -59,8 +59,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-
-                return $this->redirect(\descartes\Router::url('Sended', 'list'));
+                return $this->redirect(\descartes\Router::url('Sent', 'list'));
             }
 
             $ids = $_GET['ids'] ?? [];
@@ -69,6 +68,6 @@ namespace controllers\publics;
                 $this->internal_sended->delete($id);
             }
 
-            return $this->redirect(\descartes\Router::url('Sended', 'list'));
+            return $this->redirect(\descartes\Router::url('Sent', 'list'));
         }
     }

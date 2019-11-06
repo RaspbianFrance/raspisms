@@ -29,7 +29,7 @@ class Console extends \descartes\InternalController
 
         $this->model_command = new \models\Command($bdd);
         $this->model_database = new \models\DataBase($bdd);
-        $this->model_sended = new \models\Sended($bdd);
+        $this->model_sended = new \models\Sent($bdd);
         $this->model_smsstop = new \models\SmsStop($bdd);
         $this->model_received = new \models\Received($bdd);
         $this->model_user = new \models\User($bdd);
@@ -242,7 +242,7 @@ class Console extends \descartes\InternalController
                     if ('Failed' === trim($text))
                     {
                         $this->model_sended->update($sended['id'], ['before_delivered' => 0, 'failed' => true]);
-                        echo 'Sended Sms id ' . $sended['id'] . " pass to failed status\n";
+                        echo 'Sent Sms id ' . $sended['id'] . " pass to failed status\n";
 
                         continue;
                     }
@@ -251,14 +251,14 @@ class Console extends \descartes\InternalController
                     if ($sended['before_delivered'] > 1)
                     {
                         $this->model_database->update($sended['id'], ['before_delivered' => $sended['before_delivered'] - 1]);
-                        echo 'Sended Sms id ' . $sended['id'] . " before_delivered decrement\n";
+                        echo 'Sent Sms id ' . $sended['id'] . " before_delivered decrement\n";
 
                         continue;
                     }
 
                     //Si tout est bon, que nous avons assez d'accusés, nous validons !
                     $this->model_database->update($sended['id'], ['before_delivered' => 0, 'delivered' => true]);
-                    echo 'Sended Sms id ' . $sended['id'] . " to delivered status\n";
+                    echo 'Sent Sms id ' . $sended['id'] . " to delivered status\n";
 
                     continue;
                 }

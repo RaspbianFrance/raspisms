@@ -35,7 +35,7 @@ namespace controllers\publics;
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 
-            $this->internal_sended = new \controllers\internals\Sended($bdd);
+            $this->internal_sended = new \controllers\internals\Sent($bdd);
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_group = new \controllers\internals\Group($bdd);
