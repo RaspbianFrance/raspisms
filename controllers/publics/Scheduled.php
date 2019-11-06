@@ -58,7 +58,6 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
@@ -142,7 +141,6 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
@@ -155,14 +153,12 @@ namespace controllers\publics;
             if (!$content)
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous ne pouvez pas créer un Sms sans message.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
             if (!\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i'))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez fournir une date valide.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
@@ -183,7 +179,6 @@ namespace controllers\publics;
             if (!$numbers && !$contacts && !$groups)
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez renseigner au moins un destinataire pour le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
@@ -197,12 +192,10 @@ namespace controllers\publics;
             if (!$scheduled_id = $this->internal_scheduled->create($scheduled, $numbers, $contacts, $groups))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de créer le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
             \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le Sms a bien été créé pour le '.$date.'.');
-
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
 
@@ -219,7 +212,6 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
@@ -238,14 +230,12 @@ namespace controllers\publics;
                 if (!$content)
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
                 if (!\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i'))
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
@@ -256,7 +246,6 @@ namespace controllers\publics;
                     if (!$number)
                     {
                         unset($numbers[$key]);
-
                         continue;
                     }
 
@@ -266,40 +255,24 @@ namespace controllers\publics;
                 if (!$numbers && !$contacts && !$groups)
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
-                $scheduled = [
-                    'scheduled' => [
-                        'id' => $id_scheduled,
-                        'at' => $date,
-                        'content' => $content,
-                        'flash' => false,
-                        'progress' => false,
-                    ],
-                    'numbers' => $numbers,
-                    'contacts_ids' => $contacts,
-                    'groups_ids' => $groups,
-                ];
-
-                if (!$this->internal_scheduled->update([$scheduled]))
+                $success = $this->internal_scheduled->update($id_scheduled, $content, $at, $numbers, $contacts, $groups);
+                if (!$success)
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
             }
 
             if (!$all_update_ok)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certains Sms n\'ont pas pu êtres mis à jour.');
-
+                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certains SMS n\'ont pas pu êtres mis à jour.');
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Tous les Sms ont été mis à jour.');
-
+            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Tous les SMS ont été mis à jour.');
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
     }

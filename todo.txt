@@ -7,9 +7,9 @@ y  Contact.php
   Dashboard.php
 y  Discussion.php
 y  Event.php
-  Groupe.php
-  Received.php
-  Scheduled.php
+y  Group.php
+y  Received.php
+y  Scheduled.php
   Sended.php
 y Setting.php
   SMSAPI.php

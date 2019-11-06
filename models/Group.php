@@ -105,7 +105,7 @@ namespace models;
          *
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_group_contact($id_group)
+        public function delete_group_contacts($id_group)
         {
             return $this->_delete('group_contact', ['id_group' => $id_group]);
         }
@@ -179,7 +179,7 @@ namespace models;
          *
          * @return array : Un tableau avec les contact
          */
-        public function get_contact($id)
+        public function get_contacts($id)
         {
             $query = '
                 SELECT * 

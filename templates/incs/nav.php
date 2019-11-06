@@ -61,7 +61,7 @@
 								<a href="<?php echo \Router::url('Received', 'list'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>
 							</li>
 							<li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \Router::url('SMSStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
+								<a href="<?php echo \Router::url('SmsStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
 							</li>
 							<li <?php echo $page == 'events' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \Router::url('Event', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>

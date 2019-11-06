@@ -136,36 +136,37 @@ namespace controllers\internals;
          *
          * @return int : le nombre de ligne modifiées
          */
-        public function update($scheduleds)
+        public function update($id, $content, $at, $numbers = [], $contact_ids = [], $groups_ids = [], $flash = false, $progress = false)
         {
-            $nb_update = 0;
-            foreach ($scheduleds as $scheduled)
+            $scheduled = [
+                'at' => $date,
+                'content' => $content,
+                'flash' => $flash,
+                'progress' => $progress,
+            ];
+
+            $success = $this->model_scheduled->update($id, $scheduled);
+
+            $this->model_scheduled->delete_scheduled_numbers($id);
+            $this->model_scheduled->delete_scheduled_contacts($id);
+            $this->model_scheduled->delete_scheduled_groups($id);
+
+            foreach ($scheduled['number'] as $number)
             {
-                $result = $this->model_scheduled->update($scheduled['scheduled']['id'], $scheduled['scheduled']);
-
-                $this->model_scheduled->delete_scheduled_number($scheduled['scheduled']['id']);
-                $this->model_scheduled->delete_scheduled_contact($scheduled['scheduled']['id']);
-                $this->model_scheduled->delete_scheduled_group($scheduled['scheduled']['id']);
-
-                foreach ($scheduled['number'] as $number)
-                {
-                    $this->model_scheduled->insert_scheduled_number($scheduled['scheduled']['id'], $number);
-                }
-
-                foreach ($scheduled['contact_ids'] as $contact_id)
-                {
-                    $this->model_scheduled->insert_scheduled_contact($scheduled['scheduled']['id'], $contact_id);
-                }
-
-                foreach ($scheduled['group_ids'] as $group_id)
-                {
-                    $this->model_scheduled->insert_scheduled_group($scheduled['scheduled']['id'], $group_id);
-                }
-
-                ++$nb_update;
+                $this->model_scheduled->insert_scheduled_number($scheduled['scheduled']['id'], $number);
             }
 
-            return $nb_update;
+            foreach ($scheduled['contact_ids'] as $contact_id)
+            {
+                $this->model_scheduled->insert_scheduled_contact($scheduled['scheduled']['id'], $contact_id);
+            }
+
+            foreach ($scheduled['group_ids'] as $group_id)
+            {
+                $this->model_scheduled->insert_scheduled_group($scheduled['scheduled']['id'], $group_id);
+            }
+
+            return (bool) $success;
         }
 
         /**

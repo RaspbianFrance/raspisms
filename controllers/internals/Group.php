@@ -135,7 +135,7 @@ namespace controllers\internals;
 
             $result = $this->model_group->update($id, $group);
 
-            $this->model_group->delete_group_contact($id);
+            $this->model_group->delete_group_contacts($id);
 
             $nb_contact_insert = 0;
             foreach ($contacts_ids as $contact_id)
@@ -161,9 +161,9 @@ namespace controllers\internals;
          *
          * @return array : Un tableau avec les contact
          */
-        public function get_contact($id)
+        public function get_contacts($id)
         {
             //Recupération des groups
-            return $this->model_group->get_contact($id);
+            return $this->model_group->get_contacts($id);
         }
     }

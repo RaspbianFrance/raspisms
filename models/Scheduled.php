@@ -289,7 +289,7 @@ namespace models;
          *
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_number($id_scheduled)
+        public function delete_scheduled_numbers($id_scheduled)
         {
             return $this->_delete('scheduled_number', ['id_scheduled' => $id_scheduled]);
         }
@@ -301,7 +301,7 @@ namespace models;
          *
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_contact($id_scheduled)
+        public function delete_scheduled_contacts($id_scheduled)
         {
             return $this->_delete('scheduled_contact', ['id_scheduled' => $id_scheduled]);
         }
@@ -313,7 +313,7 @@ namespace models;
          *
          * @return int : Le nmbre d'entrées modifiées
          */
-        public function delete_scheduled_group($id_scheduled)
+        public function delete_scheduled_groups($id_scheduled)
         {
             return $this->_delete('scheduled_group', ['id_scheduled' => $id_scheduled]);
         }
