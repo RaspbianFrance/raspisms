@@ -51,7 +51,7 @@ class Console extends \descartes\InternalController
 
             echo "Début de l'envoi des Sms programmés\n";
 
-            $scheduleds = $this->model_database->get_scheduleds_not_in_progress_before($now);
+            $scheduleds = $this->model_scheduled->get_scheduleds_not_in_progress_before($now);
 
             $ids_scheduleds = [];
 
@@ -94,7 +94,7 @@ class Console extends \descartes\InternalController
                 foreach ($groups as $group)
                 {
                     //On récupère les contacts du group et on les ajoute aux numéros
-                    $contacts = $this->model_database->get_contacts_for_group($group['id']);
+                    $contacts = $this->model_database->get_by_group($group['id']);
                     foreach ($contacts as $contact)
                     {
                         $numbers[] = $contact['number'];
@@ -151,7 +151,10 @@ class Console extends \descartes\InternalController
 
             echo "Tous les Sms sont en cours d'envoi.\n";
             //Tous les Sms ont été envoyés.
-            $this->model_database->delete_scheduleds_in($ids_scheduleds);
+            foreach ($ids_scheduleds as $id_scheduled)
+            {
+                $this->model_scheduled->delete($id_scheduled);
+            }
 
             //On dors 2 secondes
             sleep(2);
@@ -365,7 +368,7 @@ class Console extends \descartes\InternalController
 
         $this->model_database->update_progress_transfers_in($ids_transfers, true);
 
-        $receiveds = $this->model_database->get_receiveds_in($ids_receiveds);
+        $receiveds = $this->model_received->gets($ids_receiveds);
 
         $users = $this->model_user->_select('users', ['transfer' => true]);
 

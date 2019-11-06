@@ -15,88 +15,10 @@ namespace models;
     class DataBase extends \descartes\Model
     {
 
-        //
-        // PARTIE DES REQUETES RECEIVEDS
-        //
-
-
-        /**
-         * Récupère les receiveds dont l'id fait partie de la liste fournie.
-         *
-         * @param array $receiveds_ids = Tableau des id des receiveds voulus
-         *
-         * @return array : Retourne un tableau avec les receiveds adaptés
-         */
-        public function get_receiveds_in($receiveds_ids)
-        {
-            $query = '
-				SELECT *
-				FROM received
-				WHERE id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generted_in = $this->_generate_in_from_array($receiveds_ids);
-            $query .= $generted_in['QUERY'];
-            $params = $generted_in['PARAMS'];
-
-            return $this->_run_query($query, $params);
-        }
-
-
-        //
-        // PARTIE DES REQUETES GROUPS_CONTACTS
-        //
-
-        /**
-         * Retourne tous les contacts pour un group donnée.
-         *
-         * @param int $id_group : L'id du group
-         *
-         * @return array : Tous les contacts compris dans le group
-         */
-        public function get_contacts_for_group($id_group)
-        {
-            $query = '
-				SELECT con.id as id, con.name as name, con.number as number
-				FROM group_contact as g_c
-				JOIN contact as con
-				ON (g_c.id_contact = con.id)
-				WHERE(g_c.id_group = :id_group)
-			';
-
-            $params = [
-                'id_group' => $id_group,
-            ];
-
-            return $this->_run_query($query, $params);
-        }
 
         //
         // PARTIE DES REQUETES SCHEDULEDS
         //
-
-        /**
-         * Récupère tout les sms programmés non en cours, et dont la date d'envoie inférieure à celle renseignée.
-         *
-         * @param string $date : \Date avant laquelle on veux les sms
-         *
-         * @return array : Tableau avec les sms programmés demandés
-         */
-        public function get_scheduleds_not_in_progress_before($date)
-        {
-            $query = '
-				SELECT *
-				FROM scheduled
-				WHERE progress = 0
-				AND at <= :date
-			';
-
-            $params = [
-                'date' => $date,
-            ];
-
-            return $this->_run_query($query, $params);
-        }
 
         /**
          * Supprime tous les sms programmés dont l'id fait partie du tableau fourni.

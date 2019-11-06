@@ -64,6 +64,17 @@ namespace models;
         }
 
         /**
+         * Get scheduleds message not in progress and before a date
+         * @param string $date : Limit date
+         * @return array
+         */
+        public function get_scheduleds_not_in_progress_before ($date)
+        {
+            return $this->_select('scheduleds', ['<=at' => $date, 'progress' => false]);
+        }
+
+
+        /**
          * Cette fonction retourne les messages programmés avant une date et pour un numéro.
          *
          * @param \DateTime $date   : La date avant laquelle on veux le message
