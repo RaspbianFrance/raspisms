@@ -15,7 +15,7 @@ namespace models;
     /**
      * Cette classe gère les accès bdd pour les sendedes.
      */
-    class Sended extends \descartes\Model
+    class Sent extends \descartes\Model
     {
         /**
          * Retourne une entrée par son id.

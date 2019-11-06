@@ -133,13 +133,19 @@ namespace controllers\internals;
          * @param array $numbers      : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
          * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
+         * @param mixed $id
+         * @param mixed $content
+         * @param mixed $at
+         * @param mixed $contact_ids
+         * @param mixed $flash
+         * @param mixed $progress
          *
          * @return int : le nombre de ligne modifiées
          */
         public function update($id, $content, $at, $numbers = [], $contact_ids = [], $groups_ids = [], $flash = false, $progress = false)
         {
             $scheduled = [
-                'at' => $date,
+                'at' => $at,
                 'content' => $content,
                 'flash' => $flash,
                 'progress' => $progress,
@@ -209,11 +215,14 @@ namespace controllers\internals;
         }
 
         /**
-         * This function update progress status of a scheduled sms
-         * @param bool $progress : Progress status
+         * This function update progress status of a scheduled sms.
+         *
+         * @param bool  $progress     : Progress status
+         * @param mixed $id_scheduled
+         *
          * @return int : Number of update
          */
-        public function update_progress ($id_scheduled, $progress)
+        public function update_progress($id_scheduled, $progress)
         {
             return $this->model_scheduled->update($id_scheduled, ['progress' => $progress]);
         }

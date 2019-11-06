@@ -58,18 +58,17 @@ namespace models;
 
             return isset($contacts[0]) ? $contacts[0] : false;
         }
-        
-        
+
         /**
-         * Get contacts of a particular group
+         * Get contacts of a particular group.
          *
          * @param int $id_group : Id of the group we want contacts for
+         *
          * @return array
          */
         public function get_by_group($id_group)
         {
-            $contacts = $this->_select('contact', ['id_group' => $id_group]);
-            return $contacts;
+            return $this->_select('contact', ['id_group' => $id_group]);
         }
 
         /**

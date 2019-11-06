@@ -16,28 +16,29 @@ class Console extends \descartes\InternalController
 {
     private $model_command;
     private $model_database;
-    private $model_sended;
+    private $model_sent;
     private $model_smsstop;
     private $model_received;
+    private $model_scheduled;
     private $model_user;
+    private $internal_scheduled;
 
     private $internal_event;
 
     public function __construct()
     {
-        $bdd = descartes\Model::connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+        $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 
         $this->model_command = new \models\Command($bdd);
         $this->model_database = new \models\DataBase($bdd);
-        $this->model_sended = new \models\Sent($bdd);
+        $this->model_sent = new \models\Sent($bdd);
         $this->model_smsstop = new \models\SmsStop($bdd);
         $this->model_received = new \models\Received($bdd);
         $this->model_user = new \models\User($bdd);
 
         $this->internal_event = new \controllers\internals\Event($bdd);
     }
-    
-    
+
     /**
      * Cette fonction envoie tous les Sms programmés qui doivent l'être.
      */
@@ -131,7 +132,7 @@ class Console extends \descartes\InternalController
                     $now = $now->format('Y-m-d H:i:s');
 
                     //On peut maintenant ajouter le Sms
-                    if (!$id_sended = $this->model_sended->insert(['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
+                    if (!$id_sended = $this->model_sent->insert(['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
                     {
                         echo 'Impossible d\'inserer le sms pour le numero '.$number."\n";
                     }
@@ -237,7 +238,7 @@ class Console extends \descartes\InternalController
                     $interval = new \DateInterval('PT12H');
                     $sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
 
-                    if (!$sendeds = $this->model_sended->_select('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
+                    if (!$sendeds = $this->model_sent->_select('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
                     {
                         continue;
                     }
@@ -247,8 +248,8 @@ class Console extends \descartes\InternalController
                     //On gère les echecs
                     if ('Failed' === trim($text))
                     {
-                        $this->model_sended->update($sended['id'], ['before_delivered' => 0, 'failed' => true]);
-                        echo 'Sent Sms id ' . $sended['id'] . " pass to failed status\n";
+                        $this->model_sent->update($sended['id'], ['before_delivered' => 0, 'failed' => true]);
+                        echo 'Sent Sms id '.$sended['id']." pass to failed status\n";
 
                         continue;
                     }
@@ -257,14 +258,14 @@ class Console extends \descartes\InternalController
                     if ($sended['before_delivered'] > 1)
                     {
                         $this->model_database->update($sended['id'], ['before_delivered' => $sended['before_delivered'] - 1]);
-                        echo 'Sent Sms id ' . $sended['id'] . " before_delivered decrement\n";
+                        echo 'Sent Sms id '.$sended['id']." before_delivered decrement\n";
 
                         continue;
                     }
 
                     //Si tout est bon, que nous avons assez d'accusés, nous validons !
                     $this->model_database->update($sended['id'], ['before_delivered' => 0, 'delivered' => true]);
-                    echo 'Sent Sms id ' . $sended['id'] . " to delivered status\n";
+                    echo 'Sent Sms id '.$sended['id']." to delivered status\n";
 
                     continue;
                 }
@@ -358,7 +359,6 @@ class Console extends \descartes\InternalController
             return false;
         }
 
-        global $this->model_database;
         $transfers = $this->model_database->_select('transfers', ['progress' => false]);
 
         $ids_transfers = [];

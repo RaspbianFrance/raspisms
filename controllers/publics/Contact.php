@@ -45,6 +45,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $contacts = $this->internal_contact->list(25, $page);
+
             return $this->render('contact/list', ['contacts' => $contacts]);
         }
 
@@ -61,6 +62,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 

@@ -14,7 +14,6 @@ namespace models;
 
     class DataBase extends \descartes\Model
     {
-
         //
         // PARTIE DES REQUETES SCHEDULEDS_NUMBERS
         //
