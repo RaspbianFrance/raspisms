@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-plug"></i> <a href="<?php echo \Router::url('webhooks'); ?>">Webhooks</a>
+							<i class="fa fa-plug"></i> <a href="<?php echo \descartes\Router::url('webhooks'); ?>">Webhooks</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,11 +37,8 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i>Modification de webhooks</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('webhooks', 'update', [$_SESSION['csrf']]);?>" method="POST">
-								<?php
-									foreach ($webhooks as $webhook)
-									{
-									?>
+							<form action="<?php echo \descartes\Router::url('webhooks', 'update', [$_SESSION['csrf']]);?>" method="POST">
+								<?php foreach ($webhooks as $webhook) { ?>
 										<div class="form-group">
 											<label>URL cible</label>
 											<div class="form-group">
@@ -57,10 +54,8 @@
 											</select>
 										</div>	
 										<hr/>
-									<?php
-									}
-								?>
-								<a class="btn btn-danger" href="<?php echo \Router::url('webhooks'); ?>">Annuler</a>
+                                <?php } ?>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('webhooks'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer la webhook" /> 	
 							</form>
 						</div>

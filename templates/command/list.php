@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-terminal"></i> Commandes
@@ -50,10 +50,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($commands as $command)
-                                                {
-                                                    ?>
+                                            <?php foreach ($commands as $command) { ?>
                                                     <tr>
                                                         <td><?php $this->s($command['id']); ?></td>
                                                         <td><?php $this->s($command['name']); ?></td>
@@ -61,22 +58,20 @@
                                                         <td><?php echo $command['admin'] ? 'Oui' : 'Non' ; ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($command['id']); ?>"></td>
                                                     </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
                                 <?php } ?>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \Router::url('Command', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter une commande</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Command', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter une commande</a>
                                     </div>
                                     <?php if ($commands) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Command', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Command', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Command', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Command', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     <?php } ?>
                                 </div>

@@ -15,7 +15,7 @@
 </div>
 <script>
     window.setTimeout(function () {
-        location.href = "<?php echo \Router::url('Connect', 'login'); ?>";
+        location.href = "<?php echo \descartes\Router::url('Connect', 'login'); ?>";
     }, 5000);
 </script>
 <?php

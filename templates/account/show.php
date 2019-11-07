@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-user"></i> Profil
@@ -49,7 +49,7 @@
 										<h4 class="panel-title"><i class="fa fa-key fa-fw"></i> Modifier mot de passe</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo \Router::url('Account', 'change_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo \descartes\Router::url('Account', 'change_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Mot de passe :</label>
 												<input name="password" type="password" class="form-control" placeholder="Nouveau mot de passe" />
@@ -65,7 +65,7 @@
 										<h4 class="panel-title"><i class="fa fa-trash-o fa-fw"></i> Supprimer ce compte</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo \Router::url('Account', 'delete', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo \descartes\Router::url('Account', 'delete', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="checkbox">
 												<label>
 													<input name="delete_account" type="checkbox" value="1" /> Je suis totalement sûr de vouloir supprimer ce compte 
@@ -84,7 +84,7 @@
 										<h4 class="panel-title"><i class="fa fa-at fa-fw"></i> Modifier e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo \Router::url('Account', 'change_email', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo \descartes\Router::url('Account', 'change_email', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Adresse e-mail :</label>
 												<input name="email" type="email" class="form-control" placeholder="Nouvelle adresse e-mail" />
@@ -100,7 +100,7 @@
 										<h4 class="panel-title"><i class="fa fa-share fa-fw"></i> Transfert des SMS par e-mail</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo \Router::url('Account', 'change_transfer', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo \descartes\Router::url('Account', 'change_transfer', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Transfert activé : </label>
 												<select name="transfer" class="form-control">

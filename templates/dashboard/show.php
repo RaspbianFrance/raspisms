@@ -38,7 +38,7 @@
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \Router::url('Contact', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Contact', 'list') ?>">
 							<div class="panel-footer">
 								<span class="pull-left">Voir vos contacts</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -60,7 +60,7 @@
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \Router::url('Groupe', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Groupe', 'list') ?>">
 							<div class="panel-footer">
 								<span class="pull-left">Voir les groupes</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -82,7 +82,7 @@
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \Router::url('Scheduled', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Scheduled', 'list') ?>">
 							<div class="panel-footer">
 								<span class="pull-left">Voir les SMS programmés</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -104,7 +104,7 @@
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \Router::url('Command', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Command', 'list') ?>">
 							<div class="panel-footer">
 								<span class="pull-left">Voir les commandes</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -151,22 +151,17 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        <?php
-                                            foreach ($sendeds as $sended)
-                                            {
-                                                ?>
+                                        <?php foreach ($sendeds as $sended) { ?>
                                                 <tr>
                                                     <td><?php $this->s($sended['target']); ?></td>
                                                     <td><?php $this->s($sended['at']); ?></td>
                                                 </tr>
-                                                <?php
-                                            }
-                                        ?>
+                                        <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <div class="text-right">
-                                    <a href="<?php echo \Router::url('Sended', 'list'); ?>">Voir tous les SMS envoyés <i class="fa fa-arrow-circle-right"></i></a>
+                                    <a href="<?php echo \descartes\Router::url('Sended', 'list'); ?>">Voir tous les SMS envoyés <i class="fa fa-arrow-circle-right"></i></a>
                                 </div>
                             <?php } ?>
 						</div>
@@ -191,23 +186,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        <?php
-                                            foreach ($receiveds as $received)
-                                            {
-                                                ?>
-                                                <tr>
-                                                    <td><?php $this->s($received['send_by']); ?></td>
-                                                    <td><?php $this->s($received['at']); ?></td>
-                                                    <td><?php echo ($received['is_command']) ? 'Oui' : 'Non'; ?></td>
-                                                </tr>
-                                                <?php
-                                            }
-                                        ?>
+                                        <?php foreach ($receiveds as $received) { ?>
+                                            <tr>
+                                                <td><?php $this->s($received['send_by']); ?></td>
+                                                <td><?php $this->s($received['at']); ?></td>
+                                                <td><?php echo ($received['is_command']) ? 'Oui' : 'Non'; ?></td>
+                                            </tr>
+                                        <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <div class="text-right">
-                                    <a href="<?php echo \Router::url('Received', 'list'); ?>">Voir tous les SMS reçus <i class="fa fa-arrow-circle-right"></i></a>
+                                    <a href="<?php echo \descartes\Router::url('Received', 'list'); ?>">Voir tous les SMS reçus <i class="fa fa-arrow-circle-right"></i></a>
                                 </div>
                             <?php } ?>
 						</div>
@@ -223,21 +213,15 @@
                                 Aucun évènement n'est encore survenus.
                             <?php } else { ?>
                                 <div class="list-group">
-                                    <?php
-                                        foreach ($events as $event)
-                                        {
-                                            $logo = \controllers\internals\Tool::event_type_to_icon($event['type']);
-                                            ?>
+                                    <?php foreach ($events as $event) { ?>
                                             <a href="#" class="list-group-item">
                                                 <span class="badge"><?php $this->s($event['at']); ?></span>
-                                                <i class="fa fa-fw <?php echo $logo; ?>"></i> <?php $this->s($event['text']); ?>
+                                                <i class="fa fa-fw <?php echo \controllers\internals\Tool::event_type_to_icon($event['type']); ?>"></i> <?php $this->s($event['text']); ?>
                                             </a>
-                                            <?php
-                                        }
-                                    ?>
+                                    <?php } ?>
                                 </div>
                                 <div class="text-right">
-                                    <a href="<?php echo \Router::url('Event', 'list'); ?>">Voirs tous les évènements survenus <i class="fa fa-arrow-circle-right"></i></a>
+                                    <a href="<?php echo \descartes\Router::url('Event', 'list'); ?>">Voirs tous les évènements survenus <i class="fa fa-arrow-circle-right"></i></a>
                                 </div>
                             <?php } ?>
 						</div>

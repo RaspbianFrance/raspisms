@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'list'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'list'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-calendar"></i> <a href="<?php echo \Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
+							<i class="fa fa-calendar"></i> <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Ajout d'un SMS programmé</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Texte du SMS</label>
 									<textarea name="content" class="form-control" required></textarea>
@@ -74,7 +74,7 @@
 										</div>
 									</div>
 								<?php } ?>
-								<a class="btn btn-danger" href="<?php echo \Router::url('Scheduled', 'list'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
 							</form>
 						</div>
@@ -90,7 +90,7 @@
 		jQuery('.add-contacts').each(function()
 		{
 			jQuery(this).magicSuggest({
-				data: '<?php echo \Router::url('Contact', 'json_list'); ?>',
+				data: '<?php echo \descartes\Router::url('Contact', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});
@@ -99,7 +99,7 @@
 		jQuery('.add-groupes').each(function()
 		{
 			jQuery(this).magicSuggest({
-				data: '<?php echo \Router::url('Groupe', 'json_list'); ?>',
+				data: '<?php echo \descartes\Router::url('Groupe', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});

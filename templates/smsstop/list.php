@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-ban"></i> SMS STOP
@@ -48,18 +48,15 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($smsstops as $smsstop)
-                                                {
-                                                    ?>
-                                                    <tr>
-                                                        <td><?php $this->s($smsstop['id']); ?></td>
-                                                        <td><?php $this->s($smsstop['number']); ?></td>
-                                                        <?php if ($_SESSION['user']['admin']) { ?><td><input name="ids[]" type="checkbox" value="<?php $this->s($smsstop['id']); ?>"></td><?php } ?>
-                                                    </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php foreach ($smsstops as $smsstop) { ?>
+                                                <tr>
+                                                    <td><?php $this->s($smsstop['id']); ?></td>
+                                                    <td><?php $this->s($smsstop['number']); ?></td>
+                                                    <?php if ($_SESSION['user']['admin']) { ?>
+                                                        <td><input name="ids[]" type="checkbox" value="<?php $this->s($smsstop['id']); ?>"></td>
+                                                    <?php } ?>
+                                                </tr>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -67,28 +64,18 @@
                                         <?php if ($_SESSION['user']['admin']) { ?>
                                             <div class="text-right col-xs-12 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
                                         <ul class="pager">
-                                            <?php
-                                                if ($page)
-                                                {
-                                                ?>
-                                                    <li><a href="<?php echo \Router::url('smsstop', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
-                                                <?php
-                                                }
+                                            <?php if ($page) { ?>
+                                                    <li><a href="<?php echo \descartes\Router::url('smsstop', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                            <?php } ?>
+                                            <?php $this->s('Page : ' . ($page + 1)); ?>
 
-                                                $numero_page = 'Page : ' . ($page + 1);
-                                                $this->s($numero_page);
-
-                                                if ($limit == $nb_results)
-                                                {
-                                                ?>
-                                                    <li><a href="<?php echo \Router::url('smsstop', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
-                                                <?php
-                                                }
-                                            ?>
+                                            <?php if ($limit == $nb_results) { ?>
+                                                    <li><a href="<?php echo \descartes\Router::url('smsstop', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                            <?php } ?>
                                         </ul>
                                     </div>
                                 <?php } ?>

@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-user"></i> <a href="<?php echo \Router::url('User', 'list'); ?>">Utilisateurs</a>
+							<i class="fa fa-user"></i> <a href="<?php echo \descartes\Router::url('User', 'list'); ?>">Utilisateurs</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-user fa-fw"></i> Ajout d'un utilisateur</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('User', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('User', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Adresse e-mail</label>
 									<div class="form-group input-group">
@@ -61,7 +61,7 @@
 										</div>
 									</div>
 								<?php } ?>	
-								<a class="btn btn-danger" href="<?php echo \Router::url('User', 'list'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('User', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le user" /> 	
 							</form>
 						</div>

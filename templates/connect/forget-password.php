@@ -5,7 +5,7 @@
 ?>
 <div class="container-fluid">
 	<div class="row">
-		<form class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-4 connexion-form" action="<?php echo \Router::url('connect', 'send_reset_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+		<form class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-4 connexion-form" action="<?php echo \descartes\Router::url('connect', 'send_reset_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 			<h2>Mot de passe oublié</h2>
 			<div class="form-group">
 				<label>Adresse e-mail</label>
@@ -15,7 +15,7 @@
 				</div>
 			</div>	
 
-			<a class="forget-password-link" href="<?php echo \Router::url('Connect', 'login'); ?>">Se connecter ?</a>
+			<a class="forget-password-link" href="<?php echo \descartes\Router::url('Connect', 'login'); ?>">Se connecter ?</a>
 			<button class="btn btn-primary btn-lg btn-block">Renvoyer nouveau mot de passe</button>
 		</form>
 	</div>

@@ -5,7 +5,7 @@
 ?>
 <div class="container-fluid">
 	<div class="row">
-		<form class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-4 connexion-form" action="<?php echo \Router::url('Connect', 'connection'); ?>" method="POST">
+		<form class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-4 connexion-form" action="<?php echo \descartes\Router::url('Connect', 'connection'); ?>" method="POST">
 			<h2>Connexion - RaspiSMS</h2>
 			<div class="form-group">
 				<label>Adresse e-mail</label>
@@ -22,7 +22,7 @@
 				</div>
 			</div>	
 
-			<a class="forget-password-link" href="<?php echo \Router::url('Connect', 'forget_password'); ?>">Mot de passe oublié ?</a>
+			<a class="forget-password-link" href="<?php echo \descartes\Router::url('Connect', 'forget_password'); ?>">Mot de passe oublié ?</a>
 			<button class="btn btn-primary btn-lg btn-block">Connexion</button>
 		</form>
 	</div>

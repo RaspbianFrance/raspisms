@@ -2,10 +2,13 @@
 <html>
 	<head>
 		<title><?php echo !empty($title) ? $title . ' - ' . WEBSITE_TITLE : WEBSITE_TITLE; ?></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="author" content="<?php echo WEBSITE_AUTHOR; ?>" />
-		<link rel="icon" type="image/png" href="<?php echo HTTP_PWD_IMG; ?>/favicon.png" />
-		<!-- Bootstrap Core CSS -->
+        
+        <link rel="icon" type="image/png" href="<?php echo HTTP_PWD_IMG; ?>/favicon.png" />
+    
+        <!-- Bootstrap Core CSS -->
 		<link href="<?php echo HTTP_PWD_CSS; ?>/css/bootstrap.min.css" rel="stylesheet">
 		<!-- Custom CSS Theme -->
 		<link href="<?php echo HTTP_PWD_CSS; ?>/css/sb-admin.css" rel="stylesheet">
@@ -15,10 +18,10 @@
 		<link href="<?php echo HTTP_PWD_FONT; ?>/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 		<!-- Custom CSS site -->
 		<link href="<?php echo HTTP_PWD_CSS; ?>/css/style.css" rel="stylesheet">
-		<?php
-			$this->render('incs/phptojs');
-		?>
-		<script src="<?php echo HTTP_PWD_JS; ?>/js/jquery.js"></script>
+        
+        <?php $this->render('incs/phptojs'); ?>
+        
+        <script src="<?php echo HTTP_PWD_JS; ?>/js/jquery.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/js/bootstrap.min.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/js/plugins/morris/raphael.min.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/js/plugins/morris/morris.min.js"></script>

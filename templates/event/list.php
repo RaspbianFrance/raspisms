@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-clock-o"></i> Évènements
@@ -50,20 +50,17 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($events as $event)
-                                                {
-                                                    ?>
+                                            <?php foreach ($events as $event) { ?>
                                                     <tr>
                                                         <td><?php $this->s($event['id']); ?></td>
                                                         <td><span class="fa fa-fw <?php echo \controllers\internals\Tool::event_type_to_icon($event['type']); ?>"></span></td>
                                                         <td><?php $this->s($event['at']); ?></td>
                                                         <td><?php $this->s($event['text']); ?></td>
-                                                        <?php if ($_SESSION['user']['admin']) { ?><td><input name="ids[]" type="checkbox" value="<?php $this->s($event['id']); ?>"></td><?php } ?>
+                                                        <?php if ($_SESSION['user']['admin']) { ?>
+                                                            <td><input name="ids[]" type="checkbox" value="<?php $this->s($event['id']); ?>"></td>
+                                                        <?php } ?>
                                                     </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -71,18 +68,18 @@
                                         <?php if ($_SESSION['user']['admin']) { ?>
                                             <div class="text-right col-xs-12 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Event', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Event', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
                                         <ul class="pager">
                                             <?php if ($page) { ?>
-                                                <li><a href="<?php echo \Router::url('events', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                                <li><a href="<?php echo \descartes\Router::url('events', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
                                             <?php } ?>
                                             
                                             Page : <?php $this->s($page + 1); ?>
 
                                             <?php if ($limit == $nb_results) { ?>
-                                                <li><a href="<?php echo \Router::url('events', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                                <li><a href="<?php echo \descartes\Router::url('events', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
                                             <?php } ?>
                                         </ul>
                                     </div>

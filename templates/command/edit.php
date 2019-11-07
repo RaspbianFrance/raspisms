@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-terminal"></i> <a href="<?php echo \Router::url('Command', 'list'); ?>">Commandes</a>
+							<i class="fa fa-terminal"></i> <a href="<?php echo \descartes\Router::url('Command', 'list'); ?>">Commandes</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,11 +37,8 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i>Modification de commandes</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('Command', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
-								<?php
-									foreach ($commands as $command)
-									{
-?>
+							<form action="<?php echo \descartes\Router::url('Command', 'update', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
+								<?php foreach ($commands as $command) { ?>
                                         <input type="hidden" value="<?php $this->s($command['id']); ?>" name="commands[<?php $this->s($command['id']); ?>][id]" />
 										<div class="form-group">
 											<label>Nom commande</label>
@@ -64,10 +61,8 @@
 											</div>
 										</div>
 										<hr/>
-									<?php
-									}
-								?>
-								<a class="btn btn-danger" href="<?php echo \Router::url('Command', 'list'); ?>">Annuler</a>
+                                <?php }	?>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Command', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer la commande" /> 	
 							</form>
 						</div>

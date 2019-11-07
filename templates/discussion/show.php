@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-comments-o"></i> <a href="<?php echo \Router::url('Discussion', 'list'); ?>">Discussions</a>
+							<i class="fa fa-comments-o"></i> <a href="<?php echo \descartes\Router::url('Discussion', 'list'); ?>">Discussions</a>
 						</li>
 						<li class="active">
 							<?php $this->s($number); ?>

@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-calendar"></i> <a href="<?php echo \Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
+							<i class="fa fa-calendar"></i> <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification des SMS programmés</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('Scheduled', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Scheduled', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 							<?php foreach ($scheduleds as $scheduled) { ?>
                                     <div class="form-group">
 										<label>Texte du SMS</label>
@@ -78,10 +78,8 @@
 										</div>
 									<?php } ?>
 									<hr/>
-								<?php
-								}
-							?>
-								<a class="btn btn-danger" href="<?php echo \Router::url('Scheduled', 'list'); ?>">Annuler</a>
+                                <?php } ?>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
 							</form>
 						</div>
@@ -105,7 +103,7 @@
 		jQuery('.add-contacts').each(function()
 		{
 			jQuery(this).magicSuggest({
-				data: '<?php echo \Router::url('Contact', 'json_list'); ?>',
+				data: '<?php echo \descartes\Router::url('Contact', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});
@@ -114,7 +112,7 @@
 		jQuery('.add-groupes').each(function()
 		{
 			jQuery(this).magicSuggest({
-				data: '<?php echo \Router::url('Groupe', 'json_list'); ?>',
+				data: '<?php echo \descartes\Router::url('Groupe', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});

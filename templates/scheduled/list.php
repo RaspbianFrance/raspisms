@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'list'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'list'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-calendar"></i> Scheduleds
@@ -49,32 +49,27 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($scheduleds as $scheduled)
-                                                {
-                                                    ?>
+                                            <?php foreach ($scheduleds as $scheduled) { ?>
                                                     <tr>
                                                         <td><?php $this->s($scheduled['id']); ?></td>
                                                         <td><?php $this->s($scheduled['at']); ?></td>
                                                         <td><?php $this->s($scheduled['content']); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($scheduled['id']); ?>"></td>
                                                     </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
                                 <?php } ?>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \Router::url('Scheduled', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un SMS programmé</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Scheduled', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un SMS programmé</a>
                                     </div>
                                     <?php if ($scheduleds) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Scheduled', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Scheduled', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     <?php } ?>
                                 </div>

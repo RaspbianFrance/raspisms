@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-terminal"></i> <a href="<?php echo \Router::url('Command', 'list'); ?>">Commandes</a>
+							<i class="fa fa-terminal"></i> <a href="<?php echo \descartes\Router::url('Command', 'list'); ?>">Commandes</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-terminal fa-fw"></i> Ajout d'une nouvelle commande</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('Command', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Command', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom commande</label>
 									<div class="form-group">
@@ -58,7 +58,7 @@
 										<input name="admin" type="radio" value="0" required /> Non
 									</div>
 								</div>
-								<a class="btn btn-danger" href="<?php echo \Router::url('Command', 'list'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Command', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer la commande" /> 	
 							</form>
 						</div>

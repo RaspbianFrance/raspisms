@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-download "></i> SMS reçus
@@ -51,10 +51,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($receiveds as $received)
-                                                {
-                                                    ?>
+                                            <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
                                                         <td><?php $this->s($received['id']); ?></td>
                                                         <td><?php $this->s($received['send_by']); ?></td>
@@ -63,9 +60,7 @@
                                                         <td><?php echo $received['is_command'] ? 'Oui' : 'Non'; ?></td>
                                                         <?php if ($_SESSION['user']['admin']) { ?><td><input name="ids[]" type="checkbox" value="<?php $this->s($received['id']); ?>"></td><?php } ?>
                                                     </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -73,28 +68,18 @@
                                         <?php if ($_SESSION['user']['admin']) { ?>
                                             <div class="text-right col-xs-12 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Received', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Received', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
                                         <ul class="pager">
-                                            <?php
-                                                if ($page)
-                                                {
-                                                ?>
-                                                    <li><a href="<?php echo \Router::url('receiveds', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
-                                                <?php
-                                                }
+                                            <?php if ($page) { ?>
+                                                    <li><a href="<?php echo \descartes\Router::url('receiveds', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                            <?php } ?>
+                                            <?php $this->s('Page : ' . ($page + 1)); ?>
 
-                                                $numero_page = 'Page : ' . ($page + 1);
-                                                $this->s($numero_page);
-
-                                                if ($limit == $nb_results)
-                                                {
-                                                ?>
-                                                    <li><a href="<?php echo \Router::url('receiveds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
-                                                <?php
-                                                }
-                                            ?>
+                                            <?php if ($limit == $nb_results) { ?>
+                                                    <li><a href="<?php echo \descartes\Router::url('receiveds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                            <?php } ?>
                                         </ul>
                                     </div>
                                 <?php } ?>

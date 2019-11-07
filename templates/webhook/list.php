@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plug"></i> Webhooks
@@ -45,33 +45,28 @@
 										</tr>
 									</thead>
 									<tbody>
-									<?php
-										foreach ($webhooks as $webhook)
-										{
-											?>
+									<?php foreach ($webhooks as $webhook) { ?>
 											<tr>
 												<td><?php $this->s($webhook['id']); ?></td>
 												<td><?php $this->s($webhook['url']); ?></td>
 												<td><?php echo array_search($webhook['type'], internalConstants::WEBHOOK_TYPE); ?></td>
 												<td><input type="checkbox" value="<?php $this->s($webhook['id']); ?>"></td>
 											</tr>
-											<?php
-										}
-									?>
-									</tbody>
+                                    <?php } ?>
+                                    </tbody>
 								</table>
 							</div>
 							<div>
 								<div class="col-xs-6 no-padding">
-									<a class="btn btn-success" href="<?php echo \Router::url('webhooks', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un webhook</a>
+									<a class="btn btn-success" href="<?php echo \descartes\Router::url('webhooks', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un webhook</a>
 								</div>
 								<div class="text-right col-xs-6 no-padding">
 									<strong>Action pour la séléction :</strong> 
 									<div class="btn-groupe action-dropdown" target="#table-webhooks">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
 										<ul class="dropdown-menu pull-right" role="menu">
-											<li><a href="<?php echo \Router::url('webhooks', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-											<li><a href="<?php echo \Router::url('webhooks', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
+											<li><a href="<?php echo \descartes\Router::url('webhooks', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
+											<li><a href="<?php echo \descartes\Router::url('webhooks', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
 										</ul>
 									</div>
 								</div>

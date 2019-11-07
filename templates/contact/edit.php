@@ -17,10 +17,10 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-user"></i> <a href="<?php echo \Router::url('Contact', 'list'); ?>">Contacts</a>
+							<i class="fa fa-user"></i> <a href="<?php echo \descartes\Router::url('Contact', 'list'); ?>">Contacts</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,11 +37,8 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification de contacts</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \Router::url('Contact', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
-							<?php
-								foreach ($contacts as $contact)
-								{
-									?>
+							<form action="<?php echo \descartes\Router::url('Contact', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+                            <?php foreach ($contacts as $contact) } ?>
 									<div class="form-group">
                                         <input name="contacts[<?php $this->s($contact['id']); ?>][id]" type="hidden" value="<?php $this->s($contact['id']); ?>">
 										<label>Nom contact</label>
@@ -58,10 +55,8 @@
 										</div>
 									</div>
 									<hr/>
-									<?php
-								}
-							?>
-								<a class="btn btn-danger" href="<?php echo \Router::url('Contact', 'list'); ?>">Annuler</a>
+                                <?php } ?>
+                                <a class="btn btn-danger" href="<?php echo \descartes\Router::url('Contact', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le contact" /> 	
 							</form>
 						</div>

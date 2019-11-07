@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-user"></i> Contacts
@@ -49,32 +49,27 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php
-                                                foreach ($contacts as $contact)
-                                                {
-                                                    ?>
+                                            <?php foreach ($contacts as $contact) } ?>
                                                     <tr>
                                                         <td><?php $this->s($contact['id']); ?></td>
                                                         <td><?php $this->s($contact['name']); ?></td>
                                                         <td><?php $this->s($contact['number']); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($contact['id']); ?>"></td>
                                                     </tr>
-                                                    <?php
-                                                }
-                                            ?>
+                                            <?php } ?>
                                             </tbody>
                                         </table>
                                     </div>
                                 <?php } ?>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \Router::url('Contact', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un contact</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Contact', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un contact</a>
                                     </div>
                                     <?php if ($contacts) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Contact', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Contact', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     <?php } ?>
                                 </div>

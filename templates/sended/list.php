@@ -17,7 +17,7 @@
 					</h1>
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa fa-dashboard"></i> <a href="<?php echo \Router::url('Dashboard', 'show'); ?>">Dashboard</a>
+							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-send"></i> SMS envoyés
@@ -72,18 +72,18 @@
                                         <?php if ($_SESSION['user']['admin']) { ?>
                                             <div class="text-right col-xs-12 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Sended', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Sended', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
                                         <ul class="pager">
                                             <?php if ($page) { ?>
-                                                    <li><a href="<?php echo \Router::url('Sended', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                                    <li><a href="<?php echo \descartes\Router::url('Sended', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
                                             <?php } ?>
 
                                             Page : <?php $this->s($page + 1); ?>
 
                                             <?php if ($limit == $nb_results) { ?>
-                                                    <li><a href="<?php echo \Router::url('sendeds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                                    <li><a href="<?php echo \descartes\Router::url('sendeds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
                                             <?php } ?>
                                         </ul>
                                     </div>
