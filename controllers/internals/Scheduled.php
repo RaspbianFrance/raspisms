@@ -182,10 +182,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des scheduledes
          */
-        public function get_number($id_scheduled)
+        public function get_numbers($id_scheduled)
         {
             //Recupération des scheduledes
-            return $this->model_scheduled->get_number($id_scheduled);
+            return $this->model_scheduled->get_numbers($id_scheduled);
         }
 
         /**
@@ -195,10 +195,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des contact
          */
-        public function get_contact($id_scheduled)
+        public function get_contacts($id_scheduled)
         {
             //Recupération des scheduledes
-            return $this->model_scheduled->get_contact($id_scheduled);
+            return $this->model_scheduled->get_contacts($id_scheduled);
         }
 
         /**
@@ -208,10 +208,10 @@ namespace controllers\internals;
          *
          * @return array : La liste des group
          */
-        public function get_group($id_scheduled)
+        public function get_groups($id_scheduled)
         {
             //Recupération des scheduledes
-            return $this->model_scheduled->get_group($id_scheduled);
+            return $this->model_scheduled->get_groups($id_scheduled);
         }
 
         /**

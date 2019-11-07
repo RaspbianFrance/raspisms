@@ -15,7 +15,7 @@ namespace models;
     /**
      * Cette classe gère les accès bdd pour les sendedes.
      */
-    class Sent extends \descartes\Model
+    class Sended extends \descartes\Model
     {
         /**
          * Retourne une entrée par son id.
@@ -167,6 +167,24 @@ namespace models;
             $params = [
                 'date' => $date,
             ];
+
+            return $this->_run_query($query, $params);
+        }
+
+        /**
+         * Decrement before_delivered field.
+         *
+         * @param int $id_sended : id of the sended sms to decrement
+         */
+        public function decrement_before_delivered($id_sended)
+        {
+            $query = ' 
+                UPDATE sended
+                SET before_delivered = before_delivered - 1
+                WHERE id = :id_sended
+                ';
+
+            $params = ['id_sended' => $id_sended];
 
             return $this->_run_query($query, $params);
         }

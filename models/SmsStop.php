@@ -18,6 +18,16 @@ namespace models;
     class SmsStop extends \descartes\Model
     {
         /**
+         * Get all smsstops.
+         *
+         * @return array
+         */
+        public function get_all()
+        {
+            return $this->_select('smsstop');
+        }
+
+        /**
          * Retourne une entrée par son id.
          *
          * @param int $id : L'id de l'entrée

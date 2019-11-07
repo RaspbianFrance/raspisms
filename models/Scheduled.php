@@ -197,7 +197,7 @@ namespace models;
          *
          * @return array : Les numéros des scheduled
          */
-        public function get_number($id_scheduled)
+        public function get_numbers($id_scheduled)
         {
             return $this->_select('scheduled_number', ['id_scheduled' => $id_scheduled]);
         }
@@ -209,7 +209,7 @@ namespace models;
          *
          * @return array : Les contact du scheduled
          */
-        public function get_contact($id_scheduled)
+        public function get_contacts($id_scheduled)
         {
             $query = 'SELECT * FROM contact WHERE id IN (SELECT id_contact FROM scheduled_contact WHERE id_scheduled = :id_scheduled)';
 
@@ -225,7 +225,7 @@ namespace models;
          *
          * @return array : Les groups du scheduled
          */
-        public function get_group($id_scheduled)
+        public function get_groups($id_scheduled)
         {
             $query = 'SELECT * FROM group WHERE id IN (SELECT id_group FROM scheduled_group WHERE id_scheduled = :id_scheduled)';
 

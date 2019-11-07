@@ -25,6 +25,16 @@ namespace controllers\internals;
         }
 
         /**
+         * Return all smsstops.
+         *
+         * @return array
+         */
+        public function get_all()
+        {
+            return $this->model_sms_stop->get_all();
+        }
+
+        /**
          * Cette fonction retourne une liste des smsstopes sous forme d'un tableau.
          *
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page

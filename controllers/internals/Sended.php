@@ -15,13 +15,13 @@ namespace controllers\internals;
     /**
      * Classe des sendedes.
      */
-    class Sent extends \descartes\InternalController
+    class Sended extends \descartes\InternalController
     {
-        private $model_sent;
+        private $model_sended;
 
         public function __construct(\PDO $bdd)
         {
-            $this->model_sent = new \models\Sent($bdd);
+            $this->model_sended = new \models\Sended($bdd);
         }
 
         /**
@@ -35,7 +35,7 @@ namespace controllers\internals;
         public function list($nb_entry = false, $page = false)
         {
             //Recupération des sendedes
-            return $this->model_sent->list($nb_entry, $nb_entry * $page);
+            return $this->model_sended->list($nb_entry, $nb_entry * $page);
         }
 
         /**
@@ -48,7 +48,7 @@ namespace controllers\internals;
         public function gets($ids)
         {
             //Recupération des sendedes
-            return $this->model_sent->gets($ids);
+            return $this->model_sended->gets($ids);
         }
 
         /**
@@ -60,7 +60,7 @@ namespace controllers\internals;
          */
         public function get_lasts_by_date($nb_entry = false)
         {
-            return $this->model_sent->get_lasts_by_date($nb_entry);
+            return $this->model_sended->get_lasts_by_date($nb_entry);
         }
 
         /**
@@ -73,7 +73,7 @@ namespace controllers\internals;
         public function get_by_target($target)
         {
             //Recupération des sendeds
-            return $this->model_sent->get_by_target($target);
+            return $this->model_sended->get_by_target($target);
         }
 
         /**
@@ -86,7 +86,7 @@ namespace controllers\internals;
          */
         public function delete($id)
         {
-            return $this->model_sent->delete($id);
+            return $this->model_sended->delete($id);
         }
 
         /**
@@ -98,7 +98,7 @@ namespace controllers\internals;
          */
         public function create($sended)
         {
-            return $this->model_sent->create($sended);
+            return $this->model_sended->create($sended);
         }
 
         /**
@@ -108,7 +108,7 @@ namespace controllers\internals;
          */
         public function count()
         {
-            return $this->model_sent->count();
+            return $this->model_sended->count();
         }
 
         /**
@@ -120,7 +120,7 @@ namespace controllers\internals;
          */
         public function count_by_day_since($date)
         {
-            $counts_by_day = $this->model_sent->count_by_day_since($date);
+            $counts_by_day = $this->model_sended->count_by_day_since($date);
             $return = [];
 
             foreach ($counts_by_day as $count_by_day)
@@ -129,5 +129,29 @@ namespace controllers\internals;
             }
 
             return $return;
+        }
+
+        /**
+         * Decrement before delivered.
+         *
+         * @param int $id_sended : id of the sended to decrement delivered for
+         *
+         * @return array
+         */
+        public function decrement_before_delivered($id_sended)
+        {
+            return $this->model_sended->decrement_before_delivered($id_sended);
+        }
+
+        /**
+         * Update sended to delivered.
+         *
+         * @param int $id_sended : id of the sended to mark as delivered
+         *
+         * @return int
+         */
+        public function set_delivered($id_sended)
+        {
+            return $this->model_sended->update($id_sended, ['before_delivered' => 0, 'delivered' => true]);
         }
     }

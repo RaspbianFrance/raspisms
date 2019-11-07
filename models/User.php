@@ -27,6 +27,16 @@ namespace models;
         }
 
         /**
+         * Return users by transfer status.
+         *
+         * @param bool $transfer : transfer status
+         */
+        public function gets_by_transfer($transfer)
+        {
+            return $this->_select('transfer', ['transfer' => $transfer]);
+        }
+
+        /**
          * Return list of user.
          *
          * @param int $limit  : Number of user to return

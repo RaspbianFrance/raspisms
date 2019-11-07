@@ -55,7 +55,7 @@
 						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
 						<ul id="logs" class="collapse <?php echo in_array($page, array('sendeds', 'receiveds', 'events', 'smsstop')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'sendeds' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \Router::url('Sent', 'list'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
+								<a href="<?php echo \Router::url('Sended', 'list'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
 							</li>
 							<li <?php echo $page == 'receiveds' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \Router::url('Received', 'list'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>

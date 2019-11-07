@@ -40,6 +40,17 @@ namespace controllers\internals;
         }
 
         /**
+         * Get all commands.
+         *
+         * @return array
+         */
+        public function get_all()
+        {
+            //Recupération des commandes
+            return $this->model_command->get_all();
+        }
+
+        /**
          * Cette fonction retourne une liste des commandes sous forme d'un tableau.
          *
          * @param array int $ids : Les ids des entrées à retourner

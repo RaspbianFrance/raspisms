@@ -1,7 +1,7 @@
 <?php
 	//Template dashboard
 	
-	$this->render('incs/head', ['title' => 'Sents - Show All'])
+	$this->render('incs/head', ['title' => 'Sendeds - Show All'])
 ?>
 <div id="wrapper">
 <?php
@@ -72,12 +72,12 @@
                                         <?php if ($_SESSION['user']['admin']) { ?>
                                             <div class="text-right col-xs-12 no-padding">
                                                 <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Sent', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \Router::url('Sended', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
                                         <ul class="pager">
                                             <?php if ($page) { ?>
-                                                    <li><a href="<?php echo \Router::url('Sent', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                                    <li><a href="<?php echo \Router::url('Sended', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
                                             <?php } ?>
 
                                             Page : <?php $this->s($page + 1); ?>

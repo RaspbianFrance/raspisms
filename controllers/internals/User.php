@@ -127,6 +127,16 @@ namespace controllers\internals;
         }
 
         /**
+         * Return users by transfer status.
+         *
+         * @param bool $transfer : transfer status
+         */
+        public function gets_by_transfer($transfer)
+        {
+            return $this->model_user->get_by_transfer($transfer);
+        }
+
+        /**
          * Cette fonction met à jour une série de users.
          *
          * @param mixed $id
