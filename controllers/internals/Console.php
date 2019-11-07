@@ -68,6 +68,11 @@ class Console extends \descartes\InternalController
                 $ids_scheduleds[] = $scheduled['id'];
             }
 
+            if (!count($ids_scheduleds))
+            {
+                continue;
+            }
+
             echo \count($ids_scheduleds)." Sms à envoyer ont été trouvés et ajoutés à la liste des Sms en cours d'envoi.\n";
 
             foreach ($ids_scheduleds as $ids_scheduled)
