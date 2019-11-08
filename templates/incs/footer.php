@@ -5,9 +5,9 @@
 
 	<?php if (RASPISMS_SETTINGS_SMS_RECEPTION_SOUND) { ?>
 		<audio id="reception-sound">
-			<source src="<?php echo HTTP_PWD_SOUND; ?>/sounds/receptionSound.ogg" type="audio/ogg">
-			<source src="<?php echo HTTP_PWD_SOUND; ?>/sounds/receptionSound.mp3" type="audio/mpeg">
-			<source src="<?php echo HTTP_PWD_SOUND; ?>/sounds/receptionSound.wav" type="audio/wav">
+			<source src="<?php echo HTTP_PWD_SOUND; ?>/receptionSound.ogg" type="audio/ogg">
+			<source src="<?php echo HTTP_PWD_SOUND; ?>/receptionSound.mp3" type="audio/mpeg">
+			<source src="<?php echo HTTP_PWD_SOUND; ?>/receptionSound.wav" type="audio/wav">
 		</audio>
 	<?php } ?>
 
