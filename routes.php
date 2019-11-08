@@ -1,5 +1,5 @@
 <?php
-	$descartesRoutes = array(
+	$routes = array(
 		'Connect' => [
             'login' => '/',
             'connection' => '/connection/',
@@ -128,4 +128,7 @@
             'create' => '/user/create/{csrf}/',
             'delete' => '/user/delete/{csrf}/',
         ],
-	);
+    );
+
+    define('ROUTES', $routes);
+    unset($routes);
