@@ -20,9 +20,9 @@ namespace models;
         /**
          * Return array of all settings.
          */
-        public function all(): array
+        public function get_all(): array
         {
-            return $this->_select('setting', [], '', false);
+            return $this->_select('setting');
         }
 
         /**

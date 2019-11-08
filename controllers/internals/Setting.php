@@ -26,9 +26,9 @@ namespace controllers\internals;
          *
          * @return array || false
          */
-        public function all()
+        public function get_all()
         {
-            return $this->model_setting->all();
+            return $this->model_setting->get_all();
         }
 
         /**
