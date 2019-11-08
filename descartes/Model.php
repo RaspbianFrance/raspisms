@@ -3,7 +3,7 @@
 
     /**
      * Cette classe sert de mère à tous les modèles, elle permet de gérer l'ensemble des fonction necessaires aux requetes en base de données
-     * @param $pdo : Une instance de PDO
+     * @param $pdo : Une instance de \PDO
      */
     class Model
     {
@@ -18,30 +18,30 @@
 
         /**
          * Model constructor
-         * @param PDO $pdo : PDO connect to use
+         * @param \PDO $pdo : \PDO connect to use
          */
-        public function __construct(PDO $pdo)
+        public function __construct(\PDO $pdo)
         {
             $this->pdo = $pdo;
         }
 
         /**
-         * Cette fonction permet créer une connexion à une base SQL via PDO
+         * Cette fonction permet créer une connexion à une base SQL via \PDO
          * @param string $host : L'host à contacter
          * @param string $dbname : Le nom de la base à contacter
          * @param string $user : L'utilisateur à utiliser
          * @param string $password : Le mot de passe à employer
-         * @return mixed : Un objet PDO ou false en cas d'erreur
+         * @return mixed : Un objet \PDO ou false en cas d'erreur
          */
         public static function _connect ($host, $dbname, $user, $password, ?string $charset = 'UTF8', ?array $options = null)
         {
             $options = $options ?? [
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
             ];
             
             // On se connecte à MySQL
-            $pdo = new PDO('mysql:host=' . $host . ';dbname=' . $dbname . ';charset=' . $charset , $user, $password, $options);
+            $pdo = new \PDO('mysql:host=' . $host . ';dbname=' . $dbname . ';charset=' . $charset , $user, $password, $options);
 
             if ($pdo === false)
             {
@@ -60,40 +60,53 @@
          * @param boolean $debug : If we must return debug info instead of data, by default false
          * @return mixed : Result of query, depend of $return_type | null | array | object | int
          */
-        protected function _run_query (string $query, array $datas = array(), int $return_type = self::FETCHALL, int $fetch_mode = PDO::FETCH_ASSOC, bool $debug = false)
+        protected function _run_query (string $query, array $datas = array(), int $return_type = self::FETCHALL, int $fetch_mode = \PDO::FETCH_ASSOC, bool $debug = false)
         {
-            $query = $this->pdo->prepare($query);
-            $query->setFetchMode($return_type);
-            $query->execute($datas);
-
-            if ($debug)
+            try
             {
-                return $query->errorInfo();
-            }
+                $query = $this->pdo->prepare($query);
+                $query->setFetchMode($return_type);
+                $query->execute($datas);
 
-            switch ($return_type)
-            {
-                case self::NO :
-                    $return = NULL;
-                    break; 
+                if ($debug)
+                {
+                    return $query->errorInfo();
+                }
 
-                case self::FETCH :
-                    $return = $query->fetch();
-                    break; 
+                switch ($return_type)
+                {
+                    case self::NO :
+                        $return = NULL;
+                        break; 
 
-                case self::FETCHALL :
-                    $return = $query->fetchAll();
-                    break; 
+                    case self::FETCH :
+                        $return = $query->fetch();
+                        break; 
+
+                    case self::FETCHALL :
+                        $return = $query->fetchAll();
+                        break; 
+                    
+                    case self::ROWCOUNT : 
+                        $return = $query->rowCount();
+                        break;
                 
-                case self::ROWCOUNT : 
-                    $return = $query->rowCount();
-                    break;
-            
-                default :
-                    $return = $query->fetchAll();
-            }
+                    default :
+                        $return = $query->fetchAll();
+                }
 
-            return $return;
+                return $return;
+            }
+            catch (\PDOException $e)
+            {
+                $error = $query->errorInfo();
+                throw new \descartes\exceptions\DescartesExceptionSqlError(
+                    'SQL Error : ' . "\n" . 
+                    'SQLSTATE : ' . $error[0] . "\n" .
+                    'Driver Error Code : ' . $error[1] . "\n" .
+                    'Driver Error Message : ' . $error[2] . "\n"
+                );
+            }
         }
         
         /**
@@ -214,58 +227,81 @@
          */
         protected function _select (string $table, array $conditions = [], ?string $order_by = null, bool $desc = false, ?int $limit = null, ?int $offset = null)
         {
-            $wheres = array();
-            $params = array();
-            foreach ($conditions as $label => $value)
+            try 
             {
-                $condition = $this->_evaluate_condition($label, $value);
-                $wheres[] = $condition['QUERY'];
-                $params = array_merge($params, $condition['PARAM']);
-            }
-
-            $query = "SELECT * FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode(' AND ', $wheres);
-
-            if ($order_by !== null)
-            {
-                $query .= ' ORDER BY ' . $order_by;
-                
-                if ($desc) 
+                $wheres = array();
+                $params = array();
+                foreach ($conditions as $label => $value)
                 {
-                    $query .= ' DESC';
+                    $condition = $this->_evaluate_condition($label, $value);
+                    $wheres[] = $condition['QUERY'];
+                    $params = array_merge($params, $condition['PARAM']);
                 }
-            }
 
-            if ($limit !== null)
-            {
-                $query .= ' LIMIT :limit';
-                if ($offset !== null)
+                $query = "SELECT * FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode(' AND ', $wheres);
+
+                if ($order_by !== null)
                 {
-                    $query .= ' OFFSET :offset';
+                    $query .= ' ORDER BY ' . $order_by;
+                    
+                    if ($desc) 
+                    {
+                        $query .= ' DESC';
+                    }
                 }
-            }
 
-
-            $query = $this->pdo->prepare($query);
-
-            if ($limit !== null)
-            {
-                $query->bindParam(':limit', $limit, PDO::PARAM_INT);
-                
-                if ($offset !== null)
+                if ($limit !== null)
                 {
-                    $query->bindParam(':offset', $offset, PDO::PARAM_INT);
+                    $query .= ' LIMIT :limit';
+                    if ($offset !== null)
+                    {
+                        $query .= ' OFFSET :offset';
+                    }
                 }
-            }
 
-            foreach ($params as $label => &$param)
+
+                $query = $this->pdo->prepare($query);
+
+                if ($limit !== null)
+                {
+                    $query->bindParam(':limit', $limit, \PDO::PARAM_INT);
+                    
+                    if ($offset !== null)
+                    {
+                        $query->bindParam(':offset', $offset, \PDO::PARAM_INT);
+                    }
+                }
+
+                foreach ($params as $label => &$param)
+                {
+                    $query->bindParam(':' . $label, $param);
+                }
+
+                $query->setFetchMode(\PDO::FETCH_ASSOC);
+                $query->execute();
+
+                return $query->fetchAll();
+            }
+            catch (\PDOException $e)
             {
-                $query->bindParam(':' . $label, $param);
+                $error = $query->errorInfo();
+
+                //Get query string and params
+                ob_start();
+                $query->debugDumpParams();
+                $debug_string = ob_get_clean();
+
+                throw new \descartes\exceptions\DescartesExceptionSqlError(
+                    'SQL Error : ' . "\n" . 
+                    'SQLSTATE : ' . $error[0] . "\n" .
+                    'Driver Error Code : ' . $error[1] . "\n" .
+                    'Driver Error Message : ' . $error[2] . "\n" .
+                    'SQL QUERY DEBUG :' . "\n" .
+                    '-----------------' . "\n" .
+                    $debug_string . "\n" .
+                    '-----------------' . "\n"
+                );
             }
-
-            $query->setFetchMode(PDO::FETCH_ASSOC);
-            $query->execute();
-
-            return $query->fetchAll();
         }
 
 
@@ -291,28 +327,41 @@
          */
         protected function _count (string $table, array $conditions = []) : int
         {
-            $wheres = array();
-            $params = array();
-            foreach ($conditions as $label => $value)
+            try
             {
-                $condition = $this->_evaluate_condition($label, $value);
-                $wheres[] = $condition['QUERY'];
-                $params = array_merge($params, $condition['PARAM']);
+                $wheres = array();
+                $params = array();
+                foreach ($conditions as $label => $value)
+                {
+                    $condition = $this->_evaluate_condition($label, $value);
+                    $wheres[] = $condition['QUERY'];
+                    $params = array_merge($params, $condition['PARAM']);
+                }
+
+                $query = "SELECT COUNT(*) as `count` FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode(' AND ', $wheres);
+                
+                $query = $this->pdo->prepare($query);
+
+                foreach ($params as $label => &$param)
+                {
+                    $query->bindParam(':' . $label, $param);
+                }
+
+                $query->setFetchMode(\PDO::FETCH_ASSOC);
+                $query->execute();
+
+                return $query->fetch()['count'];
             }
-
-            $query = "SELECT COUNT(*) as `count` FROM " . $table . " WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode(' AND ', $wheres);
-            
-            $query = $this->pdo->prepare($query);
-
-            foreach ($params as $label => &$param)
+            catch (\PDOException $e)
             {
-                $query->bindParam(':' . $label, $param);
+                $error = $query->errorInfo();
+                throw new \descartes\exceptions\DescartesExceptionSqlError(
+                    'SQL Error : ' . "\n" . 
+                    'SQLSTATE : ' . $error[0] . "\n" .
+                    'Driver Error Code : ' . $error[1] . "\n" .
+                    'Driver Error Message : ' . $error[2] . "\n"
+                );
             }
-
-            $query->setFetchMode(PDO::FETCH_ASSOC);
-            $query->execute();
-
-            return $query->fetch()['count'];
         }
 
 

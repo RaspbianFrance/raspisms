@@ -1,5 +1,5 @@
 <?php
     namespace descartes\exceptions;
 
-    class DescartesExceptionRouterUrlGenerationError extends Exception {};
+    class DescartesExceptionRouterUrlGenerationError extends \Exception {};
     

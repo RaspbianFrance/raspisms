@@ -1,5 +1,5 @@
 <?php
     namespace descartes\exceptions;
 
-    class DescartesException404 extends Exception {};
+    class DescartesException404 extends \Exception {};
     
