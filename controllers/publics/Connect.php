@@ -36,7 +36,12 @@ namespace controllers\publics;
          */
         public function login()
         {
-            $this->render('connect/login');
+            if ($_SESSION['connect'] ?? false)
+            {
+                return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
+            }
+
+            return $this->render('connect/login');
         }
 
         /**
