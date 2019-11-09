@@ -100,11 +100,21 @@
             catch (\PDOException $e)
             {
                 $error = $query->errorInfo();
+
+                //Get query string and params
+                ob_start();
+                $query->debugDumpParams();
+                $debug_string = ob_get_clean();
+
                 throw new \descartes\exceptions\DescartesExceptionSqlError(
                     'SQL Error : ' . "\n" . 
                     'SQLSTATE : ' . $error[0] . "\n" .
                     'Driver Error Code : ' . $error[1] . "\n" .
-                    'Driver Error Message : ' . $error[2] . "\n"
+                    'Driver Error Message : ' . $error[2] . "\n" .
+                    'SQL QUERY DEBUG :' . "\n" .
+                    '-----------------' . "\n" .
+                    $debug_string . "\n" .
+                    '-----------------' . "\n"
                 );
             }
         }
@@ -355,11 +365,21 @@
             catch (\PDOException $e)
             {
                 $error = $query->errorInfo();
+
+                //Get query string and params
+                ob_start();
+                $query->debugDumpParams();
+                $debug_string = ob_get_clean();
+
                 throw new \descartes\exceptions\DescartesExceptionSqlError(
                     'SQL Error : ' . "\n" . 
                     'SQLSTATE : ' . $error[0] . "\n" .
                     'Driver Error Code : ' . $error[1] . "\n" .
-                    'Driver Error Message : ' . $error[2] . "\n"
+                    'Driver Error Message : ' . $error[2] . "\n" .
+                    'SQL QUERY DEBUG :' . "\n" .
+                    '-----------------' . "\n" .
+                    $debug_string . "\n" .
+                    '-----------------' . "\n"
                 );
             }
         }
