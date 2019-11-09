@@ -44,7 +44,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('user', [], '', false, $limit, $offset);
+            return $this->_select('user', [], null, false, $limit, $offset);
         }
 
         /**

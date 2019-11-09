@@ -38,7 +38,7 @@
 						</div>
 						<div class="panel-body">
 							<form action="<?php echo \descartes\Router::url('Contact', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
-                            <?php foreach ($contacts as $contact) } ?>
+                            <?php foreach ($contacts as $contact) { ?>
 									<div class="form-group">
                                         <input name="contacts[<?php $this->s($contact['id']); ?>][id]" type="hidden" value="<?php $this->s($contact['id']); ?>">
 										<label>Nom contact</label>
@@ -68,24 +68,24 @@
 </div>
 <script>
 	jQuery('document').ready(function($)
-	{
-		jQuery('.phone-international-input').intlTelInput({
-			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
-			nationalMode: true,
-			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
-		});
-
-		jQuery('form').on('submit', function(e)
-		{
-			e.preventDefault();
-			jQuery('.phone-international-input').each(function(key, value)
-			{
-				jQuery('#phone-hidden-input-' +  jQuery(this).attr('contact-id')).val(jQuery(this).intlTelInput("getNumber"));
-			});
-			
-			this.submit();
-		});
+    {
+        jQuery('.phone-international-input').each(function()
+        {
+            var number_input = this;
+            var iti_number_input = window.intlTelInput(number_input, {
+                defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+                preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+                nationalMode: true,
+                utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
+            });
+            
+            jQuery('form').on('submit', function(e)
+            {
+                e.preventDefault();
+                jQuery('#phone-hidden-input-' + jQuery(number_input).attr('contact-id')).val(iti_number_input.getNumber())
+                this.submit();
+            });
+        });
 	});
 </script>
 <?php

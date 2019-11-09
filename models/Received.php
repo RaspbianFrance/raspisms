@@ -39,7 +39,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('received', [], '', false, $limit, $offset);
+            return $this->_select('received', [], null, false, $limit, $offset);
         }
 
         /**
@@ -178,8 +178,8 @@ namespace models;
         {
             $query = ' 
                     SELECT MAX(at) as at, number
-                    FROM (SELECT at, destination as number FROM sendeds UNION (SELECT at, origin as number FROM received)) as discussions
-                    GROUP BY origin
+                    FROM (SELECT at, destination as number FROM sended UNION (SELECT at, origin as number FROM received)) as discussions
+                    GROUP BY number
                     ORDER BY at DESC
             ';
 

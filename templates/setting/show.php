@@ -120,7 +120,7 @@
 												<label>SMS STOP activé : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_SMSSTOPS ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo RASPISMS_SETTINGS_SMSSTOP ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">

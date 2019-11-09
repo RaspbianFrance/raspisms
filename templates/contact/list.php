@@ -49,7 +49,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php foreach ($contacts as $contact) } ?>
+                                            <?php foreach ($contacts as $contact) { ?>
                                                     <tr>
                                                         <td><?php $this->s($contact['id']); ?></td>
                                                         <td><?php $this->s($contact['name']); ?></td>

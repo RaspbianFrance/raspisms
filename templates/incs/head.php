@@ -35,7 +35,7 @@
 		<link href="<?php echo HTTP_PWD_CSS; ?>/bootstrap-datetimepicker.min.css" rel="stylesheet">
 		<!-- International Phone Number, JS and CSS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/intlTelInput/intlTelInput.min.js"></script>
-		<link href="<?php echo HTTP_PWD_CSS; ?>/intlTelInput.css" rel="stylesheet">
+		<link href="<?php echo HTTP_PWD_CSS; ?>/intlTelInput.min.css" rel="stylesheet">
 		
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/custom.js"></script>

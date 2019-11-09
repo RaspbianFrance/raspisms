@@ -39,7 +39,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('sended', [], '', false, $limit, $offset);
+            return $this->_select('sended', [], null, false, $limit, $offset);
         }
 
         /**

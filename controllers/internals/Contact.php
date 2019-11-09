@@ -34,7 +34,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des contactes
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             //Recupération des contactes
             return $this->model_contact->list($nb_entry, $nb_entry * $page);

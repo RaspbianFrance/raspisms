@@ -121,7 +121,7 @@ class Console extends \descartes\InternalController
                 foreach ($numbers as $number)
                 {
                     //Si les Sms STOP sont activés, on passe au numéro suivant si le numéro actuelle fait parti des Sms STOP
-                    if (RASPISMS_SETTINGS_SMSSTOPS)
+                    if (RASPISMS_SETTINGS_SMSSTOP)
                     {
                         foreach ($smsStops as $smsStop)
                         {

@@ -157,12 +157,7 @@ namespace controllers\internals;
          */
         public static function is_admin()
         {
-            if (!isset($_SESSION['user']) || !$_SESSION['connect']['admin'])
-            {
-                return false;
-            }
-
-            return true;
+            return (bool) ($_SESSION['user']['admin'] ?? false);
         }
 
         /**
@@ -175,8 +170,13 @@ namespace controllers\internals;
         public static function send_email($to, $settings, $datas = [])
         {
             $controller = new \descartes\Controller();
-            $content = $controller->render($settings['template'], $datas, true);
 
-            return true; //mail($to, $settings['subject'], $content);
+            ob_start();
+            $controller->render($settings['template'], $datas);
+            $content = ob_get_clean();
+
+            $success = mail($to, $settings['subject'], $content);
+
+            return $success;
         }
     }

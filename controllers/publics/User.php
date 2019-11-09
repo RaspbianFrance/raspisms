@@ -101,7 +101,6 @@ class User extends \descartes\Controller
         if (!$this->verify_csrf($csrf))
         {
             \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
-
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
@@ -112,22 +111,12 @@ class User extends \descartes\Controller
         if (!$email)
         {
             \FlashMessage\FlashMessage::push('danger', 'Vous devez au moins fournir une adresse e-mail pour l\'utilisateur.');
-
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL))
         {
             \FlashMessage\FlashMessage::push('danger', 'L\'adresse e-mail n\'est pas valide.');
-
-            return $this->redirect(\descartes\Router::url('User', 'add'));
-        }
-
-        $email_send = \controllers\internals\Tool::send_email($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
-        if (!$email_send)
-        {
-            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'envoyer l\'e-mail à l\'utilisateur, le compte n\'a donc pas été créé.');
-
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
@@ -135,12 +124,16 @@ class User extends \descartes\Controller
         if (!$user_id)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce user.');
-
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        \FlashMessage\FlashMessage::push('success', 'L\'utilisateur a bien été créé.');
+        $email_send = \controllers\internals\Tool::send_email($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
+        if (!$email_send)
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'envoyer l\'e-mail à l\'utilisateur.');
+        }
 
+        \FlashMessage\FlashMessage::push('success', 'L\'utilisateur a bien été créé.');
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
 }

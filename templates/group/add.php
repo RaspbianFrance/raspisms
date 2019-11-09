@@ -46,7 +46,7 @@
 									</div>
 								</div>	
 								<div class="form-group">
-									<label>Contacts au groupe</label>
+									<label>Contacts du groupe</label>
 									<input class="add-contacts form-control" name="contacts[]"/>
 								</div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Annuler</a>

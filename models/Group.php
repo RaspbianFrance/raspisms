@@ -53,7 +53,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('group', [], '', false, $limit, $offset);
+            return $this->_select('group', [], null, false, $limit, $offset);
         }
 
         /**

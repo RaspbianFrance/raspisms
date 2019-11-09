@@ -63,7 +63,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('smsstop', [], '', false, $limit, $offset);
+            return $this->_select('smsstop', [], null, false, $limit, $offset);
         }
 
         /**

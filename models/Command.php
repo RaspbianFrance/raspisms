@@ -49,7 +49,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('command', [], '', false, $limit, $offset);
+            return $this->_select('command', [], null, false, $limit, $offset);
         }
 
         /**

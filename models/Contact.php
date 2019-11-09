@@ -79,7 +79,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('contact', [], '', false, $limit, $offset);
+            return $this->_select('contact', [], null, false, $limit, $offset);
         }
 
         /**

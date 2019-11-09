@@ -59,7 +59,7 @@ namespace models;
          */
         public function list($limit, $offset)
         {
-            return $this->_select('transfer', [], '', false, $limit, $offset);
+            return $this->_select('transfer', [], null, false, $limit, $offset);
         }
 
         /**

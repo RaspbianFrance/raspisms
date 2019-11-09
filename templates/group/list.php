@@ -35,7 +35,7 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <?php if (!$groupes) { ?>
+                                <?php if (!$groups) { ?>
                                     <p>Aucun groupe n'a été formé pour le moment.</p>
                                 <?php } else { ?>
                                     <div class="table-responsive">
@@ -49,12 +49,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($groupes as $groupe) { ?>
+                                                <?php foreach ($groups as $group) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($groupe['id']); ?></td>
-                                                        <td><?php $this->s($groupe['name']); ?></td>
-                                                        <td><?php $this->s($groupe['nb_contacts']); ?></td>
-                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($groupe['id']); ?>"></td>
+                                                        <td><?php $this->s($group['id']); ?></td>
+                                                        <td><?php $this->s($group['name']); ?></td>
+                                                        <td><?php $this->s($group['nb_contacts']); ?></td>
+                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($group['id']); ?>"></td>
                                                     </tr>
                                                 <?php } ?>
                                             </tbody>
@@ -65,7 +65,7 @@
                                     <div class="col-xs-6 no-padding">
                                         <a class="btn btn-success" href="<?php echo \descartes\Router::url('Group', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
                                     </div>
-                                    <?php if ($groupes) { ?>
+                                    <?php if ($groups) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
                                             <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
