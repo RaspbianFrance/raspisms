@@ -42,7 +42,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des smsstopes
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             //Recupération des smsstopes
             return $this->model_sms_stop->list($nb_entry, $nb_entry * $page);

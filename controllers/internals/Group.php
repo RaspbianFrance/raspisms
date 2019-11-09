@@ -34,7 +34,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des groups
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             //Recupération des groups
             return $this->model_group->list($nb_entry, $nb_entry * $page);

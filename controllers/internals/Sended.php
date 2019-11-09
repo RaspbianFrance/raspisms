@@ -32,7 +32,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des sendedes
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             //Recupération des sendedes
             return $this->model_sended->list($nb_entry, $nb_entry * $page);

@@ -34,7 +34,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des scheduledes
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             //Recupération des scheduledes
             return $this->model_scheduled->list($nb_entry, $nb_entry * $page);

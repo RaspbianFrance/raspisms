@@ -34,7 +34,7 @@ namespace controllers\internals;
          *
          * @return array : La liste des transfers
          */
-        public function list($nb_entry = false, $page = false)
+        public function list($nb_entry = null, $page = null)
         {
             return $this->model_transfer->list($nb_entry, $nb_entry * $page);
         }

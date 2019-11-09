@@ -32,7 +32,7 @@ class Received extends \descartes\InternalController
      *
      * @return array : La liste des receivedes
      */
-    public function list($nb_entry = false, $page = false)
+    public function list($nb_entry = null, $page = null)
     {
         //Recupération des receivedes
         return $this->model_received->list($nb_entry, $nb_entry * $page);
