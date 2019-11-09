@@ -69,7 +69,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Group', 'list'));
             }
@@ -120,7 +120,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Group', 'add'));
             }
@@ -130,7 +130,7 @@ namespace controllers\publics;
 
             if (!$name || !$contacts_ids)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Des champs sont manquants !');
+                \FlashMessage\FlashMessage::push('danger', 'Des champs sont manquants !');
 
                 return $this->redirect(\descartes\Router::url('Group', 'add'));
             }
@@ -138,12 +138,12 @@ namespace controllers\publics;
             $id_group = $this->internal_group->create($name, $contacts_ids);
             if (!$id_group)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de créer ce groupe.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce groupe.');
 
                 return $this->redirect(\descartes\Router::url('Group', 'add'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le groupe a bien été créé.');
+            \FlashMessage\FlashMessage::push('success', 'Le groupe a bien été créé.');
 
             return $this->redirect(\descartes\Router::url('Group', 'list'));
         }
@@ -160,7 +160,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Group', 'list'));
             }
@@ -175,12 +175,12 @@ namespace controllers\publics;
 
             if ($nb_groups_update !== \count($groups))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certains groupes n\'ont pas pu êtres mis à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Certains groupes n\'ont pas pu êtres mis à jour.');
 
                 return $this->redirect(\descartes\Router::url('Group', 'list'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Tous les groupes ont été modifiés avec succès.');
+            \FlashMessage\FlashMessage::push('success', 'Tous les groupes ont été modifiés avec succès.');
 
             return $this->redirect(\descartes\Router::url('Group', 'list'));
         }

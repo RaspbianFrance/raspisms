@@ -59,14 +59,14 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Event', 'list'));
             }
 
             if (!\controllers\internals\Tool::is_admin())
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être admin pour pouvoir supprimer des events.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez être admin pour pouvoir supprimer des events.');
 
                 return $this->redirect(\descartes\Router::url('Event', 'list'));
             }

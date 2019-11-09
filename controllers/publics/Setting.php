@@ -48,14 +48,14 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
             if (!\controllers\internals\Tool::is_admin())
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour pouvoir modifier un réglage.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour pouvoir modifier un réglage.');
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
@@ -64,7 +64,7 @@ namespace controllers\publics;
 
             if (false === $setting_value)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez renseigner une valeure pour le réglage.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner une valeure pour le réglage.');
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
@@ -72,12 +72,12 @@ namespace controllers\publics;
             $update_setting_result = $this->internal_setting->update($setting_name, $setting_value);
             if (false === $update_setting_result)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de mettre à jour ce réglage.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le réglage a bien été mis à jour.');
+            \FlashMessage\FlashMessage::push('success', 'Le réglage a bien été mis à jour.');
 
             return $this->redirect(\descartes\Router::url('Setting', 'show'));
         }

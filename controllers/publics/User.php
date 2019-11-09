@@ -57,14 +57,14 @@ class User extends \descartes\Controller
     {
         if (!$this->verify_csrf($csrf))
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
             return $this->redirect(\descartes\Router::url('User', 'list'));
         }
 
         if (!\controllers\internals\Tool::is_admin())
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour supprimer un utilisateur !');
+            \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour supprimer un utilisateur !');
 
             return $this->redirect(\descartes\Router::url('User', 'list'));
         }
@@ -100,7 +100,7 @@ class User extends \descartes\Controller
     {
         if (!$this->verify_csrf($csrf))
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
@@ -111,14 +111,14 @@ class User extends \descartes\Controller
 
         if (!$email)
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez au moins fournir une adresse e-mail pour l\'utilisateur.');
+            \FlashMessage\FlashMessage::push('danger', 'Vous devez au moins fournir une adresse e-mail pour l\'utilisateur.');
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL))
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'L\'adresse e-mail n\'est pas valide.');
+            \FlashMessage\FlashMessage::push('danger', 'L\'adresse e-mail n\'est pas valide.');
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
@@ -126,7 +126,7 @@ class User extends \descartes\Controller
         $email_send = \controllers\internals\Tool::send_email($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
         if (!$email_send)
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible d\'envoyer l\'e-mail à l\'utilisateur, le compte n\'a donc pas été créé.');
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'envoyer l\'e-mail à l\'utilisateur, le compte n\'a donc pas été créé.');
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
@@ -134,12 +134,12 @@ class User extends \descartes\Controller
         $user_id = $this->internal_user->create($email, $password, $admin);
         if (!$user_id)
         {
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de créer ce user.');
+            \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce user.');
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'L\'utilisateur a bien été créé.');
+        \FlashMessage\FlashMessage::push('success', 'L\'utilisateur a bien été créé.');
 
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }

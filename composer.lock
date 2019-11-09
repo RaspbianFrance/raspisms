@@ -4,9 +4,44 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a1268b58d2498b20008fffcaec529e24",
-    "content-hash": "865bbe9b68621affffbd85b40e2cf26d",
+    "content-hash": "37f7ef4e091e90d90b3c7d6056cbe454",
     "packages": [
+        {
+            "name": "ajani/flash-message",
+            "version": "v2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RaspbianFrance/flash-message.git",
+                "reference": "7a01306c2850b0a37c9910f29935e0b0923b65a1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RaspbianFrance/flash-message/zipball/7a01306c2850b0a37c9910f29935e0b0923b65a1",
+                "reference": "7a01306c2850b0a37c9910f29935e0b0923b65a1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "FlashMessage": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "osaajani",
+                    "email": "plebwebsas@gmail.com"
+                }
+            ],
+            "description": "A simple package to allow usage of flash messages using session.",
+            "time": "2019-11-09T02:11:30+00:00"
+        },
         {
             "name": "ingenerator/tokenista",
             "version": "v1.1.0",
@@ -58,7 +93,7 @@
                 "csrf",
                 "token"
             ],
-            "time": "2018-02-26 14:16:22"
+            "time": "2018-02-26T14:16:22+00:00"
         }
     ],
     "packages-dev": [],

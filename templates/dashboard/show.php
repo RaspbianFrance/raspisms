@@ -55,12 +55,12 @@
 									<i class="fa fa-group fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div class="huge"><?php echo $nb_groupes; ?></div>
+									<div class="huge"><?php echo $nb_groups; ?></div>
 									<div>Groupes</div>
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \descartes\Router::url('Groupe', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Group', 'list') ?>">
 							<div class="panel-footer">
 								<span class="pull-left">Voir les groupes</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>

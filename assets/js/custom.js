@@ -26,7 +26,7 @@ function showMessage(message, type)
 function verifReceived()
 {
 	jQuery('.popup-alert').fadeOut('slow');
-	jQuery.getJSON(HTTP_PWD + "/receiveds/popup", function( data ) {
+	jQuery.getJSON(HTTP_PWD + "/received/popup", function( data ) {
 		$.each(data, function(key, val) {
 			showMessage('SMS reçu du ' + val.send_by.replace(/</g, "&lt;").replace(/>/g, "&gt;") + ' : ' + val.content.replace(/</g, "&lt;").replace(/>/g, "&gt;"), 1);
 			playReceptionSound();

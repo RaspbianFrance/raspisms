@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-group"></i> <a href="<?php echo \descartes\Router::url('Groupe', 'list'); ?>">Groupes</a>
+							<i class="fa fa-group"></i> <a href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Groupes</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification de groupes</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('Groupe', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Group', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 							<?php
 								foreach ($groupes as $groupe)
 								{
@@ -65,7 +65,7 @@
 									<?php
 								}
 							?>
-								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Groupe', 'list'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le groupe" /> 	
 							</form>
 						</div>

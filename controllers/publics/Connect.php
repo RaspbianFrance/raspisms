@@ -53,7 +53,7 @@ namespace controllers\publics;
             $user = $this->internal_user->check_credentials($email, $password);
             if (!$user)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Email ou mot de passe invalide.');
+                \FlashMessage\FlashMessage::push('danger', 'Email ou mot de passe invalide.');
 
                 return $this->redirect(\descartes\Router::url('Connect', 'login'));
             }
@@ -84,7 +84,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
             }
@@ -94,7 +94,7 @@ namespace controllers\publics;
 
             if (!$email || !$user)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Aucun utilisateur n\'existe pour cette adresse mail.');
+                \FlashMessage\FlashMessage::push('danger', 'Aucun utilisateur n\'existe pour cette adresse mail.');
 
                 return $this->redirect(\descartes\Router::url('Connect', 'forget_password'));
             }

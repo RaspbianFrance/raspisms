@@ -99,7 +99,7 @@
 		jQuery('.add-groupes').each(function()
 		{
 			jQuery(this).magicSuggest({
-				data: '<?php echo \descartes\Router::url('Groupe', 'json_list'); ?>',
+				data: '<?php echo \descartes\Router::url('Group', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});

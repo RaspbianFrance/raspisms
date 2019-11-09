@@ -107,14 +107,14 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Received', 'list'));
             }
 
             if (!\controllers\internals\Tool::is_admin())
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour effectuer cette action.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour effectuer cette action.');
 
                 return $this->redirect(\descartes\Router::url('Received', 'list'));
             }

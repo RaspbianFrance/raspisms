@@ -63,13 +63,13 @@
                                 <?php } ?>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Groupe', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Group', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
                                     </div>
                                     <?php if ($groupes) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Groupe', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Groupe', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     <?php } ?>
                                 </div>

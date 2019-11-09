@@ -54,7 +54,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
                 $this->redirect(\descartes\Router::url('Command', 'list'));
 
                 return false;
@@ -107,7 +107,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
@@ -118,19 +118,19 @@ namespace controllers\publics;
 
             if (!$name || !$script)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Renseignez au moins un nom et un script.');
+                \FlashMessage\FlashMessage::push('danger', 'Renseignez au moins un nom et un script.');
 
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 
             if (!$this->internal_command->create($name, $script, $admin))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible créer cette commande.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible créer cette commande.');
 
                 return $this->redirect(\descartes\Router::url('commands', 'add'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'La commande a bien été crée.');
+            \FlashMessage\FlashMessage::push('success', 'La commande a bien été crée.');
 
             return $this->redirect(\descartes\Router::url('Command', 'list'));
         }
@@ -147,7 +147,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
@@ -161,12 +161,12 @@ namespace controllers\publics;
 
             if ($nb_commands_update !== \count($_POST['commands']))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certaines commandes n\'ont pas pu êtres mises à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Certaines commandes n\'ont pas pu êtres mises à jour.');
 
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Toutes les commandes ont été modifiées avec succès.');
+            \FlashMessage\FlashMessage::push('success', 'Toutes les commandes ont été modifiées avec succès.');
 
             return $this->redirect(\descartes\Router::url('Command', 'list'));
         }

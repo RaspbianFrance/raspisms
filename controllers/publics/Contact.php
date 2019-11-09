@@ -61,7 +61,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
@@ -110,7 +110,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
@@ -120,7 +120,7 @@ namespace controllers\publics;
 
             if (!$name || !$number)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Des champs sont manquants !');
+                \FlashMessage\FlashMessage::push('danger', 'Des champs sont manquants !');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
@@ -128,19 +128,19 @@ namespace controllers\publics;
             $number = \controllers\internals\Tool::parse_phone($number);
             if (!$number)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Numéro de téléphone incorrect.');
+                \FlashMessage\FlashMessage::push('danger', 'Numéro de téléphone incorrect.');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
             if (!$this->internal_contact->create($number, $name))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de créer ce contact.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le contact a bien été créé.');
+            \FlashMessage\FlashMessage::push('success', 'Le contact a bien été créé.');
 
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
@@ -157,7 +157,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
@@ -171,12 +171,12 @@ namespace controllers\publics;
 
             if ($nb_contacts_update !== \count($_POST['contacts']))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Certais contacts n\'ont pas pu êtres mis à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Certais contacts n\'ont pas pu êtres mis à jour.');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Tous les contacts ont été modifiés avec succès.');
+            \FlashMessage\FlashMessage::push('success', 'Tous les contacts ont été modifiés avec succès.');
 
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }

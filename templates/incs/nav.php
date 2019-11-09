@@ -49,7 +49,7 @@
 								<a href="<?php echo \descartes\Router::url('Contact', 'list'); ?>"><i class="fa fa-fw fa-user"></i> Contacts</a>
 							</li>
 							<li <?php echo $page == 'groupes' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \descartes\Router::url('Groupe', 'list'); ?>"><i class="fa fa-fw fa-group"></i> Groupes</a>
+								<a href="<?php echo \descartes\Router::url('Group', 'list'); ?>"><i class="fa fa-fw fa-group"></i> Groupes</a>
 							</li>
 						</ul>
 					</li>

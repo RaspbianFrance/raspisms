@@ -11,9 +11,9 @@
 		</audio>
 	<?php } ?>
 
-    <?php if (ENVIRONMENT == 'dev') { ?>
+    <?php if (ENV == 'dev') { ?>
 		<script>
-			<?php while ($message = \modules\DescartesSessionMessages\internals\DescartesSessionMessages::getNext()) { ?>
+			<?php while ($message = \FlashMessage\FlashMessage::next()) { ?>
 				alert('<?php echo $message['type'] . ' : ' . $message['text']; ?>');
 			<?php } ?>
 		</script>

@@ -58,14 +58,14 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
             if (!\controllers\internals\Tool::is_admin())
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP Sms" !');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP Sms" !');
 
                 return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }

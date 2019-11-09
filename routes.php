@@ -65,17 +65,17 @@
             'delete' => '/event/delete/{csrf}/',
         ],
 
-        'Groupe' => [
+        'Group' => [
             'list' => [
-                '/groupe/',
-                '/groupe/p/{page}/',
+                '/group/',
+                '/group/p/{page}/',
             ],
-            'add' => '/groupe/add/',
-            'create' => '/groupe/create/{csrf}/',
-            'delete' => '/groupe/delete/{csrf}/',
-            'edit' => '/groupe/edit/',
-            'update' => '/groupe/update/{csrf}/',
-            'json_list' => '/groupes.json/',
+            'add' => '/group/add/',
+            'create' => '/group/create/{csrf}/',
+            'delete' => '/group/delete/{csrf}/',
+            'edit' => '/group/edit/',
+            'update' => '/group/update/{csrf}/',
+            'json_list' => '/groups.json/',
         ],
 
         'Received' => [
@@ -84,6 +84,7 @@
                 '/received/p/{page}/',
             ],
             'delete' => '/received/delete/{csrf}/',
+            'popup' => '/received/popup/',
         ],
 
         'Scheduled' => [
@@ -111,7 +112,7 @@
             'update' => '/setting/update/{setting_name}/{csrf}/',
         ],
 
-        'SMSStop' => [
+        'SmsStop' => [
             'list' => [
                 '/smsstop/',
                 '/smsstop/p/{page}/',

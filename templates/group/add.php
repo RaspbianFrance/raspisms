@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-group"></i> <a href="<?php echo \descartes\Router::url('Groupe', 'list'); ?>">Groupes</a>
+							<i class="fa fa-group"></i> <a href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Groupes</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-group fa-fw"></i> Ajout d'un groupe</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('Groupe', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Group', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>Nom du groupe</label>
 									<div class="form-group input-group">
@@ -49,7 +49,7 @@
 									<label>Contacts au groupe</label>
 									<input class="add-contacts form-control" name="contacts[]"/>
 								</div>
-								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Groupe', 'list'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le groupe" /> 	
 							</form>
 						</div>

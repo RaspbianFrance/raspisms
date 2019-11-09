@@ -46,14 +46,14 @@ namespace controllers\publics;
 
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             if (!$password)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez renseigner un mot de passe.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner un mot de passe.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -61,12 +61,12 @@ namespace controllers\publics;
             $update_password_result = $this->internal_user->update_password($_SESSION['user']['id'], $password);
             if (!$update_password_result)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de mettre à jour le mot de passe.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour le mot de passe.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le mot de passe a bien été mis à jour.');
+            \FlashMessage\FlashMessage::push('success', 'Le mot de passe a bien été mis à jour.');
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
@@ -83,14 +83,14 @@ namespace controllers\publics;
 
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             if (false === $transfer)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez choisir une option parmis celles de la liste déroulante.');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez choisir une option parmis celles de la liste déroulante.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -98,14 +98,14 @@ namespace controllers\publics;
             $transfer_update_result = $this->internal_user->update_transfer($_SESSION['user']['id'], $transfer);
             if (!$transfer_update_result)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de mettre à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             $_SESSION['user']['transfer'] = $transfer;
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'Le transfert a bien été '.($transfer ? 'activé' : 'désactivé').'.');
+            \FlashMessage\FlashMessage::push('success', 'Le transfert a bien été '.($transfer ? 'activé' : 'désactivé').'.');
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
@@ -121,7 +121,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -130,14 +130,14 @@ namespace controllers\publics;
 
             if (!$email)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Vous devez fournir une adresse e-mail !');
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir une adresse e-mail !');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'L\'adresse e-mail n\'est pas une adresse valide.');
+                \FlashMessage\FlashMessage::push('danger', 'L\'adresse e-mail n\'est pas une adresse valide.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -145,14 +145,14 @@ namespace controllers\publics;
             $update_email_result = $this->internal_user->update_email($_SESSION['user']['id'], $email);
             if (!$update_email_result)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de mettre à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             $_SESSION['user']['email'] = $email;
 
-            \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('success', 'L\'email a bien été mis à jour.');
+            \FlashMessage\FlashMessage::push('success', 'L\'email a bien été mis à jour.');
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
@@ -169,7 +169,7 @@ namespace controllers\publics;
         {
             if (!$this->verify_csrf($csrf))
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Jeton CSRF invalid !');
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -178,7 +178,7 @@ namespace controllers\publics;
 
             if (!$delete_account)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Pour supprimer le compte, vous devez cocher la case correspondante.');
+                \FlashMessage\FlashMessage::push('danger', 'Pour supprimer le compte, vous devez cocher la case correspondante.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
@@ -186,7 +186,7 @@ namespace controllers\publics;
             $delete_account_result = $this->internal_user->delete($_SESSION['user']['id']);
             if (!$delete_account_result)
             {
-                \modules\DescartesSessionMessages\internals\DescartesSessionMessages::push('danger', 'Impossible de supprimer le compte.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de supprimer le compte.');
 
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
