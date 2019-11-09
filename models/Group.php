@@ -66,7 +66,7 @@ namespace models;
         public function gets($ids)
         {
             $query = ' 
-                SELECT * FROM group
+                SELECT * FROM `group`
                 WHERE id ';
 
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
@@ -87,7 +87,7 @@ namespace models;
         public function deletes($ids)
         {
             $query = ' 
-                DELETE FROM group
+                DELETE FROM `group`
                 WHERE id ';
 
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
@@ -183,8 +183,8 @@ namespace models;
         {
             $query = '
                 SELECT * 
-                FROM contact
-                WHERE id IN (SELECT id_contact FROM group_contact WHERE id_group = :id)
+                FROM `contact`
+                WHERE id IN (SELECT id_contact FROM `group_contact` WHERE id_group = :id)
             ';
 
             $params = [

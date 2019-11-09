@@ -109,7 +109,7 @@ namespace models;
                         FROM scheduled_group
                         WHERE id_group IN (
                             SELECT id_group
-                            FROM group_contact
+                            FROM `group`_contact
                             WHERE id_contact IN (
                                 SELECT id
                                 FROM contact
@@ -227,7 +227,7 @@ namespace models;
          */
         public function get_groups($id_scheduled)
         {
-            $query = 'SELECT * FROM group WHERE id IN (SELECT id_group FROM scheduled_group WHERE id_scheduled = :id_scheduled)';
+            $query = 'SELECT * FROM `group` WHERE id IN (SELECT id_group FROM scheduled_group WHERE id_scheduled = :id_scheduled)';
 
             $params = ['id_scheduled' => $id_scheduled];
 
