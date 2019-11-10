@@ -144,11 +144,11 @@ CREATE TABLE IF NOT EXISTS user
 	UNIQUE (email)
 );
 
-CREATE TABLE IF NOT EXISTS user_number
+CREATE TABLE IF NOT EXISTS phone
 (
 	id INT NOT NULL AUTO_INCREMENT,
 	id_user INT NOT NULL,
-	phone_number VARCHAR(25) NOT NULL,
+	number VARCHAR(25) NOT NULL,
 	platform VARCHAR(100) NOT NULL,
     platform_datas JSON NOT NULL,
     CHECK (JSON_VALID(platform_datas)),
