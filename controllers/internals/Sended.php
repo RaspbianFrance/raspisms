@@ -144,6 +144,18 @@ namespace controllers\internals;
         }
 
         /**
+         * Update status
+         *
+         * @param int $id_sended : id of the sended to mark as delivered
+         * @param string $status : new status
+         * @return int
+         */
+        public function update_status($id_sended, $status)
+        {
+            return $this->model_sended->update($id_sended, ['status' => $status]);
+        }
+        
+        /**
          * Update sended to delivered.
          *
          * @param int $id_sended : id of the sended to mark as delivered
@@ -152,6 +164,6 @@ namespace controllers\internals;
          */
         public function set_delivered($id_sended)
         {
-            return $this->model_sended->update($id_sended, ['before_delivered' => 0, 'delivered' => true]);
+            return $this->model_sended->update($id_sended, ['status' => 'delivered']);
         }
     }

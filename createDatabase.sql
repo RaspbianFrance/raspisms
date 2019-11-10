@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS sended
     origin VARCHAR(20) NOT NULL,
     destination VARCHAR(20),
     flash BOOLEAN NOT NULL DEFAULT 0,
+    status ENUM('unknown', 'delivered', 'failed') NOT NULL DEFAULT 'unknown',
 	PRIMARY KEY (id)
 );
 

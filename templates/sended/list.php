@@ -56,10 +56,18 @@
                                             <?php foreach ($sendeds as $sended) { ?>
                                                     <tr>
                                                         <td><?php $this->s($sended['id']); ?></td>
-                                                        <td><?php $this->s($sended['target']); ?></td>
-                                                        <td><?php $this->s($sended['content']); ?></td>
+                                                        <td><?php $this->s($sended['destination']); ?></td>
+                                                        <td><?php $this->s($sended['text']); ?></td>
                                                         <td><?php $this->s($sended['at']); ?></td>
-                                                        <td><?php $this->s($sended['delivered'] ? 'Délivré' : ($sended['failed'] ? 'Échoué' : 'Inconnu')); ?></td>
+
+                                                        <?php if ($sended['status'] == 'unknown') { ?>
+                                                            <td>Inconnu</td>
+                                                        <?php } elseif ($sended['status'] == 'delivered') { ?>
+                                                            <td>Délivré</td>
+                                                        <?php } elseif ($sended['status'] == 'failed') { ?>
+                                                            <td>Échoué</td>
+                                                        <?php } ?>
+
                                                         <?php if ($_SESSION['user']['admin']) { ?>
                                                             <td><input name="ids[]" type="checkbox" value="<?php $this->s($sended['id']); ?>"></td>
                                                         <?php } ?>
