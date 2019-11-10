@@ -63,7 +63,7 @@
 								</div>
 								<div class="form-group">
 									<label>Groupes cibles</label>
-									<input class="add-groupes form-control" name="groupes[]"/>
+									<input class="add-groupes form-control" name="groups[]"/>
 								</div>
 								<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
 									<div class="form-group">

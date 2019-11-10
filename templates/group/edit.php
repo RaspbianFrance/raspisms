@@ -49,17 +49,17 @@
 									$contacts = json_encode($contacts);
 
 									?>
-                                    <input name="groupes[<?php $this->s($group['id']); ?>][groupe][id]" type="hidden" value="<?php $this->s($group['id']); ?>">
+                                    <input name="groups[<?php $this->s($group['id']); ?>][group][id]" type="hidden" value="<?php $this->s($group['id']); ?>">
 									<div class="form-group">
 										<label>Nom groupe</label>
 										<div class="form-group input-group">
 											<span class="input-group-addon"><span class="fa fa-user"></span></span>
-											<input name="groupes[<?php $this->s($group['id']); ?>][name]" class="form-control" type="text" placeholder="Nom groupe" autofocus required value="<?php $this->s($group['name']); ?>">
+											<input name="groups[<?php $this->s($group['id']); ?>][name]" class="form-control" type="text" placeholder="Nom groupe" autofocus required value="<?php $this->s($group['name']); ?>">
 										</div>
 									</div>	
 									<div class="form-group">
 										<label>Contacts du groupe</label>
-										<input class="add-contacts form-control" name="groupes[<?php $this->s($group['id']); ?>][contacts_ids][]" value="<?php $this->s($contacts); ?>"/>
+										<input class="add-contacts form-control" name="groups[<?php $this->s($group['id']); ?>][contacts_ids][]" value="<?php $this->s($contacts); ?>"/>
 									</div>
 									<hr/>
 									<?php
