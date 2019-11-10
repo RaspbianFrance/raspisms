@@ -35,7 +35,7 @@ namespace controllers\publics;
          */
         public function login()
         {
-            if ($_SESSION['connect'] ?? false)
+            if (\controllers\internals\Tool::is_connected())
             {
                 return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
             }

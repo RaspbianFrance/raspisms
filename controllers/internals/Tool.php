@@ -153,6 +153,16 @@ namespace controllers\internals;
         }
 
         /**
+         * Check if the user connected.
+         *
+         * @return bool : True if connected, False else
+         */
+        public static function is_connected()
+        {
+            return (bool) ($_SESSION['connect'] ?? false);
+        }
+
+        /**
          * Check if the user is admin.
          *
          * @return bool : True if admin, False else
