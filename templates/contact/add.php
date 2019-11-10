@@ -48,8 +48,7 @@
 								<div class="form-group">
 									<label>Numéro de téléphone du contact</label>
 									<div class="form-group">
-										<input name="number" class="form-control" type="tel" id="phone-international-input">
-										<input name="number" type="hidden" id="phone-hidden-input" required>
+										<input name="" class="form-control" type="tel" id="phone-international-input">
 									</div>
 								</div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Contact', 'list'); ?>">Annuler</a>
@@ -67,18 +66,12 @@
     {
         var number_input = jQuery('#phone-international-input')[0];
         var iti_number_input = window.intlTelInput(number_input, {
+            hiddenInput: 'number',
 			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
 			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
         });
-
-		jQuery('form').on('submit', function(e)
-		{
-            e.preventDefault();
-            jQuery('#phone-hidden-input').val(iti_number_input.getNumber())
-			this.submit();
-		});
 	});
 </script>
 <?php

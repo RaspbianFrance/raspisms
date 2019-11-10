@@ -53,7 +53,7 @@
                                                     <tr>
                                                         <td><?php $this->s($scheduled['id']); ?></td>
                                                         <td><?php $this->s($scheduled['at']); ?></td>
-                                                        <td><?php $this->s($scheduled['content']); ?></td>
+                                                        <td><?php $this->s($scheduled['text']); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($scheduled['id']); ?>"></td>
                                                     </tr>
                                             <?php } ?>

@@ -41,20 +41,19 @@
 							<?php foreach ($scheduleds as $scheduled) { ?>
                                     <div class="form-group">
 										<label>Texte du SMS</label>
-										<textarea name="scheduleds[<?php $this->s($scheduled['id']); ?>][content]" class="form-control" required><?php $this->s($scheduled['content'], true); ?></textarea>
+										<textarea name="scheduleds[<?php $this->s($scheduled['id']); ?>][text]" class="form-control" required><?php $this->s($scheduled['text'], true); ?></textarea>
 									</div>
 									<div class="form-group">
 										<label>Date d'envoi du SMS</label>
-										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][date]" class="form-control form-datetime" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
+										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][at]" class="form-control form-datetime" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
 									</div>	
 									<div class="form-group">
 										<label>Numéros cibles</label>
 										<div class="form-group scheduleds-number-groupe-container" scheduled-id="<?php $this->s($scheduled['id']); ?>" >
 											<?php foreach ($scheduled['numbers'] as $number) { ?>
 												<div class="form-group scheduleds-number-groupe">
-													<input name="" class="form-control phone-international-input" type="tel" value="<?php $this->s($number); ?>">
+													<input name="" class="form-control phone-international-input" type="tel" value="<?php $this->s($number); ?>" scheduled-id="<?php $this->s($scheduled['id']); ?>">
 													<span class="remove-scheduleds-number fa fa-times"></span>
-													<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][numbers][]" type="hidden" class="phone-hidden-input">
 												</div>
 											<?php } ?>
 											<div class="add-number-button fa fa-plus-circle"></div>
@@ -66,7 +65,7 @@
 									</div>
 									<div class="form-group">
 										<label>Groupes cibles</label>
-										<input class="add-groupes form-control" name="scheduleds[<?php $this->s($scheduled['id']); ?>][groupes][]" value="<?php $this->s(json_encode($scheduled['groupes'])); ?>" />
+										<input class="add-groupes form-control" name="scheduleds[<?php $this->s($scheduled['id']); ?>][groups][]" value="<?php $this->s(json_encode($scheduled['groups'])); ?>" />
 									</div>
 									<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
 										<div class="form-group">
@@ -117,60 +116,49 @@
 				displayField: 'name',
 			});
 		});
-
-		jQuery('.phone-international-input').intlTelInput({
-			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
-			nationalMode: true,
-			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
-		});
-
-		jQuery('body').on('click', '.remove-scheduleds-number', function(e)
+        
+        jQuery('body').on('click', '.remove-scheduleds-number', function(e)
 		{
 			jQuery(this).parents('.scheduleds-number-groupe').remove();
 		});
 
+        jQuery('.phone-international-input').each(function ()
+        {
+            var hidden_input_name = 'scheduleds[' + jQuery(this).attr('scheduled-id') + '][numbers][]';
+            window.intlTelInput(this, {
+                hiddenInput: hidden_input_name,
+                defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+                preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+                nationalMode: true,
+                utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
+            });
+        });
+
 		jQuery('body').on('click', '.add-number-button', function(e)
-		{
+        {
+            var random_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 			var scheduledId = jQuery(this).parents('.scheduleds-number-groupe-container').attr('scheduled-id');
 			var newScheduledsNumberGroupe = '' +
 			'<div class="form-group scheduleds-number-groupe">' +
-				'<input name="" class="form-control phone-international-input" type="tel" >' +
+				'<input name="" class="form-control phone-international-input" type="tel" scheduled-id="' + scheduledId + '" id="' + random_id + '">' +
 				'<span class="remove-scheduleds-number fa fa-times"></span>' +
-				'<input name="scheduleds[' + scheduledId + '][numbers][]" type="hidden" class="phone-hidden-input">' +
 			'</div>';
 
 			jQuery(this).before(newScheduledsNumberGroupe);
 
-			jQuery('.phone-international-input').intlTelInput({
+            var hidden_input_name = 'scheduleds[' + scheduledId + '][numbers][]';
+            var phone_input = jQuery('#' + random_id)[0];
+			window.intlTelInput(phone_input, {
+                hiddenInput: hidden_input_name,
 				defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
 				preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
 				nationalMode: true,
-				utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
+				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
 			});
 
 		});
 
-		jQuery('.form-datetime').datetimepicker(
-		{
-			format: 'yyyy-mm-dd hh:ii:ss',
-			autoclose: true,
-			minuteStep: 1,
-			language: 'fr'
-		});
 
-
-		jQuery('form').on('submit', function(e)
-		{
-			e.preventDefault();
-			jQuery('.phone-international-input').each(function(key, value)
-			{
-				var container = jQuery(this).parents('.scheduleds-number-groupe');
-				container.find('.phone-hidden-input').val(jQuery(this).intlTelInput("getNumber"));
-			});
-			
-			this.submit();
-		});
 	});
 </script>
 <?php

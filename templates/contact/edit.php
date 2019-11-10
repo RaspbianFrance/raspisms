@@ -51,7 +51,6 @@
 										<label>Numéro de téléphone du contact</label>
 										<div class="form-group">
 											<input name="" class="form-control phone-international-input" type="tel" contact-id="<?php $this->s($contact['id']); ?>" value="<?php $this->s($contact['number']); ?>">
-											<input name="contacts[<?php $this->s($contact['id']); ?>][number]" type="hidden" id="phone-hidden-input-<?php $this->s($contact['id']); ?>" required>
 										</div>
 									</div>
 									<hr/>
@@ -72,18 +71,13 @@
         jQuery('.phone-international-input').each(function()
         {
             var number_input = this;
+            var hidden_input_name = 'contacts[' + jQuery(number_input).attr('contact-id') + '][number]';
             var iti_number_input = window.intlTelInput(number_input, {
+                hiddenInput: hidden_input_name,
                 defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
                 preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
                 nationalMode: true,
                 utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
-            });
-            
-            jQuery('form').on('submit', function(e)
-            {
-                e.preventDefault();
-                jQuery('#phone-hidden-input-' + jQuery(number_input).attr('contact-id')).val(iti_number_input.getNumber())
-                this.submit();
             });
         });
 	});

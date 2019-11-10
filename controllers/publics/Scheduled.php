@@ -142,27 +142,24 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            $date = $_POST['date'] ?? false;
-            $content = $_POST['content'] ?? false;
+            $at = $_POST['at'] ?? false;
+            $text = $_POST['text'] ?? false;
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
 
-            if (!$content)
+            if (empty($text))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous ne pouvez pas créer un Sms sans message.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            if (!\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i'))
+            if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i'))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir une date valide.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
@@ -173,36 +170,28 @@ namespace controllers\publics;
                 if (!$number)
                 {
                     unset($numbers[$key]);
-
                     continue;
                 }
 
                 $numbers[$key] = $number;
             }
 
+            
             if (!$numbers && !$contacts && !$groups)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner au moins un destinataire pour le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            $scheduled = [
-                'at' => $date,
-                'content' => $content,
-                'flash' => false,
-                'progress' => false,
-            ];
 
-            if (!$scheduled_id = $this->internal_scheduled->create($scheduled, $numbers, $contacts, $groups))
+            $scheduled_id = $this->internal_scheduled->create($at, $text, false, false, $numbers, $contacts, $groups);
+            if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le '.$date.'.');
-
+            \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
 
@@ -229,23 +218,21 @@ namespace controllers\publics;
 
             foreach ($scheduleds as $id_scheduled => $scheduled)
             {
-                $date = $scheduled['date'] ?? false;
-                $content = $scheduled['content'] ?? false;
+                $at = $scheduled['at'] ?? false;
+                $text = $scheduled['text'] ?? false;
                 $numbers = $scheduled['numbers'] ?? [];
                 $contacts = $scheduled['contacts'] ?? [];
                 $groups = $scheduled['groups'] ?? [];
 
-                if (!$content)
+                if (empty($text))
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
-                if (!\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($date, 'Y-m-d H:i'))
+                if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i'))
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
@@ -256,7 +243,6 @@ namespace controllers\publics;
                     if (!$number)
                     {
                         unset($numbers[$key]);
-
                         continue;
                     }
 
@@ -266,15 +252,13 @@ namespace controllers\publics;
                 if (!$numbers && !$contacts && !$groups)
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
 
-                $success = $this->internal_scheduled->update($id_scheduled, $content, $date, $numbers, $contacts, $groups);
+                $success = $this->internal_scheduled->update($id_scheduled, $text, $at, $numbers, $contacts, $groups);
                 if (!$success)
                 {
                     $all_update_ok = false;
-
                     continue;
                 }
             }
@@ -282,12 +266,10 @@ namespace controllers\publics;
             if (!$all_update_ok)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Certains SMS n\'ont pas pu êtres mis à jour.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Tous les SMS ont été mis à jour.');
-
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
     }
