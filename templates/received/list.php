@@ -54,10 +54,10 @@
                                             <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
                                                         <td><?php $this->s($received['id']); ?></td>
-                                                        <td><?php $this->s($received['send_by']); ?></td>
-                                                        <td><?php $this->s($received['content']); ?></td>
+                                                        <td><?php $this->s($received['origin']); ?></td>
+                                                        <td><?php $this->s($received['text']); ?></td>
                                                         <td><?php $this->s($received['at']); ?></td>
-                                                        <td><?php echo $received['is_command'] ? 'Oui' : 'Non'; ?></td>
+                                                        <td><?php echo $received['command'] ? 'Oui' : 'Non'; ?></td>
                                                         <?php if ($_SESSION['user']['admin']) { ?><td><input name="ids[]" type="checkbox" value="<?php $this->s($received['id']); ?>"></td><?php } ?>
                                                     </tr>
                                             <?php } ?>

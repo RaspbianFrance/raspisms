@@ -332,10 +332,10 @@ class Console extends \descartes\InternalController
                 }
 
                 //On map les données et on créer le Sms reçu
-                $send_by = $number;
+                $origin = $number;
                 $content = $text;
                 $is_command = \count($found_commands);
-                if ($id_received = $this->internal_received->create($date, $send_by, $content, $is_command))
+                if ($id_received = $this->internal_received->create($date, $origin, $content, $is_command))
                 {
                     echo "Erreur lors de l'enregistrement du Sms\n";
                     error_log('Unable to process the Sms in file "'.$dir);
@@ -385,11 +385,11 @@ class Console extends \descartes\InternalController
 
             foreach ($users as $user)
             {
-                echo "Transfer d'un Sms du ".$received['send_by']." à l'email ".$user['email'];
+                echo "Transfer d'un Sms du ".$received['origin']." à l'email ".$user['email'];
 
                 $to = $user['email'];
-                $subject = '[RaspiSms] - Transfert d\'un Sms du '.$received['send_by'];
-                $message = 'Le numéro '.$received['send_by']." vous a envoyé un Sms : \n".$received['content'];
+                $subject = '[RaspiSms] - Transfert d\'un Sms du '.$received['origin'];
+                $message = 'Le numéro '.$received['origin']." vous a envoyé un Sms : \n".$received['content'];
 
                 $success = mail($to, $subject, $message);
                 echo ' ... '.($success ? 'ok' : 'ko')."\n";

@@ -89,7 +89,7 @@ namespace controllers\publics;
             $now = $now->format('Y-m-d H:i:s');
 
             $sendeds = $this->internal_sended->get_by_target($number);
-            $receiveds = $this->internal_received->get_by_send_by($number);
+            $receiveds = $this->internal_received->get_by_origin($number);
             $scheduleds = $this->internal_scheduled->get_before_date_for_number($now, $number);
 
             $messages = [];

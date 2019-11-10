@@ -53,7 +53,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $receiveds[$key]['send_by'] = $contact['name'].' ('.$received['origin'].')';
+                $receiveds[$key]['origin'] = $contact['name'].' ('.$received['origin'].')';
             }
 
             $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);

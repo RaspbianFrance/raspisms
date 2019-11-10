@@ -120,17 +120,17 @@ class Received extends \descartes\InternalController
      * @param mixed $at
      * @param mixed $origin
      * @param mixed $content
-     * @param mixed $is_command
+     * @param mixed $command
      *
      * @return mixed bool|int : false si echec, sinon l'id de la nouvelle receivede insérée
      */
-    public function create($at, $origin, $content, $is_command)
+    public function create($at, $origin, $content, $command)
     {
         $received = [
             'at' => $at,
             'origin' => $origin,
             'content' => $content,
-            'is_command' => $is_command,
+            'command' => $command,
         ];
 
         return $this->model_received->create($received);
@@ -143,17 +143,17 @@ class Received extends \descartes\InternalController
      * @param mixed $at
      * @param mixed $origin
      * @param mixed $content
-     * @param mixed $is_command
+     * @param mixed $command
      *
      * @return int : le nombre de ligne modifiées
      */
-    public function update($id, $at, $origin, $content, $is_command)
+    public function update($id, $at, $origin, $content, $command)
     {
         $received = [
             'at' => $at,
             'origin' => $origin,
             'content' => $content,
-            'is_command' => $is_command,
+            'command' => $command,
         ];
 
         return $this->model_received->update($id, $received);
