@@ -33,11 +33,22 @@
 					<li <?php echo $page == 'dashboard' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
 					</li>
-					<li <?php echo $page == 'scheduleds' ? 'class="active"' : ''; ?>>
-						<a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>"><i class="fa fa-fw fa-envelope"></i> SMS</a>
-					</li>
 					<li <?php echo $page == 'discussions' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Discussion', 'list'); ?>"><i class="fa fa-fw fa-comments"></i> Discussions</a>
+					</li>
+					<li>
+						<a href="javascript:;" data-toggle="collapse" data-target="#smss"><i class="fa fa-fw fa-envelope"></i> SMS <i class="fa fa-fw fa-caret-down"></i></a>
+						<ul id="smss" class="collapse <?php echo in_array($page, array('scheduleds', 'sendeds', 'receiveds')) ? 'in' : ''; ?>">
+							<li <?php echo $page == 'scheduleds' ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> SMS Programmés</a>
+							</li>
+							<li <?php echo $page == 'sendeds' ? 'class="active"' : ''; ?>>
+								<a href="<?php echo \descartes\Router::url('Sended', 'list'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
+							</li>
+							<li <?php echo $page == 'receiveds' ? 'class="active"' : ''; ?>>
+								<a href="<?php echo \descartes\Router::url('Received', 'list'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>
+							</li>
+						</ul>
 					</li>
 					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
@@ -55,13 +66,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="logs" class="collapse <?php echo in_array($page, array('sendeds', 'receiveds', 'events', 'smsstop')) ? 'in' : ''; ?>">
-							<li <?php echo $page == 'sendeds' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \descartes\Router::url('Sended', 'list'); ?>"><i class="fa fa-fw fa-send"></i> SMS envoyés</a>
-							</li>
-							<li <?php echo $page == 'receiveds' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \descartes\Router::url('Received', 'list'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>
-							</li>
+						<ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('SmsStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
 							</li>
