@@ -123,7 +123,7 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $this->internal_event->create('CONTACT_ADD', 'Ajout contact : '.$name.' ('.\controllers\internals\Tool::phone_add_space($number).')');
+            $this->internal_event->create('CONTACT_ADD', 'Ajout contact : '.$name.' ('.\controllers\internals\Tool::phone_format($number).')');
 
             return $result;
         }
