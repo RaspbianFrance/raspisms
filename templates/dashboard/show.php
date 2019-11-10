@@ -153,7 +153,7 @@
                                         <tbody>
                                         <?php foreach ($sendeds as $sended) { ?>
                                                 <tr>
-                                                    <td><?php $this->s($sended['target']); ?></td>
+                                                    <td><?php $this->s($sended['destination']); ?></td>
                                                     <td><?php $this->s($sended['at']); ?></td>
                                                 </tr>
                                         <?php } ?>
@@ -190,7 +190,7 @@
                                             <tr>
                                                 <td><?php $this->s($received['origin']); ?></td>
                                                 <td><?php $this->s($received['at']); ?></td>
-                                                <td><?php echo ($received['is_command']) ? 'Oui' : 'Non'; ?></td>
+                                                <td><?php echo ($received['command']) ? 'Oui' : 'Non'; ?></td>
                                             </tr>
                                         <?php } ?>
                                         </tbody>

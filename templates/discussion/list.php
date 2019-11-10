@@ -47,7 +47,7 @@
                                         </thead>
                                         <tbody>
                                             <?php foreach ($discussions as $discussion) { ?>
-                                                        <tr class="goto" url="<?php $this->s(\Router::url('Discussion', 'show', ['number' => $discussion['number']])); ?>">
+                                                        <tr class="goto" url="<?php $this->s(\descartes\Router::url('Discussion', 'show', ['number' => $discussion['number']])); ?>">
                                                         <td><?php $this->s($discussion['at']); ?></td>
                                                         <td><?php $this->s(isset($discussion['contact']) ? $discussion['contact'] . ' (' . $discussion['number'] . ')' : $discussion['number']); ?></td>
                                                     </tr>

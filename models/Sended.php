@@ -78,13 +78,13 @@ namespace models;
         /**
          * Cette fonction retourne une liste des sended sous forme d'un tableau.
          *
-         * @param string $target : Le numéro auquel est envoyé le message
+         * @param string $destination : Le numéro auquel est envoyé le message
          *
          * @return array : La liste des sended
          */
-        public function get_by_target($target)
+        public function get_by_destination($destination)
         {
-            return $this->_select('sended', ['target' => $target]);
+            return $this->_select('sended', ['destination' => $destination]);
         }
 
         /**

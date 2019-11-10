@@ -88,7 +88,7 @@ namespace controllers\publics;
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
-            $sendeds = $this->internal_sended->get_by_target($number);
+            $sendeds = $this->internal_sended->get_by_destination($number);
             $receiveds = $this->internal_received->get_by_origin($number);
             $scheduleds = $this->internal_scheduled->get_before_date_for_number($now, $number);
 
@@ -98,7 +98,7 @@ namespace controllers\publics;
             {
                 $messages[] = [
                     'date' => htmlspecialchars($sended['at']),
-                    'text' => htmlspecialchars($sended['content']),
+                    'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
                     'status' => ($sended['delivered'] ? 'delivered' : ($sended['failed'] ? 'failed' : '')),
                 ];
@@ -108,9 +108,9 @@ namespace controllers\publics;
             {
                 $messages[] = [
                     'date' => htmlspecialchars($received['at']),
-                    'text' => htmlspecialchars($received['content']),
+                    'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
-                    'md5' => md5($received['at'].$received['content']),
+                    'md5' => md5($received['at'].$received['text']),
                 ];
             }
 
@@ -118,7 +118,7 @@ namespace controllers\publics;
             {
                 $messages[] = [
                     'date' => htmlspecialchars($scheduled['at']),
-                    'text' => htmlspecialchars($scheduled['content']),
+                    'text' => htmlspecialchars($scheduled['text']),
                     'type' => 'inprogress',
                 ];
             }
@@ -141,7 +141,7 @@ namespace controllers\publics;
          * Cette fonction permet d'envoyer facilement un sms à un numéro donné.
          *
          * @param string $csrf             : Le jeton csrf
-         * @param string $_POST['content'] : Le contenu du Sms
+         * @param string $_POST['text'] : Le contenu du Sms
          * @param string $_POST['numbers'] : Un tableau avec le numero des gens auxquel envoyer le sms
          *
          * @return string : json string Le statut de l'envoi
@@ -163,9 +163,8 @@ namespace controllers\publics;
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
-            $scheduled = [];
-            $scheduled['at'] = $now;
-            $scheduled['content'] = $_POST['content'] ?? '';
+            $at = $now;
+            $text = $_POST['text'] ?? '';
             $numbers = $_POST['numbers'] ?? false;
 
             if (!$numbers)
@@ -177,7 +176,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$this->internal_scheduled->create($scheduled, $numbers))
+            if (!$this->internal_scheduled->create($at, $text, false, false, $numbers))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

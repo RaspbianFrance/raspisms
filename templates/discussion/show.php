@@ -36,8 +36,8 @@
 				</div>
 				<div class="col-lg-12 message-input-container">
 					<div class="discussion-message message-input">
-						<form class="send-message-discussion" action="<?php $this->s(\Router::url('Discussion', 'send', ['csrf' => $_SESSION['csrf']])); ?>" method="POST">
-							<textarea name="content" placeholder="Envoyer un message..."></textarea>
+						<form class="send-message-discussion" action="<?php $this->s(\descartes\Router::url('Discussion', 'send', ['csrf' => $_SESSION['csrf']])); ?>" method="POST">
+							<textarea name="text" placeholder="Envoyer un message..."></textarea>
 							<input type="hidden" name="numbers[]" value="<?php $this->s($number); ?>" />
 							<button class="btn" ><span class="fa fa-fw fa-send-o"></span> Envoyer</button>
 						</form>
@@ -58,7 +58,7 @@
 		function getmessages ()
 		{
 			ajaxTransactionId = Date.now();
-			jQuery.getJSON(HTTP_PWD + "/discussions/getmessages/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId , function( data ) {
+			jQuery.getJSON(HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId , function( data ) {
 
                 if (data.transaction_id != ajaxTransactionId)
 				{

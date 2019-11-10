@@ -178,9 +178,9 @@
 		jQuery('.action-dropdown a').on('click', function (e)
 		{
 			e.preventDefault();
-			var target = jQuery(this).parents('.action-dropdown').attr('target');
+			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
 			var url = jQuery(this).attr('href');
-			jQuery(target).find('input:checked').each(function ()
+			jQuery(destination).find('input:checked').each(function ()
 			{
 				url += '/' + jQuery(this).val();
 			});

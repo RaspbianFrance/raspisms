@@ -109,7 +109,7 @@ namespace models;
                         FROM scheduled_group
                         WHERE id_group IN (
                             SELECT id_group
-                            FROM `group`_contact
+                            FROM `group_contact`
                             WHERE id_contact IN (
                                 SELECT id
                                 FROM contact

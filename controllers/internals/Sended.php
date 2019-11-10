@@ -66,14 +66,14 @@ namespace controllers\internals;
         /**
          * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
          *
-         * @param string $target : Le numéro auquel est envoyé le message
+         * @param string $destination : Le numéro auquel est envoyé le message
          *
          * @return array : La liste des sendeds
          */
-        public function get_by_target($target)
+        public function get_by_destination($destination)
         {
             //Recupération des sendeds
-            return $this->model_sended->get_by_target($target);
+            return $this->model_sended->get_by_destination($destination);
         }
 
         /**

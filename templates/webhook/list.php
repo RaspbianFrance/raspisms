@@ -62,7 +62,7 @@
 								</div>
 								<div class="text-right col-xs-6 no-padding">
 									<strong>Action pour la séléction :</strong> 
-									<div class="btn-groupe action-dropdown" target="#table-webhooks">
+									<div class="btn-groupe action-dropdown" destination="#table-webhooks">
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
 										<ul class="dropdown-menu pull-right" role="menu">
 											<li><a href="<?php echo \descartes\Router::url('webhooks', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
@@ -84,9 +84,9 @@
 		jQuery('.action-dropdown a').on('click', function (e)
 		{
 			e.preventDefault();
-			var target = jQuery(this).parents('.action-dropdown').attr('target');
+			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
 			var url = jQuery(this).attr('href');
-			jQuery(target).find('input:checked').each(function ()
+			jQuery(destination).find('input:checked').each(function ()
 			{
 				url += '/' + jQuery(this).val();
 			});

@@ -91,10 +91,10 @@ class Console extends \descartes\InternalController
                 $numbers = [];
 
                 //On récupère les numéros pour le Sms et on les ajoute
-                $target_numbers = $this->internal_scheduled->get_numbers($id_scheduled);
-                foreach ($target_numbers as $target_number)
+                $destination_numbers = $this->internal_scheduled->get_numbers($id_scheduled);
+                foreach ($destination_numbers as $destination_number)
                 {
-                    $numbers[] = $target_number['number'];
+                    $numbers[] = $destination_number['number'];
                 }
 
                 //On récupère les contacts, et on ajoute les numéros
@@ -143,7 +143,7 @@ class Console extends \descartes\InternalController
                     $now = $now->format('Y-m-d H:i:s');
 
                     //On peut maintenant ajouter le Sms
-                    if (!$id_sended = $this->model_sended->insert(['at' => $now, 'target' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
+                    if (!$id_sended = $this->model_sended->insert(['at' => $now, 'destination' => $number, 'content' => $scheduled['content'], 'before_delivered' => ceil(mb_strlen($scheduled['content']) / 160)]))
                     {
                         echo 'Impossible d\'inserer le sms pour le numero '.$number."\n";
                     }
@@ -249,7 +249,7 @@ class Console extends \descartes\InternalController
                     $interval = new \DateInterval('PT12H');
                     $sinceDate = $now->sub($interval)->format('Y-m-d H:i:s');
 
-                    if (!$sendeds = $this->model_sended->_select('sendeds', ['target' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
+                    if (!$sendeds = $this->model_sended->_select('sendeds', ['destination' => $number, 'delivered' => false, 'failed' => false, '>at' => $sinceDate], 'at', false, 1))
                     {
                         continue;
                     }
