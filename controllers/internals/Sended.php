@@ -144,17 +144,18 @@ namespace controllers\internals;
         }
 
         /**
-         * Update status
+         * Update status.
          *
-         * @param int $id_sended : id of the sended to mark as delivered
-         * @param string $status : new status
+         * @param int    $id_sended : id of the sended to mark as delivered
+         * @param string $status    : new status
+         *
          * @return int
          */
         public function update_status($id_sended, $status)
         {
             return $this->model_sended->update($id_sended, ['status' => $status]);
         }
-        
+
         /**
          * Update sended to delivered.
          *

@@ -141,7 +141,7 @@ namespace controllers\publics;
          * Cette fonction permet d'envoyer facilement un sms à un numéro donné.
          *
          * @param string $csrf             : Le jeton csrf
-         * @param string $_POST['text'] : Le contenu du Sms
+         * @param string $_POST['text']    : Le contenu du Sms
          * @param string $_POST['numbers'] : Un tableau avec le numero des gens auxquel envoyer le sms
          *
          * @return string : json string Le statut de l'envoi

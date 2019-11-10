@@ -68,7 +68,7 @@ class Console extends \descartes\InternalController
                 $ids_scheduleds[] = $scheduled['id'];
             }
 
-            if (!count($ids_scheduleds))
+            if (!\count($ids_scheduleds))
             {
                 continue;
             }
@@ -187,12 +187,12 @@ class Console extends \descartes\InternalController
             foreach (scandir(PWD_RECEIVEDS) as $dir)
             {
                 //Si le fichier est un fichier système, on passe à l'itération suivante
-                if (mb_substr($dir, 0, 1) == '.')
+                if ('.' === mb_substr($dir, 0, 1))
                 {
                     continue;
                 }
 
-                echo 'Analyse du Sms ' . $dir . "\n";
+                echo 'Analyse du Sms '.$dir."\n";
 
                 //On récupère la date du Sms à la seconde près grâce au nom du fichier (Cf. parseSms.sh)
                 //Il faut mettre la date au format Y-m-d H:i:s

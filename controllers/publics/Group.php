@@ -10,7 +10,7 @@
  * with this source code in the file LICENSE.
  */
 
-    namespace controllers\publics;
+namespace controllers\publics;
 
     /**
      * Page des groups.

@@ -95,13 +95,17 @@ namespace controllers\internals;
          * @param array $numbers      : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
          * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
+         * @param mixed $at
+         * @param mixed $text
+         * @param mixed $flash
+         * @param mixed $progress
          *
          * @return mixed bool|int : false si echec, sinon l'id du nouveau scheduled inséré
          */
         public function create($at, $text, $flash = false, $progress = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
         {
             $scheduled = [
-                'at' => $at, 
+                'at' => $at,
                 'text' => $text,
                 'flash' => $flash,
                 'progress' => $progress,

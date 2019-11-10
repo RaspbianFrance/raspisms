@@ -43,6 +43,7 @@ namespace controllers\internals;
         {
             $phone_number_util = \libphonenumber\PhoneNumberUtil::getInstance();
             $phone_number_o = $phone_number_util->parse($number, null);
+
             return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
         }
 
@@ -177,8 +178,6 @@ namespace controllers\internals;
             $controller->render($settings['template'], $datas);
             $content = ob_get_clean();
 
-            $success = mail($to, $settings['subject'], $content);
-
-            return $success;
+            return mail($to, $settings['subject'], $content);
         }
     }

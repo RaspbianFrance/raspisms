@@ -108,6 +108,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 
@@ -118,16 +119,19 @@ namespace controllers\publics;
             if (!$name || !$script)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Renseignez au moins un nom et un script.');
+
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 
             if (!$this->internal_command->create($name, $script, $admin))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer cette commande.');
+
                 return $this->redirect(\descartes\Router::url('commands', 'add'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'La commande a bien été crée.');
+
             return $this->redirect(\descartes\Router::url('Command', 'list'));
         }
 
@@ -144,6 +148,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 

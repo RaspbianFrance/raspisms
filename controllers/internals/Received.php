@@ -116,7 +116,7 @@ class Received extends \descartes\InternalController
     /**
      * Cette fonction insert une nouvelle receivede.
      *
-     * @param array $received   : Un tableau représentant la receivede à insérer
+     * @param array $received : Un tableau représentant la receivede à insérer
      * @param mixed $at
      * @param mixed $origin
      * @param mixed $content

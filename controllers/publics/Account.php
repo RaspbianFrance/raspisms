@@ -47,12 +47,14 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             if (!$password)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner un mot de passe.');
+
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
@@ -60,10 +62,12 @@ namespace controllers\publics;
             if (!$update_password_result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour le mot de passe.');
+
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Le mot de passe a bien été mis à jour.');
+
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
 
