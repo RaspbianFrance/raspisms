@@ -86,7 +86,9 @@
 </div>
 <script>
 	jQuery(document).ready(function()
-	{
+    {
+        var number_inputs = [];
+
 		jQuery('.add-contacts').each(function()
 		{
 			jQuery(this).magicSuggest({
@@ -104,37 +106,10 @@
 				displayField: 'name',
 			});
 		});
-
-		jQuery('.phone-international-input').intlTelInput({
-			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
-			nationalMode: true,
-			utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
-		});
-
-		jQuery('body').on('click', '.remove-scheduleds-number', function(e)
+        
+        jQuery('body').on('click', '.remove-scheduleds-number', function(e)
 		{
 			jQuery(this).parents('.scheduleds-number-groupe').remove();
-		});
-
-		jQuery('body').on('click', '.add-number-button', function(e)
-		{
-			var newScheduledsNumberGroupe = '' +
-			'<div class="form-group scheduleds-number-groupe">' +
-				'<input name="" class="form-control phone-international-input" type="tel" >' +
-				'<span class="remove-scheduleds-number fa fa-times"></span>' +
-				'<input name="numbers[]" type="hidden" class="phone-hidden-input">' +
-			'</div>';
-
-			jQuery(this).before(newScheduledsNumberGroupe);
-
-			jQuery('.phone-international-input').intlTelInput({
-				defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-				preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
-				nationalMode: true,
-				utilsScript: '<?php echo HTTP_PWD; ?>/js/intlTelInput/lib/libphonenumber/utils.js'
-			});
-
 		});
 
 		jQuery('.form-datetime').datetimepicker(
@@ -146,15 +121,53 @@
 		});
 
 
-		jQuery('form').on('submit', function(e)
+        //intlTelInput
+		jQuery('body').on('click', '.add-number-button', function(e)
+		{
+			var newScheduledsNumberGroupe = '' +
+			'<div class="form-group scheduleds-number-groupe">' +
+				'<input name="" class="form-control phone-international-input" type="tel" >' +
+				'<span class="remove-scheduleds-number fa fa-times"></span>' +
+				'<input name="numbers[]" type="hidden" class="phone-hidden-input">' +
+			'</div>';
+
+			var number_input = jQuery(this).before(newScheduledsNumberGroupe);
+			var iti_number_input = window.intlTelInput(number_input, {
+				defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+				preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+				nationalMode: true,
+				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
+            });
+
+            number_inputs.push({
+                'number_input': number_input,
+                'iti_number_input': iti_number_input,
+            });
+        });
+
+        var number_input = jQuery('.phone-international-input')[0];
+        var iti_number_input = window.intlTelInput(number_input, {
+			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
+			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+			nationalMode: true,
+			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
+		});
+
+        number_inputs.push({
+            'number_input': number_input,
+            'iti_number_input': iti_number_input,
+        });
+
+        jQuery('form').on('submit', function(e)
 		{
 			e.preventDefault();
-			jQuery('.phone-international-input').each(function(key, value)
-			{
-				var container = jQuery(this).parents('.scheduleds-number-groupe');
-				container.find('.phone-hidden-input').val(jQuery(this).intlTelInput("getNumber"));
-			});
-			
+
+            for (i = 0; i < number_inputs.length; i++)
+            {
+                var container = jQuery(number_inputs[i].number_input).parents('.scheduleds-number-groupe');
+                container.find('.phone-hidden-input').val(number_inputs[i][iti_number_input].getNumber());
+            }
+
 			this.submit();
 		});
 	});
