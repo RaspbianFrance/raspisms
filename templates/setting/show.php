@@ -45,7 +45,7 @@
 												<label>Transfert activé : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_TRANSFER ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['transfer'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">
@@ -64,7 +64,7 @@
 												<label>Détection activé : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_DETECT_URL ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['detect_url'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">
@@ -81,7 +81,7 @@
 										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'preferred_phone_country', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules : </label>
-												<input name="setting_value" class="form-control" value="<?php $this->s(RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY); ?>" />
+												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['preferred_phone_country']); ?>" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
@@ -99,7 +99,7 @@
 												<label>Jouer un son quand vous recevez un SMS : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_RECEPTION_SOUND ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['sms_reception_sound'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">
@@ -120,7 +120,7 @@
 												<label>SMS STOP activé : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_SMSSTOP ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['smsstop'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">
@@ -137,7 +137,7 @@
 										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'default_phone_country', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Code du pays (norme ISO 3166-1 alpha-2) : </label>
-												<input name="setting_value" class="form-control" value="<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>" />
+												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
@@ -155,7 +155,7 @@
 												<label>SMS Flash activé : </label>
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
-													<option value="1" <?php echo RASPISMS_SETTINGS_SMS_FLASH ? 'selected' : ''; ?>>Oui</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['sms_flash'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">

@@ -3,7 +3,7 @@
 		Copyright 2014. RaspiSMS est un programme sous <a href="https://www.gnu.org/licenses/gpl.txt" rel="nofollow">licence GNU GPL</a>.<br/>
     </footer>
 
-	<?php if (RASPISMS_SETTINGS_SMS_RECEPTION_SOUND) { ?>
+	<?php if ($_SESSION['user']['settings']['sms_reception_sound'] ?? false) { ?>
 		<audio id="reception-sound">
 			<source src="<?php echo HTTP_PWD_SOUND; ?>/receptionSound.ogg" type="audio/ogg">
 			<source src="<?php echo HTTP_PWD_SOUND; ?>/receptionSound.mp3" type="audio/mpeg">

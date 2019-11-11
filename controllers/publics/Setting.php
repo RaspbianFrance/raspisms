@@ -51,24 +51,16 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
-
-            if (!\controllers\internals\Tool::is_admin())
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour pouvoir modifier un réglage.');
-
-                return $this->redirect(\descartes\Router::url('Setting', 'show'));
-            }
-
+            
             $setting_value = $_POST['setting_value'] ?? false;
 
             if (false === $setting_value)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner une valeure pour le réglage.');
-
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
-            $update_setting_result = $this->internal_setting->update($setting_name, $setting_value);
+            $update_setting_result = $this->internal_setting->update($_SESSION['user']['id'], $setting_name, $setting_value);
             if (false === $update_setting_result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');
@@ -77,7 +69,6 @@ namespace controllers\publics;
             }
 
             \FlashMessage\FlashMessage::push('success', 'Le réglage a bien été mis à jour.');
-
             return $this->redirect(\descartes\Router::url('Setting', 'show'));
         }
     }

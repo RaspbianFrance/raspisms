@@ -64,12 +64,12 @@
 									<label>Groupes cibles</label>
 									<input class="add-groupes form-control" name="groups[]"/>
 								</div>
-								<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
+								<?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
 									<div class="form-group">
 										<label>Envoyer comme un SMS Flash : </label>
 										<div class="form-group">
-											<input name="admin" type="radio" value="1" required /> Oui 
-											<input name="admin" type="radio" value="0" required checked/> Non
+											<input name="flash" type="radio" value="1" required /> Oui 
+											<input name="flash" type="radio" value="0" required checked/> Non
 										</div>
 									</div>
 								<?php } ?>
@@ -135,8 +135,8 @@
             var number_input = jQuery('#' + random_id)[0];
 			var iti_number_input = window.intlTelInput(number_input, {
                 hiddenInput: 'numbers[]',
-				defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-				preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+				defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+				preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
             });
@@ -150,8 +150,8 @@
         var number_input = jQuery('.phone-international-input')[0];
         var iti_number_input = window.intlTelInput(number_input, {
             hiddenInput: 'numbers[]',
-			defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-			preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+			defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+			preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
 		});

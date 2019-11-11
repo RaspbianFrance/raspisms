@@ -17,6 +17,7 @@ namespace controllers\publics;
     class Connect extends \descartes\Controller
     {
         private $internal_user;
+        private $internal_setting;
 
         /**
          * Cette fonction est appelée avant toute les autres :.
@@ -28,6 +29,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 
             $this->internal_user = new \controllers\internals\User($bdd);
+            $this->internal_setting = new \controllers\internals\Setting($bdd);
         }
 
         /**
@@ -61,6 +63,9 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Connect', 'login'));
             }
+
+            $settings = $this->internal_setting->gets_for_user($user['id']);
+            $user['settings'] = $settings;
 
             $_SESSION['connect'] = true;
             $_SESSION['user'] = $user;

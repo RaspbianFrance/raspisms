@@ -70,7 +70,7 @@
 
 				$.each(data.messages, function(key, message) {
 
-					<?php if (RASPISMS_SETTINGS_DETECT_URL) { ?>
+					<?php if ($_SESSION['user']['settings']['detect_url']) { ?>
 						//On ajoute la detection de lien dans le texte du message
 						message.text = Autolinker.link(message.text, {newWindow:true});
 					<?php } ?>

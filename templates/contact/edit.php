@@ -74,8 +74,8 @@
             var hidden_input_name = 'contacts[' + jQuery(number_input).attr('contact-id') + '][number]';
             var iti_number_input = window.intlTelInput(number_input, {
                 hiddenInput: hidden_input_name,
-                defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-                preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+                defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+                preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
                 nationalMode: true,
                 utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
             });

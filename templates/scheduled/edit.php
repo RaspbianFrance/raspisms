@@ -67,7 +67,7 @@
 										<label>Groupes cibles</label>
 										<input class="add-groupes form-control" name="scheduleds[<?php $this->s($scheduled['id']); ?>][groups][]" value="<?php $this->s(json_encode($scheduled['groups'])); ?>" />
 									</div>
-									<?php if (RASPISMS_SETTINGS_SMS_FLASH) { ?>
+									<?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
 										<div class="form-group">
 											<label>Envoyer comme un SMS Flash : </label>
 											<div class="form-group">
@@ -127,8 +127,8 @@
             var hidden_input_name = 'scheduleds[' + jQuery(this).attr('scheduled-id') + '][numbers][]';
             window.intlTelInput(this, {
                 hiddenInput: hidden_input_name,
-                defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-                preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+                defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+                preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
                 nationalMode: true,
                 utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
             });
@@ -150,8 +150,8 @@
             var phone_input = jQuery('#' + random_id)[0];
 			window.intlTelInput(phone_input, {
                 hiddenInput: hidden_input_name,
-				defaultCountry: '<?php $this->s(RASPISMS_SETTINGS_DEFAULT_PHONE_COUNTRY); ?>',
-				preferredCountries: <?php $this->s(json_encode(explode(',', RASPISMS_SETTINGS_PREFERRED_PHONE_COUNTRY)), false, false); ?>,
+				defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+				preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
 			});
