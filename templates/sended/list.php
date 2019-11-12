@@ -43,7 +43,8 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Numéro</th>
+                                                    <th>De</th>
+                                                    <th>À</th>
                                                     <th>Message</th>
                                                     <th>Date</th>
                                                     <th>Statut</th>
@@ -56,6 +57,7 @@
                                             <?php foreach ($sendeds as $sended) { ?>
                                                     <tr>
                                                         <td><?php $this->s($sended['id']); ?></td>
+                                                        <td><?php $this->s($sended['origin']); ?></td>
                                                         <td><?php $this->s($sended['destination']); ?></td>
                                                         <td><?php $this->s($sended['text']); ?></td>
                                                         <td><?php $this->s($sended['at']); ?></td>

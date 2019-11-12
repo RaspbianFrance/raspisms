@@ -30,26 +30,23 @@ namespace models;
 
         /**
          * Return a list of sms where destination in array allowed_destinations
-         * @param array $allowed_destinations : Allowed destinations for sms
-         * @param int $limit  : Nombre de résultat maximum à retourner
-         * @param int $offset : Nombre de résultat à ingnorer
+         * @param int $id_user : User id
+         * @param int $limit  : Max results to return
+         * @param int $offset : Number of results to ignore
          */
-        public function list_for_destinations($allowed_destinations, $limit, $offset)
+        public function list_for_user($id_user, $limit, $offset)
         {
             $limit = (int) $limit;
             $offset = (int) $offset;
 
             $query = ' 
                 SELECT * FROM received
-                WHERE destination ';
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
 
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($allowed_destinations);
-            $query .= $generated_in['QUERY'];
-            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-
-            
-            $params = $generated_in['PARAMS'];
+            $params = [
+                'id_user' => $id_user,
+            ];
 
             return $this->_run_query($query, $params);
         }

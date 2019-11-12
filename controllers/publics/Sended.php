@@ -17,6 +17,7 @@ namespace controllers\publics;
     class Sended extends \descartes\Controller
     {
         private $internal_sended;
+        private $internal_phone;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -28,6 +29,7 @@ namespace controllers\publics;
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -41,7 +43,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $sendeds = $this->internal_sended->list($limit, $page);
+            $sendeds = $this->internal_sended->list($_SESSION['user']['id'], $limit, $page);
             $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);
         }
 
@@ -65,6 +67,18 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
+                $sended = $this->internal_sended->get($id);
+                if (!$sended)
+                {
+                    continue;
+                }
+
+                $is_owner = (bool) $this->internal_phone->get_by_number_and_user($sended['origin'], $_SESSION['user']['id']);
+                if (!$is_owner)
+                {
+                    continue;
+                }
+
                 $this->internal_sended->delete($id);
             }
 

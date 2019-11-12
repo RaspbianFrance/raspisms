@@ -31,14 +31,26 @@ namespace models;
         }
 
         /**
-         * Retourne une liste de sendedes sous forme d'un tableau.
-         *
-         * @param int $limit  : Nombre de résultat maximum à retourner
-         * @param int $offset : Nombre de résultat à ingnorer
+         * Return a list of sms where destination in array allowed_destinations
+         * @param int $id_user : User id
+         * @param int $limit  : Max results to return
+         * @param int $offset : Number of results to ignore
          */
-        public function list($limit, $offset)
+        public function list_for_user($id_user, $limit, $offset)
         {
-            return $this->_select('sended', [], null, false, $limit, $offset);
+            $limit = (int) $limit;
+            $offset = (int) $offset;
+
+            $query = ' 
+                SELECT * FROM sended
+                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
         }
 
         /**

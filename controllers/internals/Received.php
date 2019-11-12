@@ -26,24 +26,15 @@ class Received extends \descartes\InternalController
     }
 
     /**
-     * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
+     * List sms for a user
      * @param int $id_user : user id
-     * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-     * @param mixed(int|bool) $page     : Le numéro de page en cours
-     *
-     * @return array : La liste des receivedes
+     * @param mixed(int|bool) $nb_entry : Number of entry to return
+     * @param mixed(int|bool) $page     : Pagination, will offset $nb_entry * $page results
+     * @return array
      */
     public function list($id_user, $nb_entry = null, $page = null)
     {
-        //Recupération des receivedes
-        $allowed_destinations = $this->internal_phone->gets_for_user($id_user);
-
-        foreach ($allowed_destinations as &$allowed_destination)
-        {
-            $allowed_destination = $allowed_destination['number'];
-        }
-        
-        return $this->model_received->list_for_destinations($allowed_destinations, $nb_entry, $nb_entry * $page);
+        return $this->model_received->list_for_user($id_user, $nb_entry, $nb_entry * $page);
     }
 
 

@@ -24,17 +24,25 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des sendedes sous forme d'un tableau.
-         *
-         * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page     : Le numéro de page en cours
-         *
-         * @return array : La liste des sendedes
+         * List sms for a user
+         * @param int $id_user : user id
+         * @param mixed(int|bool) $nb_entry : Number of entry to return
+         * @param mixed(int|bool) $page     : Pagination, will offset $nb_entry * $page results
+         * @return array
          */
-        public function list($nb_entry = null, $page = null)
+        public function list($id_user, $nb_entry = null, $page = null)
         {
-            //Recupération des sendedes
-            return $this->model_sended->list($nb_entry, $nb_entry * $page);
+            return $this->model_sended->list_for_user($id_user, $nb_entry, $nb_entry * $page);
+        }
+        
+        /**
+         * Return a sended sms
+         * @param $id : received id
+         * @return array
+         */
+        public function get($id)
+        {
+            return $this->model_sended->get($id);
         }
 
         /**
