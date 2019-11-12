@@ -129,6 +129,16 @@
             'create' => '/user/create/{csrf}/',
             'delete' => '/user/delete/{csrf}/',
         ],
+
+        'Phone' => [
+            'list' => [
+                '/phone/',
+                '/phone/p/{page}/',
+            ],
+            'add' => '/phone/add/',
+            'create' => '/phone/create/{csrf}/',
+            'delete' => '/phone/delete/{csrf}/',
+        ],
     );
 
     define('ROUTES', $routes);

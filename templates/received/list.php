@@ -43,7 +43,8 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Numéro</th>
+                                                    <th>De</th>
+                                                    <th>À</th>
                                                     <th>Message</th>
                                                     <th>Date</th>
                                                     <th>Commande</th>
@@ -55,6 +56,7 @@
                                                     <tr>
                                                         <td><?php $this->s($received['id']); ?></td>
                                                         <td><?php $this->s($received['origin']); ?></td>
+                                                        <td><?php $this->s($received['destination']); ?></td>
                                                         <td><?php $this->s($received['text']); ?></td>
                                                         <td><?php $this->s($received['at']); ?></td>
                                                         <td><?php echo $received['command'] ? 'Oui' : 'Non'; ?></td>

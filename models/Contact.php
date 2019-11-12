@@ -43,6 +43,17 @@ namespace models;
 
             return isset($contacts[0]) ? $contacts[0] : false;
         }
+        
+        /**
+         * Return a contact for a user by a number
+         * @param int $id_user : user id
+         * @param string $number : Contact number
+         * @return array
+         */
+        public function get_by_number_and_user($number, $id_user)
+        {
+            return $this->_select_one('contact', ['number' => $number, 'id_user' => $id_user]);
+        }
 
         /**
          * Retourne une entrée par son numéro de tel.

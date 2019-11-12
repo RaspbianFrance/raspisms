@@ -162,6 +162,7 @@ namespace controllers\publics;
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
+            $id_user = $_SESSION['user']['id'];
             $at = $now;
             $text = $_POST['text'] ?? '';
             $numbers = $_POST['numbers'] ?? false;
@@ -175,7 +176,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$this->internal_scheduled->create($at, $text, false, false, $numbers))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, false, false, $numbers))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

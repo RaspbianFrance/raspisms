@@ -149,9 +149,9 @@ CREATE TABLE IF NOT EXISTS phone
 	id INT NOT NULL AUTO_INCREMENT,
 	id_user INT NOT NULL,
 	number VARCHAR(25) NOT NULL,
-	platform VARCHAR(100) NOT NULL,
-    platform_datas TEXT NOT NULL,
-    CHECK (JSON_VALID(platform_datas)),
+	adapter VARCHAR(100) NOT NULL,
+    adapter_datas TEXT DEFAULT NULL,
+    CHECK (JSON_VALID(adapter_datas)),
 	PRIMARY KEY (id),
 	FOREIGN KEY (id_user) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

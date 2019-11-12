@@ -68,6 +68,9 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
+            $settings = $this->internal_setting->gets_for_user($_SESSION['user']['id']);
+            $_SESSION['user']['settings'] = $settings;
+
             \FlashMessage\FlashMessage::push('success', 'Le réglage a bien été mis à jour.');
             return $this->redirect(\descartes\Router::url('Setting', 'show'));
         }

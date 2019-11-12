@@ -17,6 +17,7 @@ namespace controllers\publics;
     class Scheduled extends \descartes\Controller
     {
         private $internal_scheduled;
+        private $internal_phone;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -28,6 +29,7 @@ namespace controllers\publics;
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -40,7 +42,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $scheduleds = $this->internal_scheduled->list(25, $page);
+            $scheduleds = $this->internal_scheduled->list($_SESSION['user']['id'], 25, $page);
             $this->render('scheduled/list', ['scheduleds' => $scheduleds]);
         }
 
@@ -64,6 +66,12 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
+                $scheduled = $this->internal_scheduled->get($id);
+                if (!$scheduled || $scheduled['id_user'] !== $_SESSION['user']['id'])
+                {
+                    continue;
+                }
+
                 $this->internal_scheduled->delete($id);
             }
 
@@ -79,8 +87,11 @@ namespace controllers\publics;
             $less_one_minute = new \DateInterval('PT1M');
             $now->sub($less_one_minute);
 
+            $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
+
             $this->render('scheduled/add', [
                 'now' => $now->format('Y-m-d H:i'),
+                'phones' => $phones,
             ]);
         }
 
@@ -93,11 +104,23 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
+            if (!$ids)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez choisir des messages à mettre à jour !');
+                return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
+            }
+
+            $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
             $scheduleds = $this->internal_scheduled->gets($ids);
 
             //Pour chaque message on ajoute les numéros, les contacts & les groups
             foreach ($scheduleds as $key => $scheduled)
             {
+                if (!$scheduled || $scheduled['id_user'] !== $_SESSION['user']['id'])
+                {
+                    continue;
+                }
+
                 $scheduleds[$key]['numbers'] = [];
                 $scheduleds[$key]['contacts'] = [];
                 $scheduleds[$key]['groups'] = [];
@@ -123,6 +146,7 @@ namespace controllers\publics;
 
             $this->render('scheduled/edit', [
                 'scheduleds' => $scheduleds,
+                'phones' => $phones,
             ]);
         }
 
@@ -145,8 +169,11 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
+            $id_user = $_SESSION['user']['id'];
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
+            $flash = $_POST['flash'] ?? false;
+            $origin = empty($_POST['origin']) ? null : $_POST['origin'];
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
@@ -182,15 +209,21 @@ namespace controllers\publics;
             if (!$numbers && !$contacts && !$groups)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner au moins un destinataire pour le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            $scheduled_id = $this->internal_scheduled->create($at, $text, false, false, $numbers, $contacts, $groups);
+
+            if ($origin && !$this->internal_phone->get_by_number_and_user($origin, $_SESSION['user']['id']))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
+                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+            }
+
+
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
@@ -222,12 +255,23 @@ namespace controllers\publics;
 
             foreach ($scheduleds as $id_scheduled => $scheduled)
             {
+                $id_user = $_SESSION['user']['id'];
                 $at = $scheduled['at'] ?? false;
                 $text = $scheduled['text'] ?? false;
+                $origin = empty($scheduled['origin']) ? null : $scheduled['origin'];
+                $flash = $scheduled['flash'] ?? false;
                 $numbers = $scheduled['numbers'] ?? [];
                 $contacts = $scheduled['contacts'] ?? [];
                 $groups = $scheduled['groups'] ?? [];
 
+                $scheduled = $this->internal_scheduled->get($id_scheduled);
+                if (!$scheduled || $scheduled['id_user'] !== $id_user)
+                {
+                    $all_update_ok = false;
+                    continue;
+                }
+                
+                
                 if (empty($text))
                 {
                     $all_update_ok = false;
@@ -245,7 +289,6 @@ namespace controllers\publics;
                 foreach ($numbers as $key => $number)
                 {
                     $number = \controllers\internals\Tool::parse_phone($number);
-
                     if (!$number)
                     {
                         unset($numbers[$key]);
@@ -262,8 +305,15 @@ namespace controllers\publics;
 
                     continue;
                 }
+                
+                
+                if ($origin && !$this->internal_phone->get_by_number_and_user($origin, $_SESSION['user']['id']))
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
 
-                $success = $this->internal_scheduled->update($id_scheduled, $text, $at, $numbers, $contacts, $groups);
+                $success = $this->internal_scheduled->update($id_scheduled, $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
                 if (!$success)
                 {
                     $all_update_ok = false;
@@ -275,12 +325,10 @@ namespace controllers\publics;
             if (!$all_update_ok)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Certains SMS n\'ont pas pu êtres mis à jour.');
-
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Tous les SMS ont été mis à jour.');
-
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
     }

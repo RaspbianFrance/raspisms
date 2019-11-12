@@ -64,6 +64,19 @@ namespace controllers\internals;
             //Recupération des contactes
             return $this->model_contact->get_by_number($number);
         }
+        
+        
+        /**
+         * Return a contact for a user by a number
+         * @param int $id_user : user id
+         * @param string $number : Contact number
+         * @return array
+         */
+        public function get_by_number_and_user($number, $id_user)
+        {
+            //Recupération des contactes
+            return $this->model_contact->get_by_number_and_user($number, $id_user);
+        }
 
         /**
          * Cette fonction retourne un contact par son name.

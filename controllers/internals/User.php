@@ -32,7 +32,7 @@ namespace controllers\internals;
          */
         public function list(?int $nb_entry = null, ?int $page = null)
         {
-            return $this->model_user->list($nb_entry, $page);
+            return $this->model_user->list($nb_entry, $page * $nb_entry);
         }
 
         /**

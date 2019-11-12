@@ -52,13 +52,15 @@ namespace controllers\publics;
          */
         public function show()
         {
+            $id_user = $_SESSION['user']['id'];
+
             //Recupération des nombres des 4 panneaux d'accueil
-            $nb_contacts = $this->internal_contact->count();
-            $nb_groups = $this->internal_group->count();
-            $nb_scheduleds = $this->internal_scheduled->count();
-            $nb_commands = $this->internal_command->count();
-            $nb_sendeds = $this->internal_sended->count();
-            $nb_receiveds = $this->internal_received->count();
+            $nb_contacts = $this->internal_contact->count($id_user);
+            $nb_groups = $this->internal_group->count($id_user);
+            $nb_scheduleds = $this->internal_scheduled->count($id_user);
+            $nb_commands = $this->internal_command->count($id_user);
+            $nb_sendeds = $this->internal_sended->count($id_user);
+            $nb_receiveds = $this->internal_received->count($id_user);
 
             //Création de la date d'il y a une semaine
             $now = new \DateTime();
@@ -68,12 +70,12 @@ namespace controllers\publics;
 
             //Récupération des 10 derniers Sms envoyés, Sms reçus et evenements enregistrés. Par date.
             $sendeds = $this->internal_sended->get_lasts_by_date(10);
-            $receiveds = $this->internal_received->get_lasts_by_date(10);
+            $receiveds = $this->internal_received->get_lasts_for_user_by_date($id_user, 10);
             $events = $this->internal_event->get_lasts_by_date(10);
 
             //Récupération du nombre de Sms envoyés et reçus depuis les 7 derniers jours
             $nb_sendeds_by_day = $this->internal_sended->count_by_day_since($formated_date);
-            $nb_receiveds_by_day = $this->internal_received->count_by_day_since($formated_date);
+            $nb_receiveds_by_day = $this->internal_received->count_for_user_by_day_since($id_user, $formated_date);
 
             //On va traduire ces données pour les afficher en graphique
             $array_area_chart = [];

@@ -73,6 +73,15 @@
 										</div>
 									</div>
 								<?php } ?>
+                                <div class="form-group">
+                                    <label>Téléphone à employer : </label>
+                                    <select name="origin" class="form-control">
+                                        <option value="">N'importe lequel</option>
+                                        <?php foreach ($phones as $phone) { ?>
+                                            <option value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
 							</form>

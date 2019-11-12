@@ -17,25 +17,46 @@ namespace controllers\internals;
 class Received extends \descartes\InternalController
 {
     private $model_received;
+    private $internal_phone;
 
     public function __construct(\PDO $bdd)
     {
         $this->model_received = new \models\Received($bdd);
+        $this->internal_phone = new \controllers\internals\Phone($bdd);
     }
 
     /**
      * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
-     *
+     * @param int $id_user : user id
      * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
      * @param mixed(int|bool) $page     : Le numéro de page en cours
      *
      * @return array : La liste des receivedes
      */
-    public function list($nb_entry = null, $page = null)
+    public function list($id_user, $nb_entry = null, $page = null)
     {
         //Recupération des receivedes
-        return $this->model_received->list($nb_entry, $nb_entry * $page);
+        $allowed_destinations = $this->internal_phone->gets_for_user($id_user);
+
+        foreach ($allowed_destinations as &$allowed_destination)
+        {
+            $allowed_destination = $allowed_destination['number'];
+        }
+        
+        return $this->model_received->list_for_destinations($allowed_destinations, $nb_entry, $nb_entry * $page);
     }
+
+
+    /**
+     * Return a received sms
+     * @param $id : received id
+     * @return array
+     */
+    public function get($id)
+    {
+        return $this->model_received->get($id);
+    }
+
 
     /**
      * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
@@ -51,15 +72,14 @@ class Received extends \descartes\InternalController
     }
 
     /**
-     * Cette fonction retourne les X dernières entrées triées par date.
-     *
-     * @param mixed false|int $nb_entry : Nombre d'entrée à retourner ou faux pour tout
-     *
+     * Cette fonction retourne les X dernières entrées triées par date for a user.
+     * @param int $id_user
+     * @param int $nb_entry : Nombre d'entrée à retourner ou faux pour tout
      * @return array : Les dernières entrées
      */
-    public function get_lasts_by_date($nb_entry = false)
+    public function get_lasts_for_user_by_date($id_user, $nb_entry)
     {
-        return $this->model_received->get_lasts_by_date($nb_entry);
+        return $this->model_received->get_lasts_for_user_by_date($id_user, $nb_entry);
     }
 
     /**
@@ -76,14 +96,13 @@ class Received extends \descartes\InternalController
 
     /**
      * Récupère les Sms reçus depuis une date.
-     *
      * @param $date : La date depuis laquelle on veux les Sms (au format 2014-10-25 20:10:05)
-     *
+     * @param int $id_user : User id
      * @return array : Tableau avec tous les Sms depuis la date
      */
-    public function get_since_by_date($date)
+    public function get_since_by_date_for_user($date, $id_user)
     {
-        return $this->model_received->get_since_by_date($date);
+        return $this->model_received->get_since_by_date_for_user($date, $id_user);
     }
 
     /**
@@ -159,25 +178,26 @@ class Received extends \descartes\InternalController
     }
 
     /**
-     * Cette fonction permet de compter le nombre de receiveds.
-     *
-     * @return int : Le nombre d'entrées dans la table
+     * Count number of received sms for user
+     * @param int $id_user : user id
+     * @return int : Number of received SMS for user
      */
-    public function count()
+    public function count($id_user)
     {
-        return $this->model_received->count();
+        return $this->model_received->count($id_user);
     }
 
     /**
      * Cette fonction compte le nombre de receiveds par jour depuis une date.
      *
+     * @param int $id_user : user id
      * @param mixed $date
      *
      * @return array : un tableau avec en clef la date et en valeure le nombre de sms envoyés
      */
-    public function count_by_day_since($date)
+    public function count_for_user_by_day_since($id_user, $date)
     {
-        $counts_by_day = $this->model_received->count_by_day_since($date);
+        $counts_by_day = $this->model_received->count_for_user_by_day_since($id_user, $date);
         $return = [];
 
         foreach ($counts_by_day as $count_by_day)

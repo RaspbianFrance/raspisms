@@ -76,6 +76,15 @@
 											</div>
 										</div>
 									<?php } ?>
+                                    <div class="form-group">
+                                        <label>Téléphone à employer : </label>
+                                        <select name="scheduleds[<?php $this->s($scheduled['id']); ?>][origin]" class="form-control">
+                                            <option <?php echo ($scheduled['origin'] ? '' : 'selected="selected"'); ?> value="">N'importe lequel</option>
+                                            <?php foreach ($phones as $phone) { ?>
+                                                <option <?php echo ($scheduled['origin'] == $phone['number'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
 									<hr/>
                                 <?php } ?>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>

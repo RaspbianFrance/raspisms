@@ -32,13 +32,13 @@ namespace models;
 
         /**
          * Retourne une liste de scheduledes sous forme d'un tableau.
-         *
+         * @param int $id_user : User id
          * @param int $limit  : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
          */
-        public function list($limit, $offset)
+        public function list($id_user, $limit, $offset)
         {
-            return $this->_select('scheduled', [], null, false, $limit, $offset);
+            return $this->_select('scheduled', ['id_user' => $id_user], null, false, $limit, $offset);
         }
 
         /**
@@ -184,9 +184,9 @@ namespace models;
          *
          * @return int : Le nombre d'entrées
          */
-        public function count()
+        public function count($id_user)
         {
-            return $this->_count('scheduled');
+            return $this->_count('scheduled', ['id_user' => $id_user]);
         }
 
         /**

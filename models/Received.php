@@ -25,32 +25,59 @@ namespace models;
          */
         public function get($id)
         {
-            $receiveds = $this->_select('received', ['id' => $id]);
-
-            return isset($receiveds[0]) ? $receiveds[0] : false;
+            return $this->_select_one('received', ['id' => $id]);
         }
 
         /**
-         * Retourne une liste de receivedes sous forme d'un tableau.
-         *
+         * Return a list of sms where destination in array allowed_destinations
+         * @param array $allowed_destinations : Allowed destinations for sms
          * @param int $limit  : Nombre de résultat maximum à retourner
          * @param int $offset : Nombre de résultat à ingnorer
          */
-        public function list($limit, $offset)
+        public function list_for_destinations($allowed_destinations, $limit, $offset)
         {
-            return $this->_select('received', [], null, false, $limit, $offset);
+            $limit = (int) $limit;
+            $offset = (int) $offset;
+
+            $query = ' 
+                SELECT * FROM received
+                WHERE destination ';
+
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $generated_in = $this->_generate_in_from_array($allowed_destinations);
+            $query .= $generated_in['QUERY'];
+            $query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
+
+            
+            $params = $generated_in['PARAMS'];
+
+            return $this->_run_query($query, $params);
         }
 
         /**
-         * Cette fonction retourne les X dernières entrées triées par date.
+         * Cette fonction retourne les X dernières entrées triées par date pour un utilisateur.
          *
+         * @param int $id_user : User id
          * @param int $nb_entry : Nombre d'entrée à retourner
          *
          * @return array : Les dernières entrées
          */
-        public function get_lasts_by_date($nb_entry)
+        public function get_lasts_for_user_by_date($id_user, $nb_entry)
         {
-            return $this->_select('received', [], 'at', true, $nb_entry);
+            $nb_entry = (int) $nb_entry;
+
+            $query = '
+                SELECT *
+                FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                ORDER BY at ASC
+                LIMIT ' . $nb_entry;
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
         }
 
         /**
@@ -138,33 +165,45 @@ namespace models;
         }
 
         /**
-         * Compte le nombre d'entrées dans la table.
-         *
-         * @return int : Le nombre d'entrées
+         * Count number of received sms for user
+         * @param int $id_user : user id
+         * @return int : Number of received SMS for user
          */
-        public function count()
+        public function count($id_user)
         {
-            return $this->_count('received');
+            $query = '
+                SELECT COUNT(id) as nb
+                FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
         }
 
         /**
          * Récupère le nombre de SMS envoyés pour chaque jour depuis une date.
-         *
+         * @param int $id_user : user id
          * @param \DateTime $date : La date depuis laquelle on veux les SMS
          *
          * @return array : Tableau avec le nombre de SMS depuis la date
          */
-        public function count_by_day_since($date)
+        public function count_for_user_by_day_since($id_user, $date)
         {
             $query = " 
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM received
                 WHERE at > :date
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 GROUP BY at_ymd
             ";
 
             $params = [
                 'date' => $date,
+                'id_user' => $id_user,
             ];
 
             return $this->_run_query($query, $params);
@@ -186,23 +225,23 @@ namespace models;
         }
 
         /**
-         * Récupère les SMS reçus depuis une date.
-         *
+         * Get SMS received since a date for a user 
          * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
-         *
+         * @param int $id_user : User id
          * @return array : Tableau avec tous les SMS depuis la date
          */
-        public function get_since_by_date($date)
+        public function get_since_by_date_for_user($date, $id_user)
         {
             $query = " 
                 SELECT *
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
-                ORDER BY at ASC
-            ";
-
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                ORDER BY at ASC";
+            
             $params = [
                 'date' => $date,
+                'id_user' => $id_user,
             ];
 
             return $this->_run_query($query, $params);

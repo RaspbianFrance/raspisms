@@ -14,7 +14,7 @@
     <?php if (ENV == 'dev') { ?>
 		<script>
 			<?php while ($message = \FlashMessage\FlashMessage::next()) { ?>
-				alert('<?php echo $message['type'] . ' : ' . $message['text']; ?>');
+				alert('<?php $this->s($message['type'] . ' : ' . $message['text']); ?>');
 			<?php } ?>
 		</script>
     <?php } ?>

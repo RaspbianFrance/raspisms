@@ -12,7 +12,7 @@
 namespace controllers\internals;
 
     /**
-     * Classe des scheduledes.
+     * Classe des scheduleds.
      */
     class Scheduled extends \descartes\InternalController
     {
@@ -26,29 +26,43 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne une liste des scheduledes sous forme d'un tableau.
+         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
          *
+         * @param int $id_user : User id
          * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
          * @param mixed(int|bool) $page     : Le numéro de page en cours
          *
-         * @return array : La liste des scheduledes
+         * @return array : La liste des scheduleds
          */
-        public function list($nb_entry = null, $page = null)
+        public function list($id_user, $nb_entry = null, $page = null)
         {
-            //Recupération des scheduledes
-            return $this->model_scheduled->list($nb_entry, $nb_entry * $page);
+            //Recupération des scheduleds
+            return $this->model_scheduled->list($id_user, $nb_entry, $nb_entry * $page);
         }
 
         /**
-         * Cette fonction retourne une liste des scheduledes sous forme d'un tableau.
+         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
          *
          * @param array int $ids : Les ids des entrées à retourner
          *
-         * @return array : La liste des scheduledes
+         * @return array : La liste des scheduleds
+         */
+        public function get ($id)
+        {
+            //Recupération des scheduleds
+            return $this->model_scheduled->get($id);
+        }
+
+        /**
+         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
+         *
+         * @param array int $ids : Les ids des entrées à retourner
+         *
+         * @return array : La liste des scheduleds
          */
         public function gets($ids)
         {
-            //Recupération des scheduledes
+            //Recupération des scheduleds
             return $this->model_scheduled->gets($ids);
         }
 
@@ -67,12 +81,12 @@ namespace controllers\internals;
 
         /**
          * Cette fonction permet de compter le nombre de scheduled.
-         *
+         * @param int $id_user : User id
          * @return int : Le nombre d'entrées dans la table
          */
-        public function count()
+        public function count($id_user)
         {
-            return $this->model_scheduled->count();
+            return $this->model_scheduled->count($id_user);
         }
 
         /**
@@ -80,7 +94,7 @@ namespace controllers\internals;
          *
          * @param int $id : L'id du scheduled à supprimer
          *
-         * @return int : Le nombre de scheduledes supprimées;
+         * @return int : Le nombre de scheduleds supprimées;
          */
         public function delete($id)
         {
@@ -89,25 +103,26 @@ namespace controllers\internals;
 
         /**
          * Cette fonction insert un nouveau scheduled.
-         *
-         * @param array $scheduled    : Le scheduled à créer avec at, content, flash, progress
+         * @param int $id_user
+         * @param mixed $at
+         * @param mixed $text
+         * @param mixed $origin
+         * @param mixed $flash
+         * @param mixed $progress
          * @param array $numbers      : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
          * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
-         * @param mixed $at
-         * @param mixed $text
-         * @param mixed $flash
-         * @param mixed $progress
          *
          * @return mixed bool|int : false si echec, sinon l'id du nouveau scheduled inséré
          */
-        public function create($at, $text, $flash = false, $progress = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
+        public function create($id_user, $at, $text, $origin = null, $flash = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
         {
             $scheduled = [
+                'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
+                'origin' => $origin,
                 'flash' => $flash,
-                'progress' => $progress,
             ];
 
             if (!$id_scheduled = $this->model_scheduled->insert($scheduled))
@@ -137,28 +152,28 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction met à jour une série de scheduledes.
+         * Cette fonction met à jour une série de scheduleds.
          *
-         * @param array $scheduleds   : Un tableau de scheduled à modifier avec at, content, flash, progress + pour chaque scheduled number, contact_ids, group_ids
+         * @param mixed $id
+         * @param int $id_user : User id
+         * @param mixed $text
+         * @param mixed $at
+         * @param mixed $origin
          * @param array $numbers      : Les numéros auxquels envoyer le scheduled
          * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
          * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
-         * @param mixed $id
-         * @param mixed $text
-         * @param mixed $at
-         * @param mixed $contact_ids
          * @param mixed $flash
-         * @param mixed $progress
          *
          * @return int : le nombre de ligne modifiées
          */
-        public function update($id, $text, $at, $numbers = [], $contact_ids = [], $groups_ids = [], $flash = false, $progress = false)
+        public function update($id, $id_user, $at, $text, $origin = null, $flash = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
         {
             $scheduled = [
+                'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
+                'origin' => $origin,
                 'flash' => $flash,
-                'progress' => $progress,
             ];
 
             $success = $this->model_scheduled->update($id, $scheduled);
@@ -172,7 +187,7 @@ namespace controllers\internals;
                 $this->model_scheduled->insert_scheduled_number($id, $number);
             }
 
-            foreach ($contact_ids as $contact_id)
+            foreach ($contacts_ids as $contact_id)
             {
                 $this->model_scheduled->insert_scheduled_contact($id, $contact_id);
             }
@@ -190,11 +205,11 @@ namespace controllers\internals;
          *
          * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
          *
-         * @return array : La liste des scheduledes
+         * @return array : La liste des scheduleds
          */
         public function get_numbers($id_scheduled)
         {
-            //Recupération des scheduledes
+            //Recupération des scheduleds
             return $this->model_scheduled->get_numbers($id_scheduled);
         }
 
@@ -207,7 +222,7 @@ namespace controllers\internals;
          */
         public function get_contacts($id_scheduled)
         {
-            //Recupération des scheduledes
+            //Recupération des scheduleds
             return $this->model_scheduled->get_contacts($id_scheduled);
         }
 
@@ -220,7 +235,7 @@ namespace controllers\internals;
          */
         public function get_groups($id_scheduled)
         {
-            //Recupération des scheduledes
+            //Recupération des scheduleds
             return $this->model_scheduled->get_groups($id_scheduled);
         }
 

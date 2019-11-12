@@ -18,6 +18,7 @@ namespace controllers\publics;
     {
         private $internal_received;
         private $internal_contact;
+        private $internal_phone;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -30,6 +31,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -43,7 +45,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $receiveds = $this->internal_received->list($limit, $page);
+            $receiveds = $this->internal_received->list($_SESSION['user']['id'], $limit, $page);
 
             foreach ($receiveds as $key => $received)
             {
@@ -59,6 +61,43 @@ namespace controllers\publics;
         }
 
         /**
+         * Delete Receiveds
+         * @param array int $_GET['ids'] : Ids of receiveds to delete
+         * @param mixed     $csrf
+         *
+         * @return boolean;
+         */
+        public function delete($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+                return $this->redirect(\descartes\Router::url('Received', 'list'));
+            }
+
+            $ids = $_GET['ids'] ?? [];
+            foreach ($ids as $id)
+            {
+                $received = $this->internal_received->get($id);
+
+                if (!$received)
+                {
+                    continue;
+                }
+
+                $is_owner = (bool) $this->internal_phone->get_by_number_and_user($received['destination'], $_SESSION['user']['id']);
+                if (!$is_owner)
+                {
+                    continue;
+                }
+
+                $this->internal_received->delete($id);
+            }
+
+            return $this->redirect(\descartes\Router::url('Received', 'list'));
+        }
+
+        /**
          * Cette fonction retourne tous les Sms reçus aujourd'hui pour la popup.
          *
          * @return string : A JSON Un tableau des Sms reçus
@@ -66,7 +105,7 @@ namespace controllers\publics;
         public function popup()
         {
             $now = new \DateTime();
-            $receiveds = $this->internal_received->get_since_by_date($now->format('Y-m-d'));
+            $receiveds = $this->internal_received->get_since_by_date_for_user($now->format('Y-m-d'), $_SESSION['user']['id']);
 
             foreach ($receiveds as $key => $received)
             {
@@ -92,38 +131,5 @@ namespace controllers\publics;
             echo json_encode($newly_receiveds);
 
             return true;
-        }
-
-        /**
-         * Cette fonction va supprimer une liste de receiveds.
-         *
-         * @param array int $_GET['ids'] : Les id des receivedes à supprimer
-         * @param mixed     $csrf
-         *
-         * @return boolean;
-         */
-        public function delete($csrf)
-        {
-            if (!$this->verify_csrf($csrf))
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
-
-                return $this->redirect(\descartes\Router::url('Received', 'list'));
-            }
-
-            if (!\controllers\internals\Tool::is_admin())
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour effectuer cette action.');
-
-                return $this->redirect(\descartes\Router::url('Received', 'list'));
-            }
-
-            $ids = $_GET['ids'] ?? [];
-            foreach ($ids as $id)
-            {
-                $this->internal_received->delete($id);
-            }
-
-            return $this->redirect(\descartes\Router::url('Received', 'list'));
         }
     }
