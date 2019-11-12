@@ -11,120 +11,60 @@
 
 namespace controllers\internals;
 
-    /**
-     * Classe des commandes.
-     */
-    class Command extends \descartes\InternalController
+    class Command extends StandardController
     {
-        private $model_command;
-        private $internal_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_command = new \models\Command($bdd);
-            $this->internal_event = new \controllers\internals\Event($bdd);
-        }
+        protected $model = false;
 
         /**
-         * Return the list of commands as an array.
-         *
-         * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page     : Le numéro de page en cours
-         *
-         * @return array : La liste des commandes
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            return $this->model_command->list($nb_entry, $nb_entry * $page);
+            $this->model = $this->model ?? new \models\Command($this->$bdd);
+            return $this->model;
         }
 
+        
         /**
-         * Get all commands.
-         *
-         * @return array
+         * Create a new command
+         * @param int $id_user : User id
+         * @param string $name : Command name
+         * @param string $script : Script file
+         * @param bool $admin : Is command admin only
+         * @return mixed bool|int : False if cannot create command, id of the new command else
          */
-        public function get_all()
-        {
-            //Recupération des commandes
-            return $this->model_command->get_all();
-        }
-
-        /**
-         * Cette fonction retourne une liste des commandes sous forme d'un tableau.
-         *
-         * @param array int $ids : Les ids des entrées à retourner
-         *
-         * @return array : La liste des commandes
-         */
-        public function gets($ids)
-        {
-            //Recupération des commandes
-            return $this->model_command->gets($ids);
-        }
-
-        /**
-         * Cette fonction permet de compter le nombre de scheduleds.
-         *
-         * @return int : Le nombre d'entrées dans la table
-         */
-        public function count()
-        {
-            return $this->model_command->count();
-        }
-
-        /**
-         * Cette fonction va supprimer une commande.
-         *
-         * @param array $id : L'id de la commande à supprimer
-         *
-         * @return int : Le nombre de commandes supprimées;
-         */
-        public function delete($id)
-        {
-            return $this->model_command->delete($id);
-        }
-
-        /**
-         * Cette fonction insert une nouvelle commande.
-         *
-         * @param array $command : La commande à insérer
-         * @param mixed $name
-         * @param mixed $script
-         * @param mixed $admin
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle commande insérée
-         */
-        public function create($name, $script, $admin)
+        public function create(int $id_user, string $name, string $script, bool $admin)
         {
             $command = [
+                'id_user' => $id_user,
                 'name' => $name,
                 'script' => $script,
                 'admin' => $admin,
             ];
 
             $result = $this->model_command->insert($command);
-
             if (!$result)
             {
                 return false;
             }
 
-            $this->internal_event->create($_SESSION['user']['id'], 'COMMAND_ADD', 'Ajout commande : '.$name.' => '.$script);
-
+            $this->internal_event->create($id_user, 'COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
+            
             return $result;
         }
-
+        
+        
         /**
-         * Cette fonction met à jour un commande.
-         *
-         * @param mixed $id
-         * @param mixed $name
-         * @param mixed $script
-         * @param mixed $admin
-         *
-         * @return int : le nombre de ligne modifiées
+         * Update a command
+         * @param int $id_user : User id
+         * @param int $id : Command id
+         * @param string $name : Command name
+         * @param string $script : Script file
+         * @param bool $admin : Is command admin only
+         * @return mixed bool|int : False if cannot create command, id of the new command else
          */
-        public function update($id, $name, $script, $admin)
+        public function update_for_user(int $id_user, int $id, string $name, string $script, bool $admin)
         {
             $command = [
                 'name' => $name,
@@ -132,6 +72,6 @@ namespace controllers\internals;
                 'admin' => $admin,
             ];
 
-            return $this->model_command->update($id, $command);
+            return $this->model_command->update_for_user($id_user, $id, $command);
         }
     }
