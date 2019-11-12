@@ -21,6 +21,19 @@ namespace controllers\internals;
             $this->model_phone = new \models\Phone($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
         }
+        
+        /**
+         * Return list of phones
+         * @param int $id_user : User id
+         * @param mixed(int|bool) $nb_entry : Number of entry to return
+         * @param mixed(int|bool) $page     : Numero of page
+         *
+         * @return array|bool : List of user or false
+         */
+        public function list(int $id_user, ?int $nb_entry = null, ?int $page = null)
+        {
+            return $this->model_phone->list($id_user, $nb_entry, $page * $nb_entry);
+        }
 
         /**
          * Return a phone
@@ -29,15 +42,30 @@ namespace controllers\internals;
          */
         public function get (int $id)
         {
-            $phone = $this->model_phone->get($id);
-
-            if (!$phone)
-            {
-                return false;
-            }
-
-            $phone['plateform_datas'] = json_decode($phone['plateform_datas'], true);
-            return $phone;
+            return $this->model_phone->get($id);
+        }
+        
+        
+        /**
+         * Return a phone by is number
+         * @param string $number :  phone number
+         * @return array
+         */
+        public function get_by_number (string $number)
+        {
+            return $this->model_phone->get_by_number($number);
+        }
+        
+        
+        /**
+         * Return a phone by his number and user
+         * @param string $number :  phone number
+         * @param int $id_user : user id
+         * @return array
+         */
+        public function get_by_number_and_user (string $number, int $id_user)
+        {
+            return $this->model_phone->get_by_number_and_user($number, $id_user);
         }
         
         
@@ -48,19 +76,7 @@ namespace controllers\internals;
          */
         public function gets_for_user (int $id_user)
         {
-            $phones = $this->model_phone->gets($id_user);
-
-            if (!$phone)
-            {
-                return false;
-            }
-
-            foreach ($phones as &$phone)
-            {
-                $phone['plateform_datas'] = json_decode($phone['plateform_datas'], true);
-            }
-
-            return $phones;
+            return $this->model_phone->gets_for_user($id_user);
         }
         
         
@@ -70,19 +86,7 @@ namespace controllers\internals;
          */
         public function get_all ()
         {
-            $phones = $this->model_phone->get_all();
-
-            if (!$phone)
-            {
-                return false;
-            }
-
-            foreach ($phones as &$phone)
-            {
-                $phone['plateform_datas'] = json_decode($phone['plateform_datas'], true);
-            }
-
-            return $phones;
+            return $this->model_phone->get_all();
         }
 
 
@@ -91,7 +95,7 @@ namespace controllers\internals;
          * @param int $id : Phone id
          * @return bool
          */
-        public function delete (int $id) : boolean
+        public function delete (int $id) : bool
         {
             return (bool) $this->model_phone->delete($id);
         }
@@ -101,17 +105,17 @@ namespace controllers\internals;
          * Create a phone
          * @param int $id_user : User to insert phone for
          * @param string $number : The number of the phone
-         * @param string $platform : The platform to use the phone
-         * @param array $platform_datas : An array of the datas of the platform (for example credentials for an api)
+         * @param string $adapter : The adapter to use the phone
+         * @param ?string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          * @return bool : false on error, true on success
          */
-        public function insert (int $id_user, string $number, string $platform, array $platform_datas) : boolean
+        public function create (int $id_user, string $number, string $adapter, ?string $adapter_datas) : bool
         {
             $phone = [
                 'id_user' => $id_user,
                 'number' => $number,
-                'platform' => $platform,
-                'platform_datas' => json_encode($platform_datas),
+                'adapter' => $adapter,
+                'adapter_datas' => $adapter_datas,
             ];
 
             return (bool) $this->model_phone->insert($phone);
@@ -123,17 +127,17 @@ namespace controllers\internals;
          * @param int $id : Phone id
          * @param int $id_user : User to insert phone for
          * @param string $number : The number of the phone
-         * @param string $platform : The platform to use the phone
-         * @param array $platform_datas : An array of the datas of the platform (for example credentials for an api)
+         * @param string $adapter : The adapter to use the phone
+         * @param array $adapter_datas : An array of the datas of the adapter (for example credentials for an api)
          * @return bool : false on error, true on success
          */
-        public function update (int $id, int $id_user, string $number, string $platform, array $platform_datas) : boolean
+        public function update (int $id, int $id_user, string $number, string $adapter, array $adapter_datas) : bool
         {
             $phone = [
                 'id_user' => $id_user,
                 'number' => $number,
-                'platform' => $platform,
-                'platform_datas' => json_encode($platform_datas),
+                'adapter' => $adapter,
+                'adapter_datas' => json_encode($adapter_datas),
             ];
 
             return (bool) $this->model_phone->update($id, $phone);
