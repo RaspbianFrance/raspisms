@@ -128,7 +128,7 @@ namespace controllers\internals;
             if (!$id_scheduled = $this->model_scheduled->insert($scheduled))
             {
                 $date = date('Y-m-d H:i:s');
-                $this->internal_event->create('SCHEDULED_ADD', 'Ajout d\'un Sms pour le '.$date.'.');
+                $this->internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le '.$date.'.');
 
                 return false;
             }

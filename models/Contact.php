@@ -82,33 +82,35 @@ namespace models;
         }
 
         /**
-         * Retourne une liste de contactes sous forme d'un tableau.
-         *
-         * @param int $limit  : Nombre de résultat maximum à retourner
-         * @param int $offset : Nombre de résultat à ingnorer
+         * List contacts for a user
+         * @param int $id_user : user id
+         * @param mixed(int|bool) $nb_entry : Number of entry to return
+         * @param mixed(int|bool) $page     : Pagination, will offset $nb_entry * $page results
+         * @return array
          */
-        public function list($limit, $offset)
+        public function list_for_user($id_user, $limit, $offset)
         {
-            return $this->_select('contact', [], null, false, $limit, $offset);
+            return $this->_select('contact', ['id_user' => $id_user], null, false, $limit, $offset);
         }
 
         /**
          * Retourne une liste de contactes sous forme d'un tableau.
-         *
+         * @param int $id_user : user id
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
-         *
          * @return array : La liste des entrées
          */
-        public function gets($ids)
+        public function gets_for_user($id_user, $ids)
         {
             $query = ' 
                 SELECT * FROM contact
-                WHERE id ';
+                WHERE id_user = :id_user
+                AND ';
 
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
+            $params['id_user'] = $id_user; 
 
             return $this->_run_query($query, $params);
         }

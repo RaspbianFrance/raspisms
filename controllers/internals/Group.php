@@ -112,7 +112,7 @@ namespace controllers\internals;
                 $this->model_group->insert_group_contact($id_group, $contact_id);
             }
 
-            $this->internal_event->create('GROUP_ADD', 'Ajout group : '.$name);
+            $this->internal_event->create($_SESSION['user']['id'], 'GROUP_ADD', 'Ajout group : '.$name);
 
             return $id_group;
         }

@@ -185,7 +185,7 @@ namespace controllers\internals;
                 return false;
             }
 
-            $this->internal_event->create('CONTACT_ADD', 'Ajout de l\'utilisateur : '.$email.'.');
+            $this->internal_event->create($_SESSION['user']['id'], 'CONTACT_ADD', 'Ajout de l\'utilisateur : '.$email.'.');
 
             return $result;
         }

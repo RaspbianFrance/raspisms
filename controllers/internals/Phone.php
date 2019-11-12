@@ -30,9 +30,9 @@ namespace controllers\internals;
          *
          * @return array|bool : List of user or false
          */
-        public function list(int $id_user, ?int $nb_entry = null, ?int $page = null)
+        public function list_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null)
         {
-            return $this->model_phone->list($id_user, $nb_entry, $page * $nb_entry);
+            return $this->model_phone->list_for_user($id_user, $nb_entry, $page * $nb_entry);
         }
 
         /**
@@ -47,25 +47,14 @@ namespace controllers\internals;
         
         
         /**
-         * Return a phone by is number
-         * @param string $number :  phone number
-         * @return array
-         */
-        public function get_by_number (string $number)
-        {
-            return $this->model_phone->get_by_number($number);
-        }
-        
-        
-        /**
          * Return a phone by his number and user
-         * @param string $number :  phone number
          * @param int $id_user : user id
+         * @param string $number :  phone number
          * @return array
          */
-        public function get_by_number_and_user (string $number, int $id_user)
+        public function get_by_number_for_user (int $id_user, string $number)
         {
-            return $this->model_phone->get_by_number_and_user($number, $id_user);
+            return $this->model_phone->get_by_number_for_user($id_user, $number);
         }
         
         
@@ -78,16 +67,6 @@ namespace controllers\internals;
         {
             return $this->model_phone->gets_for_user($id_user);
         }
-        
-        
-        /**
-         * Return all phones
-         * @return array
-         */
-        public function get_all ()
-        {
-            return $this->model_phone->get_all();
-        }
 
 
         /**
@@ -95,9 +74,9 @@ namespace controllers\internals;
          * @param int $id : Phone id
          * @return bool
          */
-        public function delete (int $id) : bool
+        public function delete_for_user (int $id_user, int $id) : bool
         {
-            return (bool) $this->model_phone->delete($id);
+            return (bool) $this->model_phone->delete_for_user($id_user, $id);
         }
 
         
@@ -131,7 +110,7 @@ namespace controllers\internals;
          * @param array $adapter_datas : An array of the datas of the adapter (for example credentials for an api)
          * @return bool : false on error, true on success
          */
-        public function update (int $id, int $id_user, string $number, string $adapter, array $adapter_datas) : bool
+        public function update_for_user (int $id, int $id_user, string $number, string $adapter, array $adapter_datas) : bool
         {
             $phone = [
                 'id_user' => $id_user,
@@ -140,7 +119,7 @@ namespace controllers\internals;
                 'adapter_datas' => json_encode($adapter_datas),
             ];
 
-            return (bool) $this->model_phone->update($id, $phone);
+            return (bool) $this->model_phone->update_for_user($id, $phone);
         }
 
     }

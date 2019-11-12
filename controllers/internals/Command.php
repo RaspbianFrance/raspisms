@@ -109,7 +109,7 @@ namespace controllers\internals;
                 return false;
             }
 
-            $this->internal_event->create('COMMAND_ADD', 'Ajout commande : '.$name.' => '.$script);
+            $this->internal_event->create($_SESSION['user']['id'], 'COMMAND_ADD', 'Ajout commande : '.$name.' => '.$script);
 
             return $result;
         }

@@ -65,16 +65,16 @@ namespace controllers\internals;
 
         /**
          * Cette fonction insert un nouvel event.
-         *
-         * @param array $event : Un tableau représentant l'event à insérer
+         * @param int $id_user : user id
          * @param mixed $type
          * @param mixed $text
          *
          * @return mixed bool|int : false si echec, sinon l'id du nouvel event inséré
          */
-        public function create($type, $text)
+        public function create($id_user, $type, $text)
         {
             $event = [
+                'id_user' => $id_user,
                 'type' => $type,
                 'text' => $text,
             ];

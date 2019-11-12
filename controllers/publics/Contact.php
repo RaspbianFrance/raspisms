@@ -43,7 +43,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $contacts = $this->internal_contact->list(25, $page);
+            $contacts = $this->internal_contact->list($_SESSION['user']['id'], 25, $page);
 
             return $this->render('contact/list', ['contacts' => $contacts]);
         }
@@ -68,6 +68,17 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
+                $contact = $this->internal_contact->get($id);
+                if (!$contact)
+                {
+                    continue;
+                }
+
+                if ($contact['id_user'] !== $_SESSION['user']['id'])
+                {
+                    continue;
+                }
+
                 $this->internal_contact->delete($id);
             }
 
@@ -91,7 +102,7 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
-            $contacts = $this->internal_contact->gets($ids);
+            $contacts = $this->internal_contact->gets_for_user($ids, $id_user);
 
             $this->render('contact/edit', [
                 'contacts' => $contacts,
@@ -116,6 +127,7 @@ namespace controllers\publics;
 
             $name = $_POST['name'] ?? false;
             $number = $_POST['number'] ?? false;
+            $id_user = $_SESSION['user']['id'];
 
             if (!$name || !$number)
             {
@@ -132,7 +144,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            if (!$this->internal_contact->create($number, $name))
+            if (!$this->internal_contact->create($id_user, $number, $name))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
@@ -165,7 +177,18 @@ namespace controllers\publics;
 
             foreach ($_POST['contacts'] as $contact)
             {
-                $nb_contacts_update += $this->internal_contact->update($contact['id'], $contact['number'], $contact['name']);
+                $contact = $this->internal_contact->get($contact['id']);
+                if (!$contact)
+                {
+                    continue;
+                }
+
+                if ($contact['id_user'] !== $_SESSION['user']['id'])
+                {
+                    continue;
+                }                
+
+                $nb_contacts_update += $this->internal_contact->update($contact['id'], $_SESSION['user']['id'], $contact['number'], $contact['name']);
             }
 
             if ($nb_contacts_update !== \count($_POST['contacts']))
@@ -186,6 +209,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internal_contact->list());
+            echo json_encode($this->internal_contact->list($_SESSION['user']['id']));
         }
     }

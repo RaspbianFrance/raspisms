@@ -213,7 +213,7 @@ namespace controllers\publics;
             }
 
 
-            if ($origin && !$this->internal_phone->get_by_number_and_user($origin, $_SESSION['user']['id']))
+            if ($origin && !$this->internal_phone->get_by_number_for_user($id_user, $origin))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
@@ -307,7 +307,7 @@ namespace controllers\publics;
                 }
                 
                 
-                if ($origin && !$this->internal_phone->get_by_number_and_user($origin, $_SESSION['user']['id']))
+                if ($origin && !$this->internal_phone->get_by_number_for_user($id_user, $origin))
                 {
                     \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
                     return $this->redirect(\descartes\Router::url('Scheduled', 'add'));

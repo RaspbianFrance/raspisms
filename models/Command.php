@@ -17,57 +17,47 @@ namespace models;
     class Command extends \descartes\Model
     {
         /**
-         * Get all commands.
-         *
+         * Return a command by his id
+         * @param int $id : command id
          * @return array
-         */
-        public function get_all()
-        {
-            return $this->_select('command');
-        }
-
-        /**
-         * Retourne une entrée par son id.
-         *
-         * @param int $id : L'id de l'entrée
-         *
-         * @return array : L'entrée
          */
         public function get($id)
         {
-            $commands = $this->_select('command', ['id' => $id]);
-
-            return isset($commands[0]) ? $commands[0] : false;
+            return $this->_select_one('command', ['id' => $id]);
         }
 
+
         /**
-         * Retourne une liste de commandes sous forme d'un tableau.
-         *
-         * @param int $limit  : Nombre de résultat maximum à retourner
-         * @param int $offset : Nombre de résultat à ingnorer
+         * Return a list of commands for a user
+         * @param int $id_user : user id 
+         * @param int $limit  : Number of command to return
+         * @param int $offset : Number of command to ignore
+         * @return array
          */
-        public function list($limit, $offset)
+        public function list_for_user (int $id_user, $limit, $offset)
         {
-            return $this->_select('command', [], null, false, $limit, $offset);
+            return $this->_select('command', ['id_user' => $id_user], null, false, $limit, $offset);
         }
 
         /**
-         * Retourne une liste de commandes sous forme d'un tableau.
-         *
+         * Return a list of commands in a group of ids and for a user
+         * @param int $id_user : user id
          * @param array $ids : un ou plusieurs id d'entrées à récupérer
          *
          * @return array : La liste des entrées
          */
-        public function gets($ids)
+        public function gets_in_for_user($id_user, $ids)
         {
             $query = ' 
                 SELECT * FROM command
-                WHERE id ';
+                WHERE id_user = :id_user
+                AND id ';
 
             //On génère la clause IN et les paramètres adaptés depuis le tableau des id
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
+            $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params);
         }
