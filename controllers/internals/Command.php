@@ -66,12 +66,12 @@ namespace controllers\internals;
          */
         public function update_for_user(int $id_user, int $id, string $name, string $script, bool $admin)
         {
-            $command = [
+            $datas = [
                 'name' => $name,
                 'script' => $script,
                 'admin' => $admin,
             ];
 
-            return $this->model_command->update_for_user($id_user, $id, $command);
+            return $this->model_command->update_for_user($id_user, $id, $datas);
         }
     }

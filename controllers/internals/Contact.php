@@ -11,123 +11,50 @@
 
 namespace controllers\internals;
 
-    /**
-     * Classe des contactes.
-     */
-    class Contact extends \descartes\InternalController
+    class Contact extends StandardController
     {
-        private $model_contact;
-        private $internal_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_contact = new \models\Contact($bdd);
-            $this->internal_event = new \controllers\internals\Event($bdd);
-        }
+        protected $model = false;
 
         /**
-         * List contacts for a user
-         * @param int $id_user : user id
-         * @param mixed(int|bool) $nb_entry : Number of entry to return
-         * @param mixed(int|bool) $page     : Pagination, will offset $nb_entry * $page results
-         * @return array
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($id_user, $nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            return $this->model_contact->list_for_user($id_user, $nb_entry, $nb_entry * $page);
-        }
-        
-        /**
-         * Return a contact
-         * @param $id : contact id
-         * @return array
-         */
-        public function get($id)
-        {
-            return $this->model_contact->get($id);
-        }
+            $this->model = $this->model ?? new \models\Contact($this->$bdd);
+            return $this->model;
+        } 
 
-        /**
-         * Cette fonction retourne une liste des contactes sous forme d'un tableau.
-         * @param int $id_user : user id
-         * @param array int $ids : Les ids des entrées à retourner
-         * @return array : La liste des contactes
-         */
-        public function gets_for_user($id_user, $ids)
-        {
-            //Recupération des contactes
-            return $this->model_contact->gets_for_user($id_user, $ids);
-        }
-
-        /**
-         * Cette fonction retourne un contact par son numéro de tel.
-         *
-         * @param string $number : Le numéro du contact
-         *
-         * @return array : Le contact
-         */
-        public function get_by_number($number)
-        {
-            //Recupération des contactes
-            return $this->model_contact->get_by_number($number);
-        }
-        
-        
         /**
          * Return a contact for a user by a number
          * @param int $id_user : user id
          * @param string $number : Contact number
          * @return array
          */
-        public function get_by_number_and_user($number, $id_user)
+        public function get_by_number_and_user(int $id_user, string $number,)
         {
-            //Recupération des contactes
-            return $this->model_contact->get_by_number_and_user($number, $id_user);
+            return $this->model_contact->get_by_number_and_user($id_user, $number);
         }
 
+
         /**
-         * Cette fonction retourne un contact par son name.
-         *
-         * @param string $name : Le name du contact
-         *
-         * @return array : Le contact
+         * Return a contact by his name for a user
+         * @param int $id_user : User id
+         * @param string $name : Contact name
+         * @return array
          */
-        public function get_by_name($name)
+        public function get_by_name_and_user(int $id_user, string $name)
         {
-            //Recupération des contactes
-            return $this->model_contact->get_by_name($name);
+            return $this->model_contact->get_by_name_and_user($id_user, $name);
         }
 
-        /**
-         * Cette fonction permet de compter le nombre de contacts.
-         *
-         * @return int : Le nombre d'entrées dans la table
-         */
-        public function count()
-        {
-            return $this->model_contact->count();
-        }
 
         /**
-         * Cette fonction va supprimer un contact.
-         *
-         * @param array $id : L'id du contact à supprimer
-         *
-         * @return int : Le nombre de contact supprimées;
-         */
-        public function delete($id)
-        {
-            return $this->model_contact->delete($id);
-        }
-
-        /**
-         * Cette fonction insert une nouvelle contacte.
-         *
-         * @param int $id_user : user id
-         * @param mixed $number
-         * @param mixed $name
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle contacte insérée
+         * Create a new command
+         * @param int $id_user : User id
+         * @param string $number : Contact number
+         * @param string $name : Contact name
+         * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
         public function create($id_user, $number, $name)
         {
@@ -148,24 +75,22 @@ namespace controllers\internals;
             return $result;
         }
 
+
         /**
-         * Cette fonction met à jour une série de contactes.
-         *
-         * @param mixed $id
-         * @param int $id_user : user id
-         * @param mixed $number
-         * @param mixed $name
-         *
-         * @return int : le nombre de ligne modifiées
+         * Update a contact
+         * @param int $id_user : User id
+         * @param int $id : Command id
+         * @param string $number : Contact number
+         * @param string $name : Contact name
+         * @return int : number of modified rows
          */
-        public function update($id, $id_user, $number, $name)
+        public function update_for_user(int $id_user, int $id, string $number, string $name)
         {
-            $contact = [
-                'id_user' => $id_user,
+            $datas = [
                 'number' => $number,
                 'name' => $name,
             ];
 
-            return $this->model_contact->update($id, $contact);
+            return $this->model_contact->update_for_user($id_user, $id, $datas);
         }
     }
