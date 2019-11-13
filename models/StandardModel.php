@@ -29,7 +29,19 @@ namespace models;
          * @param int $id : entry id
          * @return array
          */
-        public function get($id)
+        public function get(int $id)
+        {
+            return $this->_select_one($this->get_table_name(), ['id' => $id]);
+        }
+        
+        
+        /**
+         * Return an entry by his id for a user
+         * @param int $id_user : user id
+         * @param int $id : entry id
+         * @return array
+         */
+        public function get_for_user(int $id_user, int $id)
         {
             return $this->_select_one($this->get_table_name(), ['id' => $id]);
         }

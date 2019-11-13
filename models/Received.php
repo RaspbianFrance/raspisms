@@ -21,7 +21,30 @@ namespace models;
          * @return string 
          */
         protected function get_table_name() : string { return 'received'; }
+
         
+        /**
+         * Return an entry by his id for a user
+         * @param int $id_user : user id
+         * @param int $id : entry id
+         * @return array
+         */
+        public function get_for_user(int $id_user, int $id)
+        {
+            $query = ' 
+                SELECT * FROM `' . $this->get_table_name() . '`
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            $receiveds = $this->_run_query($query, $params);
+            return $receiveds[0] ?? [];
+        }
+
+
         /**
          * Return a list of received for a user
          * @param int $id_user : User id

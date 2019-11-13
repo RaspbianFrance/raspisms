@@ -24,6 +24,28 @@ namespace models;
         
         
         /**
+         * Return an entry by his id for a user
+         * @param int $id_user : user id
+         * @param int $id : entry id
+         * @return array
+         */
+        public function get_for_user(int $id_user, int $id)
+        {
+            $query = ' 
+                SELECT * FROM `' . $this->get_table_name() . '`
+                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            $receiveds = $this->_run_query($query, $params);
+            return $receiveds[0] ?? [];
+        }
+        
+        
+        /**
          * Return a list of sended for a user
          * @param int $id_user : User id
          * @param int $limit  : Max results to return
