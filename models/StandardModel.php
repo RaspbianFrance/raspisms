@@ -21,7 +21,7 @@ namespace models;
          * Return table name
          * @return string 
          */
-        protected function get_table_name() : string;
+        abstract protected function get_table_name() : string;
 
 
         /**
@@ -107,6 +107,7 @@ namespace models;
         {
             return $this->_update($this->get_table_name(), $entry, ['id_user' => $id_user, 'id' => $id]);
         }
+
 
         /**
          * Count number of entry for a user

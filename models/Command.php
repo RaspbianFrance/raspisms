@@ -11,9 +11,6 @@
 
 namespace models;
 
-    /**
-     * Cette classe gère les accès bdd pour les commandes.
-     */
     class Command extends StandardModel
     {
         /**

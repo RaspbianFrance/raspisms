@@ -14,22 +14,16 @@ namespace models;
     /**
      * Cette classe gère les accès bdd pour les receivedes.
      */
-    class Received extends \descartes\Model
+    class Received extends StandardModel
     {
         /**
-         * Retourne une entrée par son id.
-         *
-         * @param int $id : L'id de l'entrée
-         *
-         * @return array : L'entrée
+         * Return table name
+         * @return string 
          */
-        public function get($id)
-        {
-            return $this->_select_one('received', ['id' => $id]);
-        }
-
+        protected function get_table_name() : string { return 'received'; }
+        
         /**
-         * Return a list of sms where destination in array allowed_destinations
+         * Return a list of received for a user
          * @param int $id_user : User id
          * @param int $limit  : Max results to return
          * @param int $offset : Number of results to ignore
@@ -51,15 +45,117 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
+
         /**
-         * Cette fonction retourne les X dernières entrées triées par date pour un utilisateur.
-         *
-         * @param int $id_user : User id
-         * @param int $nb_entry : Nombre d'entrée à retourner
-         *
-         * @return array : Les dernières entrées
+         * Return a list of receiveds in a group of ids and for a user
+         * @param int $id_user : user id
+         * @param array $ids : ids of receiveds to find
+         * @return array 
          */
-        public function get_lasts_for_user_by_date($id_user, $nb_entry)
+        public function gets_in_for_user(int $id_user, $ids)
+        {
+            $query = ' 
+                SELECT * FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id ';
+
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $generated_in = $this->_generate_in_from_array($ids);
+            $query .= $generated_in['QUERY'];
+            $params = $generated_in['PARAMS'];
+            $params['id_user'] = $id_user; 
+
+            return $this->_run_query($query, $params);
+        }
+        
+        /**
+         * Delete a entry by his id for a user
+         * @param int $id_user : User id
+         * @param int $id : Entry id
+         * @return int : Number of removed rows
+         */
+        public function delete_for_user(int $id_user, int $id)
+        {
+            $query = ' 
+                DELETE FROM received
+                WHERE id = :id
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = ['id_user' => $id_user, 'id' => $id];
+            
+            return $this->_run_query($query, $params, self::ROWCOUNT);
+        }
+
+
+        /**
+         * Update a received sms for a user
+         * @param int $id_user : User id
+         * @param int   $id      : Entry id
+         * @param array $datas : datas to update
+         *
+         * @return int : number of modified rows
+         */
+        public function update_for_user (int $id_user, int $id, array $datas)
+        {
+            $params = [];
+            $sets = [];
+
+            foreach ($datas as $label => $value)
+            {
+                $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
+                $params['set_' . $label] = $value;
+                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
+            }
+
+            $query = '
+                UPDATE `received`
+                SET ' . implode(', ', $sets) . '
+                WHERE id = :id
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            //If try to update destination, also check it does belong to user
+            if ($sets['set_destination'] ?? false)
+            {
+                $query .= ' AND :set_destination IN (SELECT number FROM phone WHERE id_user = :id_user)'
+            }
+
+            $params['id'] = $id;
+            $params['id_user'] = $id_user;
+
+            return $this->_run_query($query, $params, self::ROWCOUNT);
+        }
+        
+        
+        /**
+         * Count number of received sms for user
+         * @param int $id_user : user id
+         * @return int : Number of received SMS for user
+         */
+        public function count_for_user($id_user)
+        {
+            $query = '
+                SELECT COUNT(id) as nb
+                FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
+        }
+
+        
+        /**
+         * Return x last receiveds message for a user, order by date
+         * @param int $id_user : User id
+         * @param int $nb_entry : Number of receiveds messages to return
+         * @return array 
+         */
+        public function get_lasts_by_date_for_user($id_user, $nb_entry)
         {
             $nb_entry = (int) $nb_entry;
 
@@ -77,118 +173,40 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-        /**
-         * Cette fonction retourne une liste des received sous forme d'un tableau.
-         *
-         * @param string $origin : Le numéro depuis lequel est envoyé le message
-         *
-         * @return array : La liste des received
-         */
-        public function get_by_origin($origin)
-        {
-            return $this->_select('received', ['origin' => $origin]);
-        }
 
         /**
-         * Retourne une liste de receivedes sous forme d'un tableau.
-         *
-         * @param array $ids : un ou plusieurs id d'entrées à récupérer
-         *
-         * @return array : La liste des entrées
+         * Return receiveds for an origin and a user
+         * @param int $id_user : User id
+         * @param string $origin : Number who sent the message
+         * @return array
          */
-        public function gets($ids)
+        public function gets_by_origin_for_user(int $id_user, string $origin)
         {
-            $query = ' 
-                SELECT * FROM received
-                WHERE id ';
+            $nb_entry = (int) $nb_entry;
 
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($ids);
-            $query .= $generated_in['QUERY'];
-            $params = $generated_in['PARAMS'];
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Retourne une liste de receivedes sous forme d'un tableau.
-         *
-         * @param array $ids : un ou plusieurs id d'entrées à supprimer
-         * @param mixed $id
-         *
-         * @return int : Le nombre de lignes supprimées
-         */
-        public function delete($id)
-        {
-            $query = ' 
-                DELETE FROM received
-                WHERE id = :id';
-
-            $params = ['id' => $id];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Insert une receivede.
-         *
-         * @param array $received : La receivede à insérer avec les champs name, script, admin & admin
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
-         */
-        public function insert($received)
-        {
-            $result = $this->_insert('received', $received);
-
-            if (!$result)
-            {
-                return false;
-            }
-
-            return $this->_last_id();
-        }
-
-        /**
-         * Met à jour une receivede par son id.
-         *
-         * @param int   $id       : L'id de la received à modifier
-         * @param array $received : Les données à mettre à jour pour la receivede
-         *
-         * @return int : le nombre de ligne modifiées
-         */
-        public function update($id, $received)
-        {
-            return $this->_update('received', $received, ['id' => $id]);
-        }
-
-        /**
-         * Count number of received sms for user
-         * @param int $id_user : user id
-         * @return int : Number of received SMS for user
-         */
-        public function count($id_user)
-        {
             $query = '
-                SELECT COUNT(id) as nb
+                SELECT *
                 FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND origin = :origin
             ';
 
             $params = [
                 'id_user' => $id_user,
+                'origin' => $origin,
             ];
 
-            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
+            return $this->_run_query($query, $params);
         }
 
+
         /**
-         * Récupère le nombre de SMS envoyés pour chaque jour depuis une date.
+         * Get number of sended SMS for every date since a date for a specific user
          * @param int $id_user : user id
-         * @param \DateTime $date : La date depuis laquelle on veux les SMS
-         *
-         * @return array : Tableau avec le nombre de SMS depuis la date
+         * @param \DateTime $date : Date since which we want the messages
+         * @return array
          */
-        public function count_for_user_by_day_since($id_user, $date)
+        public function count_by_day_since_for_user($id_user, $date)
         {
             $query = " 
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
@@ -207,18 +225,28 @@ namespace models;
         }
 
         /**
-         * Cette fonction retourne toutes les discussions, càd les numéros pour lesquels ont a a la fois un message et une réponse.
+         * Return all discussions (ie : numbers we have a message received from or sended to) for a user
+         * @param int $id_user : User id
+         * @return array
          */
-        public function get_discussions()
+        public function get_discussions_for_user(int $id_user)
         {
             $query = ' 
-                    SELECT MAX(at) as at, number
-                    FROM (SELECT at, destination as number FROM sended UNION (SELECT at, origin as number FROM received)) as discussions
+                    SELECT at, number
+                    FROM (
+                        SELECT at, destination as number FROM sended
+                        WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                        UNION (
+                            SELECT at, origin as number FROM received
+                            WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                        )
+                    ) as discussions
                     GROUP BY number
                     ORDER BY at DESC
             ';
 
-            return $this->_run_query($query);
+            $params = ['id_user' => $id_user];
+            return $this->_run_query($query, $params);
         }
 
         /**
@@ -245,24 +273,25 @@ namespace models;
         }
 
         /**
-         * Récupère les SMS reçus depuis une date pour un numero.
-         *
-         * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
-         * @param $origin : Le numéro
-         *
-         * @return array : Tableau avec tous les SMS depuis la date
+         * Find messages received since a date for a certain origin and user
+         * @param int $id_user : User id
+         * @param $date : Date we want messages sinces
+         * @param string $origin : Origin number
+         * @return array
          */
-        public function get_since_for_origin_by_date($date, $origin)
+        public function get_since_by_date_for_origin_and_user(int $id_user, $date, string $origin)
         {
             $query = " 
                 SELECT *
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
                 AND origin = :origin
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 ORDER BY at ASC
             ";
 
             $params = [
+                'id_user' => $id_user
                 'date' => $date,
                 'origin' => $origin,
             ];

@@ -11,114 +11,23 @@
 
 namespace models;
 
-    /**
-     * Cette classe gère les accès bdd pour les eventes.
-     */
-    class Event extends \descartes\Model
+    class Event extends StandardModel
     {
         /**
-         * Retourne une entrée par son id.
-         *
-         * @param int $id : L'id de l'entrée
-         *
-         * @return array : L'entrée
+         * Return table name
+         * @return string 
          */
-        public function get($id)
-        {
-            $events = $this->_select('event', ['id' => $id]);
+        protected function get_table_name() : string { return 'event'; }
 
-            return isset($events[0]) ? $events[0] : false;
-        }
 
         /**
-         * Retourne une liste de eventes sous forme d'un tableau.
-         *
-         * @param int $limit  : Nombre de résultat maximum à retourner
-         * @param int $offset : Nombre de résultat à ingnorer
+         * Gets lasts x events for a user order by date
+         * @param int $id_user : User id
+         * @param int $nb_entry : Number of events to return
+         * @return array
          */
-        public function list($limit, $offset)
+        public function get_lasts_by_date_for_user (int $id_user, int $nb_entry)
         {
-            return $this->_select('event', [], null, false, $limit, $offset);
-        }
-
-        /**
-         * Cette fonction retourne les X dernières entrées triées par date.
-         *
-         * @param mixed $nb_entry
-         *
-         * @return array : Les dernières entrées
-         */
-        public function get_lasts_by_date($nb_entry)
-        {
-            return $this->_select('event', [], 'at', true, $nb_entry);
-        }
-
-        /**
-         * Retourne une liste de eventes sous forme d'un tableau.
-         *
-         * @param array $ids : un ou plusieurs id d'entrées à récupérer
-         *
-         * @return array : La liste des entrées
-         */
-        public function gets($ids)
-        {
-            $query = ' 
-                SELECT * FROM event
-                WHERE id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($ids);
-            $query .= $generated_in['QUERY'];
-            $params = $generated_in['PARAMS'];
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Retourne une liste de eventes sous forme d'un tableau.
-         *
-         * @param array $ids : un ou plusieurs id d'entrées à supprimer
-         * @param mixed $id
-         *
-         * @return int : Le nombre de lignes supprimées
-         */
-        public function delete($id)
-        {
-            $query = ' 
-                DELETE FROM event
-                WHERE id = :id';
-
-            $params = ['id' => $id];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Insert une evente.
-         *
-         * @param array $event : La evente à insérer avec les champs name, script, admin & admin
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle lignée insérée
-         */
-        public function insert($event)
-        {
-            $result = $this->_insert('event', $event);
-
-            if (!$result)
-            {
-                return false;
-            }
-
-            return $this->_last_id();
-        }
-
-        /**
-         * Compte le nombre d'entrées dans la table.
-         *
-         * @return int : Le nombre d'entrées
-         */
-        public function count()
-        {
-            return $this->_count('event');
+            return $this->_select('event', ['id_user' => $id_user], 'at', true, $nb_entry);
         }
     }
