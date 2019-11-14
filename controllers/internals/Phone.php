@@ -24,6 +24,18 @@ namespace controllers\internals;
             $this->model = $this->model ?? new \models\Phone($this->bdd);
             return $this->model;
         } 
+        
+        
+        /**
+         * Return a phone by his number
+         * @param string $number : Phone number
+         * @return array
+         */
+        public function get_by_number(string $number)
+        {
+            return $this->get_model()->get_by_number($number);
+        }
+
 
         /**
          * Return a phone for a user by a number
@@ -33,7 +45,7 @@ namespace controllers\internals;
          */
         public function get_by_number_and_user(int $id_user, string $number)
         {
-            return $this->model_phone->get_by_number_and_user($id_user, $number);
+            return $this->get_model()->get_by_number_and_user($id_user, $number);
         }
 
 
@@ -54,7 +66,7 @@ namespace controllers\internals;
                 'adapter_datas' => $adapter_datas,
             ];
 
-            return (bool) $this->model_phone->insert($phone);
+            return (bool) $this->get_model()->insert($phone);
         }
 
 
@@ -76,6 +88,6 @@ namespace controllers\internals;
                 'adapter_datas' => json_encode($adapter_datas),
             ];
 
-            return (bool) $this->model_phone->update_for_user($id_user, $id, $phone);
+            return (bool) $this->get_model()->update_for_user($id_user, $id, $phone);
         }
     }

@@ -60,7 +60,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
-            $update_setting_result = $this->internal_setting->update_for_user($_SESSION['user']['id'], $_SESSION['user']['id'], $setting_name, $setting_value);
+            $update_setting_result = $this->internal_setting->update_for_user($_SESSION['user']['id'], $setting_name, $setting_value);
             if (false === $update_setting_result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');

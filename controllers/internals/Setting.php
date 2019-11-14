@@ -54,9 +54,9 @@ namespace controllers\internals;
          */
         public function update_for_user (int $id_user, string $name, $value) : bool
         {
-            return (bool) $this->get_model()->update($id_user, $name, $value);
+            return (bool) $this->get_model()->update_by_name_for_user($id_user, $name, $value);
         }
-
+        
 
         /**
          * Create a new setting

@@ -40,7 +40,7 @@ class User extends \descartes\Controller
     public function list($page = 0)
     {
         $page = (int) $page;
-        $users = $this->internal_user->list_for_user($_SESSION['user']['id'], 25, $page);
+        $users = $this->internal_user->list(25, $page);
         $this->render('user/list', ['users' => $users]);
     }
 
@@ -71,7 +71,7 @@ class User extends \descartes\Controller
         $ids = $_GET['ids'] ?? [];
         foreach ($ids as $id)
         {
-            $this->internal_user->delete_for_user($_SESSION['user']['id'], $id);
+            $this->internal_user->delete($id);
         }
 
         return $this->redirect(\descartes\Router::url('User', 'list'));
@@ -122,7 +122,7 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        $user_id = $this->internal_user->create($_SESSION['user']['id'], $email, $password, $admin);
+        $user_id = $this->internal_user->create($email, $password, $admin);
         if (!$user_id)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce user.');

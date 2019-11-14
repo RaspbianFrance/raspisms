@@ -30,4 +30,15 @@ namespace models;
         {
             return $this->_select_one('phone', ['number' => $number, 'id_user' => $id_user]);
         }
+        
+        
+        /**
+         * Return a phone by his number
+         * @param string $number :  phone number
+         * @return array
+         */
+        public function get_by_number (string $number)
+        {
+            return $this->_select_one('phone', ['number' => $number]);
+        }
     }
