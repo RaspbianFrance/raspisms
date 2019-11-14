@@ -13,7 +13,7 @@ namespace controllers\internals;
 
     class Phone extends StandardController
     {
-        protected $model = false;
+        protected $model = null;
 
         /**
          * Get the model for the Controller
@@ -31,7 +31,7 @@ namespace controllers\internals;
          * @param string $number : Phone number
          * @return array
          */
-        public function get_by_number_and_user(int $id_user, string $number,)
+        public function get_by_number_and_user(int $id_user, string $number)
         {
             return $this->model_phone->get_by_number_and_user($id_user, $number);
         }

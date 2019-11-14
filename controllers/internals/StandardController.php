@@ -26,20 +26,6 @@ namespace controllers\internals;
 
 
         /**
-         * Create a new entry
-         * @return mixed bool|int : False if cannot create entry, id of the new entry else
-         */
-        abstract public function create();
-        
-        
-        /**
-         * Update a entry
-         * @return mixed bool|int : False if cannot update entry, number of modified rows else
-         */
-        abstract public function update_for_user();
-        
-
-        /**
          * Return a entry by his id
          * @param int $id : Entry id
          * @return array
@@ -75,18 +61,6 @@ namespace controllers\internals;
         }
 
 
-        /**
-         * Insert a entry
-         * @param 
-         * @param array $entry : Entry to insert
-         * @return mixed bool|int : false on error, new entry id else
-         */
-        public function create ($entry)
-        {
-            $result = $this->get_model()->insert($entry);
-        }
-
-        
         /**
          * Delete a entry by his id for a user
          * @param int $id_user : User id

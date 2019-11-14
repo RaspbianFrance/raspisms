@@ -16,7 +16,7 @@ namespace controllers\internals;
      */
     class Group extends StandardController
     {
-        protected $model = false;
+        protected $model = null;
 
         /**
          * Get the model for the Controller

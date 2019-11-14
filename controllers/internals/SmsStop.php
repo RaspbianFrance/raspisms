@@ -13,7 +13,7 @@ namespace controllers\internals;
 
     class SmsStop extends StandardController
     {
-        protected $model = false;
+        protected $model = null;
 
         /**
          * Get the model for the Controller

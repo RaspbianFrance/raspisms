@@ -13,7 +13,7 @@ namespace controllers\internals;
 
     class Received extends StandardController
     {
-        protected $model = false;
+        protected $model = null;
 
         /**
          * Get the model for the Controller

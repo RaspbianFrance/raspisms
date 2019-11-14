@@ -34,6 +34,29 @@ namespace models;
             $query = ' 
                 SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id = :id
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+                'id' => $id,
+            ];
+
+            $receiveds = $this->_run_query($query, $params);
+            return $receiveds[0] ?? [];
+        }
+        
+        
+        /**
+         * Return all entries for a user
+         * @param int $id_user : user id
+         * @return array
+         */
+        public function gets_for_user(int $id_user)
+        {
+            $query = ' 
+                SELECT * FROM `' . $this->get_table_name() . '`
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
             ';
 
             $params = [
@@ -41,7 +64,6 @@ namespace models;
             ];
 
             $receiveds = $this->_run_query($query, $params);
-            return $receiveds[0] ?? [];
         }
 
 

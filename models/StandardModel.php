@@ -45,6 +45,17 @@ namespace models;
         {
             return $this->_select_one($this->get_table_name(), ['id' => $id]);
         }
+        
+        
+        /**
+         * Return all entries for a user
+         * @param int $id_user : user id
+         * @return array
+         */
+        public function gets_for_user(int $id_user)
+        {
+            return $this->_select($this->get_table_name(), ['id_user' => $id_user]);
+        }
 
 
         /**
