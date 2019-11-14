@@ -21,7 +21,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\Event($this->$bdd);
+            $this->model = $this->model ?? new \models\Event($this->bdd);
             return $this->model;
         } 
 
@@ -40,7 +40,7 @@ namespace controllers\internals;
          */
         public function get_lasts_by_date_for_user (int $id_user, int $nb_entry)
         {
-            return $this->get_lasts_by_date_for_user($id_user, $nb_entry);
+            return $this->get_model()->get_lasts_by_date_for_user($id_user, $nb_entry);
         }
 
 
@@ -59,6 +59,6 @@ namespace controllers\internals;
                 'text' => $text,
             ];
 
-            return $this->model_event->insert($event);
+            return $this->get_model()->insert($event);
         }
     }

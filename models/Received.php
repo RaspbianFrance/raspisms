@@ -163,11 +163,11 @@ namespace models;
             //If try to update destination, also check it does belong to user
             if ($sets['set_destination'] ?? false)
             {
-                $query .= ' AND :set_destination IN (SELECT number FROM phone WHERE id_user = :id_user)'
+                $query .= ' AND :set_destination IN (SELECT number FROM phone WHERE id_user = :id_user)';
             }
 
             $params['id'] = $id;
-            $params['id_user'] = $id_user;
+            $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
@@ -336,7 +336,7 @@ namespace models;
             ";
 
             $params = [
-                'id_user' => $id_user
+                'id_user' => $id_user,
                 'date' => $date,
                 'origin' => $origin,
             ];

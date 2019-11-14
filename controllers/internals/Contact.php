@@ -21,7 +21,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\Contact($this->$bdd);
+            $this->model = $this->model ?? new \models\Contact($this->bdd);
             return $this->model;
         } 
 

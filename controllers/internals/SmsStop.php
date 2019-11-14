@@ -21,7 +21,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\SmsStop($this->$bdd);
+            $this->model = $this->model ?? new \models\SmsStop($this->bdd);
             return $this->model;
         }
 

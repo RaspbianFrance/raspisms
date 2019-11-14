@@ -21,7 +21,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\Sended($this->$bdd);
+            $this->model = $this->model ?? new \models\Sended($this->bdd);
             return $this->model;
         } 
 
@@ -126,6 +126,14 @@ namespace controllers\internals;
          */
         public function count_by_day_since_for_user(int $id_user, $date)
         {
-            return $this->get_model()->count_by_day_since_for_user($id_user, $date);
+            $counts_by_day = $this->get_model()->count_by_day_since_for_user($id_user, $date);
+            $return = [];
+
+            foreach ($counts_by_day as $count_by_day)
+            {
+                $return[$count_by_day['at_ymd']] = $count_by_day['nb'];
+            }
+
+            return $return;
         }
     }

@@ -100,7 +100,7 @@ namespace models;
          * @param int $id : Entry id
          * @return int : Number of removed rows
          */
-        public function delete_for_user(int $id_user, $id)
+        public function delete_for_user(int $id_user, int $id)
         {
             return $this->_delete($this->get_table_name(), ['id_user' => $id_user, 'id' => $id]);
         }
@@ -126,7 +126,7 @@ namespace models;
          *
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, $id, $entry)
+        public function update_for_user(int $id_user, int $id, array $entry)
         {
             return $this->_update($this->get_table_name(), $entry, ['id_user' => $id_user, 'id' => $id]);
         }

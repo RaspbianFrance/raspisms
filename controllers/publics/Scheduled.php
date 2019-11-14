@@ -42,7 +42,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $scheduleds = $this->internal_scheduled->list($_SESSION['user']['id'], 25, $page);
+            $scheduleds = $this->internal_scheduled->list_for_user($_SESSION['user']['id'], 25, $page);
             $this->render('scheduled/list', ['scheduleds' => $scheduleds]);
         }
 
@@ -72,7 +72,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $this->internal_scheduled->delete($id);
+                $this->internal_scheduled->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
@@ -111,7 +111,7 @@ namespace controllers\publics;
             }
 
             $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
-            $scheduleds = $this->internal_scheduled->gets($ids);
+            $scheduleds = $this->internal_scheduled->gets_in_for_user($_SESSION['user']['id'], $ids);
 
             //Pour chaque message on ajoute les numéros, les contacts & les groups
             foreach ($scheduleds as $key => $scheduled)
@@ -220,7 +220,7 @@ namespace controllers\publics;
             }
 
 
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+            $scheduled_id = $this->internal_scheduled->create($_SESSION['user']['id'], $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -313,7 +313,7 @@ namespace controllers\publics;
                     return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                 }
 
-                $success = $this->internal_scheduled->update($id_scheduled, $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+                $success = $this->internal_scheduled->update_for_user($_SESSION['user']['id'], $id_scheduled, $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
                 if (!$success)
                 {
                     $all_update_ok = false;

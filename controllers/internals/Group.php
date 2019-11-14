@@ -24,7 +24,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\Event($this->$bdd);
+            $this->model = $this->model ?? new \models\Event($this->bdd);
             return $this->model;
         } 
 

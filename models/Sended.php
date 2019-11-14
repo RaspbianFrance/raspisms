@@ -163,11 +163,11 @@ namespace models;
             //If try to update origin, also check it does belong to user
             if ($sets['set_origin'] ?? false)
             {
-                $query .= ' AND :set_origin IN (SELECT number FROM phone WHERE id_user = :id_user)'
+                $query .= ' AND :set_origin IN (SELECT number FROM phone WHERE id_user = :id_user)';
             }
 
             $params['id'] = $id;
-            $params['id_user'] = $id_user;
+            $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }

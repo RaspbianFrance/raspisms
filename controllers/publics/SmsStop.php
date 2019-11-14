@@ -41,7 +41,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $smsstops = $this->internal_sms_stop->list($limit, $page);
+            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id']$limit, $page);
             $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => \count($smsstops)]);
         }
 
@@ -72,7 +72,7 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                $this->internal_sms_stop->delete($id);
+                $this->internal_sms_stop->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('SmsStop', 'list'));

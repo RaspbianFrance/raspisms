@@ -43,7 +43,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $contacts = $this->internal_contact->list($_SESSION['user']['id'], 25, $page);
+            $contacts = $this->internal_contact->list_for_user($_SESSION['user']['id'], 25, $page);
 
             return $this->render('contact/list', ['contacts' => $contacts]);
         }
@@ -79,7 +79,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $this->internal_contact->delete($id);
+                $this->internal_contact->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
@@ -144,7 +144,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            if (!$this->internal_contact->create($id_user, $number, $name))
+            if (!$this->internal_contact->create($_SESSION['user']['id'], $id_user, $number, $name))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
@@ -188,7 +188,7 @@ namespace controllers\publics;
                     continue;
                 }                
 
-                $nb_contacts_update += $this->internal_contact->update($contact['id'], $_SESSION['user']['id'], $contact['number'], $contact['name']);
+                $nb_contacts_update += $this->internal_contact->update_for_user($_SESSION['user']['id'], $contact['id'], $_SESSION['user']['id'], $contact['number'], $contact['name']);
             }
 
             if ($nb_contacts_update !== \count($_POST['contacts']))
@@ -209,6 +209,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internal_contact->list($_SESSION['user']['id']));
+            echo json_encode($this->internal_contact->list_for_user($_SESSION['user']['id']));
         }
     }

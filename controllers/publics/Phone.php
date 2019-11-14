@@ -37,7 +37,7 @@ class Phone extends \descartes\Controller
     {
         $id_user = $_SESSION['user']['id'];
         $page = (int) $page;
-        $phones = $this->internal_phone->list($id_user, 25, $page);
+        $phones = $this->internal_phone->list_for_user($_SESSION['user']['id']$id_user, 25, $page);
 
         $adapters = [];
         $adapters_metas = $this->internal_adapter->list_adapters();
@@ -81,7 +81,7 @@ class Phone extends \descartes\Controller
         $ids = $_GET['ids'] ?? [];
         foreach ($ids as $id)
         {
-            $this->internal_phone->delete($id);
+            $this->internal_phone->delete_for_user($_SESSION['user']['id'], $id);
         }
 
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
@@ -163,7 +163,7 @@ class Phone extends \descartes\Controller
         }
 
 
-        $success = $this->internal_phone->create($id_user, $number, $adapter, $adapter_datas);
+        $success = $this->internal_phone->create($_SESSION['user']['id'], $id_user, $number, $adapter, $adapter_datas);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');

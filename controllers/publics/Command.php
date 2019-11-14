@@ -37,7 +37,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $commands = $this->internal_command->list(25, $page);
+            $commands = $this->internal_command->list_for_user($_SESSION['user']['id'], 25, $page);
             $this->render('command/list', ['commands' => $commands]);
         }
 
@@ -62,7 +62,7 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                $this->internal_command->delete($id);
+                $this->internal_command->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('Command', 'list'));
@@ -85,7 +85,7 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
-            $commands = $this->internal_command->gets($ids);
+            $commands = $this->internal_command->gets_in_for_user($_SESSION['user']['id'], $ids);
 
             $this->render('command/edit', [
                 'commands' => $commands,
@@ -122,7 +122,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Command', 'list'));
             }
 
-            if (!$this->internal_command->create($name, $script, $admin))
+            if (!$this->internal_command->create($_SESSION['user']['id'], $name, $script, $admin))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer cette commande.');
 
@@ -154,7 +154,7 @@ namespace controllers\publics;
             $nb_commands_update = 0;
             foreach ($_POST['commands'] as $command)
             {
-                $update_command = $this->internal_command->update($command['id'], $command['name'], $command['script'], $command['admin']);
+                $update_command = $this->internal_command->update_for_user($_SESSION['user']['id'], $command['id'], $command['name'], $command['script'], $command['admin']);
                 $nb_commands_update += (int) $update_command;
             }
 

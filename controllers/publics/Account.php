@@ -182,7 +182,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Account', 'show'));
             }
 
-            $delete_account_result = $this->internal_user->delete($_SESSION['user']['id']);
+            $delete_account_result = $this->internal_user->delete_for_user($_SESSION['user']['id'], $_SESSION['user']['id']);
             if (!$delete_account_result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de supprimer le compte.');

@@ -43,7 +43,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $sendeds = $this->internal_sended->list($_SESSION['user']['id'], $limit, $page);
+            $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id'], $limit, $page);
             $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);
         }
 
@@ -79,7 +79,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $this->internal_sended->delete($id);
+                $this->internal_sended->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('Sended', 'list'));

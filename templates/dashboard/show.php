@@ -210,7 +210,7 @@
 						</div>
                         <div class="panel-body">
                             <?php if (!$events) { ?>
-                                Aucun évènement n'est encore survenus.
+                                Aucun évènement n'est encore survenu.
                             <?php } else { ?>
                                 <div class="list-group">
                                     <?php foreach ($events as $event) { ?>

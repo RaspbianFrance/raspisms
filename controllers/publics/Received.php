@@ -45,7 +45,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $receiveds = $this->internal_received->list($_SESSION['user']['id'], $limit, $page);
+            $receiveds = $this->internal_received->list_for_user($_SESSION['user']['id'], $limit, $page);
 
             foreach ($receiveds as $key => $received)
             {
@@ -91,7 +91,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $this->internal_received->delete($id);
+                $this->internal_received->delete_for_user($_SESSION['user']['id'], $id);
             }
 
             return $this->redirect(\descartes\Router::url('Received', 'list'));
@@ -105,7 +105,7 @@ namespace controllers\publics;
         public function popup()
         {
             $now = new \DateTime();
-            $receiveds = $this->internal_received->get_since_by_date_for_user($now->format('Y-m-d'), $_SESSION['user']['id']);
+            $receiveds = $this->internal_received->get_since_by_date_for_user($_SESSION['user']['id'], $now->format('Y-m-d'));
 
             foreach ($receiveds as $key => $received)
             {

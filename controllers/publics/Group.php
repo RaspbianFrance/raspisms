@@ -45,7 +45,7 @@ namespace controllers\publics;
         public function list($page = 0)
         {
             $page = (int) $page;
-            $groups = $this->internal_group->list(25, $page);
+            $groups = $this->internal_group->list_for_user($_SESSION['user']['id'], 25, $page);
 
             foreach ($groups as $key => $group)
             {
@@ -74,7 +74,7 @@ namespace controllers\publics;
             }
 
             $ids = $_GET['ids'] ?? [];
-            $this->internal_group->delete($ids);
+            $this->internal_group->delete_for_user($_SESSION['user']['id'], $ids);
 
             return $this->redirect(\descartes\Router::url('Group', 'list'));
         }
@@ -96,7 +96,7 @@ namespace controllers\publics;
         {
             $ids = $_GET['ids'] ?? [];
 
-            $groups = $this->internal_group->gets($ids);
+            $groups = $this->internal_group->gets_in_for_user($_SESSION['user']['id'], $ids);
 
             foreach ($groups as $key => $group)
             {
@@ -134,7 +134,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Group', 'add'));
             }
 
-            $id_group = $this->internal_group->create($name, $contacts_ids);
+            $id_group = $this->internal_group->create($_SESSION['user']['id'], $name, $contacts_ids);
             if (!$id_group)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce groupe.');
@@ -169,7 +169,7 @@ namespace controllers\publics;
             $nb_groups_update = 0;
             foreach ($groups as $id => $group)
             {
-                $nb_groups_update += (int) $this->internal_group->update($id, $group['name'], $group['contacts_ids']);
+                $nb_groups_update += (int) $this->internal_group->update_for_user($_SESSION['user']['id'], $id, $group['name'], $group['contacts_ids']);
             }
 
             if ($nb_groups_update !== \count($groups))
@@ -190,6 +190,6 @@ namespace controllers\publics;
         public function json_list()
         {
             header('Content-Type: application/json');
-            echo json_encode($this->internal_group->list());
+            echo json_encode($this->internal_group->list_for_user($_SESSION['user']['id']));
         }
     }
