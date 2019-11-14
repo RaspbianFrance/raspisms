@@ -11,167 +11,121 @@
 
 namespace controllers\internals;
 
-    /**
-     * Classe des sendedes.
-     */
-    class Sended extends \descartes\InternalController
+    class Sended extends StandardController
     {
-        private $model_sended;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_sended = new \models\Sended($bdd);
-        }
+        protected $model = false;
 
         /**
-         * List sms for a user
-         * @param int $id_user : user id
-         * @param mixed(int|bool) $nb_entry : Number of entry to return
-         * @param mixed(int|bool) $page     : Pagination, will offset $nb_entry * $page results
-         * @return array
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($id_user, $nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            return $this->model_sended->list_for_user($id_user, $nb_entry, $nb_entry * $page);
+            $this->model = $this->model ?? new \models\Sended($this->$bdd);
+            return $this->model;
+        } 
+
+        /**
+         * Create a sended
+         * @param $at : Reception date
+         * @param $text : Text of the message
+         * @param string $origin : Number of the sender
+         * @param string $destination : Number of the receiver
+         * @param bool $flash : Is the sms a flash
+         * @param ?string $status : Status of a the sms. By default null -> unknown
+         * @return bool : false on error, new sended id else
+         */
+        public function create ($at, string $text, string $origin, string $destination, bool $flash = false, ?string $status = null) : bool
+        {
+            $sended = [ 
+                'at' => $at,
+                'text' => $text, 
+                'origin' => $origin,
+                'destination' => $destination,
+                'flash' => $flash,
+                'status' => $status,
+            ];
+
+            return (bool) $this->get_model()->insert($sended);
+        }
+
+
+        /**
+         * Update a sended for a user
+         * @param int $id_user : user id
+         * @param int $id_sended : Sended id
+         * @param $at : Reception date
+         * @param $text : Text of the message
+         * @param string $origin : Number of the sender
+         * @param string $destination : Number of the receiver
+         * @param bool $flash : Is the sms a flash
+         * @param ?string $status : Status of a the sms. By default null -> unknown
+         * @return bool : false on error, true on success
+         */
+        public function update_for_user (int $id_user, int $id_sended, $at, string $text, string $origin, string $destination, bool $flash = false, ?string $status = null) : bool
+        {
+            $sended = [ 
+                'at' => $at,
+                'text' => $text, 
+                'origin' => $origin,
+                'destination' => $destination,
+                'flash' => $flash,
+                'status' => $status,
+            ];
+
+            return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
         }
         
+        
         /**
-         * Return a sended sms
-         * @param $id : received id
+         * Update a sended status for a user
+         * @param int $id_user : user id
+         * @param int $id_sended : Sended id
+         * @param string $status : Status of a the sms (unknown, delivered, failed)
+         * @return bool : false on error, true on success
+         */
+        public function update_status_for_user (int $id_user, int $id_sended, string $status) : bool
+        {
+            $sended = [ 
+                'status' => $status,
+            ];
+
+            return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
+        }
+
+
+        /**
+         * Return x last sendeds message for a user, order by date
+         * @param int $id_user : User id
+         * @param int $nb_entry : Number of sendeds messages to return
+         * @return array 
+         */
+        public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
+        {
+            return $this->get_model()->get_lasts_by_date_for_user($id_user, $nb_entry);
+        }
+
+
+        /**
+         * Return sendeds for a destination and a user
+         * @param int $id_user : User id
+         * @param string $origin : Number who sent the message
          * @return array
          */
-        public function get($id)
+        public function gets_by_destination_for_user(int $id_user, string $origin)
         {
-            return $this->model_sended->get($id);
+            return $this->get_model()->gets_by_destination_for_user($id_user, $origin);
         }
 
-        /**
-         * Cette fonction retourne une liste des sendedes sous forme d'un tableau.
-         *
-         * @param array int $ids : Les ids des entrées à retourner
-         *
-         * @return array : La liste des sendedes
-         */
-        public function gets($ids)
-        {
-            //Recupération des sendedes
-            return $this->model_sended->gets($ids);
-        }
 
         /**
-         * Cette fonction retourne les X dernières entrées triées par date.
-         *
-         * @param mixed false|int $nb_entry : Nombre d'entrée à retourner ou faux pour tout
-         *
-         * @return array : Les dernières entrées
-         */
-        public function get_lasts_by_date($nb_entry = false)
-        {
-            return $this->model_sended->get_lasts_by_date($nb_entry);
-        }
-
-        /**
-         * Cette fonction retourne une liste des receivedes sous forme d'un tableau.
-         *
-         * @param string $destination : Le numéro auquel est envoyé le message
-         *
-         * @return array : La liste des sendeds
-         */
-        public function get_by_destination($destination)
-        {
-            //Recupération des sendeds
-            return $this->model_sended->get_by_destination($destination);
-        }
-
-        /**
-         * Cette fonction va supprimer une liste de sendeds.
-         *
-         * @param array $ids : Les id des sendedes à supprimer
-         * @param mixed $id
-         *
-         * @return int : Le nombre de sendedes supprimées;
-         */
-        public function delete($id)
-        {
-            return $this->model_sended->delete($id);
-        }
-
-        /**
-         * Cette fonction insert une nouvelle sendede.
-         *
-         * @param array $sended : Un tableau représentant la sendede à insérer
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle sendede insérée
-         */
-        public function create($sended)
-        {
-            return $this->model_sended->create($sended);
-        }
-
-        /**
-         * Cette fonction permet de compter le nombre de sendeds.
-         *
-         * @return int : Le nombre d'entrées dans la table
-         */
-        public function count()
-        {
-            return $this->model_sended->count();
-        }
-
-        /**
-         * Cette fonction compte le nombre de sendeds par jour depuis une date.
-         *
-         * @param mixed $date
-         *
-         * @return array : un tableau avec en clef la date et en valeure le nombre de sms envoyés
-         */
-        public function count_by_day_since($date)
-        {
-            $counts_by_day = $this->model_sended->count_by_day_since($date);
-            $return = [];
-
-            foreach ($counts_by_day as $count_by_day)
-            {
-                $return[$count_by_day['at_ymd']] = $count_by_day['nb'];
-            }
-
-            return $return;
-        }
-
-        /**
-         * Decrement before delivered.
-         *
-         * @param int $id_sended : id of the sended to decrement delivered for
-         *
+         * Get number of sended SMS for every date since a date for a specific user
+         * @param int $id_user : user id
+         * @param \DateTime $date : Date since which we want the messages
          * @return array
          */
-        public function decrement_before_delivered($id_sended)
+        public function count_by_day_since_for_user(int $id_user, $date)
         {
-            return $this->model_sended->decrement_before_delivered($id_sended);
-        }
-
-        /**
-         * Update status.
-         *
-         * @param int    $id_sended : id of the sended to mark as delivered
-         * @param string $status    : new status
-         *
-         * @return int
-         */
-        public function update_status($id_sended, $status)
-        {
-            return $this->model_sended->update($id_sended, ['status' => $status]);
-        }
-
-        /**
-         * Update sended to delivered.
-         *
-         * @param int $id_sended : id of the sended to mark as delivered
-         *
-         * @return int
-         */
-        public function set_delivered($id_sended)
-        {
-            return $this->model_sended->update($id_sended, ['status' => 'delivered']);
+            return $this->get_model()->count_by_day_since_for_user($id_user, $date);
         }
     }

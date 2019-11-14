@@ -11,14 +11,20 @@
 
 namespace controllers\internals;
 
-    class Setting extends \descartes\InternalController
+    class Setting extends StandardController
     {
-        private $model_setting;
+        protected $model = false;
 
-        public function __construct(\PDO $bdd)
+        /**
+         * Get the model for the Controller
+         * @return \descartes\Model
+         */
+        protected function get_model () : \descartes\Model
         {
-            $this->model_setting = new \models\Setting($bdd);
-        }
+            $this->model = $this->model ?? new \models\Setting($this->bdd);
+            return $this->model;
+        } 
+
 
         /**
          * Return all settings of a user.
@@ -27,7 +33,7 @@ namespace controllers\internals;
          */
         public function gets_for_user (int $id_user)
         {
-            $settings = $this->model_setting->gets_for_user($id_user);
+            $settings = $this->get_model()->gets_for_user($id_user);
             $settings_array = [];
 
             foreach ($settings as $setting)
@@ -46,9 +52,9 @@ namespace controllers\internals;
          * @param mixed $value
          * @return int : number of modified lines
          */
-        public function update (int $id_user, string $name, $value) : bool
+        public function update_for_user (int $id_user, string $name, $value) : bool
         {
-            return (bool) $this->model_setting->update($id_user, $name, $value);
+            return (bool) $this->get_model()->update($id_user, $name, $value);
         }
 
 
@@ -59,7 +65,7 @@ namespace controllers\internals;
          * @param mixed $value : value of the setting
          * @return bool 
          */
-        public function insert (int $id_user, string $name, $value) : bool
+        public function create (int $id_user, string $name, $value) : bool
         {
             $setting = [
                 'id_user' => $id_user,
@@ -67,6 +73,6 @@ namespace controllers\internals;
                 'value' => $value,
             ];
 
-            return (bool) $this->model_setting->insert($setting);
+            return (bool) $this->get_model()->insert($setting);
         }
     }

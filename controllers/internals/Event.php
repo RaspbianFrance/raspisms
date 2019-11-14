@@ -11,65 +11,45 @@
 
 namespace controllers\internals;
 
-    /**
-     * Classe des Event.
-     */
-    class Event extends \descartes\InternalController
+    class Event extends StandardController
     {
-        private $model_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_event = new \models\Event($bdd);
-        }
+        protected $model = false;
 
         /**
-         * Cette fonction retourne une liste des events sous forme d'un tableau.
-         *
-         * @param PDO             $bdd      :  instance PDO de la base de donnée
-         * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page     : Le numéro de page en cours
-         *
-         * @return array : La liste des events
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            //Recupération des events
-            return $this->model_event->list($nb_entry, $nb_entry * $page);
-        }
+            $this->model = $this->model ?? new \models\Event($this->$bdd);
+            return $this->model;
+        } 
+
 
         /**
-         * Cette fonction retourne les X dernières entrées triées par date.
-         *
-         * @param mixed false|int $nb_entry : Nombre d'entrée à retourner ou faux pour tout
-         *
-         * @return array : Les dernières entrées
+         * Disabled methods
          */
-        public function get_lasts_by_date($nb_entry = false)
-        {
-            return $this->model_event->get_lasts_by_date($nb_entry);
-        }
+        public function update_for_user() { return false; }
+
 
         /**
-         * Cette fonction va supprimer une liste de contacts.
-         *
-         * @param array $ids : Les id des contactes à supprimer
-         * @param mixed $id
-         *
-         * @return int : Le nombre de contactes supprimées;
+         * Gets lasts x events for a user order by date
+         * @param int $id_user : User id
+         * @param int $nb_entry : Number of events to return
+         * @return array
          */
-        public function delete($id)
+        public function get_lasts_by_date_for_user (int $id_user, int $nb_entry)
         {
-            return $this->model_event->delete($id);
+            return $this->get_lasts_by_date_for_user($id_user, $nb_entry);
         }
 
+
         /**
-         * Cette fonction insert un nouvel event.
+         * Create a new event
          * @param int $id_user : user id
          * @param mixed $type
          * @param mixed $text
-         *
-         * @return mixed bool|int : false si echec, sinon l'id du nouvel event inséré
+         * @return mixed bool : false on fail, new event id else
          */
         public function create($id_user, $type, $text)
         {

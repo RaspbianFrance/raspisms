@@ -11,6 +11,10 @@
 
 namespace controllers\internals;
 
+    /**
+     * Some tools frequently used.
+     * Not a standard controller as it's not linked to a model in any way
+     */
     class Tool extends \descartes\InternalController
     {
         /**

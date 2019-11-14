@@ -11,6 +11,9 @@
 
 namespace controllers\internals;
 
+    /**
+     * Methods to manage user. Not a standard controller as it has nothing to do with user based restrictions and must be usable only by admin
+     */
     class User extends \descartes\InternalController
     {
         private $model_user;
@@ -36,25 +39,26 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction va supprimer une liste de users.
+         * Delete a user.
          *
          * @param array $ids : Les id des useres à supprimer
          * @param mixed $id
          *
-         * @return int : Le nombre de useres supprimées;
+         * @return int : Number of users deleted
          */
         public function delete($id)
         {
             return $this->model_user->remove($id);
         }
 
+
         /**
-         * Cette fonction vérifie s'il existe un utilisateur qui corresponde à ce couple login/password.
+         * Check user credentials
          *
-         * @param string $email    : L'eamil de l'utilisateur
-         * @param string $password : Le mot de passe de l'utilisateur
+         * @param string $email    : User email
+         * @param string $password : User password
          *
-         * @return mixed false | array : False si pas de user, le user correspondant sous forme d'array sinon
+         * @return mixed false | array : False if no user for thoses credentials, the user else
          */
         public function check_credentials($email, $password)
         {
@@ -114,11 +118,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction retourne un utilisateur pour un mail donné.
+         * Get a user by his email address
+         * @param string $email : User email
          *
-         * @param string $email : L'email de l'utilisateur
-         *
-         * @return mixed boolean | array : false si pas de user pour le mail, le user sinon
+         * @return mixed boolean | array : false if cannot find user for this email, the user else
          */
         public function get_by_email($email)
         {
@@ -136,15 +139,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction met à jour une série de users.
-         *
+         * Update a user by his id
          * @param mixed $id
          * @param mixed $email
          * @param mixed $password
          * @param mixed $admin
          * @param mixed $transfer
          *
-         * @return int : le nombre de ligne modifiées
+         * @return int : Number of modified user
          */
         public function update($id, $email, $password, $admin, $transfer)
         {
@@ -159,15 +161,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction insert une nouvelle usere.
+         * Create a new user
          *
-         * @param array $user     : Un tableau représentant la usere à insérer
          * @param mixed $email
          * @param mixed $password
          * @param mixed $admin
          * @param mixed $transfer
          *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle usere insérée
+         * @return mixed bool|int : false on error, id of the new user else
          */
         public function create($email, $password, $admin, $transfer = false)
         {
@@ -184,8 +185,6 @@ namespace controllers\internals;
             {
                 return false;
             }
-
-            $this->internal_event->create($_SESSION['user']['id'], 'CONTACT_ADD', 'Ajout de l\'utilisateur : '.$email.'.');
 
             return $result;
         }

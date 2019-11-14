@@ -26,7 +26,7 @@ namespace models;
          * @param string $number :  phone number
          * @return array
          */
-        public function get_by_number_for_user (int $id_user, string $number)
+        public function get_by_number_and_user (int $id_user, string $number)
         {
             return $this->_select_one('phone', ['number' => $number, 'id_user' => $id_user]);
         }

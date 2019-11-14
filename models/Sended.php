@@ -248,31 +248,6 @@ namespace models;
         }
 
         /**
-         * Return all discussions (ie : numbers we have a message sended from or sended to) for a user
-         * @param int $id_user : User id
-         * @return array
-         */
-        public function get_discussions_for_user(int $id_user)
-        {
-            $query = ' 
-                    SELECT at, number
-                    FROM (
-                        SELECT at, origin as number FROM sended
-                        WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                        UNION (
-                            SELECT at, destination as number FROM sended
-                            WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-                        )
-                    ) as discussions
-                    GROUP BY number
-                    ORDER BY at DESC
-            ';
-
-            $params = ['id_user' => $id_user];
-            return $this->_run_query($query, $params);
-        }
-
-        /**
          * Get SMS sended since a date for a user 
          * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
          * @param int $id_user : User id
@@ -295,30 +270,4 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-        /**
-         * Find messages sended since a date for a certain destination and user
-         * @param int $id_user : User id
-         * @param $date : Date we want messages sinces
-         * @param string $destination : Origin number
-         * @return array
-         */
-        public function get_since_by_date_for_destination_and_user(int $id_user, $date, string $destination)
-        {
-            $query = " 
-                SELECT *
-                FROM sended
-                WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
-                AND destination = :destination
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-                ORDER BY at ASC
-            ";
-
-            $params = [
-                'id_user' => $id_user
-                'date' => $date,
-                'destination' => $destination,
-            ];
-
-            return $this->_run_query($query, $params);
-        }
     }

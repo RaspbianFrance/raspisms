@@ -25,7 +25,7 @@ namespace models;
          * @param int $id_scheduled : Scheduled id
          * @return array
          */
-        public function get_numbers($id_scheduled)
+        public function get_numbers(int $id_scheduled)
         {
             return $this->_select('scheduled_number', ['id_scheduled' => $id_scheduled]);
         }
@@ -36,7 +36,7 @@ namespace models;
          * @param int $id_scheduled : Scheduled id
          * @return array
          */
-        public function get_contacts($id_scheduled)
+        public function get_contacts(int $id_scheduled)
         {
             $query = 'SELECT * FROM contact WHERE id IN (SELECT id_contact FROM scheduled_contact WHERE id_scheduled = :id_scheduled)';
             $params = ['id_scheduled' => $id_scheduled];
@@ -49,7 +49,7 @@ namespace models;
          * @param int $id_scheduled : Scheduled id
          * @return array
          */
-        public function get_groups($id_scheduled)
+        public function get_groups(int $id_scheduled)
         {
             $query = 'SELECT * FROM `group` WHERE id IN (SELECT id_group FROM scheduled_group WHERE id_scheduled = :id_scheduled)';
             $params = ['id_scheduled' => $id_scheduled];

@@ -14,94 +14,45 @@ namespace controllers\internals;
     /**
      * Classe des groups.
      */
-    class Group extends \descartes\InternalController
+    class Group extends StandardController
     {
-        private $model_group;
-        private $internal_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_group = new \models\Group($bdd);
-            $this->internal_event = new \controllers\internals\Event($bdd);
-        }
+        protected $model = false;
 
         /**
-         * Cette fonction retourne une liste des groups sous forme d'un tableau.
-         *
-         * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page     : Le numéro de page en cours
-         *
-         * @return array : La liste des groups
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            //Recupération des groups
-            return $this->model_group->list($nb_entry, $nb_entry * $page);
-        }
+            $this->model = $this->model ?? new \models\Event($this->$bdd);
+            return $this->model;
+        } 
+
 
         /**
-         * Cette fonction retourne une liste des groups sous forme d'un tableau.
-         *
-         * @param array int $ids : Les ids des entrées à retourner
-         *
-         * @return array : La liste des groups
+         * Create a new group for a user
+         * @param int $id_user : user id
+         * @param stirng $name         : Group name
+         * @param array $contacts_ids : Ids of the contacts of the group
+         * @return mixed bool|int : false on error, new group id
          */
-        public function gets($ids)
-        {
-            //Recupération des groups
-            return $this->model_group->gets($ids);
-        }
-
-        /**
-         * Cette fonction retourne un group par son name.
-         *
-         * @param string $name : Le name du group
-         *
-         * @return array : Le group
-         */
-        public function get_by_name($name)
-        {
-            //Recupération des groups
-            return $this->model_group->get_by_name($name);
-        }
-
-        /**
-         * Cette fonction permet de compter le nombre de group.
-         *
-         * @return int : Le nombre d'entrées dans la table
-         */
-        public function count()
-        {
-            return $this->model_group->count();
-        }
-
-        /**
-         * Cette fonction va supprimer une liste de group.
-         *
-         * @param array $ids : Les id des groups à supprimer
-         *
-         * @return int : Le nombre de groups supprimées;
-         */
-        public function delete($ids)
-        {
-            return $this->model_group->deletes($ids);
-        }
-
-        /**
-         * Cette fonction insert une nouvelle group.
-         *
-         * @param array $name         : le nom du group
-         * @param array $contacts_ids : Un tableau des ids des contact du group
-         *
-         * @return mixed bool|int : false si echec, sinon l'id de la nouvelle group insérée
-         */
-        public function create($name, $contacts_ids)
+        public function create (int $id_user, string $name, array $contacts_ids)
         {
             $group = [
+                'id_user' => $id_user,
                 'name' => $name,
             ];
 
-            $id_group = $this->model_group->insert($group);
+            foreach ($contacts_ids as $key => $contact_id)
+            {
+                $contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                if (!$contact)
+                {
+                    unset($contacts_ids[$key]);
+                }
+            }
+
+            $id_group = $this->get_model()->insert($group);
             if (!$id_group)
             {
                 return false;
@@ -109,39 +60,46 @@ namespace controllers\internals;
 
             foreach ($contacts_ids as $contact_id)
             {
-                $this->model_group->insert_group_contact($id_group, $contact_id);
+                $this->get_model()->insert_group_contact_relation($id_group, $contact_id);
             }
 
-            $this->internal_event->create($_SESSION['user']['id'], 'GROUP_ADD', 'Ajout group : '.$name);
+            $internal_event = new Event($this->bdd);
+            $internal_event->create($id_user, 'GROUP_ADD', 'Ajout group : ' . $name);
 
             return $id_group;
         }
 
+
         /**
-         * Cette fonction met à jour un group.
-         *
-         * @param int    $id           : L'id du group à update
-         * @param string $name         : Le nom du group à update
-         * @param string $contacts_ids : Les ids des contact du group
-         *
-         * @return bool : True if all update ok, false else
+         * Update a group for a user
+         * @param int $id_user : User id
+         * @param int $id_group           : Group id
+         * @param stirng $name         : Group name
+         * @param array $contacts_ids : Ids of the contacts of the group
+         * @return bool : False on error, true on success
          */
-        public function update($id, $name, $contacts_ids)
+        public function update_for_user(int $id_user, int $id_group, string $name, array $contacts_ids)
         {
             $group = [
                 'name' => $name,
             ];
 
-            $result = $this->model_group->update($id, $group);
+            $result = $this->get_model()->update_for_user($id_user, $id_group, $group);
 
-            $this->model_group->delete_group_contacts($id);
+            $this->get_model()->delete_group_contact_relations($id_group);
 
             $nb_contact_insert = 0;
             foreach ($contacts_ids as $contact_id)
             {
-                if ($this->model_group->insert_group_contact($id, $contact_id))
+                $contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                if (!$contact)
                 {
-                    ++$nb_contact_insert;
+                    continue;
+                }
+
+                if ($this->get_model()->insert_group_contact_relation($id_group, $contact_id))
+                {
+                    $nb_contact_insert++;
                 }
             }
 
@@ -153,16 +111,26 @@ namespace controllers\internals;
             return true;
         }
 
+
         /**
-         * Cette fonction retourne les contact pour un group.
-         *
-         * @param string $id : L'id du group
-         *
-         * @return array : Un tableau avec les contact
+         * Return a group by his name for a user
+         * @param int $id_user : User id
+         * @param string $name : Group name
+         * @return array
          */
-        public function get_contacts($id)
+        public function get_by_name_for_user (int $id_user, string $name)
         {
-            //Recupération des groups
-            return $this->model_group->get_contacts($id);
+            return $this->get_model()->get_by_name_for_user($id_user, $name);
+        }
+
+
+        /**
+         * Get groups contacts
+         * @param int $id_group : Group id
+         * @return array : Contacts of the group
+         */
+        public function get_contacts($id_group)
+        {
+            return $this->get_model()->get_contacts($id_group);
         }
     }

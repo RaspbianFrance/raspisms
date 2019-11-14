@@ -11,75 +11,32 @@
 
 namespace controllers\internals;
 
-    class Phone extends \descartes\InternalController
+    class Phone extends StandardController
     {
-        private $model_phone;
-        private $internal_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_phone = new \models\Phone($bdd);
-            $this->internal_event = new \controllers\internals\Event($bdd);
-        }
-        
-        /**
-         * Return list of phones
-         * @param int $id_user : User id
-         * @param mixed(int|bool) $nb_entry : Number of entry to return
-         * @param mixed(int|bool) $page     : Numero of page
-         *
-         * @return array|bool : List of user or false
-         */
-        public function list_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null)
-        {
-            return $this->model_phone->list_for_user($id_user, $nb_entry, $page * $nb_entry);
-        }
+        protected $model = false;
 
         /**
-         * Return a phone
-         * @param int $id :  id of the phone
-         * @return array
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function get (int $id)
+        protected function get_model () : \descartes\Model
         {
-            return $this->model_phone->get($id);
-        }
-        
-        
+            $this->model = $this->model ?? new \models\Phone($this->$bdd);
+            return $this->model;
+        } 
+
         /**
-         * Return a phone by his number and user
+         * Return a phone for a user by a number
          * @param int $id_user : user id
-         * @param string $number :  phone number
+         * @param string $number : Phone number
          * @return array
          */
-        public function get_by_number_for_user (int $id_user, string $number)
+        public function get_by_number_and_user(int $id_user, string $number,)
         {
-            return $this->model_phone->get_by_number_for_user($id_user, $number);
-        }
-        
-        
-        /**
-         * Return phones of a user
-         * @param int $id_user :  id of the user
-         * @return array
-         */
-        public function gets_for_user (int $id_user)
-        {
-            return $this->model_phone->gets_for_user($id_user);
+            return $this->model_phone->get_by_number_and_user($id_user, $number);
         }
 
 
-        /**
-         * Delete a phone
-         * @param int $id : Phone id
-         * @return bool
-         */
-        public function delete_for_user (int $id_user, int $id) : bool
-        {
-            return (bool) $this->model_phone->delete_for_user($id_user, $id);
-        }
-
-        
         /**
          * Create a phone
          * @param int $id_user : User to insert phone for
@@ -90,7 +47,7 @@ namespace controllers\internals;
          */
         public function create (int $id_user, string $number, string $adapter, ?string $adapter_datas) : bool
         {
-            $phone = [
+            $phone = [ 
                 'id_user' => $id_user,
                 'number' => $number,
                 'adapter' => $adapter,
@@ -103,14 +60,14 @@ namespace controllers\internals;
 
         /**
          * Update a phone
-         * @param int $id : Phone id
          * @param int $id_user : User to insert phone for
+         * @param int $id : Phone id
          * @param string $number : The number of the phone
          * @param string $adapter : The adapter to use the phone
          * @param array $adapter_datas : An array of the datas of the adapter (for example credentials for an api)
          * @return bool : false on error, true on success
          */
-        public function update_for_user (int $id, int $id_user, string $number, string $adapter, array $adapter_datas) : bool
+        public function update_for_user (int $id_user, int $id, string $number, string $adapter, array $adapter_datas) : bool
         {
             $phone = [
                 'id_user' => $id_user,
@@ -119,7 +76,6 @@ namespace controllers\internals;
                 'adapter_datas' => json_encode($adapter_datas),
             ];
 
-            return (bool) $this->model_phone->update_for_user($id, $phone);
+            return (bool) $this->model_phone->update_for_user($id_user, $id, $phone);
         }
-
     }

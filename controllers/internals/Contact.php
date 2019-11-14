@@ -33,7 +33,7 @@ namespace controllers\internals;
          */
         public function get_by_number_and_user(int $id_user, string $number,)
         {
-            return $this->model_contact->get_by_number_and_user($id_user, $number);
+            return $this->get_model()->get_by_number_and_user($id_user, $number);
         }
 
 
@@ -45,12 +45,12 @@ namespace controllers\internals;
          */
         public function get_by_name_and_user(int $id_user, string $name)
         {
-            return $this->model_contact->get_by_name_and_user($id_user, $name);
+            return $this->get_model()->get_by_name_and_user($id_user, $name);
         }
 
 
         /**
-         * Create a new command
+         * Create a new contact
          * @param int $id_user : User id
          * @param string $number : Contact number
          * @param string $name : Contact name
@@ -64,7 +64,7 @@ namespace controllers\internals;
                 'name' => $name,
             ];
 
-            $result = $this->model_contact->insert($contact);
+            $result = $this->get_model()->insert($contact);
             if (!$result)
             {
                 return $result;
@@ -79,7 +79,7 @@ namespace controllers\internals;
         /**
          * Update a contact
          * @param int $id_user : User id
-         * @param int $id : Command id
+         * @param int $id : Contact id
          * @param string $number : Contact number
          * @param string $name : Contact name
          * @return int : number of modified rows
@@ -91,6 +91,6 @@ namespace controllers\internals;
                 'name' => $name,
             ];
 
-            return $this->model_contact->update_for_user($id_user, $id, $datas);
+            return $this->get_model()->update_for_user($id_user, $id, $datas);
         }
     }

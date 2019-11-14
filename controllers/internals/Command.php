@@ -43,13 +43,14 @@ namespace controllers\internals;
                 'admin' => $admin,
             ];
 
-            $result = $this->model_command->insert($command);
+            $result = $this->get_model()->insert($command);
             if (!$result)
             {
                 return false;
             }
 
-            $this->internal_event->create($id_user, 'COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
+            $internal_event = new Event($this->bdd);
+            $internal_event->create($id_user, 'COMMAND_ADD', 'Ajout commande : ' . $name . ' => ' . $script);
             
             return $result;
         }
@@ -72,6 +73,6 @@ namespace controllers\internals;
                 'admin' => $admin,
             ];
 
-            return $this->model_command->update_for_user($id_user, $id, $datas);
+            return $this->get_model()->update_for_user($id_user, $id, $datas);
         }
     }

@@ -156,7 +156,7 @@ namespace models;
          * @param int $id_user : user id
          * @return int : Number of received SMS for user
          */
-        public function count_for_user($id_user)
+        public function count_for_user(int $id_user)
         {
             $query = '
                 SELECT COUNT(id) as nb
@@ -178,7 +178,7 @@ namespace models;
          * @param int $nb_entry : Number of receiveds messages to return
          * @return array 
          */
-        public function get_lasts_by_date_for_user($id_user, $nb_entry)
+        public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
         {
             $nb_entry = (int) $nb_entry;
 
@@ -229,7 +229,7 @@ namespace models;
          * @param \DateTime $date : Date since which we want the messages
          * @return array
          */
-        public function count_by_day_since_for_user($id_user, $date)
+        public function count_by_day_since_for_user(int $id_user, $date)
         {
             $query = " 
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
@@ -274,11 +274,11 @@ namespace models;
 
         /**
          * Get SMS received since a date for a user 
-         * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
          * @param int $id_user : User id
+         * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
          * @return array : Tableau avec tous les SMS depuis la date
          */
-        public function get_since_by_date_for_user($date, $id_user)
+        public function get_since_by_date_for_user(int $id_user, $date)
         {
             $query = " 
                 SELECT *

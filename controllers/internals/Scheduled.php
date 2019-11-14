@@ -11,113 +11,35 @@
 
 namespace controllers\internals;
 
-    /**
-     * Classe des scheduleds.
-     */
-    class Scheduled extends \descartes\InternalController
+    class Scheduled extends StandardController
     {
-        private $model_scheduled;
-        private $internal_event;
-
-        public function __construct(\PDO $bdd)
-        {
-            $this->model_scheduled = new \models\Scheduled($bdd);
-            $this->internal_event = new \controllers\internals\Event($bdd);
-        }
+        protected $model = false;
 
         /**
-         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
-         *
-         * @param int $id_user : User id
-         * @param mixed(int|bool) $nb_entry : Le nombre d'entrées à retourner par page
-         * @param mixed(int|bool) $page     : Le numéro de page en cours
-         *
-         * @return array : La liste des scheduleds
+         * Get the model for the Controller
+         * @return \descartes\Model
          */
-        public function list($id_user, $nb_entry = null, $page = null)
+        protected function get_model () : \descartes\Model
         {
-            //Recupération des scheduleds
-            return $this->model_scheduled->list($id_user, $nb_entry, $nb_entry * $page);
-        }
+            $this->model = $this->model ?? new \models\Scheduled($this->$bdd);
+            return $this->model;
+        } 
 
         /**
-         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
-         *
-         * @param array int $ids : Les ids des entrées à retourner
-         *
-         * @return array : La liste des scheduleds
+         * Create a scheduled
+         * @param int $id_user : User to insert scheduled for
+         * @param $at : Scheduled date to send
+         * @param string $text : Text of the message
+         * @param ?string $origin : Origin number of the message, null by default
+         * @param bool $flash : Is the sms a flash sms, by default false
+         * @param array $numbers : Numbers to send message to
+         * @param array $contacts_ids : Contact ids to send message to
+         * @param array $groups_ids : Group ids to send message to
+         * @return bool : false on error, new id on success
          */
-        public function get ($id)
+        public function create (int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [])
         {
-            //Recupération des scheduleds
-            return $this->model_scheduled->get($id);
-        }
-
-        /**
-         * Cette fonction retourne une liste des scheduleds sous forme d'un tableau.
-         *
-         * @param array int $ids : Les ids des entrées à retourner
-         *
-         * @return array : La liste des scheduleds
-         */
-        public function gets($ids)
-        {
-            //Recupération des scheduleds
-            return $this->model_scheduled->gets($ids);
-        }
-
-        /**
-         * Cette fonction retourne les messages programmés avant une date et pour un numéro.
-         *
-         * @param \DateTime $date   : La date avant laquelle on veux le message
-         * @param string    $number : Le numéro
-         *
-         * @return array : Les messages programmés avant la date
-         */
-        public function get_before_date_for_number($date, $number)
-        {
-            return $this->model_scheduled->get_before_date_for_number($date, $number);
-        }
-
-        /**
-         * Cette fonction permet de compter le nombre de scheduled.
-         * @param int $id_user : User id
-         * @return int : Le nombre d'entrées dans la table
-         */
-        public function count($id_user)
-        {
-            return $this->model_scheduled->count($id_user);
-        }
-
-        /**
-         * Cette fonction va supprimer un scheduled.
-         *
-         * @param int $id : L'id du scheduled à supprimer
-         *
-         * @return int : Le nombre de scheduleds supprimées;
-         */
-        public function delete($id)
-        {
-            return $this->model_scheduled->delete($id);
-        }
-
-        /**
-         * Cette fonction insert un nouveau scheduled.
-         * @param int $id_user
-         * @param mixed $at
-         * @param mixed $text
-         * @param mixed $origin
-         * @param mixed $flash
-         * @param mixed $progress
-         * @param array $numbers      : Les numéros auxquels envoyer le scheduled
-         * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
-         * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
-         *
-         * @return mixed bool|int : false si echec, sinon l'id du nouveau scheduled inséré
-         */
-        public function create($id_user, $at, $text, $origin = null, $flash = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
-        {
-            $scheduled = [
+            $scheduled = [ 
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
@@ -125,50 +47,74 @@ namespace controllers\internals;
                 'flash' => $flash,
             ];
 
-            if (!$id_scheduled = $this->model_scheduled->insert($scheduled))
+            if ($origin)
+            {
+                $internal_phone = new Phone($this->bdd);
+                $find_phone = $internal_phone->get_by_number_and_user($id_user, $origin);
+
+                if (!$find_phone)
+                {
+                    return false;
+                }
+            }
+            
+            
+            $id_scheduled = $this->get_model()->insert($scheduled);
+            if (!$id_scheduled)
             {
                 $date = date('Y-m-d H:i:s');
-                $this->internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le '.$date.'.');
-
+                $internal_event = new Event($this->bdd);
+                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
                 return false;
             }
 
             foreach ($numbers as $number)
             {
-                $this->model_scheduled->insert_scheduled_number($id_scheduled, $number);
+                $this->get_model()->insert_scheduled_number($id_scheduled, $number);
             }
 
             foreach ($contacts_ids as $contact_id)
             {
-                $this->model_scheduled->insert_scheduled_contact($id_scheduled, $contact_id);
+                $find_contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                if (!$find_contact)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_contact($id_scheduled, $contact_id);
             }
 
             foreach ($groups_ids as $group_id)
             {
-                $this->model_scheduled->insert_scheduled_group($id_scheduled, $group_id);
+                $find_group = $this->get_model()->get_for_user($id_user, $group_id);
+                if (!$find_group)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_group($id_scheduled, $group_id);
             }
 
             return $id_scheduled;
         }
 
+
         /**
-         * Cette fonction met à jour une série de scheduleds.
-         *
-         * @param mixed $id
-         * @param int $id_user : User id
-         * @param mixed $text
-         * @param mixed $at
-         * @param mixed $origin
-         * @param array $numbers      : Les numéros auxquels envoyer le scheduled
-         * @param array $contacts_ids : Les ids des contact auquels envoyer le scheduled
-         * @param array $groups_ids   : Les ids des group auxquels envoyer le scheduled
-         * @param mixed $flash
-         *
-         * @return int : le nombre de ligne modifiées
+         * Update a scheduled
+         * @param int $id_user : User to insert scheduled for
+         * @param int $id_scheduled : Scheduled id
+         * @param $at : Scheduled date to send
+         * @param string $text : Text of the message
+         * @param ?string $origin : Origin number of the message, null by default
+         * @param bool $flash : Is the sms a flash sms, by default false
+         * @param array $numbers : Numbers to send message to
+         * @param array $contacts_ids : Contact ids to send message to
+         * @param array $groups_ids : Group ids to send message to
+         * @return bool : false on error, new id on success
          */
-        public function update($id, $id_user, $at, $text, $origin = null, $flash = false, $numbers = [], $contacts_ids = [], $groups_ids = [])
+        public function update_for_user (int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [])
         {
-            $scheduled = [
+            $scheduled = [ 
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
@@ -176,7 +122,18 @@ namespace controllers\internals;
                 'flash' => $flash,
             ];
 
-            $success = $this->model_scheduled->update($id, $scheduled);
+            if ($origin)
+            {
+                $internal_phone = new Phone($this->bdd);
+                $find_phone = $internal_phone->get_by_number_and_user($id_user, $origin);
+
+                if (!$find_phone)
+                {
+                    return false;
+                }
+            }
+
+            $success = (bool) $this->get_model()->update_for_user($id_user, $id_scheduled, $scheduled);
 
             $this->model_scheduled->delete_scheduled_numbers($id);
             $this->model_scheduled->delete_scheduled_contacts($id);
@@ -184,71 +141,77 @@ namespace controllers\internals;
 
             foreach ($numbers as $number)
             {
-                $this->model_scheduled->insert_scheduled_number($id, $number);
+                $this->get_model()->insert_scheduled_number($id_scheduled, $number);
             }
 
             foreach ($contacts_ids as $contact_id)
             {
-                $this->model_scheduled->insert_scheduled_contact($id, $contact_id);
+                $find_contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                if (!$find_contact)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_contact($id_scheduled, $contact_id);
             }
 
             foreach ($groups_ids as $group_id)
             {
-                $this->model_scheduled->insert_scheduled_group($id, $group_id);
+                $find_group = $this->get_model()->get_for_user($id_user, $group_id);
+                if (!$find_group)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_group($id_scheduled, $group_id);
             }
 
-            return (bool) $success;
+            return true;
         }
 
-        /**
-         * Cette fonction retourne une liste de numéro pour un scheduled.
-         *
-         * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
-         *
-         * @return array : La liste des scheduleds
-         */
-        public function get_numbers($id_scheduled)
-        {
-            //Recupération des scheduleds
-            return $this->model_scheduled->get_numbers($id_scheduled);
-        }
 
         /**
-         * Cette fonction retourne une liste de contact pour un scheduled.
-         *
-         * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
-         *
-         * @return array : La liste des contact
+         * Get messages scheduled before a date for a number and a user
+         * @param int $id_user : User id
+         * @param $date : Date before which we want messages
+         * @param string $number : Number for which we want messages
+         * @return array
          */
-        public function get_contacts($id_scheduled)
+        public function get_before_date_for_number_and_user (int $id_user, $date, string $number)
         {
-            //Recupération des scheduleds
-            return $this->model_scheduled->get_contacts($id_scheduled);
+            return $this->get_model()->get_before_date_for_number_and_user($id_user, $date, $number);
         }
 
+        
         /**
-         * Cette fonction retourne une liste de group pour un scheduled.
-         *
-         * @param int $id_scheduled : L'id du scheduled pour lequel on veux le numéro
-         *
-         * @return array : La liste des group
+         * Return numbers for a scheduled message
+         * @param int $id_scheduled : Scheduled id
+         * @return array
          */
-        public function get_groups($id_scheduled)
+        public function get_numbers(int $id_scheduled)
         {
-            //Recupération des scheduleds
-            return $this->model_scheduled->get_groups($id_scheduled);
+            return $this->get_model()->get_numbers($id_scheduled);
         }
 
+
         /**
-         * This function update progress status of a scheduled sms.
-         *
-         * @param bool  $progress     : Progress status
-         * @param mixed $id_scheduled
-         *
-         * @return int : Number of update
+         * Return contacts for a scheduled message
+         * @param int $id_scheduled : Scheduled id
+         * @return array
          */
-        public function update_progress($id_scheduled, $progress)
+        public function get_contacts(int $id_scheduled)
         {
-            return $this->model_scheduled->update($id_scheduled, ['progress' => $progress]);
+            return $this->get_model()->get_contacts($id_scheduled);
+        }
+
+
+        /**
+         * Return groups for a scheduled message
+         * @param int $id_scheduled : Scheduled id
+         * @return array
+         */
+        public function get_groups(int $id_scheduled)
+        {
+            return $this->get_model()->get_groups($id_scheduled);
         }
     }
