@@ -42,7 +42,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $events = $this->internal_event->list_for_user($_SESSION['user']['id']$limit, $page);
+            $events = $this->internal_event->list_for_user($_SESSION['user']['id'], $limit, $page);
             $this->render('event/list', ['events' => $events, 'limit' => $limit, 'page' => $page, 'nb_results' => \count($events)]);
         }
 
@@ -59,13 +59,6 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
-
-                return $this->redirect(\descartes\Router::url('Event', 'list'));
-            }
-
-            if (!\controllers\internals\Tool::is_admin())
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Vous devez être admin pour pouvoir supprimer des events.');
 
                 return $this->redirect(\descartes\Router::url('Event', 'list'));
             }

@@ -70,7 +70,8 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $this->internal_event->create($id_user, 'CONTACT_ADD', 'Ajout contact : '.$name.' ('.\controllers\internals\Tool::phone_format($number).')');
+            $internal_event = new Event($this->bdd);
+            $internal_event->create($id_user, 'CONTACT_ADD', 'Ajout contact : '.$name.' ('.\controllers\internals\Tool::phone_format($number).')');
 
             return $result;
         }

@@ -49,7 +49,7 @@ namespace controllers\publics;
 
             foreach ($receiveds as $key => $received)
             {
-                if (!$contact = $this->internal_contact->get_by_number($received['origin']))
+                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
                 {
                     continue;
                 }
@@ -78,19 +78,6 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                $received = $this->internal_received->get($id);
-
-                if (!$received)
-                {
-                    continue;
-                }
-
-                $is_owner = (bool) $this->internal_phone->get_by_number_and_user($received['destination'], $_SESSION['user']['id']);
-                if (!$is_owner)
-                {
-                    continue;
-                }
-
                 $this->internal_received->delete_for_user($_SESSION['user']['id'], $id);
             }
 
@@ -109,7 +96,7 @@ namespace controllers\publics;
 
             foreach ($receiveds as $key => $received)
             {
-                if (!$contact = $this->internal_contact->get_by_number($received['origin']))
+                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
                 {
                     continue;
                 }

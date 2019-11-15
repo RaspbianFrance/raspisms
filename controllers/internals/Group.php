@@ -24,7 +24,7 @@ namespace controllers\internals;
          */
         protected function get_model () : \descartes\Model
         {
-            $this->model = $this->model ?? new \models\Event($this->bdd);
+            $this->model = $this->model ?? new \models\Group($this->bdd);
             return $this->model;
         } 
 
@@ -43,23 +43,22 @@ namespace controllers\internals;
                 'name' => $name,
             ];
 
-            foreach ($contacts_ids as $key => $contact_id)
-            {
-                $contact = $this->get_model()->get_for_user($id_user, $contact_id);
-                if (!$contact)
-                {
-                    unset($contacts_ids[$key]);
-                }
-            }
-
+            
             $id_group = $this->get_model()->insert($group);
             if (!$id_group)
             {
                 return false;
             }
 
+            $internal_contact = new Contact($this->bdd);
             foreach ($contacts_ids as $contact_id)
             {
+                $contact = $internal_contact->get_for_user($id_user, $contact_id);
+                if (!$contact)
+                {
+                    continue;
+                }
+
                 $this->get_model()->insert_group_contact_relation($id_group, $contact_id);
             }
 
@@ -88,10 +87,11 @@ namespace controllers\internals;
 
             $this->get_model()->delete_group_contact_relations($id_group);
 
+            $internal_contact = new Contact($this->bdd);
             $nb_contact_insert = 0;
             foreach ($contacts_ids as $contact_id)
             {
-                $contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                $contact = $internal_contact->get_for_user($id_user, $contact_id);
                 if (!$contact)
                 {
                     continue;

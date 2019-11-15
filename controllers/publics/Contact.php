@@ -68,17 +68,6 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                $contact = $this->internal_contact->get($id);
-                if (!$contact)
-                {
-                    continue;
-                }
-
-                if ($contact['id_user'] !== $_SESSION['user']['id'])
-                {
-                    continue;
-                }
-
                 $this->internal_contact->delete_for_user($_SESSION['user']['id'], $id);
             }
 
@@ -101,8 +90,14 @@ namespace controllers\publics;
         public function edit()
         {
             $ids = $_GET['ids'] ?? [];
+            $id_user = $_SESSION['user']['id'];
 
-            $contacts = $this->internal_contact->gets_for_user($ids, $id_user);
+            $contacts = $this->internal_contact->gets_in_for_user($id_user, $ids);
+
+            if (!$contacts)
+            {
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
 
             $this->render('contact/edit', [
                 'contacts' => $contacts,
@@ -144,7 +139,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            if (!$this->internal_contact->create($_SESSION['user']['id'], $id_user, $number, $name))
+            if (!$this->internal_contact->create($id_user, $number, $name))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
@@ -174,21 +169,9 @@ namespace controllers\publics;
             }
 
             $nb_contacts_update = 0;
-
             foreach ($_POST['contacts'] as $contact)
             {
-                $contact = $this->internal_contact->get($contact['id']);
-                if (!$contact)
-                {
-                    continue;
-                }
-
-                if ($contact['id_user'] !== $_SESSION['user']['id'])
-                {
-                    continue;
-                }                
-
-                $nb_contacts_update += $this->internal_contact->update_for_user($_SESSION['user']['id'], $contact['id'], $_SESSION['user']['id'], $contact['number'], $contact['name']);
+                $nb_contacts_update += (int) $this->internal_contact->update_for_user($_SESSION['user']['id'], $contact['id'], $contact['number'], $contact['name']);
             }
 
             if ($nb_contacts_update !== \count($_POST['contacts']))

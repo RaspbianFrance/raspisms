@@ -30,6 +30,11 @@ class User extends \descartes\Controller
         $this->internal_user = new \controllers\internals\User($bdd);
 
         \controllers\internals\Tool::verifyconnect();
+
+        if (!\controllers\internals\Tool::is_admin())
+        {
+            return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
+        }
     }
 
     /**

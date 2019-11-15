@@ -43,7 +43,7 @@ namespace models;
          */
         public function get_for_user(int $id_user, int $id)
         {
-            return $this->_select_one($this->get_table_name(), ['id' => $id]);
+            return $this->_select_one($this->get_table_name(), ['id' => $id, 'id_user' => $id_user]);
         }
         
         
@@ -80,7 +80,7 @@ namespace models;
         public function gets_in_for_user(int $id_user, $ids)
         {
             $query = ' 
-                SELECT * FROM ' . $this->get_table_name() . '
+                SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE id_user = :id_user
                 AND id ';
 

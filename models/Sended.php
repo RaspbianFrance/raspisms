@@ -225,10 +225,8 @@ namespace models;
          * @param string $destination : Number who sent the message
          * @return array
          */
-        public function gets_by_destination_for_user(int $id_user, string $destination)
+        public function gets_by_destination_and_user(int $id_user, string $destination)
         {
-            $nb_entry = (int) $nb_entry;
-
             $query = '
                 SELECT *
                 FROM sended

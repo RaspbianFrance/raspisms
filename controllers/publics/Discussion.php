@@ -44,11 +44,11 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $discussions = $this->internal_received->get_discussions();
+            $discussions = $this->internal_received->get_discussions_for_user($_SESSION['user']['id']);
 
             foreach ($discussions as $key => $discussion)
             {
-                if (!$contact = $this->internal_contact->get_by_number($discussion['number']))
+                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $discussion['number']))
                 {
                     continue;
                 }
@@ -68,7 +68,7 @@ namespace controllers\publics;
          */
         public function show($number)
         {
-            $contact = $this->internal_contact->get_by_number($number);
+            $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $number);
 
             $this->render('discussion/show', [
                 'number' => $number,
@@ -87,9 +87,11 @@ namespace controllers\publics;
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
-            $sendeds = $this->internal_sended->get_by_destination($number);
-            $receiveds = $this->internal_received->get_by_origin($number);
-            $scheduleds = $this->internal_scheduled->get_before_date_for_number($now, $number);
+            $id_user = $_SESSION['user']['id'];
+
+            $sendeds = $this->internal_sended->gets_by_destination_and_user($id_user, $number);
+            $receiveds = $this->internal_received->gets_by_origin_and_user($id_user, $number);
+            $scheduleds = $this->internal_scheduled->gets_before_date_for_number_and_user($id_user, $now, $number);
 
             $messages = [];
 
@@ -99,7 +101,7 @@ namespace controllers\publics;
                     'date' => htmlspecialchars($sended['at']),
                     'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
-                    'status' => ($sended['delivered'] ? 'delivered' : ($sended['failed'] ? 'failed' : '')),
+                    'status' => $sended['status'],
                 ];
             }
 
@@ -176,7 +178,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$this->internal_scheduled->create($_SESSION['user']['id'], $id_user, $at, $text, false, false, $numbers))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, false, false, $numbers))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

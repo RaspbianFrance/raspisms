@@ -74,17 +74,17 @@
 								<a href="<?php echo \descartes\Router::url('Event', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>
 							</li>
 						</ul>
-					</li>
-					<li <?php echo $page == 'users' ? 'class="active"' : ''; ?>>
-						<a href="<?php echo \descartes\Router::url('User', 'list'); ?>"><i class="fa fa-fw fa-user"></i> Utilisateurs</a>
-					</li>
+                    </li>
 					<li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
 					</li>
-					<?php if ($_SESSION['user']['admin']) { ?>
-						<li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
-							<a href="<?php echo \descartes\Router::url('Setting', 'show'); ?>"><i class="fa fa-fw fa-cogs"></i> Réglages</a>
-						</li>
+                    <li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
+                        <a href="<?php echo \descartes\Router::url('Setting', 'show'); ?>"><i class="fa fa-fw fa-cogs"></i> Réglages</a>
+                    </li>
+                    <?php if (\controllers\internals\Tool::is_admin()) { ?>
+                        <li <?php echo $page == 'users' ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo \descartes\Router::url('User', 'list'); ?>"><i class="fa fa-fw fa-user"></i> Utilisateurs</a>
+                        </li>
 					<?php } ?>
 				</ul>
 			</div>

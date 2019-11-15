@@ -73,26 +73,28 @@ namespace controllers\internals;
                 $this->get_model()->insert_scheduled_number($id_scheduled, $number);
             }
 
+            $internal_contact = new Contact($this->bdd);
             foreach ($contacts_ids as $contact_id)
             {
-                $find_contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                $find_contact = $internal_contact->get_for_user($id_user, $contact_id);
                 if (!$find_contact)
                 {
                     continue;
                 }
 
-                $this->get_model()->insert_scheduled_contact($id_scheduled, $contact_id);
+                $this->get_model()->insert_scheduled_contact_relation($id_scheduled, $contact_id);
             }
 
+            $internal_group = new Group($this->bdd);
             foreach ($groups_ids as $group_id)
             {
-                $find_group = $this->get_model()->get_for_user($id_user, $group_id);
+                $find_group = $internal_group->get_for_user($id_user, $group_id);
                 if (!$find_group)
                 {
                     continue;
                 }
 
-                $this->get_model()->insert_scheduled_group($id_scheduled, $group_id);
+                $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
             }
 
             return $id_scheduled;
@@ -122,6 +124,7 @@ namespace controllers\internals;
                 'flash' => $flash,
             ];
 
+
             if ($origin)
             {
                 $internal_phone = new Phone($this->bdd);
@@ -135,35 +138,37 @@ namespace controllers\internals;
 
             $success = (bool) $this->get_model()->update_for_user($id_user, $id_scheduled, $scheduled);
 
-            $this->model_scheduled->delete_scheduled_numbers($id);
-            $this->model_scheduled->delete_scheduled_contacts($id);
-            $this->model_scheduled->delete_scheduled_groups($id);
+            $this->get_model()->delete_scheduled_numbers($id_scheduled);
+            $this->get_model()->delete_scheduled_contact_relations($id_scheduled);
+            $this->get_model()->delete_scheduled_group_relations($id_scheduled);
 
             foreach ($numbers as $number)
             {
                 $this->get_model()->insert_scheduled_number($id_scheduled, $number);
             }
-
+            
+            $internal_contact = new Contact($this->bdd);
             foreach ($contacts_ids as $contact_id)
             {
-                $find_contact = $this->get_model()->get_for_user($id_user, $contact_id);
+                $find_contact = $internal_contact->get_for_user($id_user, $contact_id);
                 if (!$find_contact)
                 {
                     continue;
                 }
 
-                $this->get_model()->insert_scheduled_contact($id_scheduled, $contact_id);
+                $this->get_model()->insert_scheduled_contact_relation($id_scheduled, $contact_id);
             }
 
+            $internal_group = new Group($this->bdd);
             foreach ($groups_ids as $group_id)
             {
-                $find_group = $this->get_model()->get_for_user($id_user, $group_id);
+                $find_group = $internal_group->get_for_user($id_user, $group_id);
                 if (!$find_group)
                 {
                     continue;
                 }
 
-                $this->get_model()->insert_scheduled_group($id_scheduled, $group_id);
+                $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
             }
 
             return true;
@@ -177,9 +182,9 @@ namespace controllers\internals;
          * @param string $number : Number for which we want messages
          * @return array
          */
-        public function get_before_date_for_number_and_user (int $id_user, $date, string $number)
+        public function gets_before_date_for_number_and_user (int $id_user, $date, string $number)
         {
-            return $this->get_model()->get_before_date_for_number_and_user($id_user, $date, $number);
+            return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
 
         

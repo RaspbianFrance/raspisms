@@ -136,7 +136,7 @@ namespace models;
          * @param string $number : Number for which we want messages
          * @return array
          */
-        public function get_before_date_for_number_and_user (int $id_user, $date, string $number)
+        public function gets_before_date_for_number_and_user (int $id_user, $date, string $number)
         {
             $query = '
                 SELECT *

@@ -91,9 +91,9 @@ namespace controllers\internals;
          * @param string $origin : Number who sent the message
          * @return array
          */
-        public function gets_by_origin_for_user(int $id_user, string $origin)
+        public function gets_by_origin_and_user(int $id_user, string $origin)
         {
-            return $this->get_model()->gets_by_origin_for_user($id_user, $origin);
+            return $this->get_model()->gets_by_origin_and_user($id_user, $origin);
         }
 
 

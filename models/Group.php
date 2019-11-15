@@ -39,7 +39,7 @@ namespace models;
          */
         public function delete_group_contact_relations (int $id_group)
         {
-            return $this->delete('group_contact', ['id_group' => $id_group]);
+            return $this->_delete('group_contact', ['id_group' => $id_group]);
         }
 
 

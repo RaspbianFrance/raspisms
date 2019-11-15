@@ -27,6 +27,17 @@ namespace controllers\internals;
         
         
         /**
+         * Return all phones of a user.
+         * @param int $id_user : user id
+         * @return array
+         */
+        public function gets_for_user (int $id_user)
+        {
+            return $this->get_model()->gets_for_user($id_user);
+        }
+        
+        
+        /**
          * Return a phone by his number
          * @param string $number : Phone number
          * @return array

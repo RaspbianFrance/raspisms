@@ -98,7 +98,7 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
-									'<div class="discussion-message-date">' + message.date + (message.status ? (message.status == 'delivered' ? ' <span class="fa fa-check-circle fa-fw text-success"></span>' : '<span class="fa fa-times-circle fa-fw text-danger"></span>' ) : '' ) + '</div>' +
+									'<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="fa fa-times-circle fa-fw text-danger"></span>' : '<span class="fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
 								'</div>' +
 							'</div>';
 							break;

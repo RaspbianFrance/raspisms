@@ -67,18 +67,6 @@ namespace controllers\publics;
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                $sended = $this->internal_sended->get($id);
-                if (!$sended)
-                {
-                    continue;
-                }
-
-                $is_owner = (bool) $this->internal_phone->get_by_number_and_user($sended['origin'], $_SESSION['user']['id']);
-                if (!$is_owner)
-                {
-                    continue;
-                }
-
                 $this->internal_sended->delete_for_user($_SESSION['user']['id'], $id);
             }
 

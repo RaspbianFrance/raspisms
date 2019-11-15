@@ -41,7 +41,7 @@ namespace controllers\publics;
         {
             $page = (int) $page;
             $limit = 25;
-            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id']$limit, $page);
+            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id'], $limit, $page);
             $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => \count($smsstops)]);
         }
 

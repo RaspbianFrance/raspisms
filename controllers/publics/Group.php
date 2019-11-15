@@ -74,7 +74,10 @@ namespace controllers\publics;
             }
 
             $ids = $_GET['ids'] ?? [];
-            $this->internal_group->delete_for_user($_SESSION['user']['id'], $ids);
+            foreach ($ids as $id)
+            {
+                $this->internal_group->delete_for_user($_SESSION['user']['id'], $id);
+            }
 
             return $this->redirect(\descartes\Router::url('Group', 'list'));
         }

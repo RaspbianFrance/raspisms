@@ -213,14 +213,14 @@ namespace controllers\publics;
             }
 
 
-            if ($origin && !$this->internal_phone->get_by_number_for_user($id_user, $origin))
+            if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
 
-            $scheduled_id = $this->internal_scheduled->create($_SESSION['user']['id'], $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -307,13 +307,13 @@ namespace controllers\publics;
                 }
                 
                 
-                if ($origin && !$this->internal_phone->get_by_number_for_user($id_user, $origin))
+                if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
                 {
                     \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
                     return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                 }
 
-                $success = $this->internal_scheduled->update_for_user($_SESSION['user']['id'], $id_scheduled, $id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
                 if (!$success)
                 {
                     $all_update_ok = false;
