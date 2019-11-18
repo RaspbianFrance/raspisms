@@ -257,3 +257,20 @@ footer
 {
     line-height: 24px;
 }
+
+
+/* CONTACT */
+#contact-datas-container input
+{
+    display: inline-block;
+}
+
+#contact-datas-container .contact-data-name
+{
+    width: 25%;
+}
+
+#contact-datas-container .contact-data-value
+{
+    width: 50%;
+}

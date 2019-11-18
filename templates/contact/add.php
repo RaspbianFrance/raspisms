@@ -51,6 +51,20 @@
 										<input name="" class="form-control" type="tel" id="phone-international-input">
 									</div>
 								</div>
+								<div class="form-group">
+                                    <label>Données du contact</label>
+                                    <p class="italic small" id="description-datas">
+                                        Les données d'un contact vous permettent de l'enrichir afin de pouvoir accéder à ces données au sein d'un message via <a href="#">l'utilisation de templates.</a><br/>
+                                        Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact.
+                                    </p>
+                                    <div id="contact-datas-container">
+                                        <div class="form-group">
+                                            <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée">
+                                             : 
+                                            <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">
+                                        </div>
+                                    </div>
+								</div>	
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Contact', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le contact" /> 	
 							</form>
@@ -71,6 +85,43 @@
 			preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
+        });
+
+
+        jQuery('#contact-datas-container').on('input', '.contact-data-value', function (e) 
+        {
+            var focus_input = this;
+
+            jQuery('#contact-datas-container .form-group').each(function (e) 
+            {
+                var current_input_name = jQuery(this).find('.contact-data-name');
+                var current_input_value = jQuery(this).find('.contact-data-value');
+
+                if (current_input_value.is(focus_input))
+                {
+                    return true;
+                }
+
+                if (jQuery(current_input_name).val() !== '' || jQuery(current_input_value).val() !== '')
+                {
+                    return true;
+                }
+
+                jQuery(this).remove();
+            });
+
+            if (jQuery(focus_input).val() === '')
+            {
+                return true;
+            }
+
+            var template = '' +
+                '<div class="form-group">' +
+                    '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée">' +
+                    ' : ' +
+                    '<input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">' +
+                '</div>';
+            jQuery('#contact-datas-container').append(template);
         });
 	});
 </script>
