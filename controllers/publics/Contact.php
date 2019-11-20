@@ -99,6 +99,14 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
+            foreach ($contacts as &$contact)
+            {
+                if ($contact['datas'])
+                {
+                    $contact['datas'] = json_decode($contact['datas']);
+                }
+            }
+
             $this->render('contact/edit', [
                 'contacts' => $contacts,
             ]);
@@ -123,6 +131,7 @@ namespace controllers\publics;
             $name = $_POST['name'] ?? false;
             $number = $_POST['number'] ?? false;
             $id_user = $_SESSION['user']['id'];
+            $datas = empty($_POST['datas']) ? null : $_POST['datas'];
 
             if (!$name || !$number)
             {
@@ -139,7 +148,25 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            if (!$this->internal_contact->create($id_user, $number, $name))
+            $clean_datas = null;
+            if ($datas)
+            {
+                $clean_datas = [];
+                foreach ($datas as $key => $value)
+                {
+                    if ($value === "")
+                    {
+                        continue;
+                    }
+
+                    $key = mb_ereg_replace('[\W]', '', $key);
+                    $clean_datas[$key] = (string) $value;
+                }
+
+                $clean_datas = json_encode($clean_datas);
+            }
+
+            if (!$this->internal_contact->create($id_user, $number, $name, $clean_datas))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
@@ -168,15 +195,54 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            $nb_contacts_update = 0;
-            foreach ($_POST['contacts'] as $contact)
+            if (!array($_POST['contacts']))
             {
-                $nb_contacts_update += (int) $this->internal_contact->update_for_user($_SESSION['user']['id'], $contact['id'], $contact['number'], $contact['name']);
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $nb_contacts_update = 0;
+            foreach ($_POST['contacts'] as $id_contact => $contact)
+            {
+                $name = $contact['name'] ?? false;
+                $number = $contact['number'] ?? false;
+                $id_user = $_SESSION['user']['id'];
+                $datas = empty($contact['datas']) ? null : $contact['datas'];
+                
+                if (!$name || !$number)
+                {
+                    continue;
+                }
+                
+                $number = \controllers\internals\Tool::parse_phone($number);
+                if (!$number)
+                {
+                    continue;
+                }
+
+                $clean_datas = null;
+                if ($datas)
+                {
+                    $clean_datas = [];
+                    foreach ($datas as $key => $value)
+                    {
+                        if ($value === "")
+                        {
+                            continue;
+                        }
+
+                        $key = mb_ereg_replace('[\W]', '', $key);
+                        $clean_datas[$key] = (string) $value;
+                    }
+
+                    $clean_datas = json_encode($clean_datas);
+                }
+                
+                $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_datas);
             }
 
             if ($nb_contacts_update !== \count($_POST['contacts']))
             {
-                \FlashMessage\FlashMessage::push('danger', 'Certais contacts n\'ont pas pu êtres mis à jour.');
+                \FlashMessage\FlashMessage::push('danger', 'Certains contacts n\'ont pas pu êtres mis à jour.');
 
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }

@@ -231,9 +231,6 @@ footer
 .remove-scheduleds-number
 {
 	display: inline-block;
-	position: absolute;
-	top: 2px;
-	right: 2px;
 	color: #bbbbbb;
 	font-size: 15px;
 	z-index: 999;
@@ -243,6 +240,25 @@ footer
 {
 	color: #aaaaaa;
 	cursor: pointer;
+}
+
+.scheduled-preview-container
+{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.scheduled-preview-container label,
+.scheduled-preview-container select
+{
+    display: inline-block;
+    width: auto;
+}
+
+.scheduled-preview-text-modal .modal-title
+{
+    font-weight: bold;
 }
 
 /* AUDIO RECEPTION MESSAGE */
@@ -260,17 +276,22 @@ footer
 
 
 /* CONTACT */
-#contact-datas-container input
+.contact-datas-container input
 {
     display: inline-block;
 }
 
-#contact-datas-container .contact-data-name
+.contact-datas-container .contact-data-name
 {
     width: 25%;
 }
 
-#contact-datas-container .contact-data-value
+.contact-datas-container .contact-data-value
 {
     width: 50%;
+}
+
+.contact-datas-container .contact-datas-remove
+{
+    color: #c9302c;
 }

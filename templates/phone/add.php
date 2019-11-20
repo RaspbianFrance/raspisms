@@ -40,7 +40,7 @@
 							<form action="<?php echo \descartes\Router::url('Phone', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
                                     <label>Numéro de téléphone</label>
-                                    <p class="italic small">
+                                    <p class="italic small help">
                                         Le numéro de téléphone qui enverra et recevra les messages.
                                     </p>
 									<div class="form-group">
@@ -49,7 +49,7 @@
 								</div>
                                 <div class="form-group">
                                     <label>Adaptateur logiciel du téléphone : </label>
-                                    <p class="italic small" id="description-adapter">
+                                    <p class="italic small help" id="description-adapter">
                                         L'adaptateur logiciel utilisé par RaspiSMS pour communiquer avec le téléphone. Pour plus d'information, consultez <a href="https://raspisms.raspberry-pi.fr/documentation" target="_blank">la documentation de RaspiSMS</a> concernant les adaptateurs logiciels.
                                     </p>
                                     <select name="adapter" class="form-control" id="adapter-select">
@@ -67,7 +67,7 @@
                                 </div>
 								<div class="form-group" id="adapter-datas-container">
                                     <label>Configuration de l'adaptateur</label>
-                                    <p class="italic small" id="description-adapter-datas">
+                                    <p class="italic small help" id="description-adapter-datas">
                                         Les données à fournir à l'adaptateur pour lui permettre de faire la liaison avec le téléphone. Par exemple des identifiants d'API.<br/>
                                     </p>
                                     <textarea id="adapter-datas" name="adapter_datas" class="form-control has-error"></textarea>

@@ -39,59 +39,93 @@
 						<div class="panel-body">
 							<form action="<?php echo \descartes\Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
-									<label>Texte du SMS</label>
-									<textarea name="text" class="form-control" required></textarea>
-								</div>
-								<div class="form-group">
-									<label>Date d'envoi du SMS</label>
-									<input name="at" class="form-control form-datetime" type="text" value="<?php $this->s($now); ?>" readonly>
-								</div>	
-								<div class="form-group">
-									<label>Numéros cibles</label>
-									<div class="form-group scheduleds-number-groupe-container">
-										<div class="form-group scheduleds-number-groupe">
-											<input name="" class="form-control phone-international-input" type="tel" >
-											<span class="remove-scheduleds-number fa fa-times"></span>
-										</div>
-										<div class="add-number-button fa fa-plus-circle"></div>
-									</div>
-								</div>
-								<div class="form-group">
-									<label>Contacts cibles</label>
-									<input class="add-contacts form-control" name="contacts[]"/>
-								</div>
-								<div class="form-group">
-									<label>Groupes cibles</label>
-									<input class="add-groupes form-control" name="groups[]"/>
-								</div>
-								<?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
-									<div class="form-group">
-										<label>Envoyer comme un SMS Flash : </label>
-										<div class="form-group">
-											<input name="flash" type="radio" value="1" required /> Oui 
-											<input name="flash" type="radio" value="0" required checked/> Non
-										</div>
-									</div>
-								<?php } ?>
-                                <div class="form-group">
-                                    <label>Téléphone à employer : </label>
-                                    <select name="origin" class="form-control">
-                                        <option value="">N'importe lequel</option>
-                                        <?php foreach ($phones as $phone) { ?>
-                                            <option value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
-                                        <?php } ?>
-                                    </select>
+                                <label>Texte du SMS</label>
+                                <?php if ($_SESSION['user']['settings']['templating']) { ?>
+                                    <p class="italic small help description-scheduled-text">
+                                        Vous pouvez utilisez des fonctionnalités de templating pour indiquer des valeures génériques qui seront remplacées par les données du contact au moment de l'envoie. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des templates.</a><br/>
+                                        Vous pouvez obtenir une prévisualisation du résultat pour un contact en cliquant sur le boutton <b>"Prévisualiser"</b>.
+                                    </p>
+                                <?php } ?>
+                                <textarea name="text" class="form-control" required></textarea>
+                                <?php if ($_SESSION['user']['settings']['templating']) { ?>
+                                    <div class="scheduled-preview-container">
+                                        <label>Prévisualiser pour : </label>
+                                        <select name="" class="form-control">
+                                            <?php foreach ($contacts as $contact) { ?>
+                                                <option value="<?php $this->s($contact['id']); ?>"><?php $this->s($contact['name']); ?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <a class="btn btn-info preview-button" href="#">Prévisualiser</a>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                            <div class="form-group">
+                                <label>Date d'envoi du SMS</label>
+                                <input name="at" class="form-control form-datetime" type="text" value="<?php $this->s($now); ?>" readonly>
+                            </div>	
+                            <div class="form-group">
+                                <label>Numéros cibles</label>
+                                <div class="form-group scheduleds-number-groupe-container">
+                                    <div class="form-group scheduleds-number-groupe">
+                                        <input name="" class="form-control phone-international-input" type="tel" >
+                                        <span class="remove-scheduleds-number fa fa-times"></span>
+                                    </div>
+                                    <div class="add-number-button fa fa-plus-circle"></div>
                                 </div>
-								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
-								<input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Contacts cibles</label>
+                                <input class="add-contacts form-control" name="contacts[]"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Groupes cibles</label>
+                                <input class="add-groupes form-control" name="groups[]"/>
+                            </div>
+                            <?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
+                                <div class="form-group">
+                                    <label>Envoyer comme un SMS Flash : </label>
+                                    <div class="form-group">
+                                        <input name="flash" type="radio" value="1" required /> Oui 
+                                        <input name="flash" type="radio" value="0" required checked/> Non
+                                    </div>
+                                </div>
+                            <?php } ?>
+                            <div class="form-group">
+                                <label>Numéro à employer : </label>
+                                <select name="origin" class="form-control">
+                                    <option value="">N'importe lequel</option>
+                                    <?php foreach ($phones as $phone) { ?>
+                                        <option value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                            <a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
+                            <input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+<div class="modal fade" tabindex="-1" id="scheduled-preview-text-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Prévisualisation du message</h4>
+            </div>
+            <div class="modal-body">
+                <pre></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 	jQuery(document).ready(function()
     {
@@ -136,7 +170,7 @@
 			var newScheduledsNumberGroupe = '' +
 			'<div class="form-group scheduleds-number-groupe">' +
 				'<input name="" class="form-control phone-international-input" type="tel" id="' + random_id + '">' +
-				'<span class="remove-scheduleds-number fa fa-times"></span>' +
+				' <span class="remove-scheduleds-number fa fa-times"></span>' +
 			'</div>';
 
             jQuery(this).before(newScheduledsNumberGroupe);
@@ -168,6 +202,29 @@
         number_inputs.push({
             'number_input': number_input,
             'iti_number_input': iti_number_input,
+        });
+
+        jQuery('body').on('click', '.preview-button', function (e)
+        {
+            e.preventDefault();
+            var id_contact = jQuery(this).parents('.scheduled-preview-container').find('select').val();
+            var template = jQuery(this).parents('.form-group').find('textarea').val();
+
+            var datas = {
+                'id_contact' : id_contact,
+                'template' : template,
+            };
+
+            jQuery.ajax({
+                type: "POST",
+                url: HTTP_PWD + '/template/preview',
+                data: datas,
+                success: function (datas) {
+                    jQuery('#scheduled-preview-text-modal').find('.modal-body pre').text(datas.result);
+                    jQuery('#scheduled-preview-text-modal').modal({'keyboard': true});
+                },
+                dataType: 'json'
+            });
         });
 	});
 </script>

@@ -53,13 +53,13 @@
 								</div>
 								<div class="form-group">
                                     <label>Données du contact</label>
-                                    <p class="italic small" id="description-datas">
+                                    <p class="italic small help" id="description-datas">
                                         Les données d'un contact vous permettent de l'enrichir afin de pouvoir accéder à ces données au sein d'un message via <a href="#">l'utilisation de templates.</a><br/>
-                                        Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact.
+                                        Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact. Utilisez uniquement des lettres, des chiffres et des underscore pour les noms de données, ni espace ni caractères spéciaux.
                                     </p>
-                                    <div id="contact-datas-container">
+                                    <div class="contact-datas-container">
                                         <div class="form-group">
-                                            <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée">
+                                            <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
                                              : 
                                             <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">
                                         </div>
@@ -88,40 +88,70 @@
         });
 
 
-        jQuery('#contact-datas-container').on('input', '.contact-data-value', function (e) 
+        jQuery('.contact-datas-container').on('input', '.contact-data-value, .contact-data-name', function (e) 
         {
+            var focus_group = jQuery(this).parent('.form-group');
             var focus_input = this;
+            var input_name = focus_group.find('.contact-data-name');
+            var input_value = focus_group.find('.contact-data-value');
 
-            jQuery('#contact-datas-container .form-group').each(function (e) 
+            jQuery('.contact-datas-container .form-group').each(function (e) 
             {
                 var current_input_name = jQuery(this).find('.contact-data-name');
                 var current_input_value = jQuery(this).find('.contact-data-value');
 
-                if (current_input_value.is(focus_input))
+                if (current_input_value.is(focus_input) || current_input_name.is(focus_input))
                 {
                     return true;
                 }
 
-                if (jQuery(current_input_name).val() !== '' || jQuery(current_input_value).val() !== '')
+                if (jQuery(current_input_name).val() === '' && jQuery(current_input_value).val() === '')
                 {
-                    return true;
+                    jQuery(this).remove();
                 }
 
-                jQuery(this).remove();
+                return true;
             });
 
-            if (jQuery(focus_input).val() === '')
+            if (input_name.val() === '' || input_value.val() === '')
             {
                 return true;
             }
 
             var template = '' +
                 '<div class="form-group">' +
-                    '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée">' +
+                    '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
                     ' : ' +
                     '<input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">' +
+                    ' <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>' +
                 '</div>';
-            jQuery('#contact-datas-container').append(template);
+            jQuery('.contact-datas-container').append(template);
+        });
+
+        jQuery('.contact-datas-container').on('click', '.contact-datas-remove', function (e)
+        {
+            e.preventDefault();
+            if (jQuery('.contact-datas-container .form-group').length > 1)
+            {
+                jQuery(this).parent('.form-group').remove();
+            }
+
+            return false;
+        });
+
+        jQuery('form').on('submit', function (e)
+        {
+            e.preventDefault();
+
+            jQuery('.contact-datas-container .form-group').each(function ()
+            {
+                var name = jQuery(this).find('.contact-data-name').val();
+                name = name.replace(/\W/g, '');
+                name = 'datas[' + name + ']';
+                jQuery(this).find('.contact-data-value').attr('name', name);
+            });
+
+            e.currentTarget.submit();    
         });
 	});
 </script>

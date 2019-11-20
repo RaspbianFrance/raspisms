@@ -18,6 +18,7 @@ namespace controllers\publics;
     {
         private $internal_scheduled;
         private $internal_phone;
+        private $internal_contact;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -30,6 +31,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -87,10 +89,12 @@ namespace controllers\publics;
             $less_one_minute = new \DateInterval('PT1M');
             $now->sub($less_one_minute);
 
+            $contacts = $this->internal_contact->gets_for_user($_SESSION['user']['id']);
             $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
 
             $this->render('scheduled/add', [
                 'now' => $now->format('Y-m-d H:i'),
+                'contacts' => $contacts,
                 'phones' => $phones,
             ]);
         }
@@ -110,6 +114,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
+            $all_contacts = $this->internal_contact->gets_for_user($_SESSION['user']['id']);
             $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
             $scheduleds = $this->internal_scheduled->gets_in_for_user($_SESSION['user']['id'], $ids);
 
@@ -147,6 +152,7 @@ namespace controllers\publics;
             $this->render('scheduled/edit', [
                 'scheduleds' => $scheduleds,
                 'phones' => $phones,
+                'contacts' => $all_contacts,
             ]);
         }
 
@@ -331,4 +337,5 @@ namespace controllers\publics;
             \FlashMessage\FlashMessage::push('success', 'Tous les SMS ont été mis à jour.');
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
+
     }

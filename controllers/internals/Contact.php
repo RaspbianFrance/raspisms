@@ -47,6 +47,17 @@ namespace controllers\internals;
         {
             return $this->get_model()->get_by_name_and_user($id_user, $name);
         }
+        
+        
+        /**
+         * Return all contacts of a user.
+         * @param int $id_user : user id
+         * @return array
+         */
+        public function gets_for_user (int $id_user)
+        {
+            return $this->get_model()->gets_for_user($id_user);
+        }
 
 
         /**
@@ -54,14 +65,16 @@ namespace controllers\internals;
          * @param int $id_user : User id
          * @param string $number : Contact number
          * @param string $name : Contact name
+         * @param string $datas : Contact datas
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
-        public function create($id_user, $number, $name)
+        public function create($id_user, $number, $name, $datas)
         {
             $contact = [
                 'id_user' => $id_user,
                 'number' => $number,
                 'name' => $name,
+                'datas' => $datas,
             ];
 
             $result = $this->get_model()->insert($contact);
@@ -83,15 +96,17 @@ namespace controllers\internals;
          * @param int $id : Contact id
          * @param string $number : Contact number
          * @param string $name : Contact name
+         * @param ?string $datas : Contact datas
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, int $id, string $number, string $name)
+        public function update_for_user(int $id_user, int $id, string $number, string $name, ?string $datas)
         {
-            $datas = [
+            $contact = [
                 'number' => $number,
                 'name' => $name,
+                'datas' => $datas,
             ];
 
-            return $this->get_model()->update_for_user($id_user, $id, $datas);
+            return $this->get_model()->update_for_user($id_user, $id, $contact);
         }
     }

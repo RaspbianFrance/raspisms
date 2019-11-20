@@ -2,6 +2,7 @@
     "require": {
         "ingenerator/tokenista": "^1.1",
         "ajani/flash-message": "^2.0",
-        "giggsey/libphonenumber-for-php": "^8.10"
+        "giggsey/libphonenumber-for-php": "^8.10",
+        "twig/twig": "^3.0"
     }
 }

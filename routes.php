@@ -120,6 +120,10 @@
             'delete' => '/smsstop/delete/{csrf}/',
         ],
 
+        'Templating' => [
+            'render_preview' => '/template/preview/',
+        ],
+
         'User' => [
             'list' => [
                 '/user/',

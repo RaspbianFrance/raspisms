@@ -18,6 +18,10 @@
 			<?php } ?>
 		</script>
     <?php } ?>
+    
+    <?php if (!$_SESSION['user']['settings']['display_help']) { ?>
+        <style>.help {display: none;}</style>
+    <?php } ?>
 
     </body>
 </html>
