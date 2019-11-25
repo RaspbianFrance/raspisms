@@ -84,6 +84,17 @@ CREATE TABLE IF NOT EXISTS `group`
 	UNIQUE (id_user, name)
 );
 
+CREATE TABLE IF NOT EXISTS `conditional_group`
+(
+	id INT NOT NULL AUTO_INCREMENT,
+    id_user INT NOT NULL,
+	name VARCHAR(100) NOT NULL,
+    condition TEXT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_user) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	UNIQUE (id_user, name)
+);
+
 CREATE TABLE IF NOT EXISTS group_contact
 (
 	id INT NOT NULL AUTO_INCREMENT,

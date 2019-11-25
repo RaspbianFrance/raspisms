@@ -185,6 +185,25 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-filter fa-fw"></i> Support des groupes conditionnels</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'conditional_group', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Groupes conditionnels activés : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['conditional_group'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-code fa-fw"></i> Support du templating</h4>
 									</div>
 									<div class="panel-body">
