@@ -1,0 +1,181 @@
+<?php
+
+/*
+ * This file is part of RaspiSMS.
+ *
+ * (c) Pierre-Lin Bonnemaison <plebwebsas@gmail.com>
+ *
+ * This source file is subject to the GPL-3.0 license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace controllers\publics;
+
+    /**
+     * Page des groups.
+     */
+    class ConditionalGroup extends \descartes\Controller
+    {
+        private $internal_conditional_group;
+        private $internal_contact;
+        private $internal_ruler;
+        private $internal_event;
+
+        /**
+         * Cette fonction est appelée avant toute les autres :
+         * Elle vérifie que l'utilisateur est bien connecté.
+         *
+         * @return void;
+         */
+        public function __construct()
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+
+            $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
+            $this->internal_event = new \controllers\internals\Event($bdd);
+            $this->internal_ruler = new \controllers\internals\Ruler($bdd);
+
+            \controllers\internals\Tool::verifyconnect();
+        }
+
+        /**
+         * Return all conditionnals groups for administration
+         *
+         * @param mixed $page
+         */
+        public function list($page = 0)
+        {
+            $page = (int) $page;
+
+
+            $groups = $this->internal_conditional_group->list_for_user($_SESSION['user']['id'], 25, $page);
+            $this->render('conditional_group/list', ['groups' => $groups]);
+        }
+
+        /**
+         * Cette fonction va supprimer une liste de groups.
+         *
+         * @param array int $_GET['ids'] : Les id des groups à supprimer
+         * @param mixed     $csrf
+         *
+         * @return boolean;
+         */
+        public function delete($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+            }
+
+            $ids = $_GET['ids'] ?? [];
+            foreach ($ids as $id)
+            {
+                $this->internal_conditional_group->delete_for_user($_SESSION['user']['id'], $id);
+            }
+
+            return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+        }
+
+        /**
+         * Cette fonction retourne la page d'ajout d'un group.
+         */
+        public function add()
+        {
+            $this->render('conditional_group/add');
+        }
+
+        /**
+         * Cette fonction retourne la page d'édition des groups.
+         *
+         * @param int... $ids : Les id des groups à supprimer
+         */
+        public function edit()
+        {
+            $ids = $_GET['ids'] ?? [];
+
+            $groups = $this->internal_conditional_group->gets_in_for_user($_SESSION['user']['id'], $ids);
+
+            $this->render('conditional_group/edit', [
+                'groups' => $groups,
+            ]);
+        }
+
+        /**
+         * Cette fonction insert un nouveau group.
+         *
+         * @param $csrf : Le jeton CSRF
+         * @param string $_POST['name']     : Le nom du group
+         * @param array  $_POST['condition'] : The condition to used
+         */
+        public function create($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'add'));
+            }
+
+            $name = $_POST['name'] ?? false;
+            $condition = $_POST['condition'] ?? false;
+
+            if (!$name || !$condition)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Des champs sont manquants !');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'add'));
+            }
+
+            $id_group = $this->internal_conditional_group->create($_SESSION['user']['id'], $name, $condition);
+            if (!$id_group)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce groupe.');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'add'));
+            }
+
+            \FlashMessage\FlashMessage::push('success', 'Le groupe a bien été créé.');
+
+            return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+        }
+
+        /**
+         * Cette fonction met à jour une group.
+         *
+         * @param $csrf : Le jeton CSRF
+         * @param array $_POST['groups'] : Un tableau des groups avec leur nouvelle valeurs & une entrée 'contacts_id' avec les ids des contacts pour chaque group
+         *
+         * @return boolean;
+         */
+        public function update($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+            }
+
+            $groups = $_POST['groups'] ?? [];
+
+            $nb_groups_update = 0;
+            foreach ($groups as $id => $group)
+            {
+                $nb_groups_update += (int) $this->internal_conditional_group->update_for_user($_SESSION['user']['id'], $id, $group['name'], $group['condition']);
+            }
+
+            if ($nb_groups_update !== \count($groups))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Certains groupes n\'ont pas pu êtres mis à jour.');
+
+                return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+            }
+
+            \FlashMessage\FlashMessage::push('success', 'Tous les groupes ont été modifiés avec succès.');
+
+            return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
+        }
+    }

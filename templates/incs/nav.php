@@ -55,12 +55,15 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#repertoire"><i class="fa fa-fw fa-book"></i> Répertoire <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="repertoire" class="collapse <?php echo in_array($page, array('contacts', 'groupes')) ? 'in' : ''; ?>">
+						<ul id="repertoire" class="collapse <?php echo in_array($page, array('contacts', 'groupes', 'conditional_groupes')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'contacts' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('Contact', 'list'); ?>"><i class="fa fa-fw fa-user"></i> Contacts</a>
 							</li>
 							<li <?php echo $page == 'groupes' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('Group', 'list'); ?>"><i class="fa fa-fw fa-group"></i> Groupes</a>
+							</li>
+							<li <?php echo $page == 'conditional_groupes' ? 'class="active"' : ''; ?>>
+								<a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>"><i class="fa fa-fw fa-random"></i> Groupes Conditionnels</a>
 							</li>
 						</ul>
 					</li>

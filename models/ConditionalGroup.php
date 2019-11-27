@@ -11,7 +11,7 @@
 
 namespace models;
 
-    class CondiditionalGroup extends StandardModel
+    class ConditionalGroup extends StandardModel
     {
         /**
          * Return table name

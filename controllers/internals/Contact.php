@@ -68,7 +68,7 @@ namespace controllers\internals;
          * @param string $datas : Contact datas
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
-        public function create($id_user, $number, $name, $datas)
+        public function create($id_user, $number, $name, ?string $datas = null)
         {
             $contact = [
                 'id_user' => $id_user,

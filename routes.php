@@ -77,6 +77,18 @@
             'update' => '/group/update/{csrf}/',
             'json_list' => '/groups.json/',
         ],
+        
+        'ConditionalGroup' => [
+            'list' => [
+                '/conditional_group/',
+                '/conditional_group/p/{page}/',
+            ],
+            'add' => '/conditional_group/add/',
+            'create' => '/conditional_group/create/{csrf}/',
+            'delete' => '/conditional_group/delete/{csrf}/',
+            'edit' => '/conditional_group/edit/',
+            'update' => '/conditional_group/update/{csrf}/',
+        ],
 
         'Received' => [
             'list' => [

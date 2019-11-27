@@ -19,7 +19,7 @@
 		</script>
     <?php } ?>
     
-    <?php if (!$_SESSION['user']['settings']['display_help']) { ?>
+    <?php if (!$_SESSION['user']['settings']['display_help'] ?? false) { ?>
         <style>.help {display: none;}</style>
     <?php } ?>
 

@@ -131,7 +131,7 @@ namespace controllers\publics;
             $name = $_POST['name'] ?? false;
             $number = $_POST['number'] ?? false;
             $id_user = $_SESSION['user']['id'];
-            $datas = empty($_POST['datas']) ? null : $_POST['datas'];
+            $datas = $_POST['datas'] ?? [];
 
             if (!$name || !$number)
             {
@@ -162,7 +162,11 @@ namespace controllers\publics;
                     $key = mb_ereg_replace('[\W]', '', $key);
                     $clean_datas[$key] = (string) $value;
                 }
-
+            }
+            $clean_datas = $clean_datas ?: null;
+            
+            if ($clean_datas)
+            {
                 $clean_datas = json_encode($clean_datas);
             }
 
@@ -206,7 +210,7 @@ namespace controllers\publics;
                 $name = $contact['name'] ?? false;
                 $number = $contact['number'] ?? false;
                 $id_user = $_SESSION['user']['id'];
-                $datas = empty($contact['datas']) ? null : $contact['datas'];
+                $datas = $contact['datas'] ?? null;
                 
                 if (!$name || !$number)
                 {
@@ -218,7 +222,7 @@ namespace controllers\publics;
                 {
                     continue;
                 }
-
+                
                 $clean_datas = null;
                 if ($datas)
                 {
@@ -233,9 +237,14 @@ namespace controllers\publics;
                         $key = mb_ereg_replace('[\W]', '', $key);
                         $clean_datas[$key] = (string) $value;
                     }
-
+                }
+                $clean_datas = $clean_datas ?: null;
+                
+                if ($clean_datas)
+                {
                     $clean_datas = json_encode($clean_datas);
                 }
+
                 
                 $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_datas);
             }

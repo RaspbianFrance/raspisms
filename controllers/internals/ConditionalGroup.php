@@ -41,7 +41,9 @@ namespace controllers\internals;
                 'condition' => $condition,
             ];
 
-            if (!$this->validate_condition($condition))
+            $internal_ruler = new Ruler();
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
+            if (!$valid_condition)
             {
                 return false;
             }
@@ -73,8 +75,10 @@ namespace controllers\internals;
                 'name' => $name,
                 'condition' => $condition,
             ];
-            
-            if (!$this->validate_condition($condition))
+
+            $internal_ruler = new Ruler();
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
+            if (!$valid_condition)
             {
                 return false;
             }
@@ -102,11 +106,39 @@ namespace controllers\internals;
 
 
         /**
-         * Verify if a condition string is valid (i.e we can parse it without error)
+         * Gets the user's contacts that respects a condition
+         * @param int $id_user : User id
          * @param string $condition : Condition string to verify
          * @return bool
          */
-        public function validate_condition (string $condition) : bool
+        public function get_contacts_for_condition_and_user (int $id_user, string $condition) : bool
         {
+            $internal_contacts = new Contacts($this->bdd);
+            $contacts = $internal_contacts->gets_for_user($id_user);
+
+            $ruler = new Ruler();
+
+            foreach ($contacts as $key => $contact)
+            {
+                if ($contact['datas'] != null)
+                {
+                    $contact['datas'] = json_decode($contact['datas']);
+                }
+                else
+                {
+                    $contact['datas'] = new \stdClass();
+                }
+
+                $contact = (object) $contact;
+                
+                $datas = ['contact' => $contact];
+                $is_valid = $ruler->evaluate_condition($condition, $datas);
+                if (!$is_valid)
+                {
+                    unset($contacts[$key]);
+                }
+            }
+            
+            return $contacts;
         }
     }
