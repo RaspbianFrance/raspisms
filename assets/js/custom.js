@@ -66,6 +66,15 @@ function playReceptionSound ()
 jQuery(document).ready(function()
 {
 	var verifReceivedInterval = setInterval(verifReceived, 10000);
+    
+    jQuery('body').on('click', '.btn-confirm', function (e)
+    {
+        e.preventDefault();
+        jQuery(this).addClass('btn-warning');
+        jQuery(this).removeClass('btn-confirm');
+        jQuery(this).html('<span class="fa fa-trash-o"></span> Valider la suppression');
+        return false;
+    });
 
 	jQuery('body').on('click', '.goto', function (e) {
 		e.preventDefault();
