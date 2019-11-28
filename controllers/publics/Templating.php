@@ -62,10 +62,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if ($contact['datas'])
-            {
-                $contact['datas'] = json_decode($contact['datas'], true);
-            }
+            $contact['datas'] = json_decode($contact['datas'], true);
 
             $datas = [
                 'contact' => $contact,

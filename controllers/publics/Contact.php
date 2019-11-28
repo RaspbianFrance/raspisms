@@ -148,27 +148,19 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            $clean_datas = null;
-            if ($datas)
+            $clean_datas = [];
+            foreach ($datas as $key => $value)
             {
-                $clean_datas = [];
-                foreach ($datas as $key => $value)
+                if ($value === "")
                 {
-                    if ($value === "")
-                    {
-                        continue;
-                    }
-
-                    $key = mb_ereg_replace('[\W]', '', $key);
-                    $clean_datas[$key] = (string) $value;
+                    continue;
                 }
+
+                $key = mb_ereg_replace('[\W]', '', $key);
+                $clean_datas[$key] = (string) $value;
             }
-            $clean_datas = $clean_datas ?: null;
             
-            if ($clean_datas)
-            {
-                $clean_datas = json_encode($clean_datas);
-            }
+            $clean_datas = json_encode($clean_datas);
 
             if (!$this->internal_contact->create($id_user, $number, $name, $clean_datas))
             {
@@ -210,7 +202,7 @@ namespace controllers\publics;
                 $name = $contact['name'] ?? false;
                 $number = $contact['number'] ?? false;
                 $id_user = $_SESSION['user']['id'];
-                $datas = $contact['datas'] ?? null;
+                $datas = $contact['datas'] ?? [];
                 
                 if (!$name || !$number)
                 {
@@ -223,28 +215,18 @@ namespace controllers\publics;
                     continue;
                 }
                 
-                $clean_datas = null;
-                if ($datas)
+                $clean_datas = [];
+                foreach ($datas as $key => $value)
                 {
-                    $clean_datas = [];
-                    foreach ($datas as $key => $value)
+                    if ($value === "")
                     {
-                        if ($value === "")
-                        {
-                            continue;
-                        }
-
-                        $key = mb_ereg_replace('[\W]', '', $key);
-                        $clean_datas[$key] = (string) $value;
+                        continue;
                     }
-                }
-                $clean_datas = $clean_datas ?: null;
-                
-                if ($clean_datas)
-                {
-                    $clean_datas = json_encode($clean_datas);
-                }
 
+                    $key = mb_ereg_replace('[\W]', '', $key);
+                    $clean_datas[$key] = (string) $value;
+                }
+                $clean_datas = json_encode($clean_datas);
                 
                 $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_datas);
             }

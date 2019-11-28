@@ -178,4 +178,67 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
         }
+        
+        
+        /**
+         * Try to get the preview of contacts for a conditionnal group
+         * @param string $_POST['condition'] : Condition to apply
+         * @return json string
+         */
+        public function contacts_preview ()
+        {
+            $return = [
+                'success' => false,
+                'result' => 'Une erreur inconnue est survenue.',
+            ];
+
+            $condition = $_POST['condition'] ?? false;
+            
+            if (!$condition)
+            {
+                $return['result'] = 'Vous devez renseigner une condition.';
+                echo json_encode($return);
+                return false;
+            }
+
+
+            $internal_ruler = new \controllers\internals\Ruler();
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
+            if (!$valid_condition)
+            {
+                $return['result'] = 'Syntaxe de la condition invalide.';
+                echo json_encode($return);
+                return false;
+            }
+
+            $contacts = $this->internal_conditional_group->get_contacts_for_condition_and_user($_SESSION['user']['id'], $condition);
+            if (!$contacts)
+            {
+                $return['result'] = 'Aucun contact dans le groupe.';
+                echo json_encode($return);
+                return false;
+            }
+
+            $contacts_name = [];
+            foreach ($contacts as $contact)
+            {
+                $contacts_name[] = $contact['name'];
+            }
+
+            $return['result'] = "Contacts du groupe : " . implode(', ', $contacts_name);
+            $return['success'] = true;
+            echo json_encode($return);
+
+            return true;
+        }
+        
+        
+        /**
+         * Return the list of groups as JSON
+         */
+        public function json_list()
+        {
+            header('Content-Type: application/json');
+            echo json_encode($this->internal_conditional_group->list_for_user($_SESSION['user']['id']));
+        }
     }

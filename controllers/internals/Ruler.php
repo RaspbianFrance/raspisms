@@ -47,8 +47,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
             }
             catch (\Exception $e)
             {
-                echo "Error : ";
-                echo $e->getMessage();
                 return false;
             } 
         }

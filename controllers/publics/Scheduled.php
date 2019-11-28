@@ -129,6 +129,7 @@ namespace controllers\publics;
                 $scheduleds[$key]['numbers'] = [];
                 $scheduleds[$key]['contacts'] = [];
                 $scheduleds[$key]['groups'] = [];
+                $scheduleds[$key]['conditional_groups'] = [];
 
                 $numbers = $this->internal_scheduled->get_numbers($scheduled['id']);
                 foreach ($numbers as $number)
@@ -146,6 +147,12 @@ namespace controllers\publics;
                 foreach ($groups as $group)
                 {
                     $scheduleds[$key]['groups'][] = (int) $group['id'];
+                }
+
+                $conditional_groups = $this->internal_scheduled->get_conditional_groups($scheduled['id']);
+                foreach ($conditional_groups as $conditional_group)
+                {
+                    $scheduleds[$key]['conditional_groups'][] = (int) $conditional_group['id'];
                 }
             }
 
@@ -183,6 +190,7 @@ namespace controllers\publics;
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
+            $conditional_groups = $_POST['conditional_groups'] ?? [];
 
             if (empty($text))
             {
@@ -212,7 +220,7 @@ namespace controllers\publics;
                 $numbers[$key] = $number;
             }
 
-            if (!$numbers && !$contacts && !$groups)
+            if (!$numbers && !$contacts && !$groups && !$conditional_groups)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner au moins un destinataire pour le Sms.');
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
@@ -226,7 +234,7 @@ namespace controllers\publics;
             }
 
 
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -269,6 +277,7 @@ namespace controllers\publics;
                 $numbers = $scheduled['numbers'] ?? [];
                 $contacts = $scheduled['contacts'] ?? [];
                 $groups = $scheduled['groups'] ?? [];
+                $conditional_groups = $scheduled['conditional_groups'] ?? [];
 
                 $scheduled = $this->internal_scheduled->get($id_scheduled);
                 if (!$scheduled || $scheduled['id_user'] !== $id_user)
@@ -305,7 +314,7 @@ namespace controllers\publics;
                     $numbers[$key] = $number;
                 }
 
-                if (!$numbers && !$contacts && !$groups)
+                if (!$numbers && !$contacts && !$groups && !$conditional_groups)
                 {
                     $all_update_ok = false;
 
@@ -319,7 +328,7 @@ namespace controllers\publics;
                     return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                 }
 
-                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $origin, $flash, $numbers, $contacts, $groups);
+                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
                 if (!$success)
                 {
                     $all_update_ok = false;

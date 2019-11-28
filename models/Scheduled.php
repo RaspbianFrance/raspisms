@@ -55,6 +55,19 @@ namespace models;
             $params = ['id_scheduled' => $id_scheduled];
             return $this->_run_query($query, $params);
         }
+        
+        
+        /**
+         * Return conitional groups for a scheduled message
+         * @param int $id_scheduled : Scheduled id
+         * @return array
+         */
+        public function get_conditional_groups(int $id_scheduled)
+        {
+            $query = 'SELECT * FROM `conditional_group` WHERE id IN (SELECT id_conditional_group FROM scheduled_conditional_group WHERE id_scheduled = :id_scheduled)';
+            $params = ['id_scheduled' => $id_scheduled];
+            return $this->_run_query($query, $params);
+        }
 
 
         /**
@@ -97,6 +110,19 @@ namespace models;
         
         
         /**
+         * Insert a relation between a scheduled and a conditional group
+         * @param int $id_scheduled : Scheduled id
+         * @param int $id_conditional_group : Group id
+         * @return mixed (bool|int) : False on error, new row id else
+         */
+        public function insert_scheduled_conditional_group_relation(int $id_scheduled, int $id_conditional_group)
+        {
+            $success = $this->_insert('scheduled_conditional_group', ['id_scheduled' => $id_scheduled, 'id_conditional_group' => $id_conditional_group]);
+            return ($success ? $this->_last_id() : false);
+        }
+        
+        
+        /**
          * Delete numbers for a scheduled
          * @param int $id_scheduled : Scheduled id
          * @return mixed int : Number of deleted rows
@@ -126,6 +152,17 @@ namespace models;
         public function delete_scheduled_group_relations(int $id_scheduled)
         {
             return $this->_delete('scheduled_group', ['id_scheduled' => $id_scheduled]);
+        }
+        
+        
+        /**
+         * Delete conditional group scheduled relations for a scheduled
+         * @param int $id_scheduled : Scheduled id
+         * @return mixed int : Number of deleted rows
+         */
+        public function delete_scheduled_conditional_group_relations(int $id_scheduled)
+        {
+            return $this->_delete('scheduled_conditional_group', ['id_scheduled' => $id_scheduled]);
         }
 
 

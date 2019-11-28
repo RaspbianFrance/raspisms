@@ -35,9 +35,10 @@ namespace controllers\internals;
          * @param array $numbers : Numbers to send message to
          * @param array $contacts_ids : Contact ids to send message to
          * @param array $groups_ids : Group ids to send message to
+         * @param array $conditional_group_ids : Conditional Groups ids to send message to
          * @return bool : false on error, new id on success
          */
-        public function create (int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [])
+        public function create (int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
             $scheduled = [ 
                 'id_user' => $id_user,
@@ -96,6 +97,18 @@ namespace controllers\internals;
 
                 $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
             }
+            
+            $internal_conditional_group = new ConditionalGroup($this->bdd);
+            foreach ($conditional_group_ids as $conditional_group_id)
+            {
+                $find_group = $internal_conditional_group->get_for_user($id_user, $conditional_group_id);
+                if (!$find_group)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_conditional_group_relation($id_scheduled, $conditional_group_id);
+            }
 
             return $id_scheduled;
         }
@@ -112,9 +125,10 @@ namespace controllers\internals;
          * @param array $numbers : Numbers to send message to
          * @param array $contacts_ids : Contact ids to send message to
          * @param array $groups_ids : Group ids to send message to
+         * @param array $conditional_group_ids : Conditional Groups ids to send message to
          * @return bool : false on error, new id on success
          */
-        public function update_for_user (int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [])
+        public function update_for_user (int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
             $scheduled = [ 
                 'id_user' => $id_user,
@@ -141,6 +155,7 @@ namespace controllers\internals;
             $this->get_model()->delete_scheduled_numbers($id_scheduled);
             $this->get_model()->delete_scheduled_contact_relations($id_scheduled);
             $this->get_model()->delete_scheduled_group_relations($id_scheduled);
+            $this->get_model()->delete_scheduled_conditional_group_relations($id_scheduled);
 
             foreach ($numbers as $number)
             {
@@ -169,6 +184,18 @@ namespace controllers\internals;
                 }
 
                 $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
+            }
+            
+            $internal_conditional_group = new ConditionalGroup($this->bdd);
+            foreach ($conditional_group_ids as $conditional_group_id)
+            {
+                $find_group = $internal_conditional_group->get_for_user($id_user, $conditional_group_id);
+                if (!$find_group)
+                {
+                    continue;
+                }
+
+                $this->get_model()->insert_scheduled_conditional_group_relation($id_scheduled, $conditional_group_id);
             }
 
             return true;
@@ -218,5 +245,16 @@ namespace controllers\internals;
         public function get_groups(int $id_scheduled)
         {
             return $this->get_model()->get_groups($id_scheduled);
+        }
+        
+        
+        /**
+         * Return conditional groups for a scheduled message
+         * @param int $id_scheduled : Scheduled id
+         * @return array
+         */
+        public function get_conditional_groups(int $id_scheduled)
+        {
+            return $this->get_model()->get_conditional_groups($id_scheduled);
         }
     }

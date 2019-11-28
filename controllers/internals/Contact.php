@@ -68,7 +68,7 @@ namespace controllers\internals;
          * @param string $datas : Contact datas
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
-        public function create($id_user, $number, $name, ?string $datas = null)
+        public function create($id_user, $number, $name, $datas)
         {
             $contact = [
                 'id_user' => $id_user,
@@ -99,7 +99,7 @@ namespace controllers\internals;
          * @param ?string $datas : Contact datas
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, int $id, string $number, string $name, ?string $datas)
+        public function update_for_user(int $id_user, int $id, string $number, string $name, string $datas)
         {
             $contact = [
                 'number' => $number,

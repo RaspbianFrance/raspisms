@@ -109,26 +109,18 @@ namespace controllers\internals;
          * Gets the user's contacts that respects a condition
          * @param int $id_user : User id
          * @param string $condition : Condition string to verify
-         * @return bool
+         * @return array
          */
-        public function get_contacts_for_condition_and_user (int $id_user, string $condition) : bool
+        public function get_contacts_for_condition_and_user (int $id_user, string $condition) : array
         {
-            $internal_contacts = new Contacts($this->bdd);
+            $internal_contacts = new Contact($this->bdd);
             $contacts = $internal_contacts->gets_for_user($id_user);
 
             $ruler = new Ruler();
 
             foreach ($contacts as $key => $contact)
             {
-                if ($contact['datas'] != null)
-                {
-                    $contact['datas'] = json_decode($contact['datas']);
-                }
-                else
-                {
-                    $contact['datas'] = new \stdClass();
-                }
-
+                $contact['datas'] = json_decode($contact['datas']);
                 $contact = (object) $contact;
                 
                 $datas = ['contact' => $contact];

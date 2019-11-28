@@ -88,6 +88,8 @@
             'delete' => '/conditional_group/delete/{csrf}/',
             'edit' => '/conditional_group/edit/',
             'update' => '/conditional_group/update/{csrf}/',
+            'contacts_preview' => '/conditional_group/preview/',
+            'json_list' => '/conditional_groups.json/',
         ],
 
         'Received' => [

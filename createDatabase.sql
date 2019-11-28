@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS contact
     id_user INT NOT NULL,
 	name VARCHAR(100) NOT NULL,
 	number VARCHAR(20) NOT NULL,
-    datas TEXT DEFAULT NULL,
+    datas TEXT NOT NULL,
     CHECK (JSON_VALID(datas)),
 	PRIMARY KEY (id),
 	FOREIGN KEY (id_user) REFERENCES user (id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -122,6 +122,16 @@ CREATE TABLE IF NOT EXISTS scheduled_group
 	PRIMARY KEY (id),
 	FOREIGN KEY (id_scheduled) REFERENCES scheduled (id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (id_group) REFERENCES `group` (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS scheduled_conditional_group
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	id_scheduled INT NOT NULL,
+	id_conditional_group INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_scheduled) REFERENCES scheduled (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (id_conditional_group) REFERENCES `conditional_group` (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS scheduled_number

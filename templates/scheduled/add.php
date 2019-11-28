@@ -81,6 +81,12 @@
                                 <label>Groupes cibles</label>
                                 <input class="add-groupes form-control" name="groups[]"/>
                             </div>
+                            <?php if ($_SESSION['user']['settings']['conditional_group'] ?? false) { ?>
+                                <div class="form-group">
+                                    <label>Groupes conditionnels cibles</label>
+                                    <input class="add-conditional-groups form-control" name="conditional_groups[]"/>
+                                </div>
+                            <?php } ?>
                             <?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
                                 <div class="form-group">
                                     <label>Envoyer comme un SMS Flash : </label>
@@ -144,6 +150,15 @@
 		{
 			jQuery(this).magicSuggest({
 				data: '<?php echo \descartes\Router::url('Group', 'json_list'); ?>',
+				valueField: 'id',
+				displayField: 'name',
+			});
+		});
+        
+        jQuery('.add-conditional-groups').each(function()
+		{
+			jQuery(this).magicSuggest({
+				data: '<?php echo \descartes\Router::url('ConditionalGroup', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
 			});
