@@ -19,6 +19,8 @@ namespace controllers\publics;
         private $internal_scheduled;
         private $internal_phone;
         private $internal_contact;
+        private $internal_group;
+        private $internal_conditional_group;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -32,6 +34,8 @@ namespace controllers\publics;
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
+            $this->internal_group = new \controllers\internals\Group($bdd);
+            $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -82,20 +86,57 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne la page d'ajout d'un scheduled.
+         * @param $prefilled : If we have prefilled some fields (possible values : 'contacts', 'groups', 'conditional_groups', false)
          */
-        public function add()
+        public function add($prefilled = false)
         {
             $now = new \DateTime();
             $less_one_minute = new \DateInterval('PT1M');
             $now->sub($less_one_minute);
 
-            $contacts = $this->internal_contact->gets_for_user($_SESSION['user']['id']);
-            $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
+            $id_user = $_SESSION['user']['id'];
+
+            $contacts = $this->internal_contact->gets_for_user($id_user);
+            $phones = $this->internal_phone->gets_for_user($id_user);
+        
+            $prefilled_contacts = [];
+            $prefilled_groups = [];
+            $prefilled_conditional_groups = [];
+
+            if ($prefilled)
+            {
+                $ids = $_GET['ids'] ?? [];
+            }
+
+            if ($prefilled === 'contacts')
+            {
+                foreach ($this->internal_contact->gets_in_for_user($id_user, $ids) as $contact)
+                {
+                    $prefilled_contacts[] = $contact['id'];
+                }
+            }
+            elseif ($prefilled === 'groups')
+            {
+                foreach ($this->internal_group->gets_in_for_user($id_user, $ids) as $group)
+                {
+                    $prefilled_groups[] = $group['id'];
+                }
+            }
+            elseif ($prefilled === 'conditional_groups')
+            {
+                foreach ($this->internal_conditional_group->gets_in_for_user($id_user, $ids) as $conditional_group)
+                {
+                    $prefilled_conditional_groups[] = $conditional_group['id'];
+                }
+            }
 
             $this->render('scheduled/add', [
                 'now' => $now->format('Y-m-d H:i'),
                 'contacts' => $contacts,
                 'phones' => $phones,
+                'prefilled_contacts' => $prefilled_contacts,
+                'prefilled_groups' => $prefilled_groups,
+                'prefilled_conditional_groups' => $prefilled_conditional_groups,
             ]);
         }
 

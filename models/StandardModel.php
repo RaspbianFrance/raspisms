@@ -79,15 +79,23 @@ namespace models;
          */
         public function gets_in_for_user(int $id_user, $ids)
         {
+            if (!$ids)
+            {
+                return [];
+            }
+            
             $query = ' 
                 SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE id_user = :id_user
+                WHERE id_user = :id_user 
                 AND id ';
 
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
+            $params = [];
+
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
+
+            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
             $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params);

@@ -68,6 +68,7 @@
                                     <?php if ($contacts) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                                 <strong>Action pour la séléction :</strong>
+                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add', ['prefilled' => 'contacts']); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
                                                 <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
                                                 <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>

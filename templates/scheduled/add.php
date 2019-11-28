@@ -75,16 +75,16 @@
                             </div>
                             <div class="form-group">
                                 <label>Contacts cibles</label>
-                                <input class="add-contacts form-control" name="contacts[]"/>
+                                <input class="add-contacts form-control" name="contacts[]" value="<?php $this->s(json_encode($prefilled_contacts)); ?>" />
                             </div>
                             <div class="form-group">
                                 <label>Groupes cibles</label>
-                                <input class="add-groupes form-control" name="groups[]"/>
+                                <input class="add-groupes form-control" name="groups[]" value="<?php $this->s(json_encode($prefilled_groups)); ?>" />
                             </div>
                             <?php if ($_SESSION['user']['settings']['conditional_group'] ?? false) { ?>
                                 <div class="form-group">
                                     <label>Groupes conditionnels cibles</label>
-                                    <input class="add-conditional-groups form-control" name="conditional_groups[]"/>
+                                    <input class="add-conditional-groups form-control" name="conditional_groups[]" value="<?php $this->s(json_encode($prefilled_conditional_groups)); ?>"/>
                                 </div>
                             <?php } ?>
                             <?php if ($_SESSION['user']['settings']['sms_flash']) { ?>

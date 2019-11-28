@@ -106,7 +106,10 @@
                 '/scheduled/',
                 '/scheduled/p/{page}/',
             ],
-            'add' => '/scheduled/add/',
+            'add' => [
+                '/scheduled/add/',
+                '/scheduled/add/{prefilled}/',
+            ],
             'create' => '/scheduled/create/{csrf}/',
             'edit' => '/scheduled/edit/',
             'update' => '/scheduled/update/{csrf}/',
