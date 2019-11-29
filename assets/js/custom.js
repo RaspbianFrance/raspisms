@@ -91,6 +91,8 @@ jQuery(document).ready(function()
 		}
 	});
 
+    jQuery('body :checkbox').shiftcheckbox();
+
 	jQuery('body').on('submit', '.send-message-discussion', function (e) 
 	{
 		e.preventDefault();
