@@ -24,7 +24,7 @@
         <script src="<?php echo HTTP_PWD_JS; ?>/jquery.js"></script>
         <script src="<?php echo HTTP_PWD_JS; ?>/jquery.shiftcheckbox.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/bootstrap.min.js"></script>
-		<script src="<?php echo HTTP_PWD_JS; ?>/plugins/morris/raphael.min.js"></script>
+		<script src="<?php echo HTTP_PWD_JS; ?>/plugins/morris/raphael-min.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/plugins/morris/morris.min.js"></script>
 		<script src="<?php echo HTTP_PWD_JS; ?>/Autolinker.min.js"></script>
 		<!-- Magic Suggest JS and CSS -->
