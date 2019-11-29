@@ -28,7 +28,7 @@ function verifReceived()
 	jQuery('.popup-alert').fadeOut('slow');
 	jQuery.getJSON(HTTP_PWD + "/received/popup", function( data ) {
 		$.each(data, function(key, val) {
-			showMessage('SMS reçu du ' + val.origin.replace(/</g, "&lt;").replace(/>/g, "&gt;") + ' : ' + val.text.replace(/</g, "&lt;").replace(/>/g, "&gt;"), 1);
+			showMessage('SMS reçu du ' + val.origin + ' : ' + val.text, 1);
 			playReceptionSound();
 		});
 	});

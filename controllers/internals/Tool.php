@@ -51,6 +51,18 @@ namespace controllers\internals;
         }
 
         /**
+         * Format a number and make a link to a discussion with this number
+         * @param string $number : Number to format and make a link for
+         * @return string : Link to the number
+         */
+        public static function phone_link ($number)
+        {
+            $number_format = \controllers\internals\Tool::phone_format($number);
+            $url = \descartes\Router::url('Discussion', 'show', ['number' => $number]);
+            return '<a href="' . self::s($url, false, true, false) . '">' . self::s($number_format, false, true, false) . '</a>';
+        }
+
+        /**
          * Cette fonction fait la correspondance entre un type d'evenement et une icone font awesome.
          *
          * @param string $type : Le type de l'évenement à analyser

@@ -178,7 +178,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, false, false, $numbers))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, null, false, $numbers))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

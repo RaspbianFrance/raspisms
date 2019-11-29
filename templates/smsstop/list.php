@@ -51,7 +51,7 @@
                                             <?php foreach ($smsstops as $smsstop) { ?>
                                                 <tr>
                                                     <td><?php $this->s($smsstop['id']); ?></td>
-                                                    <td><?php $this->s(\controllers\internals\Tool::phone_format($smsstop['number'])); ?></td>
+                                                    <td><?php echo(\controllers\internals\Tool::phone_link($smsstop['number'])); ?></td>
                                                     <?php if ($_SESSION['user']['admin']) { ?>
                                                         <td><input name="ids[]" type="checkbox" value="<?php $this->s($smsstop['id']); ?>"></td>
                                                     <?php } ?>

@@ -101,7 +101,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $receiveds[$key]['origin'] = $contact['name'].' ('.$received['origin'].')';
+                $receiveds[$key]['origin'] = $this->s($contact['name'], false, true, false) . ' (' . \controllers\internals\Tool::phone_link($received['origin']) . ')';
             }
 
             $nb_received = \count($receiveds);

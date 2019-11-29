@@ -68,7 +68,14 @@ namespace controllers\publics;
                 'contact' => $contact,
             ];
 
-            echo json_encode($this->internal_templating->render($template, $datas));
+            $result = $this->internal_templating->render($template, $datas);
+            $return = $result;
+            if (!trim($result['result']))
+            {
+                $return['result'] = 'Message vide, il ne sera pas envoyé.';
+            }
+
+            echo json_encode($return);
             return true;
         }
     }
