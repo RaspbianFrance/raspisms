@@ -64,7 +64,7 @@
                             </li>
                             <?php if ($_SESSION['user']['settings']['conditional_group'] ?? false) { ?>
                                 <li <?php echo $page == 'conditional_groupes' ? 'class="active"' : ''; ?>>
-                                    <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>"><i class="fa fa-fw fa-random"></i> Groupes Conditionnels</a>
+                                    <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>"><i class="fa fa-fw fa-bullseye"></i> Groupes Conditionnels</a>
                                 </li>
                             <?php } ?>
 						</ul>

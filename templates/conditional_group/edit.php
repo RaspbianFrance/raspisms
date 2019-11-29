@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-random"></i> <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>">Groupes Conditionnels</a>
+							<i class="fa fa-bullseye"></i> <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>">Groupes Conditionnels</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier

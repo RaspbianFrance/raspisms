@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-random"></i> <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>">Groupes Conditionnels</a>
+							<i class="fa fa-bullseye"></i> <a href="<?php echo \descartes\Router::url('ConditionalGroup', 'list'); ?>">Groupes Conditionnels</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -34,7 +34,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-random fa-fw"></i> Ajout d'un groupe conditionnel</h3>
+							<h3 class="panel-title"><i class="fa fa-bullseye fa-fw"></i> Ajout d'un groupe conditionnel</h3>
 						</div>
 						<div class="panel-body">
 							<form action="<?php echo \descartes\Router::url('ConditionalGroup', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">

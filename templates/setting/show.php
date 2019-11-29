@@ -185,7 +185,7 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-filter fa-fw"></i> Support des groupes conditionnels</h4>
+										<h4 class="panel-title"><i class="fa fa-bullseye fa-fw"></i> Support des groupes conditionnels</h4>
 									</div>
 									<div class="panel-body">
 										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'conditional_group', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
