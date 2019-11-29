@@ -55,8 +55,8 @@
                                             <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
                                                         <td><?php $this->s($received['id']); ?></td>
-                                                        <td><?php $this->s($received['origin']); ?></td>
-                                                        <td><?php $this->s($received['destination']); ?></td>
+                                                        <td><?php $this->s(\controllers\internals\Tool::phone_format($received['origin'])); ?></td>
+                                                        <td><?php $this->s(\controllers\internals\Tool::phone_format($received['destination'])); ?></td>
                                                         <td><?php $this->s($received['text']); ?></td>
                                                         <td><?php $this->s($received['at']); ?></td>
                                                         <td><?php echo $received['command'] ? 'Oui' : 'Non'; ?></td>

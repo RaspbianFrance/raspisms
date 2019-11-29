@@ -49,7 +49,7 @@
                                         <?php foreach ($phones as $phone) { ?>
                                             <tr>
                                                 <td><?php $this->s($phone['id']); ?></td>
-                                                <td><?php $this->s($phone['number']); ?></td>
+                                                <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['number'])); ?></td>
                                                 <td><?php $this->s($phone['adapter']); ?></td>
                                                 <td><input type="checkbox" value="<?php $this->s($phone['id']); ?>" name="ids[]"></td>
                                             </tr>

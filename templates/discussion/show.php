@@ -13,7 +13,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Discussion <small><?php $this->s($contact ? $contact['name'] . ' (' . $number . ')' : $number); ?></small>
+						Discussion <small><?php $this->s($contact ? $contact['name'] . ' (' . \controllers\internals\Tool::phone_format($number) . ')' : \controllers\internals\Tool::phone_format($number)); ?></small>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
@@ -23,7 +23,7 @@
 							<i class="fa fa-comments-o"></i> <a href="<?php echo \descartes\Router::url('Discussion', 'list'); ?>">Discussions</a>
 						</li>
 						<li class="active">
-							<?php $this->s($number); ?>
+							<?php $this->s(\controllers\internals\Tool::phone_format($number)); ?>
 						</li>
 					</ol>
 				</div>

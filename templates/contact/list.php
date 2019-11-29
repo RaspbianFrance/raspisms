@@ -53,7 +53,7 @@
                                                     <tr>
                                                         <td><?php $this->s($contact['id']); ?></td>
                                                         <td><?php $this->s($contact['name']); ?></td>
-                                                        <td><?php $this->s($contact['number']); ?></td>
+                                                        <td><?php $this->s(\controllers\internals\Tool::phone_format($contact['number'])); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($contact['id']); ?>"></td>
                                                     </tr>
                                             <?php } ?>
