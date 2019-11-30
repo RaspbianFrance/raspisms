@@ -243,6 +243,120 @@ namespace controllers\publics;
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
 
+
+        /**
+         * Allow to import a contacts list
+         * @param string $csrf : Csrf token
+         * @param $_FILES['contacts_list_file'] : A csv file of the contacts to import
+         */
+        public function import (string $csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $id_user = $_SESSION['user']['id'];
+
+            $upload_array = $_FILES['contacts_list_file'] ?? false;
+            if (!$upload_array)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir un fichier de contacts à importer.');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $read_file = \controllers\internals\Tool::read_uploaded_file($upload_array);
+            if (!$read_file['success'])
+            {
+                \FlashMessage\FlashMessage::push('danger', $read_file['content']);
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            //Try to import file
+            $invalid_type = false;
+            switch ($read_file['mime_type'])
+            {
+                case 'text/csv' :
+                    $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
+                    break;
+                
+                case 'application/json' :
+                    $result = $this->internal_contact->import_json($id_user, $read_file['content']);
+                    break;
+                
+                default :
+                    $invalid_type = true;
+            }
+
+            if ($invalid_type)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Le type de fichier n\'est pas valide.');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            if ($result === false)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Le fichier contient des erreurs. Impossible d\'importer les contacts.');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $msg = $result . ' nouveau contact a été inséré.';
+            if ($result > 1)
+            {
+                $msg = $result . ' nouveaux contacts ont été insérés.';
+            }
+
+            \FlashMessage\FlashMessage::push('success', $msg);
+            return $this->redirect(\descartes\Router::url('Contact', 'list'));
+        }
+        
+        
+        /**
+         * Allow to export a contacts list
+         * @param $format : Format to export contacts to
+         */
+        public function export (string $format)
+        {
+            $id_user = $_SESSION['user']['id'];
+
+            //Try to export contacts
+            $invalid_type = false;
+            switch ($format)
+            {
+                case 'csv' :
+                    $result = $this->internal_contact->export_csv($id_user);
+                    break;
+                
+                case 'json' :
+                    $result = $this->internal_contact->export_json($id_user);
+                    break;
+                
+                default :
+                    $invalid_type = true;
+            }
+
+            if ($invalid_type)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Le format demandé n\'est pas supporté.');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            if ($result === false)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Nous ne sommes par parveu à exporté les contacts.');
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $result['headers'] = $result['headers'] ?? [];
+            foreach ($result['headers'] as $header)
+            {
+                header($header);
+            }
+
+            echo $result['content'];
+        }
+
         /**
          * Cette fonction retourne la liste des contacts sous forme JSON.
          */

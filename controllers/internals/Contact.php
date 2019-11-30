@@ -109,4 +109,229 @@ namespace controllers\internals;
 
             return $this->get_model()->update_for_user($id_user, $id, $contact);
         }
+
+
+        /**
+         * Import a list of contacts as csv
+         * @param resource $file_handler : File handler to import contacts from
+         * @param int $id_user : User id
+         * @return mixed : False on error, number of inserted contacts else
+         */
+        public function import_csv (int $id_user, $file_handler)
+        {
+            if (!is_resource($file_handler))
+            {
+                return false;
+            }
+
+            $nb_insert = 0;
+
+            $head = null;
+            while ($line = fgetcsv($file_handler))
+            {
+                if ($head === null)
+                {
+                    $head = $line;
+                    continue;
+                }
+
+                $line = array_combine($head, $line);
+                if ($line === false)
+                {
+                    continue;
+                }
+
+                if (!isset($line['name'], $line['number']))
+                {
+                    continue;
+                }
+
+                $datas = [];
+                foreach ($line as $key => $value)
+                {
+                    if ($key == 'name' || $key == 'number')
+                    {
+                        continue;
+                    }
+
+                    if ($value === '')
+                    {
+                        continue;
+                    }
+
+                    $key = mb_ereg_replace('[\W]', '', $key);
+                    $datas[$key] = $value;
+                }
+                $datas = json_encode($datas);
+
+                $success = $this->create($id_user, $line['number'], $line['name'], $datas);
+                if ($success)
+                {
+                    $nb_insert ++;
+                }
+            }
+
+            return $nb_insert;
+        }
+
+
+        /**
+         * Import a list of contacts as json
+         * @param resource $file_handler : File handler to import contacts from
+         * @param int $id_user : User id
+         * @return mixed : False on error, number of inserted contacts else
+         */
+        public function import_json (int $id_user, $file_handler)
+        {
+            if (!is_resource($file_handler))
+            {
+                return false;
+            }
+
+            $file_content = '';
+            while ($line = fgets($file_handler))
+            {
+                $file_content .= $line;
+            }
+
+            try
+            {
+                $contacts = json_decode($file_content, true);
+
+                if (!is_array($contacts))
+                {
+                    return false;
+                }
+
+                $nb_insert = 0;
+                foreach ($contacts as $contact)
+                {
+                    if (!is_array($contact))
+                    {
+                        continue;
+                    }
+
+                    if (!isset($contact['name'], $contact['number']))
+                    {
+                        continue;
+                    }
+
+                    $datas = $contact['datas'] ?? [];
+                    $datas = json_encode($datas);
+                    
+                    $success = $this->create($id_user, $contact['number'], $contact['name'], $datas);
+                    if ($success)
+                    {
+                        $nb_insert ++;
+                    }
+                }
+
+                return $nb_insert;
+            }
+            catch (\Exception $e)
+            {
+                return false;
+            }
+        }
+        
+        
+        /**
+         * Export the contacts of a user as csv
+         * @param int $id_user : User id
+         * @return array : ['headers' => array of headers to return, 'content' => the generated file]
+         */
+        public function export_csv (int $id_user) : array
+        {
+            $contacts = $this->get_model()->gets_for_user($id_user);
+
+            $columns = [
+                'name',
+                'number',
+            ];
+
+            foreach ($contacts as $contact)
+            {
+                $datas = json_decode($contact['datas'], true);
+                foreach ($datas as $key => $value)
+                {
+                    $columns[] = $key;        
+                }
+            }
+            $columns = array_unique($columns);
+
+            $lines = [];
+            foreach ($contacts as $contact)
+            {
+                $datas = json_decode($contact['datas'], true);
+
+                $line = [];
+                foreach ($columns as $column)
+                {
+                    if (isset($contact[$column]))
+                    {
+                        $line[] = $contact[$column];
+                        continue;
+                    }
+
+                    if (isset($datas[$column]))
+                    {
+                        $line[] = $datas[$column];
+                        continue;
+                    }
+
+                    $line[] = null;
+                }
+                $lines[] = $line;
+            }
+
+            //Php only support csv formatting to file. To get it in string we need to create a tmp in memory file, write in it, and then read the file into a var
+            // output up to 5MB is kept in memory, if it becomes bigger it will automatically be written to a temporary file
+            $csv_tmp_file = fopen('php://temp/maxmemory:'. (5*1024*1024), 'r+');
+            fputcsv($csv_tmp_file, $columns);
+            foreach ($lines as $line)
+            {
+                fputcsv($csv_tmp_file, $line);
+            }
+            rewind($csv_tmp_file);
+
+            $csv_string = stream_get_contents($csv_tmp_file);
+
+            return [
+                'headers' => [
+                    'Content-Disposition: attachment; filename=contacts.csv',
+                    'Content-Type: text/csv',
+                    'Content-Length: ' . strlen($csv_string),
+                ],
+                'content' => $csv_string,
+            ];
+        }
+        
+        
+        /**
+         * Export the contacts of a user as json
+         * @param int $id_user : User id
+         * @return array : ['headers' => array of headers to return, 'content' => the generated file]
+         */
+        public function export_json (int $id_user) : array
+        {
+            $contacts = $this->get_model()->gets_for_user($id_user);
+
+            foreach ($contacts as &$contact)
+            {
+                unset($contact['id']);
+                unset($contact['id_user']);
+                $contact['datas'] = json_decode($contact['datas']);
+            }
+            $content = json_encode($contacts);
+
+            return [
+                'headers' => [
+                    'Content-Disposition: attachment; filename=contacts.json',
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($content),
+                ],
+                'content' => $content,
+            ];
+        }
+        
     }

@@ -23,6 +23,11 @@
 	font-style: italic;
 }
 
+.float-right
+{
+    float: right;
+}
+
 /** POPUPS ALERT **/
 .popup-alerts-container
 {
@@ -276,6 +281,17 @@ footer
 
 
 /* CONTACT */
+#import-modal input:valid + label .valid-icon
+{
+    color: #4cae4c;
+    display: inline-block !important;
+}
+
+#import-modal input:invalid + label .invalid-icon
+{
+    display: inline-block !important;
+}
+
 .contact-datas-container input
 {
     display: inline-block;

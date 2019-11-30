@@ -26,13 +26,24 @@ namespace controllers\internals;
          */
         public static function parse_phone($number)
         {
-            $number = preg_replace('#[^-0-9+]#', '', $number);
-            if (preg_match('#^(0|\+[1-9]{1,3}|\+1\-[0-9]{3})[1-9][0-9]{8,10}$#', $number))
+            try
             {
-                return $number;
-            }
+                $phone_number_util = \libphonenumber\PhoneNumberUtil::getInstance();
+                $phone_number_o = $phone_number_util->parse($number, null);
 
-            return false;
+                $valid = $phone_number_util->isValidNumber($phone_number_o);
+
+                if (!$valid)
+                {
+                    return false;
+                }
+
+                return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::E164);
+            }
+            catch(\Exception $e)
+            {
+                return false;
+            }
         }
 
         /**
@@ -44,10 +55,17 @@ namespace controllers\internals;
          */
         public static function phone_format($number)
         {
-            $phone_number_util = \libphonenumber\PhoneNumberUtil::getInstance();
-            $phone_number_o = $phone_number_util->parse($number, null);
+            try
+            {
+                $phone_number_util = \libphonenumber\PhoneNumberUtil::getInstance();
+                $phone_number_o = $phone_number_util->parse($number, null);
 
-            return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+                return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+            }
+            catch(\Exception $e)
+            {
+                return $number;
+            }
         }
 
         /**
@@ -204,5 +222,70 @@ namespace controllers\internals;
             $content = ob_get_clean();
 
             return mail($to, $settings['subject'], $content);
+        }
+
+        /**
+         * Allow to read an uploaded file
+         * @param array $file : The array extracted from $_FILES['file']
+         * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error']]
+         */
+        public static function read_uploaded_file(array $file)
+        {
+            $result = [
+                'success' => false,
+                'content' => 'Une erreur inconnue est survenue.',
+                'error_code' => $file['error'] ?? 99,
+                'mime_type' => false,
+            ];
+
+            if ($file['error'] !== UPLOAD_ERR_OK)
+            {
+                switch ($file['error'])
+                {
+                    case UPLOAD_ERR_INI_SIZE :
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
+                        break;
+                    
+                    case UPLOAD_ERR_FORM_SIZE :
+                        $result['content'] = 'Le fichier dépasse la limite de taille.';
+                        break;
+                    
+                    case UPLOAD_ERR_PARTIAL :
+                        $result['content'] = 'L\'envoi du fichier a été interrompu.';
+                        break;
+
+                    case UPLOAD_ERR_NO_FILE :
+                        $result['content'] = 'Aucun fichier n\'a été envoyé.';
+                        break;
+                    
+                    case UPLOAD_ERR_NO_TMP_DIR :
+                        $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
+                        break;
+
+                    case UPLOAD_ERR_CANT_WRITE :
+                        $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
+                        break;
+
+                    case UPLOAD_ERR_EXTENSION :
+                        $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
+                        break;
+                }
+
+                return $result;    
+            }
+
+            $tmp_filename = $file['tmp_name'] ?? false;
+            if (!$tmp_filename || !is_readable($tmp_filename))
+            {
+                return $result;
+            }
+
+            $result['mime_type'] = mime_content_type($tmp_filename) == 'text/plain' ? $file['type'] : mime_content_type($tmp_filename);
+
+            $file_handler = fopen($tmp_filename, 'r');
+            $result['success'] = true;
+            $result['content'] = $file_handler;
+
+            return $result;
         }
     }

@@ -14,6 +14,8 @@
 				<div class="col-lg-12">
 					<h1 class="page-header">
 						Dashboard <small>Contacts</small>
+                        <a class="btn btn-info float-right" id="btn-export" href="#"><span class="fa fa-upload"></span> Exporter la liste des contacts</a>
+                        <a class="btn btn-info float-right" id="btn-import" href="#" style="margin-right: 10px;"><span class="fa fa-download"></span> Importer une liste de contacts</a>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
@@ -82,5 +84,60 @@
 		</div>
 	</div>
 </div>
+<div class="modal fade" tabindex="-1" id="import-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="<?php $this->s(\descartes\Router::url('Contact', 'import', ['csrf' => $_SESSION['csrf']])); ?>" method="POST" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Importer une liste de contacts</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Vous pouvez importer une liste aux formats suivants : CSV ou JSON.</p>
+                    <input id="contacts_list_file" type="file" name="contacts_list_file" class="hidden" required="required">
+                    <label class="btn btn-default" for="contacts_list_file"><span class="fa fa-file-text-o hidden invalid-icon"></span><span class="fa fa-check hidden valid-icon"></span> Choisir le fichier</label>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-danger" data-dismiss="modal">Annuler</a>
+                    <input type="submit" class="btn btn-success" value="Valider" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="export-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="<?php $this->s(\descartes\Router::url('Contact', 'import', ['csrf' => $_SESSION['csrf']])); ?>" method="POST" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Exporter la liste des contacts</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Vous pouvez exporter la liste aux formats suivants.</p>
+                    <a target="_blank" href="<?php $this->s(\descartes\Router::url('Contact', 'export', ['format' => 'csv'])); ?>" class="btn btn-default">CSV</a>
+                    <a target="_blank" href="<?php $this->s(\descartes\Router::url('Contact', 'export', ['format' => 'json'])); ?>" class="btn btn-default">JSON</a>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-danger" data-dismiss="modal">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+	jQuery(document).ready(function()
+    {
+        jQuery('body').on('click', '#btn-import', function ()
+        {
+            jQuery('#import-modal').modal({'keyboard': true});
+        });
+        
+        jQuery('body').on('click', '#btn-export', function ()
+        {
+            jQuery('#export-modal').modal({'keyboard': true});
+        });
+    });
+</script>
 <?php
 	$this->render('incs/footer');

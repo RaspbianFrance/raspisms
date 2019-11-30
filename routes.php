@@ -44,6 +44,8 @@
             'delete' => '/contact/delete/{csrf}/',
             'edit' => '/contact/edit/',
             'update' => '/contact/update/{csrf}/',
+            'import' => '/contact/import/{csrf}/',
+            'export' => '/contact/export/{format}/',
             'json_list' => '/contacts.json/',
         ],
 
