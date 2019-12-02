@@ -1,11 +1,11 @@
 <?php
 	//Template dashboard
 	
-	$this->render('incs/head', ['title' => 'Receiveds - Show All'])
+	$this->render('incs/head', ['title' => 'Receiveds - Unread'])
 ?>
 <div id="wrapper">
 <?php
-	$this->render('incs/nav', ['page' => 'receiveds'])
+	$this->render('incs/nav', ['page' => 'receiveds_unread'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -13,14 +13,14 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Dashboard <small>SMS reçus</small>
+						Dashboard <small>SMS non lus</small>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-download "></i> SMS reçus
+							<i class="fa fa-eye-slash "></i> SMS non lus
 						</li>
 					</ol>
 				</div>
@@ -31,12 +31,12 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-download  fa-fw"></i> Liste des SMS reçus</h3>
+							<h3 class="panel-title"><i class="fa fa-eye-slash  fa-fw"></i> Liste des SMS non lus</h3>
 						</div>
                         <div class="panel-body">
                             <form method="GET">
                                 <?php if (!$receiveds) { ?>
-                                    <p>Aucun SMS n'a été reçu pour le moment.</p>
+                                    <p>Aucun SMS non lu à afficher.</p>
                                 <?php } else { ?>
                                     <div class="table-receiveds">
                                         <table class="table table-bordered table-hover table-striped" id="table-receiveds">
@@ -68,24 +68,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div>
-                                        <?php if ($_SESSION['user']['admin']) { ?>
-                                            <div class="text-right col-xs-12 no-padding">
-                                                <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Received', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                            </div>
-                                        <?php } ?>
-                                        <ul class="pager">
-                                            <?php if ($page) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('receiveds', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
-                                            <?php } ?>
-                                            <?php $this->s('Page : ' . ($page + 1)); ?>
-
-                                            <?php if ($limit == $nb_results) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('receiveds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
-                                            <?php } ?>
-                                        </ul>
-                                    </div>
                                 <?php } ?>
                             </form>
 						</div>
@@ -95,21 +77,5 @@
 		</div>
 	</div>
 </div>
-<script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
-</script>
 <?php
 	$this->render('incs/footer');

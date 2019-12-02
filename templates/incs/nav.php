@@ -48,10 +48,10 @@
 							<li <?php echo $page == 'receiveds' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('Received', 'list'); ?>"><i class="fa fa-fw fa-download"></i> SMS reçus</a>
 							</li>
+							<li <?php echo $page == 'receiveds_unread' ? 'class="active"' : ''; ?>>
+								<a href="<?php echo \descartes\Router::url('Received', 'list_unread'); ?>"><i class="fa fa-fw fa-eye-slash"></i> SMS non lus</a>
+							</li>
 						</ul>
-					</li>
-					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
-						<a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#repertoire"><i class="fa fa-fw fa-book"></i> Répertoire <i class="fa fa-fw fa-caret-down"></i></a>
@@ -80,6 +80,9 @@
 							</li>
 						</ul>
                     </li>
+					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
+						<a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
+					</li>
 					<li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
 					</li>

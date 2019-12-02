@@ -49,6 +49,11 @@ namespace controllers\publics;
 
             foreach ($receiveds as $key => $received)
             {
+                if ($received['status'] != 'read')
+                {
+                    $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
+                }
+
                 if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
                 {
                     continue;
@@ -58,6 +63,32 @@ namespace controllers\publics;
             }
 
             $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
+        }
+        
+        
+        /**
+         * Return all unread receiveds messages
+         * @param mixed $page
+         */
+        public function list_unread($page = 0)
+        {
+            $page = (int) $page;
+            $limit = 25;
+            $receiveds = $this->internal_received->list_unread_for_user($_SESSION['user']['id'], $limit, $page);
+
+            foreach ($receiveds as $key => $received)
+            {
+                $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
+
+                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
+                {
+                    continue;
+                }
+
+                $receiveds[$key]['origin'] = $contact['name'].' ('.$received['origin'].')';
+            }
+
+            $this->render('received/list_unread', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
         }
 
         /**

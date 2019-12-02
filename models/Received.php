@@ -89,6 +89,31 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
+        
+        
+        /**
+         * Return a list of unread received for a user
+         * @param int $id_user : User id
+         * @param int $limit  : Max results to return
+         * @param int $offset : Number of results to ignore
+         */
+        public function list_unread_for_user($id_user, $limit, $offset)
+        {
+            $limit = (int) $limit;
+            $offset = (int) $offset;
+
+            $query = ' 
+                SELECT * FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND status = \'unread\'
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
 
 
         /**
@@ -184,6 +209,28 @@ namespace models;
                 SELECT COUNT(id) as nb
                 FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
+        }
+        
+        
+        /**
+         * Count number of unread received sms for user
+         * @param int $id_user : user id
+         * @return int : Number of received SMS for user
+         */
+        public function count_unread_for_user(int $id_user)
+        {
+            $query = '
+                SELECT COUNT(id) as nb
+                FROM received
+                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND status = \'unread\'
             ';
 
             $params = [

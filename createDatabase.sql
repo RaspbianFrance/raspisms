@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS received
     origin VARCHAR(20) NOT NULL,
     destination VARCHAR(20),
 	command BOOLEAN NOT NULL DEFAULT 0,
+    status ENUM('read', 'unread') NOT NULL DEFAULT 'unread',
 	PRIMARY KEY (id)
 );
 

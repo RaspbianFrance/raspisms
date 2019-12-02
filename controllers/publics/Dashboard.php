@@ -21,7 +21,6 @@ namespace controllers\publics;
         private $internal_contact;
         private $internal_group;
         private $internal_scheduled;
-        private $internal_command;
         private $internal_event;
 
         /**
@@ -39,7 +38,6 @@ namespace controllers\publics;
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_group = new \controllers\internals\Group($bdd);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
-            $this->internal_command = new \controllers\internals\Command($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
 
             \controllers\internals\Tool::verifyconnect();
@@ -58,7 +56,7 @@ namespace controllers\publics;
             $nb_contacts = $this->internal_contact->count_for_user($id_user);
             $nb_groups = $this->internal_group->count_for_user($id_user);
             $nb_scheduleds = $this->internal_scheduled->count_for_user($id_user);
-            $nb_commands = $this->internal_command->count_for_user($id_user);
+            $nb_unreads = $this->internal_received->count_unread_for_user($id_user);
             $nb_sendeds = $this->internal_sended->count_for_user($id_user);
             $nb_receiveds = $this->internal_received->count_for_user($id_user);
 
@@ -124,9 +122,9 @@ namespace controllers\publics;
                 'nb_contacts' => $nb_contacts,
                 'nb_groups' => $nb_groups,
                 'nb_scheduleds' => $nb_scheduleds,
-                'nb_commands' => $nb_commands,
                 'nb_sendeds' => $nb_sendeds,
                 'nb_receiveds' => $nb_receiveds,
+                'nb_unreads' => $nb_unreads,
                 'avg_sendeds' => $avg_sendeds,
                 'avg_receiveds' => $avg_receiveds,
                 'sendeds' => $sendeds,

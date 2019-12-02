@@ -99,6 +99,10 @@
                 '/received/',
                 '/received/p/{page}/',
             ],
+            'list_unread' => [
+                '/unread/',
+                '/unread/p/{page}/',
+            ],
             'delete' => '/received/delete/{csrf}/',
             'popup' => '/received/popup/',
         ],

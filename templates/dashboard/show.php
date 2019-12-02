@@ -96,17 +96,17 @@
 						<div class="panel-heading">
 							<div class="row">
 								<div class="col-xs-3">
-									<i class="fa fa-terminal fa-5x"></i>
+									<i class="fa fa-eye-slash fa-5x"></i>
 								</div>
 								<div class="col-xs-9 text-right">
-									<div class="huge"><?php echo $nb_commands; ?></div>
-									<div>Commandes</div>
+									<div class="huge"><?php echo $nb_unreads; ?></div>
+									<div>SMS non lus</div>
 								</div>
 							</div>
 						</div>
-						<a href="<?php echo \descartes\Router::url('Command', 'list') ?>">
+						<a href="<?php echo \descartes\Router::url('Received', 'list_unread') ?>">
 							<div class="panel-footer">
-								<span class="pull-left">Voir les commandes</span>
+								<span class="pull-left">Voir les SMS non lus</span>
 								<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 								<div class="clearfix"></div>
 							</div>

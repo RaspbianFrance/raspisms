@@ -107,6 +107,11 @@ namespace controllers\publics;
 
             foreach ($receiveds as $received)
             {
+                if ($received['status'] != 'read')
+                {
+                    $this->internal_received->mark_as_read_for_user($id_user, $received['id']);
+                }
+
                 $messages[] = [
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
