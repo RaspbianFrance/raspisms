@@ -53,7 +53,8 @@
 											</div>
 										</form>
 									</div>
-								</div>
+                                </div>
+                                <!--
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-picture-o fa-fw"></i> Support des MMS</h4>
@@ -72,7 +73,8 @@
 											</div>
 										</form>
 									</div>
-								</div>
+                                </div>
+                                -->
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Détection des URL dans les discussions</h4>

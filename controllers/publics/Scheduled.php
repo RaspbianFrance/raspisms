@@ -387,6 +387,7 @@ namespace controllers\publics;
                 $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
 
                 //Check for media
+                /*
                 $current_media = $scheduled['current_media'] ?? false;
                 if (!$current_media)
                 {
@@ -405,11 +406,12 @@ namespace controllers\publics;
                 {
                     continue;
                 }
+                 */
 
                 $nb_update += 1;
             }
 
-            if (!$nb_update != count($scheduleds))
+            if ($nb_update != count($scheduleds))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Certains SMS n\'ont pas été mis à jour.');
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
