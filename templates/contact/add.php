@@ -83,7 +83,10 @@
             hiddenInput: 'number',
 			defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
 			preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
-			nationalMode: true,
+            nationalMode: true,
+            <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
+                onlyCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['authorized_phone_country'])), false, false); ?>,
+            <?php } ?>
 			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
         });
 

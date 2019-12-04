@@ -1,11 +1,9 @@
 <?php
-	//Template dashboard
-	$incs = new internalIncs();
-	$incs->head('Webhook - Add');
+	$this->render('incs/head', ['title' => 'Webhooks - Add'])
 ?>
 <div id="wrapper">
 <?php
-	$incs->nav('webhooks');
+	$this->render('incs/nav', ['page' => 'webhooks'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -20,7 +18,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-plug"></i> <a href="<?php echo \descartes\Router::url('webhooks'); ?>">Webhooks</a>
+							<i class="fa fa-plug"></i> <a href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Webhooks</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -37,7 +35,7 @@
 							<h3 class="panel-title"><i class="fa fa-plug fa-fw"></i> Ajout d'un nouveau webhook</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('webhooks', 'create', [$_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Webhook', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
 									<label>URL cible</label>
 									<div class="form-group">
@@ -47,12 +45,11 @@
 								<div class="form-group">
 									<label>Type de Webhook</label>
 									<select name="type" class="form-control" required>
-										<?php foreach (internalConstants::WEBHOOK_TYPE as $key => $value) { ?>
-											<option value="<?php $this->s($value); ?>"><?php $this->s($key); ?></option>
-										<?php } ?>
+                                        <option value="receive_sms">Réception d'un SMS</option>
+                                        <option value="send_sms">Envoi d'un SMS</option>
 									</select>
 								</div>	
-								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('webhooks'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le webhook" /> 	
 							</form>
 						</div>
@@ -63,4 +60,4 @@
 	</div>
 </div>
 <?php
-	$incs->footer();
+    $this->render('incs/footer');

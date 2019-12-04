@@ -56,6 +56,25 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-picture-o fa-fw"></i> Support des MMS</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'mms', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Activer les MMS : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['mms'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Détection des URL dans les discussions</h4>
 									</div>
 									<div class="panel-body">
@@ -82,6 +101,22 @@
 											<div class="form-group">
 												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules : </label>
 												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['preferred_phone_country']); ?>" />
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-flag fa-fw"></i> Pays autorisés pour l'envoi</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'preferred_phone_country', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules (laissez vide pour tout autoriser) : </label>
+												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['authorized_phone_country']); ?>" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
@@ -140,6 +175,25 @@
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
 													<option value="1" <?php echo $_SESSION['user']['settings']['smsstop'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-plug fa-fw"></i> Activation de Webhooks</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'webhook', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Webhooks activé : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['webhook'] ? 'selected' : ''; ?>>Oui</option>
 												</select>
 											</div>	
 											<div class="text-center">

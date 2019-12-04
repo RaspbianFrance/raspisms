@@ -28,6 +28,11 @@
     float: right;
 }
 
+.inline-block
+{
+    display: inline-block;
+}
+
 /** POPUPS ALERT **/
 .popup-alerts-container
 {

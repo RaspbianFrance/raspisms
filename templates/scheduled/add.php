@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Ajout d'un SMS programmé</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST" enctype="multipart/form-data">
 								<div class="form-group">
                                 <label>Texte du SMS</label>
                                 <?php if ($_SESSION['user']['settings']['templating']) { ?>
@@ -59,6 +59,16 @@
                                     </div>
                                 <?php } ?>
                             </div>
+                            
+                            <?php if ($_SESSION['user']['settings']['mms'] ?? false) { ?>
+                                <div class="form-group">
+                                    <label>Ajouter un média</label>
+                                    <p class="italic small help description-scheduled-media">
+                                        Le média sera utilisé uniquement si le téléphone utilisé supporte l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>
+                                    </p>
+                                    <input class="" name="media" value="" type="file" />
+                                </div>
+                            <?php } ?>
                             <div class="form-group">
                                 <label>Date d'envoi du SMS</label>
                                 <input name="at" class="form-control form-datetime" type="text" value="<?php $this->s($now); ?>" readonly>
@@ -195,6 +205,9 @@
                 hiddenInput: 'numbers[]',
 				defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
 				preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
+                <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
+                    onlyCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['authorized_phone_country'])), false, false); ?>,
+                <?php } ?>
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
             });
@@ -210,6 +223,9 @@
             hiddenInput: 'numbers[]',
 			defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
 			preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
+            <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
+                onlyCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['authorized_phone_country'])), false, false); ?>,
+            <?php } ?>
 			nationalMode: true,
 			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
 		});

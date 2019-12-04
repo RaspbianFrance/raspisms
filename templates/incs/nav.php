@@ -82,7 +82,12 @@
                     </li>
 					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
-					</li>
+                    </li>
+                    <?php if ($_SESSION['user']['settings']['webhook'] ?? false) { ?>
+                        <li <?php echo $page == 'webhooks' ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>"><i class="fa fa-fw fa-plug"></i> Webhooks</a>
+                        </li>
+					<?php } ?>
 					<li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
 						<a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
 					</li>

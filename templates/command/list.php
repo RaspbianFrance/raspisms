@@ -83,21 +83,5 @@
 		</div>
 	</div>
 </div>
-<script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
-</script>
 <?php
 	$this->render('incs/footer');

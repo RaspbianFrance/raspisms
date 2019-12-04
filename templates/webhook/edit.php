@@ -1,11 +1,10 @@
 <?php
 	//Template dashboard
-	$incs = new internalIncs();
-	$incs->head('Webhook - Edit');
+	$this->render('incs/head', ['title' => 'Webhooks - Edit'])
 ?>
 <div id="wrapper">
 <?php
-	$incs->nav('webhooks');
+	$this->render('incs/nav', ['page' => 'webhooks'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -20,7 +19,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-plug"></i> <a href="<?php echo \descartes\Router::url('webhooks'); ?>">Webhooks</a>
+							<i class="fa fa-plug"></i> <a href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Webhooks</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-edit"></i> Modifier
@@ -37,8 +36,9 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i>Modification de webhooks</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('webhooks', 'update', [$_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Webhook', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<?php foreach ($webhooks as $webhook) { ?>
+                                        <input type="hidden" value="<?php $this->s($webhook['id']); ?>" name="webhooks[<?php $this->s($webhook['id']); ?>][id]" />
 										<div class="form-group">
 											<label>URL cible</label>
 											<div class="form-group">
@@ -48,14 +48,13 @@
 										<div class="form-group">
 											<label>Type de Webhook</label>
 											<select name="webhooks[<?php $this->s($webhook['id']); ?>][type]" class="form-control" required>
-												<?php foreach (internalConstants::WEBHOOK_TYPE as $key => $value) { ?>
-													<option <?php echo ($webhook['type'] == $value ? 'selected' : ''); ?> value="<?php $this->s($value); ?>"><?php $this->s($key); ?></option>
-												<?php } ?>
+                                                <option <?php echo $webhook['type'] == 'receive_sms' ? 'selected="selected"' : '' ?> value="receive_sms">Réception d'un SMS</option>
+                                                <option <?php echo $webhook['type'] == 'send_sms' ? 'selected="selected"' : '' ?> value="send_sms">Envoi d'un SMS</option>
 											</select>
 										</div>	
 										<hr/>
                                 <?php } ?>
-								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('webhooks'); ?>">Annuler</a>
+								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer la webhook" /> 	
 							</form>
 						</div>
@@ -66,4 +65,4 @@
 	</div>
 </div>
 <?php
-	$incs->footer();
+    $this->render('incs/footer');

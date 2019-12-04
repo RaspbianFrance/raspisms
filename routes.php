@@ -166,6 +166,18 @@
             'create' => '/phone/create/{csrf}/',
             'delete' => '/phone/delete/{csrf}/',
         ],
+        
+        'Webhook' => [
+            'list' => [
+                '/webhook/',
+                '/webhook/p/{page}/',
+            ],
+            'add' => '/webhook/add/',
+            'create' => '/webhook/create/{csrf}/',
+            'delete' => '/webhook/delete/{csrf}/',
+            'edit' => '/webhook/edit/',
+            'update' => '/webhook/update/{csrf}/',
+        ],
     );
 
     define('ROUTES', $routes);

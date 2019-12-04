@@ -288,4 +288,89 @@ namespace controllers\internals;
 
             return $result;
         }
+        
+        
+        /**
+         * Allow to upload file
+         * @param array $file : The array extracted from $_FILES['file']
+         * @return array : ['success' => bool, 'content' => file path | error message, 'error_code' => $file['error']]
+         */
+        public static function upload_file(array $file)
+        {
+            $result = [
+                'success' => false,
+                'content' => 'Une erreur inconnue est survenue.',
+                'error_code' => $file['error'] ?? 99,
+            ];
+
+            if ($file['error'] !== UPLOAD_ERR_OK)
+            {
+                switch ($file['error'])
+                {
+                    case UPLOAD_ERR_INI_SIZE :
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
+                        break;
+                    
+                    case UPLOAD_ERR_FORM_SIZE :
+                        $result['content'] = 'Le fichier dépasse la limite de taille.';
+                        break;
+                    
+                    case UPLOAD_ERR_PARTIAL :
+                        $result['content'] = 'L\'envoi du fichier a été interrompu.';
+                        break;
+
+                    case UPLOAD_ERR_NO_FILE :
+                        $result['content'] = 'Aucun fichier n\'a été envoyé.';
+                        break;
+                    
+                    case UPLOAD_ERR_NO_TMP_DIR :
+                        $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
+                        break;
+
+                    case UPLOAD_ERR_CANT_WRITE :
+                        $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
+                        break;
+
+                    case UPLOAD_ERR_EXTENSION :
+                        $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
+                        break;
+                }
+
+                return $result;    
+            }
+
+            $tmp_filename = $file['tmp_name'] ?? false;
+            if (!$tmp_filename || !is_readable($tmp_filename))
+            {
+                return $result;
+            }
+
+            $md5_filename = md5_file($tmp_filename);
+            if (!$md5_filename)
+            {
+                return $result;
+            }
+
+            $new_file_path = PWD_DATAS . '/' . $md5_filename;
+
+            if (file_exists($new_file_path))
+            {
+                $result['success'] = true;
+                $result['content'] = $new_file_path;
+                
+                return $result;
+            }
+
+            $success = move_uploaded_file($tmp_filename, $new_file_path);
+            if (!$success)
+            {
+                $result['content'] = 'Impossible d\'écrire le fichier sur le serveur.';
+                return $result;
+            }
+
+            $result['success'] = true;
+            $result['content'] = $new_file_path;
+
+            return $result;
+        }
     }

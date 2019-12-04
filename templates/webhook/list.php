@@ -1,11 +1,9 @@
 <?php
-	//Template dashboard
-	$incs = new internalIncs();
-	$incs->head('Webhooks - Show All');
+	$this->render('incs/head', ['title' => 'Webhooks - Show All'])
 ?>
 <div id="wrapper">
 <?php
-	$incs->nav('webhooks');
+	$this->render('incs/nav', ['page' => 'webhooks'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -33,44 +31,47 @@
 						<div class="panel-heading">
 							<h3 class="panel-title"><i class="fa fa-plug fa-fw"></i> Liste des webhooks</h3>
 						</div>
-						<div class="panel-body">
-							<div class="table-responsive">
-								<table class="table table-bordered table-hover table-striped" id="table-webhooks">
-									<thead>
-										<tr>
-											<th>#</th>
-											<th>Url</th>
-											<th>Type de Webhook</th>
-											<th style="width:5%;">Sélectionner</th>
-										</tr>
-									</thead>
-									<tbody>
-									<?php foreach ($webhooks as $webhook) { ?>
-											<tr>
-												<td><?php $this->s($webhook['id']); ?></td>
-												<td><?php $this->s($webhook['url']); ?></td>
-												<td><?php echo array_search($webhook['type'], internalConstants::WEBHOOK_TYPE); ?></td>
-												<td><input type="checkbox" value="<?php $this->s($webhook['id']); ?>"></td>
-											</tr>
+                        <div class="panel-body">
+                            <form method="GET">
+                                <?php if (!$webhooks) { ?>
+                                    <p>Aucun webhook n'a été créé pour le moment.</p>
+                                <?php } else { ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover table-striped" id="table-webhooks">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Url</th>
+                                                    <th>Type de webhook</th>
+                                                    <th style="width:5%;">Sélectionner</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($webhooks as $webhook) { ?>
+                                                    <tr>
+                                                        <td><?php $this->s($webhook['id']); ?></td>
+                                                        <td><?php $this->s($webhook['url']); ?></td>
+                                                        <td><?php $this->s($webhook['type'] == 'send_sms' ? 'Envoi de SMS' : 'Reception de SMS'); ?></td>
+                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($webhook['id']); ?>"></td>
+                                                    </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php } ?>
+                                <div>
+                                    <div class="col-xs-6 no-padding">
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Webhook', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un webhook</a>
+                                    </div>
+                                    <?php if ($webhooks) { ?>
+                                        <div class="text-right col-xs-6 no-padding">
+                                            <strong>Action pour la séléction :</strong>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Webhook', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Webhook', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                        </div>
                                     <?php } ?>
-                                    </tbody>
-								</table>
-							</div>
-							<div>
-								<div class="col-xs-6 no-padding">
-									<a class="btn btn-success" href="<?php echo \descartes\Router::url('webhooks', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un webhook</a>
-								</div>
-								<div class="text-right col-xs-6 no-padding">
-									<strong>Action pour la séléction :</strong> 
-									<div class="btn-groupe action-dropdown" destination="#table-webhooks">
-										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action pour la sélection <span class="caret"></span></button>
-										<ul class="dropdown-menu pull-right" role="menu">
-											<li><a href="<?php echo \descartes\Router::url('webhooks', 'edit', [$_SESSION['csrf']]); ?>"><span class="fa fa-edit"></span> Modifier</a></li>
-											<li><a href="<?php echo \descartes\Router::url('webhooks', 'delete', [$_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</a></li>
-										</ul>
-									</div>
-								</div>
-							</div>
+                                </div>
+                            </form>
 						</div>
 					</div>
 				</div>
@@ -78,21 +79,5 @@
 		</div>
 	</div>
 </div>
-<script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
-</script>
 <?php
-	$incs->footer();
+	$this->render('incs/footer');

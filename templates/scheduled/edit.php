@@ -37,7 +37,7 @@
 							<h3 class="panel-title"><i class="fa fa-edit fa-fw"></i> Modification des SMS programmés</h3>
 						</div>
 						<div class="panel-body">
-							<form action="<?php echo \descartes\Router::url('Scheduled', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
+							<form action="<?php echo \descartes\Router::url('Scheduled', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST" enctype="multipart/form-data">
 							<?php foreach ($scheduleds as $scheduled) { ?>
                                     <div class="form-group">
                                         <label>Texte du SMS</label>
@@ -60,6 +60,24 @@
                                             </div>
                                         <?php } ?>
 									</div>
+                                    <?php if ($_SESSION['user']['settings']['mms'] ?? false) { ?>
+                                        <div class="form-group">
+                                            <label>Ajouter un média</label>
+                                            <p class="italic small help description-scheduled-media">
+                                                Le média sera utilisé uniquement si le téléphone utilisé supporte l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>
+                                            </p>
+                                            <?php if ($scheduled['media']) { ?>
+                                                <div class="current-media-container">
+                                                    <input type="hidden" name="scheduleds[<?php $this->s($scheduled['id']); ?>][current_media]" value="1">
+                                                    <p class="inline-block">Un média est déjà lié à ce message.</p>
+                                                    <a href="#" class="btn btn-warning btn-delete-media">Supprimer le média</a>
+                                                </div>
+                                                <input class="hidden" name="media_<?php $this->s($scheduled['id']); ?>" type="file" />
+                                            <?php } else { ?>
+                                                <input name="media_<?php $this->s($scheduled['id']); ?>" type="file" />
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
 									<div class="form-group">
 										<label>Date d'envoi du SMS</label>
 										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][at]" class="form-control form-datetime" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
@@ -187,6 +205,9 @@
                 hiddenInput: hidden_input_name,
                 defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
                 preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
+                <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
+                    onlyCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['authorized_phone_country'])), false, false); ?>,
+                <?php } ?>
                 nationalMode: true,
                 utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
             });
@@ -210,11 +231,21 @@
                 hiddenInput: hidden_input_name,
 				defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
 				preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
+                <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
+                    onlyCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['authorized_phone_country'])), false, false); ?>,
+                <?php } ?>
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
 			});
 
-		});
+        });
+
+        jQuery('body').on('click', '.btn-delete-media', function (e)
+        {
+            e.preventDefault();
+            jQuery(this).parents('.form-group').find('input').removeClass('hidden');
+            jQuery(this).parents('.form-group').find('.current-media-container').remove();
+        });
 
         jQuery('body').on('click', '.preview-button', function (e)
         {
