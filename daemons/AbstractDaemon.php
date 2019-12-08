@@ -1,5 +1,7 @@
 <?php
 
+namespace daemons;
+
 /**
  * Class defining the global structur of a Linux Daemon
  */
