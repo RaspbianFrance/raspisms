@@ -214,6 +214,166 @@ namespace controllers\internals;
             return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
 
+
+        /**
+         * Get all messages to send and the number to use to send theme
+         * @return array : [['text', 'origin', 'destination', 'flash'], ...]
+         */
+        public function get_smss_to_send ()
+        {
+            $smss_to_send = [];
+            
+            $internal_templating = new \controllers\internals\Templating();
+            $internal_setting = new \controllers\internals\Setting($this->bdd);
+            $internal_group = new \controllers\internals\Group($this->bdd);
+            $internal_conditional_group = new \controllers\internals\ConditionalGroup($this->bdd);
+            $internal_phone = new \controllers\internals\Phone($this->bdd);
+
+            $users_settings = [];
+            $users_phones = [];
+
+            $now = new \DateTime();
+            $now = $now->format('Y-m-d H:i:s');
+            $scheduleds = $this->get_model()->gets_before_date($now);
+            foreach ($scheduleds as $scheduled)
+            {
+                if (!isset($users_settings[$scheduled['id_user']]))
+                {
+                    $users_settings[$scheduled['id_user']] = [];
+                    
+                    $settings = $internal_setting->gets_for_user($scheduled['id_user']);
+                    foreach ($settings as $name => $value)
+                    {
+                        $users_settings[$scheduled['id_user']][$name] = $value;
+                    }
+                }
+
+                if (!isset($users_phones[$scheduled['id_user']]))
+                {
+                    $users_phones[$scheduled['id_user']] = [];
+
+                    $phones = $internal_phone->gets_for_user($scheduled['id_user']);
+                    foreach ($phones as $phone)
+                    {
+                        $users_phones[$scheduled['id_user']][] = $phone;
+                    }
+                }
+
+                $messages = [];
+
+                //Add messages for numbers
+                $numbers = $this->get_numbers($scheduled['id']);
+                foreach ($numbers as $number)
+                {
+                    $message = [
+                        'origin' => $scheduled['origin'],
+                        'destination' => $number['number'],
+                        'flash' => $scheduled['flash'],
+                    ];
+
+                    if ($message['origin'] == null)
+                    {
+                        $k = array_rand($users_phones[$scheduled['id_user']]);
+                        $rnd_phone = $users_phones[$scheduled['id_user']][$k];
+                        $message['origin'] = $rnd_phone['number'];
+                    }
+
+                    if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
+                    {
+                        $render = $internal_templating->render($scheduled['text']);
+
+                        if (!$render['success'])
+                        {
+                            continue;
+                        }
+
+                        $message['text'] = $render['result'];
+                    }
+                    else
+                    {
+                        $message['text'] = $scheduled['text'];
+                    }
+
+                    $messages[] = $message;
+                }
+
+
+                //Add messages for contacts
+                $contacts = $this->get_contacts($scheduled['id']);
+
+                $groups = $this->get_groups($scheduled['id']);
+                foreach ($groups as $group)
+                {
+                    $contacts_to_add = $internal_group->get_contacts($group['id']);
+                    $contacts = array_merge($contacts, $contacts_to_add);
+                }
+
+                $conditional_groups = $this->get_conditional_groups($scheduled['id']);
+                foreach ($conditional_groups as $conditional_group)
+                {
+                    $contacts_to_add = $internal_conditional_group->get_contacts_for_condition_and_user($scheduled['id_user'], $conditional_group['condition']);
+                    $contacts = array_merge($contacts, $contacts_to_add);
+                }
+
+                $added_contacts = [];
+                foreach ($contacts as $contact)
+                {
+                    if ($added_contacts[$contact['id']] ?? false)
+                    {
+                        continue;
+                    }
+
+                    $added_contacts[$contact['id']] = true;
+
+                    $message = [
+                        'origin' => $scheduled['origin'],
+                        'destination' => $number['number'],
+                        'flash' => $scheduled['flash'],
+                    ];
+                    
+                    if ($message['origin'] == null)
+                    {
+                        $k = array_rand($users_phones[$scheduled['id_user']]);
+                        $rnd_phone = $users_phones[$scheduled['id_user']][$k];
+                        $message['origin'] = $rnd_phone['number'];
+                    }
+                    
+                    if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
+                    {
+                        $contact['datas'] = json_decode($contact['datas'], true);
+                        $render = $internal_templating->render($scheduled['text'], $contact);
+
+                        if (!$render['success'])
+                        {
+                            continue;
+                        }
+
+                        $message['text'] = $render['result'];
+                    }
+                    else
+                    {
+                        $message['text'] = $scheduled['text'];
+                    }
+
+                    $messages[] = $message;
+                }
+
+                foreach ($messages as $message)
+                {
+                    //Remove empty messages
+                    if (trim($message['text']) == '')
+                    {
+                        continue;
+                    }
+
+                    $smss_to_send[] = $message;
+                }
+            }
+
+            return $smss_to_send;
+        }
+
+
         
         /**
          * Return numbers for a scheduled message

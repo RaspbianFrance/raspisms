@@ -24,6 +24,16 @@ namespace controllers\internals;
          */
         abstract protected function get_model () : \descartes\Model;
 
+        
+        /**
+         * Return all the entries
+         * @return array
+         */
+        public function get_all ()
+        {
+            return $this->get_model()->get_all();
+        }
+
 
         /**
          * Return a entry by his id

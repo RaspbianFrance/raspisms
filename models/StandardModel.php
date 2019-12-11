@@ -23,6 +23,15 @@ namespace models;
          */
         abstract protected function get_table_name() : string;
 
+        /**
+         * Return all the entries
+         * @return array
+         */
+        public function get_all ()
+        {
+            return $this->_select($this->get_table_name());
+        }
+
 
         /**
          * Return an entry by his id

@@ -8,6 +8,8 @@ namespace daemons;
 abstract class AbstractDaemon
 {
 	protected $name;
+	protected $uniq;
+	protected $logger;
 	private $is_running = true;
 	private $signals = array (
         SIGTERM,
@@ -19,13 +21,19 @@ abstract class AbstractDaemon
 	/**
 	 * Class used to handle POSIX signals and fork from the current process
 	 *
-	 * @param string $name : The name of the class
-	 * @param array $signals :An array containing additional POSIX signals to handle [optionel]
+     * @param string $name : The name of the class
+     * @param object $logger : A PSR3 logger instance
+     * @param string $pid_dir : Directory for the pid files
+     * @param array $signals :An array containing additional POSIX signals to handle [optionel]
+     * @param bool $uniq : Must the process be uniq ?
 	 */
-    protected function __construct (string $name, array $signals = [])
+    protected function __construct (string $name, object $logger, string $pid_dir = '/var/run', array $signals = [], bool $uniq = false)
     {
-		$this->name = $name;
+        $this->name = $name;
+        $this->logger = $logger;
         $this->signals = array_merge($this->signals, $signals);
+        $this->uniq = $uniq;
+        $this->pid_dir = $pid_dir;
 
         //Allow script to run indefinitly
         set_time_limit(0);
@@ -86,13 +94,73 @@ abstract class AbstractDaemon
 	 */
     protected function start ()
     {
-		$this->on_start();
-        while ($this->is_running)
+        //If process must be uniq and a process with the same pid file is already running
+        if (file_exists($this->pid_dir . '/' . $this->name . '.pid') && $this->uniq)
         {
-			pcntl_signal_dispatch(); //Call dispatcher for signals
-			$this->run();
-		}
-		$this->on_stop();
+            echo "Another process named " . $this->name . " is already running.\n";
+            return false;
+        }
+
+        $pid = pcntl_fork(); //Fork current process into a child, so we will be able to later make the child indepedant, kill current process and keep only the child
+
+        if ($pid == -1) //Impossible to run script
+        {
+            echo "Impossible to create a subprocess.\n";
+            return false;
+        }
+        elseif ($pid) //Current script
+        {
+            echo "Child process started with pid " . $pid . ".\n";
+            return true;
+        }
+
+        //Child script
+        $sid = posix_setsid(); //Try to make the child process a main process
+        if ($sid == -1) //Error
+        {
+            $this->logger->critical('Cannot make the child process independent.');
+            exit(1);
+        }
+
+        //Create pid dir if not exists
+        if (!file_exists($this->pid_dir))
+        {
+            $success = mkdir($this->pid_dir, 0777, true);
+            if (!$success)
+            {
+                $this->logger->critical('Cannot create PID directory : ' . $this->pid_dir);
+                exit(2);
+            }
+        }
+
+        //Set process name
+        cli_set_process_title($this->name);
+
+        //Write the pid of the process into a file
+        file_put_contents($this->pid_dir . '/' . $this->name . '.pid', getmypid());
+
+        $this->on_start();
+        
+        try 
+        {
+            while ($this->is_running)
+            {
+                pcntl_signal_dispatch(); //Call dispatcher for signals
+                $this->run();
+            }
+        }
+        catch (\Exception $e)
+        {
+            $this->logger->critical('Exception : ' . $e->getMessage() . " in " . $e->getFile() . " line " . $e->getLine());
+        }
+        
+        $this->on_stop();
+
+        //Delete pid file
+        if (file_exists($this->pid_dir . '/' . $this->name . '.pid'))
+        {
+            unlink($this->pid_dir . '/' . $this->name . '.pid');
+        }
     }
 
 

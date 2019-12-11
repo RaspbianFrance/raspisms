@@ -5,7 +5,8 @@
         "giggsey/libphonenumber-for-php": "^8.10",
         "twig/twig": "^3.0",
         "symfony/expression-language": "^5.0",
-        "robmorgan/phinx": "^0.11.1"
+        "robmorgan/phinx": "^0.11.1",
+        "monolog/monolog": "^2.0"
     },
     "require-dev": {
     }

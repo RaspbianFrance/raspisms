@@ -220,4 +220,14 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
+
+        /**
+         * Get scheduleds before a date
+         * @param string $date : Date to get scheduleds before
+         * @return array
+         */
+        public function gets_before_date (string $date)
+        {
+            return $this->_select($this->get_table_name(), ['<=at' => $date]);
+        }
     }
