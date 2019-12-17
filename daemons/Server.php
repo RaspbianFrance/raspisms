@@ -21,7 +21,7 @@ class Server extends AbstractDaemon
 
         $name = "RaspiSMS Server";
         $pid_dir = PWD_PID;
-        $additional_signals = [SIGUSR1, SIGUSR2];
+        $additional_signals = [];
         $uniq = true; //Main server should be uniq
 
         //Construct the server and add SIGUSR1 and SIGUSR2
@@ -54,7 +54,7 @@ class Server extends AbstractDaemon
                 continue;
             }
 
-            //Create a new daemon for the phone and a new queue
+            //Create a new daemon for the phone
             $phone = new \daemons\Phone($phone);
         }
 
@@ -64,13 +64,18 @@ class Server extends AbstractDaemon
         $smss = $this->internal_scheduled->get_smss_to_send();
         foreach ($smss as $sms)
         {
-            if (!isset($queues[$sms['origin']]))
+            //If queue has been deleted or does not exist, create a new one
+            $queue_id = (int) mb_substr($sms['origin'], 1);
+            if (!msg_queue_exists($queue_id))
             {
-                $queue_id = (int) mb_substr($sms['origin'], 1);
-                $queues[$sms['origin']] = msg_get_queue($queue_id);
+                $queues[$queue_id] = msg_get_queue($queue_id);
+            }
+            elseif (!isset($queues[$queue_id]))
+            {
+                $queues[$queue_id] = msg_get_queue($queue_id);
             }
 
-            $queue = $queues[$sms['origin']];
+            $queue = $queues[$queue_id];
 
             $msg = [
                 'text' => (string) $sms['text'],
@@ -81,7 +86,6 @@ class Server extends AbstractDaemon
 
             msg_send($queue, SEND_MSG, $msg);
         }
-
 
 
         sleep(0.5);
