@@ -20,5 +20,10 @@ namespace controllers\internals;
         {
             $server = new \daemons\Server();
         }
-    
+
+
+        public function phone ($number)
+        {
+            $server = new \daemons\Phone($number);
+        }
     }

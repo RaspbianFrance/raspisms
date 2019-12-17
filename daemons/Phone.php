@@ -13,11 +13,11 @@ class Phone extends AbstractDaemon
     private $queue_id;
     private $last_message_at;
 
-    public function __construct($phone)
+    public function __construct($phone_number)
     {
-        $this->queue_id = (int) mb_substr($phone['number'], 1);
+        $this->queue_id = (int) mb_substr($phone_number, 1);
         
-        $name = 'Phone ' . $phone['number'];
+        $name = 'RaspiSMS Phone ' . $phone_number;
 
         $logger = new Logger($name);
         $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
@@ -28,8 +28,7 @@ class Phone extends AbstractDaemon
 
         //Construct the server and add SIGUSR1 and SIGUSR2
         parent::__construct($name, $logger, $pid_dir, $additional_signals, $uniq);
-
-        //Start the daemon
+        
         parent::start();
     }
 
@@ -68,7 +67,7 @@ class Phone extends AbstractDaemon
 
         $this->msg_queue = msg_get_queue($this->queue_id);
         
-        $this->logger->info("Starting " . $this->name . " with pid " . getmypid());
+        $this->logger->info("Starting Phone with pid " . getmypid());
     }
 
 
@@ -77,7 +76,7 @@ class Phone extends AbstractDaemon
         $this->logger->info("Closing queue : " . $this->queue_id);
         msg_remove_queue($this->msg_queue); //Delete queue on daemon close
 
-        $this->logger->info("Stopping " . $this->name . " with pid " . getmypid ());
+        $this->logger->info("Stopping Phone with pid " . getmypid ());
     }
 
 

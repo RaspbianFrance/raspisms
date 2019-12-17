@@ -27,8 +27,6 @@ class Server extends AbstractDaemon
         //Construct the server and add SIGUSR1 and SIGUSR2
         parent::__construct($name, $logger, $pid_dir, $additional_signals, $uniq);
 
-
-        //Start the daemon
         parent::start();
     }
 
@@ -46,7 +44,7 @@ class Server extends AbstractDaemon
         $phones = $this->internal_phone->get_all();
         foreach ($phones as $phone)
         {
-            $phone_name = 'Phone ' . $phone['number'];
+            $phone_name = 'RaspiSMS Phone ' . $phone['number'];
             $pid_file = PWD_PID . '/' . $phone_name . '.pid';
             
             if (file_exists($pid_file))
@@ -54,8 +52,10 @@ class Server extends AbstractDaemon
                 continue;
             }
 
+            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone number=\'' . $phone['number'] . '\' > /dev/null &');
+            $this->logger->info('Command : ' . 'php ' . PWD . '/console.php controllers/internals/Console.php phone number=\'' . $phone['number'] . '\' > /dev/null &');
             //Create a new daemon for the phone
-            $phone = new \daemons\Phone($phone);
+            //$phone = new \daemons\Phone($phone);
         }
 
         $queues = [];
@@ -94,13 +94,13 @@ class Server extends AbstractDaemon
 
     public function on_start()
     {
-        $this->logger->info("Starting " . $this->name . " with pid " . getmypid());
+        $this->logger->info("Starting Server with pid " . getmypid());
     }
 
 
     public function on_stop() 
     {
-        $this->logger->info("Stopping " . $this->name . " with pid " . getmypid ());
+        $this->logger->info("Stopping Server with pid " . getmypid ());
     }
 
 

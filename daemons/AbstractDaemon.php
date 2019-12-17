@@ -71,7 +71,7 @@ abstract class AbstractDaemon
     {
         if ($signal == SIGTERM || $signal == SIGINT) //Stop the daemon
         {
-			$this->is_running = false;
+            $this->is_running = false;
         }
         else if ($signal == SIGHUP) //Restart the daemon
         {
@@ -80,7 +80,7 @@ abstract class AbstractDaemon
         }
         else if ($signal == SIGCHLD) //On daemon child stopping
         {
-			pcntl_waitpid(-1, $status, WNOHANG);
+            pcntl_waitpid(-1, $status, WNOHANG);
         }
         else //All the other signals
         {
@@ -97,7 +97,7 @@ abstract class AbstractDaemon
         //If process must be uniq and a process with the same pid file is already running
         if (file_exists($this->pid_dir . '/' . $this->name . '.pid') && $this->uniq)
         {
-            echo "Another process named " . $this->name . " is already running.\n";
+            $this->logger->info("Another process named " . $this->name . " is already running.");
             return false;
         }
 
@@ -105,22 +105,25 @@ abstract class AbstractDaemon
 
         if ($pid == -1) //Impossible to run script
         {
-            echo "Impossible to create a subprocess.\n";
+            $this->logger->critical("Impossible to create a subprocess.");
             return false;
         }
         elseif ($pid) //Current script
         {
-            echo "Child process started with pid " . $pid . ".\n";
             return true;
         }
+        
+        $this->logger->info("Process $this->name started as a child with pid $pid.");
 
         //Child script
         $sid = posix_setsid(); //Try to make the child process a main process
         if ($sid == -1) //Error
         {
-            $this->logger->critical('Cannot make the child process independent.');
+            $this->logger->critical("Cannot make the child process with pid $pid independent.");
             exit(1);
         }
+        
+        $this->logger->info("The child process with pid $pid is now independent.");
 
         //Create pid dir if not exists
         if (!file_exists($this->pid_dir))
