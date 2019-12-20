@@ -121,6 +121,17 @@ namespace models;
         {
             return $this->_delete($this->get_table_name(), ['id_user' => $id_user, 'id' => $id]);
         }
+        
+        
+        /**
+         * Delete a entry by his id
+         * @param int $id : Entry id
+         * @return int : Number of removed rows
+         */
+        public function delete(int $id)
+        {
+            return $this->_delete($this->get_table_name(), ['id' => $id]);
+        }
 
 
         /**

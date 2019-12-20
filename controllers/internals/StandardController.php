@@ -93,6 +93,17 @@ namespace controllers\internals;
         {
             return $this->get_model()->delete_for_user($id_user, $id);
         }
+        
+        
+        /**
+         * Delete a entry by his id
+         * @param int $id : Entry id
+         * @return int : Number of removed rows
+         */
+        public function delete (int $id)
+        {
+            return $this->get_model()->delete($id);
+        }
 
 
         /**

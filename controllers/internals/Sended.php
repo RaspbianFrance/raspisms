@@ -32,10 +32,10 @@ namespace controllers\internals;
          * @param string $origin : Number of the sender
          * @param string $destination : Number of the receiver
          * @param bool $flash : Is the sms a flash
-         * @param ?string $status : Status of a the sms. By default null -> unknown
+         * @param string $status : Status of a the sms. By default 'unknown'
          * @return bool : false on error, new sended id else
          */
-        public function create ($at, string $text, string $origin, string $destination, bool $flash = false, ?string $status = null) : bool
+        public function create ($at, string $text, string $origin, string $destination, bool $flash = false, ?string $status = 'unknown') : bool
         {
             $sended = [ 
                 'at' => $at,

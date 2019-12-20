@@ -52,10 +52,8 @@ class Server extends AbstractDaemon
                 continue;
             }
 
-            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone number=\'' . $phone['number'] . '\' > /dev/null &');
-            $this->logger->info('Command : ' . 'php ' . PWD . '/console.php controllers/internals/Console.php phone number=\'' . $phone['number'] . '\' > /dev/null &');
             //Create a new daemon for the phone
-            //$phone = new \daemons\Phone($phone);
+            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone number=\'' . $phone['number'] . '\' > /dev/null &');
         }
 
         $queues = [];
@@ -85,8 +83,10 @@ class Server extends AbstractDaemon
             ];
 
             msg_send($queue, SEND_MSG, $msg);
-        }
 
+            //Delete the scheduled sms after sending
+            $this->internal_scheduled->delete($sms['id_scheduled']);
+        }
 
         sleep(0.5);
     }

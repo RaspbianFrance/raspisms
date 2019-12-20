@@ -52,11 +52,23 @@ class Phone extends AbstractDaemon
         {
             return true;
         }
+        
+        $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+        $internal_sended = new \controllers\internals\Sended($bdd);
 
         //If message received, update last message time
         $this->last_message_at = microtime(true);
 
-        $this->logger->debug(json_encode($message));
+        //Register message as sended
+        $now = new \DateTime();
+        $now = $now->format('Y-m-d H:i:s');
+        $internal_sended->create($now, $message['text'], $message['origin'], $message['destination'], $message['flash']);
+
+        //Close bdd
+        $bdd = null;
+        $internal_sended = null;
+
+        $this->logger->info('Send message : ' . json_encode($message));
     }
 
 

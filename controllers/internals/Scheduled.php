@@ -217,7 +217,7 @@ namespace controllers\internals;
 
         /**
          * Get all messages to send and the number to use to send theme
-         * @return array : [['text', 'origin', 'destination', 'flash'], ...]
+         * @return array : [['id_scheduled', 'text', 'origin', 'destination', 'flash'], ...]
          */
         public function get_smss_to_send ()
         {
@@ -266,6 +266,7 @@ namespace controllers\internals;
                 foreach ($numbers as $number)
                 {
                     $message = [
+                        'id_scheduled' => $scheduled['id'],
                         'origin' => $scheduled['origin'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
@@ -326,6 +327,7 @@ namespace controllers\internals;
                     $added_contacts[$contact['id']] = true;
 
                     $message = [
+                        'id_scheduled' => $scheduled['id'],
                         'origin' => $scheduled['origin'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
@@ -373,8 +375,8 @@ namespace controllers\internals;
 
             return $smss_to_send;
         }
-
-
+        
+        
         
         /**
          * Return numbers for a scheduled message
