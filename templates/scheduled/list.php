@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-calendar"></i> Scheduleds
+							<i class="fa fa-send"></i> Scheduleds
 						</li>
 					</ol>
 				</div>
@@ -31,7 +31,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Liste des SMS programmés</h3>
+							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> Liste des SMS à envoyer</h3>
 						</div>
                         <div class="panel-body">
                             <form method="GET">
@@ -63,7 +63,7 @@
                                 <?php } ?>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Scheduled', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un SMS programmé</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Scheduled', 'add'); ?>"><span class="fa fa-plus"></span> Créer un nouveau SMS</a>
                                     </div>
                                     <?php if ($scheduleds) { ?>
                                         <div class="text-right col-xs-6 no-padding">

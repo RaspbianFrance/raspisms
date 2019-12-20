@@ -33,6 +33,11 @@
     display: inline-block;
 }
 
+.auto-width
+{
+    width: auto !important;
+}
+
 /** POPUPS ALERT **/
 .popup-alerts-container
 {

@@ -136,7 +136,7 @@
 				<div class="col-lg-4">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> SMS Envoyés</h3>
+							<h3 class="panel-title"><i class="fa fa-upload fa-fw"></i> SMS Envoyés</h3>
 						</div>
                         <div class="panel-body">
                             <?php if (!$sendeds) { ?>

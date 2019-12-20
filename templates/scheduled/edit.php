@@ -80,7 +80,7 @@
                                     <?php } ?>
 									<div class="form-group">
 										<label>Date d'envoi du SMS</label>
-										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][at]" class="form-control form-datetime" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
+										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][at]" class="form-control form-datetime auto-width" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
 									</div>	
 									<div class="form-group">
 										<label>Numéros cibles</label>

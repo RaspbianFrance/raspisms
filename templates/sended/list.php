@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-send"></i> SMS envoyés
+							<i class="fa fa-upload"></i> SMS envoyés
 						</li>
 					</ol>
 				</div>
@@ -31,7 +31,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> Liste des SMS envoyés</h3>
+							<h3 class="panel-title"><i class="fa fa-upload fa-fw"></i> Liste des SMS envoyés</h3>
 						</div>
                         <div class="panel-body">
                             <form method="GET">

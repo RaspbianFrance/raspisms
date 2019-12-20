@@ -20,7 +20,7 @@
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li>
-							<i class="fa fa-calendar"></i> <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
+							<i class="fa fa-send"></i> <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Scheduleds</a>
 						</li>
 						<li class="active">
 							<i class="fa fa-plus"></i> Nouveau
@@ -34,7 +34,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Ajout d'un SMS programmé</h3>
+							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> Création d'un nouveau SMS</h3>
 						</div>
 						<div class="panel-body">
 							<form action="<?php echo \descartes\Router::url('Scheduled', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST" enctype="multipart/form-data">
@@ -71,7 +71,7 @@
                             <?php } ?>
                             <div class="form-group">
                                 <label>Date d'envoi du SMS</label>
-                                <input name="at" class="form-control form-datetime" type="text" value="<?php $this->s($now); ?>" readonly>
+                                <input name="at" class="form-control form-datetime auto-width" type="text" value="<?php $this->s($now); ?>" readonly>
                             </div>	
                             <div class="form-group">
                                 <label>Numéros cibles</label>
