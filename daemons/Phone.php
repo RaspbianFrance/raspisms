@@ -42,6 +42,17 @@ class Phone extends AbstractDaemon
             return true;
         }
 
+        //Send a sms
+        $this->send_sms();
+    }
+
+
+    /**
+     * Send sms
+     */
+    public function send_sms () : bool
+    {
+        //Call message 
         $msgtype = null;
         $maxsize = 409600;
         $message = null;
@@ -50,25 +61,22 @@ class Phone extends AbstractDaemon
 
         if (!$message)
         {
-            return true;
+            return false;
         }
         
-        $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
-        $internal_sended = new \controllers\internals\Sended($bdd);
-
         //If message received, update last message time
         $this->last_message_at = microtime(true);
-
-        //Register message as sended
-        $now = new \DateTime();
-        $now = $now->format('Y-m-d H:i:s');
-        $internal_sended->create($now, $message['text'], $message['origin'], $message['destination'], $message['flash']);
+        
+        $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+        $internal_scheduled = new \controllers\internals\Scheduled($bdd);
+        $internal_scheduled->send($message['id_scheduled'], $message['text'], $message['origin'], $message['destination'], $message['flash']);
 
         //Close bdd
         $bdd = null;
-        $internal_sended = null;
+        $internal_scheduled = null;
 
         $this->logger->info('Send message : ' . json_encode($message));
+        return true;
     }
 
 
