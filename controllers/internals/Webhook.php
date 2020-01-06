@@ -68,4 +68,16 @@ namespace controllers\internals;
 
             return $this->get_model()->update_for_user($id_user, $id, $datas);
         }
+
+
+        /**
+         * Find all webhooks for a user and for a type of webhook
+         * @param int $id_user : User id
+         * @param string $type : Webhook type
+         * @return array
+         */
+        public function gets_for_type_and_user (int $id_user, string $type)
+        {
+            return $this->get_model()->gets_for_type_and_user($id_user, $type);
+        }
     }
