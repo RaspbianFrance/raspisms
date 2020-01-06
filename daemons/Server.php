@@ -114,6 +114,8 @@ class Server extends AbstractDaemon
             ];
 
             msg_send($queue, SEND_MSG, $msg);
+
+            $internal_scheduled->delete($sms['id_scheduled']);
         }
 
         return $queues;

@@ -69,12 +69,12 @@
                                         <?php } ?>
                                         <ul class="pager">
                                             <?php if ($page) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('smsstop', 'showAll', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
+                                                    <li><a href="<?php echo \descartes\Router::url('SmsStop', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
                                             <?php } ?>
                                             <?php $this->s('Page : ' . ($page + 1)); ?>
 
                                             <?php if ($limit == $nb_results) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('smsstop', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                                    <li><a href="<?php echo \descartes\Router::url('SmsStop', 'list', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
                                             <?php } ?>
                                         </ul>
                                     </div>

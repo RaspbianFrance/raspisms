@@ -93,7 +93,7 @@
                                             Page : <?php $this->s($page + 1); ?>
 
                                             <?php if ($limit == $nb_results) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('sendeds', 'showAll', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
+                                                    <li><a href="<?php echo \descartes\Router::url('Sended', 'list', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
                                             <?php } ?>
                                         </ul>
                                     </div>

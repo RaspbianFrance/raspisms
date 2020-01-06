@@ -378,27 +378,6 @@ namespace controllers\internals;
         
         
         /**
-         * Send a scheduled message
-         * @param int $id_scheduled : Id of the message to send
-         * @param string $text : Text of the message
-         * @param string $origin : Origin of the message
-         * @param string $destination : Destination of the message
-         * @param bool $flash : Is the message a flash sms
-         * return bool: false on error, true else
-         */
-        public function send (int $id_scheduled, string $text, string $origin, string $destination, bool $flash) : bool
-        {
-            //TODO : Do the sending (càd, instanciate a phone adapter and send the message)
-
-            $now = new \DateTime();
-            $at = $now->format('Y-m-d H:i:s');
-            $internal_sended = new \controllers\internals\Sended($this->bdd);
-            $this->delete($id_scheduled); 
-            return $internal_sended->create($at, $text, $origin, $destination, $flash);
-        }
-        
-        
-        /**
          * Return numbers for a scheduled message
          * @param int $id_scheduled : Scheduled id
          * @return array
