@@ -51,9 +51,9 @@
          * @param string $destination : Phone number to send the sms to
          * @param string $text : Text of the SMS to send
          * @param bool $flash : Is the SMS a Flash SMS
-         * @return bool : True if send, False else
+         * @return mixed Uid of the sended message if send, False else
          */
-        public function send (string $destination, string $text, boolean $flash) : boolean;
+        public function send (string $destination, string $text, boolean $flash) : mixed;
 
 
         /**
