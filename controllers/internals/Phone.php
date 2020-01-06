@@ -65,10 +65,10 @@ namespace controllers\internals;
          * @param int $id_user : User to insert phone for
          * @param string $number : The number of the phone
          * @param string $adapter : The adapter to use the phone
-         * @param ?string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
+         * @param string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          * @return bool : false on error, true on success
          */
-        public function create (int $id_user, string $number, string $adapter, ?string $adapter_datas) : bool
+        public function create (int $id_user, string $number, string $adapter, string $adapter_datas) : bool
         {
             $phone = [ 
                 'id_user' => $id_user,

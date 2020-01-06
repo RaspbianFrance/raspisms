@@ -101,7 +101,7 @@ class Phone extends \descartes\Controller
      * @param $csrf : CSRF token
      * @param string  $_POST['number'] : Phone number
      * @param string  $_POST['adapter'] : Phone adapter
-     * @param boolean $_POST['adapter_datas'] : Phone adapter datas
+     * @param string $_POST['adapter_datas'] : Phone adapter datas
      */
     public function create($csrf)
     {
@@ -114,7 +114,7 @@ class Phone extends \descartes\Controller
         $id_user = $_SESSION['user']['id'];
         $number = $_POST['number'] ?? false;
         $adapter = $_POST['adapter'] ?? false;
-        $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : null;
+        $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : '{}';
 
         if (!$number || !$adapter)
         {
@@ -156,7 +156,7 @@ class Phone extends \descartes\Controller
         }
 
 
-        if (NULL !== $adapter_datas && NULL === json_decode($adapter_datas))
+        if (NULL === json_decode($adapter_datas))
         {
             \FlashMessage\FlashMessage::push('danger', 'La chaîne de configuration n\'est pas valide.');
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
