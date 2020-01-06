@@ -75,4 +75,22 @@ namespace controllers\internals;
 
             return (bool) $this->get_model()->insert($setting);
         }
+
+
+        /**
+         * Generate and insert default settings for a user
+         * @param int $id_user : user id
+         * @return bool
+         */
+        public function create_defaults_for_user(int $id_user)
+        {
+            $all_success = true;
+            foreach (USER_DEFAULT_SETTINGS as $name => $value)
+            {
+                $success = $this->create($id_user, $name, $value);
+                $all_success = ($all_success && $success);
+            }
+
+            return $all_success;
+        }
     }

@@ -23,6 +23,7 @@ namespace controllers\internals;
         {
             $this->model_user = new \models\User($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
+            $this->internal_setting = new \controllers\internals\Setting($bdd);
         }
 
         /**
@@ -179,13 +180,21 @@ namespace controllers\internals;
                 'transfer' => $transfer,
             ];
 
-            $result = $this->model_user->insert($user);
+            $new_user_id = $this->model_user->insert($user);
 
-            if (!$result)
+            if (!$new_user_id)
             {
                 return false;
             }
 
-            return $result;
+            $success = $this->internal_setting->create_defaults_for_user($new_user_id);
+
+            if (!$success)
+            {
+                $this->delete($new_user_id);
+                return false;
+            }
+
+            return $new_user_id;
         }
     }
