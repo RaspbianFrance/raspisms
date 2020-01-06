@@ -132,26 +132,7 @@ namespace controllers\internals;
             return $objectDate && $objectDate->format($format) === $date;
         }
 
-        /**
-         * Cette fonction parse un texte, pour en extraire des données contenu dans des drapeaux au format [FLAG:contenu du drapeau].
-         *
-         * @param string $texte : Le texte à parser
-         *
-         * @return mixed : Tableau de la forme 'FLAG' => 'contenu du drapeau'. si on trouve une forme correcte (Le contenu de FLAG sera mis en majuscule automatiquement). Sinon le tableau vide.
-         */
-        public static function parse_for_flag($texte)
-        {
-            $returns = [];
-            $results = [];
-            while (preg_match('#\[(.*)(?<!\\\):(.*)(?<!\\\)\]#Uui', $texte, $results))
-            { //Tant qu'on recuèpre un flag
-                $returns[mb_strtoupper($results[1])] = $results[2];
-                $texte = str_replace($results[0], '', $texte);
-            }
-
-            return $returns;
-        }
-
+        
         /**
          * Cette fonction retourne un mot de passe généré aléatoirement.
          *
