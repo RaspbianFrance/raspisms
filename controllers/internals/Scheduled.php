@@ -266,6 +266,7 @@ namespace controllers\internals;
                 foreach ($numbers as $number)
                 {
                     $message = [
+                        'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
                         'origin' => $scheduled['origin'],
                         'destination' => $number['number'],
@@ -327,6 +328,7 @@ namespace controllers\internals;
                     $added_contacts[$contact['id']] = true;
 
                     $message = [
+                        'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
                         'origin' => $scheduled['origin'],
                         'destination' => $number['number'],
