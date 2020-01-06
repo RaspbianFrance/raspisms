@@ -56,6 +56,17 @@ namespace controllers\internals;
         {
             return $this->get_model()->get_for_user($id_user, $id);
         }
+        
+        
+        /**
+         * Return all entries for a user
+         * @param int $id_user : Entry id
+         * @return array
+         */
+        public function gets_for_user (int $id_user)
+        {
+            return $this->get_model()->gets_for_user($id_user);
+        }
 
 
         /**
