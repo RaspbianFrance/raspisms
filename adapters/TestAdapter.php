@@ -76,10 +76,9 @@
 
         /**
          * Method called to read SMSs of the number
-         * @param float $since : Unix microtime representation of the date from wich we want to read the SMSs
          * @return array : Array of the sms reads
          */
-        public function read (float $since) : array
+        public function read () : array
         {
             return [];
         }

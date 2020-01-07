@@ -16,14 +16,48 @@ namespace controllers\internals;
      */
     class Console extends \descartes\InternalController
     {
-        public function server ()
+        /**
+         * Start manager daemon
+         */
+        public function manager ()
         {
-            $server = new \daemons\Server();
+            new \daemons\Manager();
         }
 
 
-        public function phone ($number)
+        /**
+         * Start sender daemon
+         */
+        public function sender ()
         {
-            $server = new \daemons\Phone($number);
+            new \daemons\Sender();
+        }
+        
+        
+        /**
+         * Start webhook daemon
+         */
+        public function webhook ()
+        {
+            new \daemons\Webhook();
+        }
+
+
+        /**
+         * Start a phone daemon
+         * @param $id_phone : Phone id
+         */
+        public function phone ($id_phone)
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_phone = new \controllers\internals\Phone($bdd);
+
+            $phone = $internal_phone->get($id_phone);
+            if (!$phone)
+            {
+                return false;
+            }
+
+            new \daemons\Phone($phone);
         }
     }
