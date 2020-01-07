@@ -47,9 +47,8 @@ class Phone extends AbstractDaemon
         //Stop after 5 minutes of inactivity to avoid useless daemon
         if ( (microtime(true) - $this->last_message_at) > 5 * 60 )
         {
-            $this->is_running = false;
-            $this->logger->info("End running");
-            return true;
+            posix_kill(getmypid(), SIGTERM); //Send exit signal to the current process
+            return false;
         }
         
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
