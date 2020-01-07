@@ -69,15 +69,22 @@ class Phone extends AbstractDaemon
      */
     private function send_smss ()
     {
-        //Call message 
-        $msgtype = null;
-        $maxsize = 409600;
-        $message = null;
-
         $find_message = true;
         while ($find_message)
         {
-            msg_receive($this->msg_queue, QUEUE_TYPE_SEND_MSG, $msgtype, $maxsize, $message);
+            //Call message 
+            $msgtype = null;
+            $maxsize = 409600;
+            $message = null;
+
+            $error_code = null;
+            $success = msg_receive($this->msg_queue, QUEUE_TYPE_SEND_MSG, $msgtype, $maxsize, $message, TRUE, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+
+            if (!$success && $error_code !== MSG_ENOMSG)
+            {
+                $this->logger->critical('Error reading MSG SEND Queue, error code : ' . $error);
+                return false;
+            }
 
             if (!$message)
             {
@@ -98,7 +105,7 @@ class Phone extends AbstractDaemon
             $sended_sms_uid = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
             if (!$sended_sms_uid)
             {
-                $this->logger->info('Failed send message : ' . json_encode($message));
+                $this->logger->error('Failed send message : ' . json_encode($message));
                 $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
                 continue;
             }
@@ -106,7 +113,7 @@ class Phone extends AbstractDaemon
             //Run webhook
             $internal_setting = new \controllers\internals\Setting($this->bdd);
             $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
-            process_for_webhook($message, 'send_sms', $user_settings);
+            $this->process_for_webhook($message, 'send_sms', $user_settings);
 
             $this->logger->info('Successfully send message : ' . json_encode($message));
 
@@ -122,7 +129,6 @@ class Phone extends AbstractDaemon
     private function read_smss ()
     {
         $internal_received = new \controllers\internals\Received($this->bdd);
-        $internal_command = new \controllers\internals\Command($this->bdd);
         $internal_setting = new \controllers\internals\Setting($this->bdd);
         
         $smss = $this->adapter->read();
@@ -146,7 +152,7 @@ class Phone extends AbstractDaemon
 
             $this->process_for_webhook($sms, 'receive_sms', $user_settings);
 
-            $this->internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
+            $internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
         }
     }
 
@@ -158,15 +164,18 @@ class Phone extends AbstractDaemon
      */
     private function process_for_command (array $sms)
     {
+        $internal_command = new \controllers\internals\Command($this->bdd);
+        
         $is_command = false;
         $command = $internal_command->check_for_command($this->phone['id_user'], $sms['text']);
         if ($command)
         {
             $is_command = true;
+            $sms['text'] = $command['updated_text'];
             exec($command['command']);
         }
 
-        return ['text' => $command['updated_text'], 'is_command' => $is_command];
+        return ['text' => $sms['text'], 'is_command' => $is_command];
     }
 
 
@@ -198,7 +207,13 @@ class Phone extends AbstractDaemon
                     'destination' => $sms['destination'],
                 ],
             ];
-            msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $webhook);
+
+            $error_code = null;
+            $success = msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $message, TRUE, TRUE, $error_code);
+            if (!$success)
+            {
+                $this->logger->critical("Failed send webhook message in queue, error code : " . $error_code);
+            }
         }
     }
 

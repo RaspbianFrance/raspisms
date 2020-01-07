@@ -53,7 +53,7 @@
          * @param bool $flash : Is the SMS a Flash SMS
          * @return mixed Uid of the sended message if send, False else
          */
-        public function send (string $destination, string $text, boolean $flash) : mixed;
+        public function send (string $destination, string $text, bool $flash);
 
 
         /**

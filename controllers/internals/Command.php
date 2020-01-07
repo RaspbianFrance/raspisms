@@ -87,7 +87,7 @@ namespace controllers\internals;
         {
             $extracted_command = [];
 
-            $decode_message = json_decode(trim($message));
+            $decode_message = json_decode(trim($message), true);
             if ($decode_message === null)
             {
                 return false;

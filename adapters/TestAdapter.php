@@ -48,6 +48,17 @@
          */
         private $datas;
 
+
+        /**
+         * Path for the file to read sms as a json from
+         */
+        private $test_file_read = PWD_DATAS . '/test_read_sms.json'; 
+        
+        /**
+         * Path for the file to write sms as a json in
+         */
+        private $test_file_write = PWD_DATAS . '/test_write_sms.json'; 
+
         
         /**
          * Adapter constructor, called when instanciated by RaspiSMS
@@ -68,8 +79,13 @@
          * @param bool $flash : Is the SMS a Flash SMS
          * @return mixed Uid of the sended message if send, False else
          */
-        public function send (string $destination, string $text, boolean $flash) : mixed
+        public function send (string $destination, string $text, bool $flash)
         {
+            $uid = uniqid();
+
+            $at = (new \DateTime())->format('Y-m-d H:i:s');
+            file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash]) . "\n", FILE_APPEND);
+
             return uniqid();
         }
 
@@ -80,6 +96,26 @@
          */
         public function read () : array
         {
-            return [];
+            $file_contents = file_get_contents($this->test_file_read);
+
+            //Empty file to avoid dual read
+            file_put_contents($this->test_file_read, '');
+
+            $smss = explode("\n", $file_contents);
+
+            $return = [];
+
+            foreach ($smss as $key => $sms)
+            {
+                $decode_sms = json_decode($sms, true);
+                if (NULL === $decode_sms)
+                {
+                    continue;
+                }
+
+                $return[] = $decode_sms;
+            }
+
+            return $return;
         }
     }

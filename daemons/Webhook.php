@@ -39,15 +39,20 @@ class Webhook extends AbstractDaemon
 
     public function run()
     {
-        //Call message 
-        $msgtype = null;
-        $maxsize = 409600;
-        $message = null;
-
         $find_message = true;
         while ($find_message)
         {
-            msg_receive($this->webhook_queue, QUEUE_ID_WEBHOOK, $msgtype, $maxsize, $message);
+            //Call message 
+            $msgtype = null;
+            $maxsize = 409600;
+            $message = null;
+
+            $error_code = null;
+            $success = msg_receive($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $msgtype, $maxsize, $message, true, 0, $error_code);
+            if (!$success)
+            {
+                $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
+            }
             
             if (!$message)
             {
