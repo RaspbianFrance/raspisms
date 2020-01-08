@@ -146,6 +146,7 @@ class Phone extends AbstractDaemon
             $this->logger->info('Receive message : ' . json_encode($sms));
 
             $command_result = $this->process_for_command($sms);
+            $this->logger->info('after command');
             $sms['text'] = $command_result['text'];
             $is_command = $command_result['is_command'];
 

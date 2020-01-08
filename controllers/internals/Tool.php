@@ -202,7 +202,7 @@ namespace controllers\internals;
             $controller->render($settings['template'], $datas);
             $content = ob_get_clean();
 
-            return mail($to, $settings['subject'], $content);
+            return @mail($to, $settings['subject'], $content);
         }
 
         /**

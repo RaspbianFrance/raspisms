@@ -83,7 +83,7 @@ namespace controllers\internals;
          * @param string $message : Text of the message to analyse
          * @return mixed : false on error, array with new text and command to execute ['updated_text' => string, 'command' => string]
          */
-        public function check_for_command (int $id_user, string $message) : bool
+        public function check_for_command (int $id_user, string $message) 
         {
             $extracted_command = [];
 
@@ -94,14 +94,14 @@ namespace controllers\internals;
             }
 
 
-            if (!isset($decode_message['login'], $decode_message['password']))
+            if (!isset($decode_message['login'], $decode_message['password'], $decode_message['command']))
             {
                 return false;
             }
 
 
             //Check for user
-            $internal_user = \controllers\internals\User($this->bdd);
+            $internal_user = new \controllers\internals\User($this->bdd);
             $user = $internal_user->check_credentials($decode_message['login'], $decode_message['password']);
             if (!$user || $user['id'] != $id_user)
             {
@@ -109,37 +109,38 @@ namespace controllers\internals;
             }
             
 
-            //Check for admin rights
-            if ($command['admin'] && !$user['admin'])
-            {
-                return false;
-            }
-
-
             //Find command
             $commands = $this->gets_for_user($user['id']);
             $find_command = false;
             foreach ($commands as $command)
             {
-                $command_name = $command['name'];
-                if (isset($decode_message[$command_name]))
+                if ($decode_message['command'] === $command['name'])
                 {
-                    $find_command = true;
+                    $find_command = $command;
                     break;
                 }
             }
 
-            if (!$find_command)
+            if (false === $find_command)
             {
                 return false;
             }
+            
+            
+            //Check for admin rights
+            if ($find_command['admin'] && !$user['admin'])
+            {
+                return false;
+            }
+
+
 
 
             //Forge command and return
             $decode_message['password'] = '******';
             $updated_text = json_encode($decode_message);
             
-            $generated_command = PWD_SCRIPTS . '/' . $command['script'];
+            $generated_command = PWD_SCRIPTS . '/' . $find_command['script'];
             $args = $decode_message['args'] ?? '';
             $generated_command .= ' ' . escapeshellcmd($args);
 
