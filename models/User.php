@@ -17,6 +17,17 @@ namespace models;
     class User extends \descartes\Model
     {
         /**
+         * Find a user by his id
+         * @param string $id : User id
+         * @return mixed array
+         */
+        public function get ($id)
+        {
+            return $this->_select_one('user', ['id' => $id]);
+        }
+
+
+        /**
          * Find a user using his email
          * @param string $email : User email
          * @return mixed array

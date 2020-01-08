@@ -141,6 +141,17 @@ namespace controllers\internals;
         
         
         /**
+         * Find a user by his id
+         * @param string $id : User id
+         * @return mixed array
+         */
+        public function get ($id)
+        {
+            return $this->model_user->get($id);
+        }
+        
+        
+        /**
          * Get a user by his api_key address
          * @param string $api_key : User api key
          *

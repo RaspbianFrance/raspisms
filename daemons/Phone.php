@@ -140,7 +140,6 @@ class Phone extends AbstractDaemon
         //Get users settings
         $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
 
-
         //Process smss
         foreach ($smss as $sms)
         {
@@ -151,6 +150,8 @@ class Phone extends AbstractDaemon
             $is_command = $command_result['is_command'];
 
             $this->process_for_webhook($sms, 'receive_sms', $user_settings);
+
+            $this->process_for_transfer($sms, $user_settings);
 
             $internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
         }
@@ -215,6 +216,32 @@ class Phone extends AbstractDaemon
                 $this->logger->critical("Failed send webhook message in queue, error code : " . $error_code);
             }
         }
+    }
+    
+    
+    /**
+     * Process a sms to transfer it by mail
+     * @param array $sms : The sms
+     * @param array $user_settings : Use settings
+     */
+    private function process_for_transfer (array $sms, array $user_settings)
+    {
+        if (!$user_settings['transfer'])
+        {
+            return false;
+        }
+
+        $internal_user = new \controllers\internals\User($this->bdd);
+        $user = $internal_user->get($this->phone['id_user']);
+
+        if (!$user)
+        {
+            return false;
+        }
+        
+        $this->logger->info('Transfer sms to ' . $user['email'] . ' : ' . json_encode($sms));
+
+        \controllers\internals\Tool::send_email($user['email'], EMAIL_TRANSFER_SMS, ['sms' => $sms]);
     }
 
 
