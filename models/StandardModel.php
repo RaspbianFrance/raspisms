@@ -158,6 +158,19 @@ namespace models;
         {
             return $this->_update($this->get_table_name(), $entry, ['id_user' => $id_user, 'id' => $id]);
         }
+        
+        
+        /**
+         * Update a entry by his id
+         * @param int   $id      : Entry id
+         * @param array $datas : datas to update
+         *
+         * @return int : number of modified rows
+         */
+        public function update(int $id, array $entry)
+        {
+            return $this->_update($this->get_table_name(), $entry, ['id' => $id]);
+        }
 
 
         /**

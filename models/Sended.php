@@ -241,7 +241,18 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-
+        
+        
+        /**
+         * Return sended for an uid and an adapter
+         * @param string $uid : Uid of the sended
+         * @param string $adapter : Adapter used to send the message
+         * @return array
+         */
+        public function get_by_uid_and_adapter(string $uid, string $adapter)
+        {
+            return $this->_select_one('sended', ['uid' => $uid, 'adapter' => $adapter]);
+        }
 
         /**
          * Get number of sended SMS for every date since a date for a specific user

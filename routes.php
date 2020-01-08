@@ -18,6 +18,7 @@
             'update_password' => '/account/update_password/{csrf}/',
             'update_transfer' => '/account/update_transfer/{csrf}/',
             'update_email' => '/account/update_email/{csrf}/',
+            'update_api_key' => '/account/update_api_key/{csrf}/',
             'delete' => '/account/delete/{csrf}/',
             'logout' => '/logout/',
         ],
@@ -177,6 +178,10 @@
             'delete' => '/webhook/delete/{csrf}/',
             'edit' => '/webhook/edit/',
             'update' => '/webhook/update/{csrf}/',
+        ],
+
+        'Callback' => [
+            'update_sended_status' => '/callback/status/{adapter_name}/',
         ],
     );
 

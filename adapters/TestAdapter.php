@@ -36,6 +36,11 @@
          * Does the implemented service support flash smss
          */
         public static function meta_support_flash() : bool { return true ; }
+        
+        /**
+         * Does the implemented service support status change
+         */
+        public static function meta_support_status_change() : bool { return true; }
 
 
         /**
@@ -114,6 +119,44 @@
                 }
 
                 $return[] = $decode_sms;
+            }
+
+            return $return;
+        }
+        
+        
+        /**
+         * Method called on reception of a status update notification for a SMS
+         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
+         */
+        public static function status_change_callback ()
+        {
+            $uid = $_GET['uid'] ?? false;
+            $status = $_GET['status'] ?? false;
+
+            if (!$uid || !$status)
+            {
+                return false;
+            }
+
+            $return = [
+                'uid' => $uid,
+                'status' => 'unknown',
+            ];
+
+            switch ($status)
+            {
+                case 'delivered' :
+                    $return['status'] = 'delivered';
+                    break;
+                
+                case 'failed' :
+                    $return['status'] = 'failed';
+                    break;
+
+                default :  
+                    $return['status'] = 'unknown';
+                    break;
             }
 
             return $return;

@@ -100,6 +100,22 @@ namespace controllers\internals;
 
             return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
         }
+        
+        
+        /**
+         * Update a sended status for a sended
+         * @param int $id_sended : Sended id
+         * @param string $status : Status of a the sms (unknown, delivered, failed)
+         * @return bool : false on error, true on success
+         */
+        public function update_status (int $id_sended, string $status) : bool
+        {
+            $sended = [ 
+                'status' => $status,
+            ];
+
+            return (bool) $this->get_model()->update($id_sended, $sended);
+        }
 
 
         /**
@@ -123,6 +139,18 @@ namespace controllers\internals;
         public function gets_by_destination_and_user(int $id_user, string $origin)
         {
             return $this->get_model()->gets_by_destination_and_user($id_user, $origin);
+        }
+        
+        
+        /**
+         * Return sended for an uid and an adapter
+         * @param string $uid : Uid of the sended
+         * @param string $adapter : Adapter used to send the message
+         * @return array
+         */
+        public function get_by_uid_and_adapter(string $uid, string $adapter)
+        {
+            return $this->get_model()->get_by_uid_and_adapter($uid, $adapter);
         }
 
 

@@ -91,6 +91,8 @@ class Phone extends AbstractDaemon
                 continue;
             }
             
+            $internal_sended = new \controllers\internals\Sended($this->bdd);
+            
             //Update last message time
             $this->last_message_at = microtime(true);
 
@@ -116,7 +118,6 @@ class Phone extends AbstractDaemon
 
             $this->logger->info('Successfully send message : ' . json_encode($message));
 
-            $internal_sended = new \controllers\internals\Sended($this->bdd);
             $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
         }
     }
@@ -154,8 +155,8 @@ class Phone extends AbstractDaemon
             $internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
         }
     }
-
-
+    
+    
     /**
      * Process a sms to find if its a command and so execute it
      * @param array $sms : The sms
@@ -226,7 +227,8 @@ class Phone extends AbstractDaemon
         $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
 
         //Instanciate adapter
-        $this->adapter = new \adapters\TestAdapter($this->phone['number'], $this->phone['adapter_datas']);
+        $adapter_class = $this->phone['adapter'];
+        $this->adapter = new $adapter_class($this->phone['number'], $this->phone['adapter_datas']);
 
         $this->logger->info("Starting Phone daemon with pid " . getmypid());
     }

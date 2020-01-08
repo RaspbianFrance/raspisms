@@ -155,6 +155,37 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
+        
+        
+        /**
+         * Update user api key.
+         *
+         * @param $csrf : Le jeton CSRF
+         */
+        public function update_api_key($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('Account', 'show'));
+            }
+
+            $new_api_key = $this->internal_user->update_api_key($_SESSION['user']['id']);
+            if (!$new_api_key)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour.');
+
+                return $this->redirect(\descartes\Router::url('Account', 'show'));
+            }
+
+            $_SESSION['user']['api_key'] = $new_api_key;
+
+            \FlashMessage\FlashMessage::push('success', 'Votre ancienne clef API a été désactivée et une nouvelle clef générée.');
+
+            return $this->redirect(\descartes\Router::url('Account', 'show'));
+        }
+
 
         /**
          * Delete a user.

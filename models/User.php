@@ -25,6 +25,18 @@ namespace models;
         {
             return $this->_select_one('user', ['email' => $email]);
         }
+        
+        
+        /**
+         * Get a user by his api_key address
+         * @param string $api_key : User api key
+         *
+         * @return mixed boolean | array : false if cannot find user for this api key, the user else
+         */
+        public function get_by_api_key(string $api_key)
+        {
+            return $this->_select_one('user', ['api_key' => $api_key]);
+        }
 
 
         /**

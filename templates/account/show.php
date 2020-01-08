@@ -42,11 +42,12 @@
 									<div class="panel-body">
 										<strong>Adresse e-mail :</strong> <?php $this->s($_SESSION['user']['email']); ?><br/>
 										<strong>Niveau administrateur :</strong> <?php echo $_SESSION['user']['admin'] ? 'Oui' : 'Non'; ?><br/>
+										<strong>Clef API :</strong> <?php echo $_SESSION['user']['api_key']; ?><br/>
 									</div>
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-key fa-fw"></i> Modifier mot de passe</h4>
+										<h4 class="panel-title"><i class="fa fa-lock fa-fw"></i> Modifier mot de passe</h4>
 									</div>
 									<div class="panel-body">
 										<form action="<?php echo \descartes\Router::url('Account', 'update_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
@@ -93,6 +94,16 @@
 												<button class="btn btn-success">Mettre à jour les données</button>	
 											</div>
 										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-key fa-fw"></i> Modifier clef API</h4>
+									</div>
+									<div class="panel-body">
+                                        <div class="text-center">
+                                            <a class="btn btn-success" href="<?= \descartes\Router::url('Account', 'update_api_key', ['csrf' => $_SESSION['csrf']]); ?>"><i class="fa fa-refresh"></i> Générer une nouvelle clef API</a>	
+                                        </div>
 									</div>
 								</div>
 								<div class="panel panel-default">

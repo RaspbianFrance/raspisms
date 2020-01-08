@@ -117,6 +117,28 @@ namespace controllers\internals;
         {
             return (bool) $this->model_user->update_email($id, $email);
         }
+        
+        
+        /**
+         * Update user api key.
+         *
+         * @param string $id    : user id
+         * @param ?string $api_key : new api key
+         *
+         * @return mixed : false on error, else new api key;
+         */
+        public function update_api_key($id, ?string $api_key = null)
+        {
+            $api_key = $api_key ?? $this->generate_random_api_key();
+            $success = $this->model_user->update($id, ['api_key' => $api_key]);
+
+            if (!$success)
+            {
+                return false;
+            }
+
+            return $api_key;
+        }
 
         /**
          * Get a user by his email address
@@ -127,6 +149,18 @@ namespace controllers\internals;
         public function get_by_email($email)
         {
             return $this->model_user->get_by_email($email);
+        }
+        
+        
+        /**
+         * Get a user by his api_key address
+         * @param string $api_key : User api key
+         *
+         * @return mixed boolean | array : false if cannot find user for this api key, the user else
+         */
+        public function get_by_api_key(string $api_key)
+        {
+            return $this->model_user->get_by_api_key($api_key);
         }
 
         /**
@@ -168,16 +202,18 @@ namespace controllers\internals;
          * @param mixed $password
          * @param mixed $admin
          * @param mixed $transfer
+         * @param ?string $api_key : The api key of the user, if null generate randomly
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
-        public function create($email, $password, $admin, $transfer = false)
+        public function create($email, $password, $admin, $transfer = false, ?string $api_key = null)
         {
             $user = [
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'admin' => $admin,
                 'transfer' => $transfer,
+                'api_key' => $api_key ?? $this->generate_random_api_key(),
             ];
 
             $new_user_id = $this->model_user->insert($user);
@@ -196,5 +232,15 @@ namespace controllers\internals;
             }
 
             return $new_user_id;
+        }
+
+
+        /**
+         * Generate a random api key
+         * @return string : The api key
+         */
+        public function generate_random_api_key () : string
+        {
+            return bin2hex(random_bytes(16));
         }
     }

@@ -36,6 +36,11 @@
          * Does the implemented service support flash smss
          */
         public static function meta_support_flash() : bool;
+        
+        /**
+         * Does the implemented service support status change
+         */
+        public static function meta_support_status_change() : bool;
 
 
         /**
@@ -61,4 +66,11 @@
          * @return array : Array of the sms reads
          */
         public function read () : array;
+        
+        
+        /**
+         * Method called on reception of a status update notification for a SMS
+         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
+         */
+        public static function status_change_callback ();
     }
