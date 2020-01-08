@@ -40,17 +40,6 @@ namespace models;
 
 
         /**
-         * Return users by their transfer status.
-         * @param bool $transfer : transfer status
-         * @return array
-         */
-        public function gets_by_transfer($transfer)
-        {
-            return $this->_select('user', ['transfer' => $transfer]);
-        }
-
-
-        /**
          * Return list of user.
          *
          * @param int $limit  : Number of user to return
@@ -109,18 +98,6 @@ namespace models;
         public function update_password($id, $password)
         {
             return $this->_update('user', ['password' => $password], ['id' => $id]);
-        }
-
-
-        /**
-         * Update a user transfer property value by his id.
-         * @param int   $id       : User id
-         * @param array $transfer : The new transfer property value
-         * @return int : Number of modified lines
-         */
-        public function update_transfer($id, $transfer)
-        {
-            return $this->_update('user', ['transfer' => $transfer], ['id' => $id]);
         }
 
 

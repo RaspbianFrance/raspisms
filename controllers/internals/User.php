@@ -92,18 +92,6 @@ namespace controllers\internals;
             return (bool) $this->model_user->update_password($id, $password);
         }
 
-        /**
-         * Update a user transfer property value.
-         *
-         * @param string $id       : User id
-         * @param string $transfer : New value of property transfer
-         *
-         * @return boolean;
-         */
-        public function update_transfer(int $id, int $transfer): bool
-        {
-            return (bool) $this->model_user->update_transfer($id, $transfer);
-        }
 
         /**
          * Update user email.
@@ -164,32 +152,21 @@ namespace controllers\internals;
         }
 
         /**
-         * Return users by transfer status.
-         *
-         * @param bool $transfer : transfer status
-         */
-        public function gets_by_transfer($transfer)
-        {
-            return $this->model_user->get_by_transfer($transfer);
-        }
-
-        /**
          * Update a user by his id
          * @param mixed $id
          * @param mixed $email
          * @param mixed $password
          * @param mixed $admin
-         * @param mixed $transfer
          *
          * @return int : Number of modified user
          */
-        public function update($id, $email, $password, $admin, $transfer)
+        public function update($id, $email, $password, $admin, $api_key)
         {
             $user = [
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'admin' => $admin,
-                'transfer' => $transfer,
+                'api_key' => $api_key,
             ];
 
             return $this->model_user->update($id, $user);
@@ -201,18 +178,16 @@ namespace controllers\internals;
          * @param mixed $email
          * @param mixed $password
          * @param mixed $admin
-         * @param mixed $transfer
          * @param ?string $api_key : The api key of the user, if null generate randomly
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
-        public function create($email, $password, $admin, $transfer = false, ?string $api_key = null)
+        public function create($email, $password, $admin, ?string $api_key = null)
         {
             $user = [
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'admin' => $admin,
-                'transfer' => $transfer,
                 'api_key' => $api_key ?? $this->generate_random_api_key(),
             ];
 

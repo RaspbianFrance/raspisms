@@ -106,25 +106,6 @@
                                         </div>
 									</div>
 								</div>
-								<div class="panel panel-default">
-									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-share fa-fw"></i> Transfert des SMS par e-mail</h4>
-									</div>
-									<div class="panel-body">
-										<form action="<?php echo \descartes\Router::url('Account', 'update_transfer', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
-											<div class="form-group">
-												<label>Transfert activé : </label>
-												<select name="transfer" class="form-control">
-													<option value="0">Non</option>
-													<option value="1" <?php echo $_SESSION['user']['transfer'] ? 'selected' : ''; ?>>Oui</option>
-												</select>
-											</div>	
-											<div class="text-center">
-												<button class="btn btn-success">Mettre à jour les données</button>	
-											</div>
-										</form>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>

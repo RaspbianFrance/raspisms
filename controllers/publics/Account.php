@@ -70,44 +70,6 @@ namespace controllers\publics;
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
 
-        /**
-         * Update user mail transfer property.
-         *
-         * @param $csrf : CSRF token
-         * @param string $_POST['transfer'] : New transfer property value
-         */
-        public function update_transfer($csrf)
-        {
-            $transfer = $_POST['transfer'] ?? false;
-
-            if (!$this->verify_csrf($csrf))
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
-
-                return $this->redirect(\descartes\Router::url('Account', 'show'));
-            }
-
-            if (false === $transfer)
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Vous devez choisir une option parmis celles de la liste déroulante.');
-
-                return $this->redirect(\descartes\Router::url('Account', 'show'));
-            }
-
-            $transfer_update_result = $this->internal_user->update_transfer($_SESSION['user']['id'], $transfer);
-            if (!$transfer_update_result)
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour.');
-
-                return $this->redirect(\descartes\Router::url('Account', 'show'));
-            }
-
-            $_SESSION['user']['transfer'] = $transfer;
-
-            \FlashMessage\FlashMessage::push('success', 'Le transfert a bien été '.($transfer ? 'activé' : 'désactivé').'.');
-
-            return $this->redirect(\descartes\Router::url('Account', 'show'));
-        }
 
         /**
          * Update user email.
