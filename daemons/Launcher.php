@@ -16,10 +16,10 @@ class Launcher extends AbstractDaemon
 
     public function __construct()
     {
-        $logger = new Logger('Daemon Launcher');
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
-
         $name = "RaspiSMS Daemon Launcher";
+        
+        $logger = new Logger($name);
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = true; //Launcher should be rattach to PID 1
         $additional_signals = [];
@@ -65,7 +65,8 @@ class Launcher extends AbstractDaemon
         }
 
         //Create a new daemon for sender
-        exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null &');
+        $pid = null;
+        exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
     }
     
     
@@ -84,7 +85,7 @@ class Launcher extends AbstractDaemon
         }
 
         //Create a new daemon for webhook
-        exec('php ' . PWD . '/console.php controllers/internals/Console.php webhook > /dev/null &');
+        exec('php ' . PWD . '/console.php controllers/internals/Console.php webhook > /dev/null 2>&1 &');
     }
 
 
@@ -106,7 +107,7 @@ class Launcher extends AbstractDaemon
             }
 
             //Create a new daemon for the phone
-            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone --id_phone=\'' . $phone['id'] . '\' > /dev/null &');
+            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone --id_phone=\'' . $phone['id'] . '\' > /dev/null 2>&1 &');
         }
     }
 
