@@ -27,16 +27,15 @@ class Phone extends AbstractDaemon
         $this->msg_queue_id = (int) mb_substr($this->phone['number'], 1);
         
         $name = 'RaspiSMS Daemon Phone ' . $this->phone['number'];
-        
         $logger = new Logger($name);
         $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
-        
         $pid_dir = PWD_PID;
+        $no_parent = false; //Phone should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
-        $uniq = true; //Main server should be uniq
+        $uniq = true; //Each phone should be uniq
 
-        //Construct the server and add SIGUSR1 and SIGUSR2
-        parent::__construct($name, $logger, $pid_dir, $additional_signals, $uniq);
+        //Construct the daemon
+        parent::__construct($name, $logger, $pid_dir, $no_parent, $additional_signals, $uniq);
         
         parent::start();
     }

@@ -17,11 +17,11 @@ namespace controllers\internals;
     class Console extends \descartes\InternalController
     {
         /**
-         * Start manager daemon
+         * Start launcher daemon
          */
-        public function manager ()
+        public function launcher ()
         {
-            new \daemons\Manager();
+            new \daemons\Launcher();
         }
 
 

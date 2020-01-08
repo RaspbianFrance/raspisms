@@ -21,18 +21,17 @@ class Webhook extends AbstractDaemon
      */
     public function __construct()
     {
-        $name = 'RaspiSMS Daemon Webhook';
-
+        $name = "RaspiSMS Daemon Webhook";
         $logger = new Logger($name);
         $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
-        
         $pid_dir = PWD_PID;
+        $no_parent = false; //Sended should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
-        $uniq = true; //Main server should be uniq
+        $uniq = true; //Sender should be uniq
 
-        //Construct the server and add SIGUSR1 and SIGUSR2
-        parent::__construct($name, $logger, $pid_dir, $additional_signals, $uniq);
-        
+        //Construct the daemon
+        parent::__construct($name, $logger, $pid_dir, $no_parent, $additional_signals, $uniq);
+
         parent::start();
     }
 

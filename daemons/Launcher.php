@@ -7,7 +7,7 @@ use \Monolog\Handler\StreamHandler;
 /**
  * Main daemon class
  */
-class Manager extends AbstractDaemon
+class Launcher extends AbstractDaemon
 {
     private $internal_phone;
     private $internal_scheduled;
@@ -16,16 +16,17 @@ class Manager extends AbstractDaemon
 
     public function __construct()
     {
-        $logger = new Logger('Daemon Manager');
+        $logger = new Logger('Daemon Launcher');
         $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
 
-        $name = "RaspiSMS Daemon Manager";
+        $name = "RaspiSMS Daemon Launcher";
         $pid_dir = PWD_PID;
+        $no_parent = true; //Launcher should be rattach to PID 1
         $additional_signals = [];
         $uniq = true; //Main server should be uniq
 
         //Construct the server and add SIGUSR1 and SIGUSR2
-        parent::__construct($name, $logger, $pid_dir, $additional_signals, $uniq);
+        parent::__construct($name, $logger, $pid_dir, $no_parent, $additional_signals, $uniq);
 
         parent::start();
     }
@@ -112,13 +113,13 @@ class Manager extends AbstractDaemon
 
     public function on_start()
     {
-        $this->logger->info("Starting Manager with pid " . getmypid());
+        $this->logger->info("Starting Launcher with pid " . getmypid());
     }
 
 
     public function on_stop() 
     {
-        $this->logger->info("Stopping Manager with pid " . getmypid ());
+        $this->logger->info("Stopping Launcher with pid " . getmypid ());
     }
 
 

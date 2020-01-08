@@ -9,7 +9,8 @@ abstract class AbstractDaemon
 {
 	protected $name;
 	protected $uniq;
-	protected $logger;
+    protected $logger;
+    protected $no_parent;
 	private $is_running = true;
 	private $signals = array (
         SIGTERM,
@@ -24,16 +25,18 @@ abstract class AbstractDaemon
      * @param string $name : The name of the class
      * @param object $logger : A PSR3 logger instance
      * @param string $pid_dir : Directory for the pid files
+     * @param bool $no_parent : Should the daemon be disconnected from his parent process
      * @param array $signals :An array containing additional POSIX signals to handle [optionel]
      * @param bool $uniq : Must the process be uniq ?
 	 */
-    protected function __construct (string $name, object $logger, string $pid_dir = '/var/run', array $signals = [], bool $uniq = false)
+    protected function __construct (string $name, object $logger, string $pid_dir = '/var/run', $no_parent = false, array $signals = [], bool $uniq = false)
     {
         $this->name = $name;
         $this->logger = $logger;
+        $this->no_parent = $no_parent;
+        $this->pid_dir = $pid_dir;
         $this->signals = array_merge($this->signals, $signals);
         $this->uniq = $uniq;
-        $this->pid_dir = $pid_dir;
 
         //Allow script to run indefinitly
         set_time_limit(0);
@@ -101,29 +104,35 @@ abstract class AbstractDaemon
             return false;
         }
 
-        $pid = pcntl_fork(); //Fork current process into a child, so we will be able to later make the child indepedant, kill current process and keep only the child
 
-        if ($pid == -1) //Impossible to run script
+        //If we must make the daemon independant from any parent, we do a fork and die operation
+        if ($this->no_parent)
         {
-            $this->logger->critical("Impossible to create a subprocess.");
-            return false;
-        }
-        elseif ($pid) //Current script
-        {
-            return true;
-        }
-        
-        $this->logger->info("Process $this->name started as a child with pid $pid.");
+            $pid = pcntl_fork(); //Fork current process into a child, so we can kill current process and keep only the child with parent PID = 1
 
-        //Child script
-        $sid = posix_setsid(); //Try to make the child process a main process
-        if ($sid == -1) //Error
-        {
-            $this->logger->critical("Cannot make the child process with pid $pid independent.");
-            exit(1);
+            if ($pid == -1) //Impossible to run script
+            {
+                $this->logger->critical("Impossible to create a subprocess.");
+                return false;
+            }
+            elseif ($pid) //Current script
+            {
+                return true;
+            }
+            
+            $this->logger->info("Process $this->name started as a child with pid " . getmypid() . ".");
+
+            //Child script
+            $sid = posix_setsid(); //Try to make the child process a main process
+            if ($sid == -1) //Error
+            {
+                $this->logger->critical("Cannot make the child process with pid $pid independent.");
+                exit(1);
+            }
+            
+            $this->logger->info("The child process with pid " . getmypid() . " is now independent.");
         }
-        
-        $this->logger->info("The child process with pid $pid is now independent.");
+
 
         //Create pid dir if not exists
         if (!file_exists($this->pid_dir))
@@ -136,14 +145,17 @@ abstract class AbstractDaemon
             }
         }
 
+
         //Set process name
         cli_set_process_title($this->name);
 
         //Write the pid of the process into a file
         file_put_contents($this->pid_dir . '/' . $this->name . '.pid', getmypid());
 
+
+        //Really start the daemon
         $this->on_start();
-        
+
         try 
         {
             while ($this->is_running)
@@ -156,9 +168,11 @@ abstract class AbstractDaemon
         {
             $this->logger->critical('Exception : ' . $e->getMessage() . " in " . $e->getFile() . " line " . $e->getLine());
         }
-        
+
+        //Stop the daemon        
         $this->on_stop();
 
+        
         //Delete pid file
         if (file_exists($this->pid_dir . '/' . $this->name . '.pid'))
         {
