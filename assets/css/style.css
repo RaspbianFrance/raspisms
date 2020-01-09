@@ -38,6 +38,11 @@
     width: auto !important;
 }
 
+.no-wrap
+{
+    white-space: nowrap;
+}
+
 /** POPUPS ALERT **/
 .popup-alerts-container
 {

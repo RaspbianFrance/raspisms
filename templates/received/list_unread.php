@@ -56,8 +56,8 @@
                                             <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
                                                         <td><?php $this->s($received['id']); ?></td>
-                                                        <td><?php echo(\controllers\internals\Tool::phone_link($received['origin'])); ?></td>
-                                                        <td><?php echo(\controllers\internals\Tool::phone_link($received['destination'])); ?></td>
+                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['origin'])); ?></td>
+                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['destination'])); ?></td>
                                                         <td><?php $this->s($received['text']); ?></td>
                                                         <td><?php $this->s($received['at']); ?></td>
                                                         <td><?php echo ($received['status'] == 'read' ? 'Lu' : 'Non lu'); ?></td>

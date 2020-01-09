@@ -57,8 +57,8 @@
                                             <?php foreach ($sendeds as $sended) { ?>
                                                     <tr>
                                                         <td><?php $this->s($sended['id']); ?></td>
-                                                        <td><?php echo(\controllers\internals\Tool::phone_link($sended['origin'])); ?></td>
-                                                        <td><?php echo(\controllers\internals\Tool::phone_link($sended['destination'])); ?></td>
+                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($sended['origin'])); ?></td>
+                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($sended['destination'])); ?></td>
                                                         <td><?php $this->s($sended['text']); ?></td>
                                                         <td><?php $this->s($sended['at']); ?></td>
 
