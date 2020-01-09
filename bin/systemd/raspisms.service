@@ -1,13 +1,16 @@
 [Unit]
 Description=RaspiSMS Daemons
 Documentation=https://raspisms.raspberry-pi.fr
-After=network-online.target
+After=network-online.target apache2.service
 Wants=network-online.target
 
 [Service]
 Type=forking
 PIDFile=/var/run/raspisms/RaspiSMS Daemon Launcher.pid
 ExecStart=/opt/raspisms/bin/start.sh
-ExecStop=/opt/raspisms/bin/start.sh
+ExecStop=/opt/raspisms/bin/stop.sh
 WorkingDirectory=/opt/raspisms
 Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target 
