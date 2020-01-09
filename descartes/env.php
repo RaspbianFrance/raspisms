@@ -4,7 +4,7 @@
     /*
      * Define Descartes env
      */
-    $http_dir_path = ''; //Path we need to put after servername in url to access app
+    $http_dir_path = '/raspisms'; //Path we need to put after servername in url to access app
     $http_protocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://';
     $http_server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
     $http_server_port = isset($_SERVER['SERVER_PORT']) ? ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'] : '';
