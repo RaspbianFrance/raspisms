@@ -101,7 +101,7 @@ class Phone extends \descartes\Controller
      * @param $csrf : CSRF token
      * @param string  $_POST['number'] : Phone number
      * @param string  $_POST['adapter'] : Phone adapter
-     * @param string $_POST['adapter_datas'] : Phone adapter datas
+     * @param array   $_POST['adapter_datas'] : Phone adapter datas
      */
     public function create($csrf)
     {
@@ -114,7 +114,7 @@ class Phone extends \descartes\Controller
         $id_user = $_SESSION['user']['id'];
         $number = $_POST['number'] ?? false;
         $adapter = $_POST['adapter'] ?? false;
-        $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : '{}';
+        $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
 
         if (!$number || !$adapter)
         {
@@ -139,26 +139,49 @@ class Phone extends \descartes\Controller
 
 
         $adapters = $this->internal_adapter->list_adapters();
-        $adapter_exists = false;
+        $find_adapter = false;
         foreach ($adapters as $metas)
         {
             if ($metas['meta_classname'] === $adapter)
             {
-                $adapter_exists = true;
+                $find_adapter = $metas;
                 break;
             }
         }
 
-        if (!$adapter_exists)
+        if (!$find_adapter)
         {
             \FlashMessage\FlashMessage::push('danger', 'Cet adaptateur n\'existe pas.');
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-
-        if (NULL === json_decode($adapter_datas))
+        //If missing required data fields, error
+        foreach ($find_adapter['meta_datas_fields'] as $field)
         {
-            \FlashMessage\FlashMessage::push('danger', 'La chaîne de configuration n\'est pas valide.');
+            if ($field['required'] === false)
+            {
+                continue;
+            }
+
+            if (!empty($adapter_datas[$field['name']]))
+            {
+                continue;
+            }
+
+            \FlashMessage\FlashMessage::push('danger', 'Vous n\'avez pas rempli certains champs obligatoires pour l\'adaptateur choisis.');
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        $adapter_datas = json_encode($adapter_datas);
+
+        //Check adapter is working correctly with thoses numbers and datas
+        $adapter_classname = $find_adapter['meta_classname'];
+        $adapter_instance = new $adapter_classname($number, $adapter_datas);
+        $adapter_working = $adapter_instance->test();
+
+        if (!$adapter_working)
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez le numéro de téléphone et les réglages.');
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 

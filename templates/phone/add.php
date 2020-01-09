@@ -59,20 +59,15 @@
                                                 title="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-datas-help="<?php $this->s($adapter['meta_datas_help']); ?>"
+                                                data-datas-fields="<?php $this->s(json_encode($adapter['meta_datas_fields'])); ?>"
                                             >
                                                 <?php $this->s($adapter['meta_name']); ?>
                                             </option>
                                         <?php } ?>
                                     </select>
                                 </div>
-								<div class="form-group" id="adapter-datas-container">
-                                    <label>Configuration de l'adaptateur</label>
-                                    <p class="italic small help" id="description-adapter-datas">
-                                        Les données à fournir à l'adaptateur pour lui permettre de faire la liaison avec le téléphone. Par exemple des identifiants d'API.<br/>
-                                    </p>
-                                    <textarea id="adapter-datas" name="adapter_datas" class="form-control has-error"></textarea>
-                                    <p class="hidden help-block" id="adapter-datas-error-message">La configuration doit être un JSON valide.</p>
-								</div>
+                                <div id="adapter-datas-fields-container">
+                                </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le phone" /> 	
 							</form>
@@ -84,36 +79,39 @@
 	</div>
 </div>
 <script>
-	jQuery('document').ready(function($)
+
+    function change_adapter ()
     {
         var option = jQuery('#adapter-select').find('option:selected');
         jQuery('#description-adapter').text(option.attr('data-description'));
         jQuery('#description-adapter-datas').text(option.attr('data-datas-help'));
-        
-        jQuery('#adapter-select').on('change', function (e)
+    
+        var datas_fields = option.attr('data-datas-fields');
+        datas_fields = JSON.parse(datas_fields);
+
+
+        var html = '';
+        jQuery.each(datas_fields, function (index, field)
         {
-            var option = jQuery(this).find('option:selected');
-            jQuery('#description-adapter').text(option.attr('data-description'));
-            jQuery('#description-adapter-datas').text(option.attr('data-datas-help'));
+            html += '<div class="form-group">' +
+                        '<label>' + field.title + '</label>' +
+                        '<p class="italic small help">' + field.description + '</p>' +
+                        '<div class="form-group">' + 
+                            '<input name="adapter_datas[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' >' +
+                        '</div>' +
+                    '</div>';
         });
 
-        jQuery('#adapter-datas').on('input', function (e)
-        {
-            try
-            {
-                if (jQuery(this).val() !== '')
-                {
-                    JSON.parse(jQuery(this).val());
-                }
+        jQuery('#adapter-datas-fields-container').html(html);
+    }
 
-                jQuery('#adapter-datas-container').removeClass('has-error');
-                jQuery('#adapter-datas-error-message').addClass('hidden');
-            }
-            catch (err) 
-            {
-                jQuery('#adapter-datas-container').addClass('has-error');
-                jQuery('#adapter-datas-error-message').removeClass('hidden');
-            }
+	jQuery('document').ready(function($)
+    {
+        change_adapter();
+
+        jQuery('#adapter-select').on('change', function (e)
+        {
+            change_adapter();
         });
 
         var number_input = jQuery('#phone-international-input')[0];

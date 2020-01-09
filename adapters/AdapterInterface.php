@@ -31,6 +31,12 @@
          * Description of the datas expected by the adapter to help the user. (e.g : A list of expecteds Api credentials fields, with name and value)
          */
         public static function meta_datas_help() : string;
+        
+        /**
+         * List of entries we want in datas for the adapter
+         * @return array : Eachline line is a field as an array with keys : name, title, description, required
+         */
+        public static function meta_datas_fields() : array;
 
         /**
          * Does the implemented service support flash smss
@@ -58,7 +64,7 @@
          * @param bool $flash : Is the SMS a Flash SMS
          * @return mixed Uid of the sended message if send, False else
          */
-        public function send (string $destination, string $text, bool $flash);
+        public function send (string $destination, string $text, bool $flash = false);
 
 
         /**
@@ -66,6 +72,14 @@
          * @return array : Array of the sms reads
          */
         public function read () : array;
+        
+        
+        /**
+         * Method called to verify if the adapter is working correctly
+         * should be use for exemple to verify that credentials and number are both valid
+         * @return boolean : False on error, true else
+         */
+        public function test () : bool;
         
         
         /**
