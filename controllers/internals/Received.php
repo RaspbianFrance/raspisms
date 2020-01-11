@@ -213,4 +213,16 @@ namespace controllers\internals;
         {
             return $this->get_model()->get_since_by_date_for_origin_and_user($id_user, $date, $origin);
         }
+        
+        
+        /**
+         * Find destination of last received message for an origin and user
+         * @param int $id_user : User id
+         * @param string $origin : Origin number
+         * @return array
+         */
+        public function get_last_for_origin_and_user (int $id_user, string $origin)
+        {
+            return $this->get_model()->get_last_for_origin_and_user($id_user, $origin);
+        }
     }

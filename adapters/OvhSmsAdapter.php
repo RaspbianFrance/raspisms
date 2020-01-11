@@ -250,7 +250,7 @@
             $uid = $_GET['id'] ?? false;
             $dlr = $_GET['dlr'] ?? false;
 
-            if ($uid === false || $dlr ==== false)
+            if ($uid === false || $dlr === false)
             {
                 return false;
             }

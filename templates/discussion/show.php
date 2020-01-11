@@ -38,7 +38,10 @@
 					<div class="discussion-message message-input">
 						<form class="send-message-discussion" action="<?php $this->s(\descartes\Router::url('Discussion', 'send', ['csrf' => $_SESSION['csrf']])); ?>" method="POST">
 							<textarea name="text" placeholder="Envoyer un message..."></textarea>
-							<input type="hidden" name="numbers[]" value="<?php $this->s($number); ?>" />
+							<input type="hidden" name="destination" value="<?php $this->s($number); ?>" />
+                            <?php if ($response_number ) { ?>
+                                <input type="hidden" name="origin" value="<?php $this->s($response_number); ?>" />
+                            <?php } ?>
 							<button class="btn" ><span class="fa fa-fw fa-send-o"></span> Envoyer</button>
 						</form>
 					</div>

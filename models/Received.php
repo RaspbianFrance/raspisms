@@ -388,4 +388,31 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
+
+        /**
+         * Find destination of last received message for an origin and user
+         * @param int $id_user : User id
+         * @param string $origin : Origin number
+         * @return array
+         */
+        public function get_last_for_origin_and_user (int $id_user, string $origin)
+        {
+            $query = "
+                SELECT *
+                FROM received
+                WHERE origin = :origin
+                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                ORDER BY at DESC
+                LIMIT 0,1
+            ";
+
+            $params = [
+                'origin' => $origin,
+                'id_user' => $id_user,
+            ];
+
+            $result = $this->_run_query($query, $params);
+
+            return ($result[0] ?? []);
+        }
     }

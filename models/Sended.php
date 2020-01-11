@@ -300,5 +300,33 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
+        
+        
+        /**
+         * Find last sended message for a destination and user
+         * @param int $id_user : User id
+         * @param string $destination : Destination number
+         * @return array
+         */
+        public function get_last_for_destination_and_user (int $id_user, string $destination)
+        {
+            $query = "
+                SELECT *
+                FROM sended
+                WHERE destination = :destination
+                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                ORDER BY at DESC
+                LIMIT 0,1
+            ";
+
+            $params = [
+                'destination' => $destination,
+                'id_user' => $id_user,
+            ];
+
+            $result = $this->_run_query($query, $params);
+
+            return ($result[0] ?? []);
+        }
 
     }

@@ -172,4 +172,16 @@ namespace controllers\internals;
 
             return $return;
         }
+        
+        
+        /**
+         * Find last sended message for a destination and user
+         * @param int $id_user : User id
+         * @param string $destination : Destination number
+         * @return array
+         */
+        public function get_last_for_destination_and_user (int $id_user, string $destination)
+        {
+            return $this->get_model()->get_last_for_destination_and_user($id_user, $destination);
+        }
     }
