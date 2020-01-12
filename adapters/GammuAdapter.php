@@ -84,15 +84,7 @@
         public function __construct (string $number, string $datas)
         {
             $this->number = $number;
-            $this->formatted_number = str_replace('+', '00', $number);
             $this->datas = json_decode($datas, true);
-
-            $this->api = new Api(
-                $this->datas['app_key'],
-                $this->datas['app_secret'],
-                $this->datas['endpoint'],
-                $this->datas['consumer_key']
-            );
         }
     
     
@@ -136,14 +128,14 @@
                 return false;
             }
 
-            $find_ok = $this->search_for_string('ok', $command_parts['output']);
+            $find_ok = $this->search_for_string($result['output'], 'ok');
             if (!$find_ok)
             {
                 return false;
             }
 
             $uid = false;
-            foreach ($output as $line)
+            foreach ($result['output'] as $line)
             {
                 $matches = [];
                 preg_match('#reference=([0-9]+)#u', $line, $matches);
@@ -184,17 +176,7 @@
          */
         public function test () : bool
         {
-            if (!file_exists($this->datas['config_file']))
-            {
-                return false;
-            }
-            
-            $result = $this->exec_command($command_parts);
-            if ($result['return'] != 0)
-            {
-                return false;
-            }
-
+            //Always return true as we cannot test because we would be needing a root account
             return true;
         }
 
@@ -258,11 +240,17 @@
          */
         private function exec_command (array $command_parts) : array
         {
+            //Add redirect of error to stdout
+            $command_parts[] = '2>&1';
+
+
             $command = implode(' ', $command_parts);
             
             $output = [];
             $return_var = null;
             exec($command, $output, $return_var);
+
+            var_dump($output);
 
             return ['return' => (int) $return_var, 'output' => $output];
         }
