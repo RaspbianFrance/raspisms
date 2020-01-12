@@ -62,7 +62,7 @@
         /**
          * Does the implemented service support status change
          */
-        public static function meta_support_status_change() : bool { return true; }
+        public static function meta_support_status_change() : bool { return false; }
 
 
         /**
