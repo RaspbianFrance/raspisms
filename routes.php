@@ -183,10 +183,6 @@
         'Callback' => [
             'update_sended_status' => '/callback/status/{adapter_name}/',
         ],
-        
-        'Test' => [
-            'test' => '/test/{id_phone}/',
-        ],
     );
 
     define('ROUTES', $routes);
