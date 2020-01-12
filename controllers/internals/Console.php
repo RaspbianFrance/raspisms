@@ -81,6 +81,7 @@ namespace controllers\internals;
             $adapter = new $adapter_classname($phone['number'], $phone['adapter_datas']);
 
             //Try send a message
+            /*
             $destination = '+33669529042';
             $text = "Coucou c'est pour un test !";
             $flash = false;
@@ -89,8 +90,12 @@ namespace controllers\internals;
             if (!$uid)
             {
                 echo "Cannot send message to $destination\n";
+                return false;
             }
 
             echo "Send a message to $destination with uid $uid \n";
+            */
+            $smss = $adapter->read();
+            var_dump($smss);
         }
     }

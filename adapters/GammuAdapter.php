@@ -166,6 +166,36 @@
             {
                 return [];
             }
+
+            $command_parts = [
+                PWD . '/bin/gammu_get_unread_sms.py',
+                escapeshellarg($this->datas['config_file']),
+            ];
+
+            $return = $this->exec_command($command_parts);
+            if ($return['return'] != 0)
+            {
+                return [];
+            }
+
+            $smss = [];
+            foreach ($return['output'] as $line)
+            {
+                $decode = json_decode($line, true);
+                if ($decode === null)
+                {
+                    continue;
+                }
+
+                $smss[] = [
+                    'at' => $decode['at'],
+                    'text' => $decode['text'],
+                    'origin' => $decode['number'],
+                    'destination' => $this->number,
+                ];
+            }
+
+            return $smss;
         }
 
 
@@ -249,8 +279,6 @@
             $output = [];
             $return_var = null;
             exec($command, $output, $return_var);
-
-            var_dump($output);
 
             return ['return' => (int) $return_var, 'output' => $output];
         }
