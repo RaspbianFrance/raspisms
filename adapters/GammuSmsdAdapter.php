@@ -8,7 +8,7 @@
      *
      * All Phone Adapters must implement this interface
      */
-    class GammuAdapter implements AdapterInterface
+    class GammuSmsdAdapter implements AdapterInterface
     {
         /**
          * Classname of the adapter
@@ -25,7 +25,7 @@
          * Description of the adapter.
          * A short description of the service the adapter implements.
          */
-        public static function meta_description() : string { return 'Utilisation du logiciel Gammu qui doit être installé sur le serveur et configuré. Voir https://wammu.eu.'; }
+        public static function meta_description() : string { return 'Utilisation du logiciel Gammu & Gammu SMSd qui doivent être installés sur le serveur et configuré. Voir https://wammu.eu.'; }
         
         /**
          * Description of the datas expected by the adapter to help the user. (e.g : A list of expecteds Api credentials fields, with name and value)
@@ -44,12 +44,6 @@
                     'title' => 'Fichier de configuration',
                     'description' => 'Chemin vers le fichier de configuration que Gammu devra utilisé pour se connecter au téléphone.',
                     'required' => true,
-                ],
-                [
-                    'name' => 'pin',
-                    'title' => 'Code PIN',
-                    'description' => 'Code PIN devant être utilisé pour activer la carte SIM (laisser vide pour ne pas utiliser de code PIN).',
-                    'required' => false,
                 ],
             ];
         }
@@ -105,11 +99,6 @@
          */
         public function send (string $destination, string $text, bool $flash = false)
         {
-            if (!$this->unlock_sim())
-            {
-                return false;
-            }
-            
             $command_parts = [
                 'gammu',
                 '--config',
@@ -170,10 +159,6 @@
          */
         public function read () : array
         {
-            if (!$this->unlock_sim())
-            {
-                return [];
-            }
         }
 
 
@@ -185,12 +170,6 @@
         public function test () : bool
         {
             if (!file_exists($this->datas['config_file']))
-            {
-                return false;
-            }
-            
-            $result = $this->exec_command($command_parts);
-            if ($result['return'] != 0)
             {
                 return false;
             }
@@ -209,48 +188,6 @@
         }
 
     
-        /**
-         * Function to unlock pin 
-         * @return bool : False on error, true else
-         */
-        private function unlock_sim () : bool
-        {
-            if (!$this->datas['pin'])
-            {
-                return true;
-            }
-
-            $command_parts = [
-                'gammu',
-                '--config',
-                escapeshellarg($this->datas['config_file']),
-                'entersecuritycode',
-                'PIN',
-                escapeshellarg($this->datas['pin']),
-            ];
-
-            $result = $this->exec_command($command_parts);
-
-
-            //Check security status
-            $command_parts = [
-                'gammu',
-                '--config',
-                escapeshellarg($this->datas['config_file']),
-                'getsecuritystatus',
-            ];
-
-            $result = $this->exec_command($command_parts);
-
-            if ($result['return'] != 0)
-            {
-                return false;
-            }
-
-            return $this->search_for_string($result['output'], 'nothing');
-        }
-
-
         /**
          * Function to execute a command and transmit it to Gammu
          * @param array $command_parts : Commands parts to be join with a space
