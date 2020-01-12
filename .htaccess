@@ -1,3 +1,2 @@
 RewriteEngine on
-RewriteBase "/raspisms/"
 RewriteRule "!\.(js|ico|ICO|gif|GIF|jpg|JPG|jpeg|JPEG|png|PNG|css|woff|woff2|ttf|wav|ogg|mp3)$" index.php
