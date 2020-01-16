@@ -250,13 +250,8 @@ namespace controllers\internals;
 
                 if (!isset($users_phones[$scheduled['id_user']]))
                 {
-                    $users_phones[$scheduled['id_user']] = [];
-
                     $phones = $internal_phone->gets_for_user($scheduled['id_user']);
-                    foreach ($phones as $phone)
-                    {
-                        $users_phones[$scheduled['id_user']][] = $phone;
-                    }
+                    $users_phones[$scheduled['id_user']] = $phones ? $phones : [];;
                 }
 
                 $messages = [];
