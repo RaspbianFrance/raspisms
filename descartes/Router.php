@@ -198,11 +198,14 @@
 					default :
 						$prefix_method = 'get_';
                 }
+
+                //If we dont match prefix with request method, return error
+                if (mb_substr($method, 0, mb_strlen($prefix_method)) != $prefix_method)
+                {
+                    return false;
+                }
             }
-            $prefix_method = $prefix_method ?? '';
 
-
-            $method = $prefix_method . $method;
             if (!method_exists($controller, $method))
             {
                 return false;
