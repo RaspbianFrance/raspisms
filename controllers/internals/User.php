@@ -18,6 +18,7 @@ namespace controllers\internals;
     {
         private $model_user;
         private $internal_event;
+        private $internal_setting;
 
         public function __construct(\PDO $bdd)
         {

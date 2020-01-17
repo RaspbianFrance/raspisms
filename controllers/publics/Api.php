@@ -43,8 +43,10 @@ namespace controllers\publics;
         private $internal_phone;
         private $internal_received;
         private $internal_sended;
+        private $internal_scheduled;
         private $internal_contact;
         private $internal_group;
+        private $internal_conditional_group;
         private $user;
 
         /**
@@ -92,7 +94,7 @@ namespace controllers\publics;
          * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone']
          * @param int    $page       : Pagination number, Default = 0. Group of 25 results.
          *
-         * @return List of entries
+         * @return : List of entries
          */
         public function get_entries(string $entry_type, int $page = 0)
         {
@@ -165,7 +167,7 @@ namespace controllers\publics;
          * @param string $_POST['groups']             : Array of ids of groups to send message to
          * @param string $_POST['conditional_groups'] : Array of ids of conditional groups to send message to
          *
-         * @return Id of scheduled created
+         * @return : Id of scheduled created
          */
         public function post_scheduled()
         {
@@ -225,7 +227,7 @@ namespace controllers\publics;
                 return false;
             }
 
-            if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
+            if ($origin && !$this->internal_phone->get_by_number_and_user($this->user['id'], $origin))
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
@@ -258,6 +260,7 @@ namespace controllers\publics;
          * Delete a scheduled message.
          *
          * @param int $id : Id of scheduled message to delete
+         * @return bool : void
          */
         public function delete_scheduled(int $id)
         {
@@ -271,5 +274,6 @@ namespace controllers\publics;
             }
 
             $this->auto_http_code(true);
+            return true;
         }
     }

@@ -20,6 +20,7 @@ abstract class AbstractDaemon
     protected $uniq;
     protected $logger;
     protected $no_parent;
+    protected $pid_dir;
     private $is_running = true;
     private $signals = [
         SIGTERM,

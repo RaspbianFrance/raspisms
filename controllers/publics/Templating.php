@@ -37,7 +37,7 @@ namespace controllers\publics;
          * @param string $_POST['template']   : Template string
          * @param int    $_POST['id_contact'] : Id of the contact to render the template for
          *
-         * @return json string
+         * @return mixed : False or json string ['success' => bool, 'result' => message]
          */
         public function render_preview()
         {

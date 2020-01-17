@@ -34,7 +34,7 @@ namespace controllers\publics;
             $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
-            $this->internal_ruler = new \controllers\internals\Ruler($bdd);
+            $this->internal_ruler = new \controllers\internals\Ruler();
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -183,7 +183,7 @@ namespace controllers\publics;
          *
          * @param string $_POST['condition'] : Condition to apply
          *
-         * @return json string
+         * @return mixed : False on error, json string ['success' => bool, 'result' => String with contacts]
          */
         public function contacts_preview()
         {

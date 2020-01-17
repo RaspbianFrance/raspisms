@@ -13,6 +13,7 @@ namespace controllers\internals;
 
     class Webhook extends StandardController
     {
+        protected $bdd;
         protected $model;
 
         /**

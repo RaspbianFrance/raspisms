@@ -92,7 +92,7 @@ namespace controllers\internals;
 
             unlink($media['path']);
 
-            return $this->get_model()->delete_for_user($id_user, $id);
+            return $this->get_model()->delete_for_user($id_user, $id_media);
         }
 
         /**

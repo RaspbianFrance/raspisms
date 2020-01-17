@@ -118,7 +118,7 @@ class Phone extends AbstractDaemon
 
             if (!$success && MSG_ENOMSG !== $error_code)
             {
-                $this->logger->critical('Error reading MSG SEND Queue, error code : '.$error);
+                $this->logger->critical('Error reading MSG SEND Queue, error code : '.$error_code);
 
                 return false;
             }

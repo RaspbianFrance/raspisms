@@ -13,6 +13,8 @@ namespace controllers\internals;
 
     abstract class StandardController extends \descartes\InternalController
     {
+        protected $bdd;
+
         public function __construct(\PDO $bdd)
         {
             $this->bdd = $bdd;
