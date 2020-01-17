@@ -1,11 +1,21 @@
 <?php
+
+/*
+ * This file is part of RaspiSMS.
+ *
+ * (c) Pierre-Lin Bonnemaison <plebwebsas@gmail.com>
+ *
+ * This source file is subject to the GPL-3.0 license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace daemons;
 
-use \Monolog\Logger;
-use \Monolog\Handler\StreamHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
- * Main daemon class
+ * Main daemon class.
  */
 class Sender extends AbstractDaemon
 {
@@ -17,9 +27,9 @@ class Sender extends AbstractDaemon
 
     public function __construct()
     {
-        $name = "RaspiSMS Daemon Sender";
+        $name = 'RaspiSMS Daemon Sender';
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = false; //Webhook should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
@@ -30,7 +40,6 @@ class Sender extends AbstractDaemon
 
         parent::start();
     }
-
 
     public function run()
     {
@@ -44,12 +53,12 @@ class Sender extends AbstractDaemon
         usleep(0.5 * 1000000);
     }
 
-
     /**
-     * Function to get messages to send and transfer theme to phones daemons
+     * Function to get messages to send and transfer theme to phones daemons.
+     *
      * @param array $smss : Smss to send
      */
-    public function transmit_smss (array $smss) : void
+    public function transmit_smss(array $smss): void
     {
         foreach ($smss as $sms)
         {
@@ -75,29 +84,26 @@ class Sender extends AbstractDaemon
         }
     }
 
-
     public function on_start()
     {
-        $this->logger->info("Starting Sender with pid " . getmypid());
+        $this->logger->info('Starting Sender with pid '.getmypid());
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
     }
 
-
-    public function on_stop() 
+    public function on_stop()
     {
-        $this->logger->info("Stopping Sender with pid " . getmypid ());
+        $this->logger->info('Stopping Sender with pid '.getmypid());
 
         //Delete queues on daemon close
         foreach ($this->queues as $queue_id => $queue)
         {
-            $this->logger->info("Closing queue : " . $queue_id);
+            $this->logger->info('Closing queue : '.$queue_id);
             msg_remove_queue($queue);
         }
     }
 
-
     public function handle_other_signals($signal)
     {
-        $this->logger->info("Signal not handled by " . $this->name . " Daemon : " . $signal);
+        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
     }
 }

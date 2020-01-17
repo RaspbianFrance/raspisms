@@ -14,8 +14,12 @@ namespace models;
     class Command extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
+         * Return table name.
+         *
+         * @return string
          */
-        protected function get_table_name() : string { return 'command'; }
+        protected function get_table_name(): string
+        {
+            return 'command';
+        }
     }

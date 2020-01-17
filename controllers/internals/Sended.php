@@ -13,35 +13,27 @@ namespace controllers\internals;
 
     class Sended extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Sended($this->bdd);
-            return $this->model;
-        } 
-
-        /**
-         * Create a sended
+         * Create a sended.
+         *
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $origin : Number of the sender
+         * @param string $origin      : Number of the sender
          * @param string $destination : Number of the receiver
-         * @param string $uid : Uid of the sms on the adapter service used
-         * @param string $adapter : Name of the adapter service used to send the message
-         * @param bool $flash : Is the sms a flash
-         * @param string $status : Status of a the sms. By default 'unknown'
+         * @param string $uid         : Uid of the sms on the adapter service used
+         * @param string $adapter     : Name of the adapter service used to send the message
+         * @param bool   $flash       : Is the sms a flash
+         * @param string $status      : Status of a the sms. By default 'unknown'
+         *
          * @return bool : false on error, new sended id else
          */
-        public function create ($at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown') : bool
+        public function create($at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
         {
-            $sended = [ 
+            $sended = [
                 'at' => $at,
-                'text' => $text, 
+                'text' => $text,
                 'origin' => $origin,
                 'destination' => $destination,
                 'uid' => $uid,
@@ -53,26 +45,27 @@ namespace controllers\internals;
             return (bool) $this->get_model()->insert($sended);
         }
 
-
         /**
-         * Update a sended for a user
-         * @param int $id_user : user id
+         * Update a sended for a user.
+         *
+         * @param int $id_user   : user id
          * @param int $id_sended : Sended id
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $origin : Number of the sender
-         * @param string $destination : Number of the receiver
-         * @param string $uid : Uid of the sms on the adapter service used
-         * @param string $adapter : Name of the adapter service used to send the message
-         * @param bool $flash : Is the sms a flash
-         * @param ?string $status : Status of a the sms. By default null -> unknown
+         * @param string  $origin      : Number of the sender
+         * @param string  $destination : Number of the receiver
+         * @param string  $uid         : Uid of the sms on the adapter service used
+         * @param string  $adapter     : Name of the adapter service used to send the message
+         * @param bool    $flash       : Is the sms a flash
+         * @param ?string $status      : Status of a the sms. By default null -> unknown
+         *
          * @return bool : false on error, true on success
          */
-        public function update_for_user (int $id_user, int $id_sended, $at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = null) : bool
+        public function update_for_user(int $id_user, int $id_sended, $at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = null): bool
         {
-            $sended = [ 
+            $sended = [
                 'at' => $at,
-                'text' => $text, 
+                'text' => $text,
                 'origin' => $origin,
                 'destination' => $destination,
                 'uid' => $uid,
@@ -83,69 +76,74 @@ namespace controllers\internals;
 
             return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
         }
-        
-        
+
         /**
-         * Update a sended status for a user
-         * @param int $id_user : user id
-         * @param int $id_sended : Sended id
-         * @param string $status : Status of a the sms (unknown, delivered, failed)
+         * Update a sended status for a user.
+         *
+         * @param int    $id_user   : user id
+         * @param int    $id_sended : Sended id
+         * @param string $status    : Status of a the sms (unknown, delivered, failed)
+         *
          * @return bool : false on error, true on success
          */
-        public function update_status_for_user (int $id_user, int $id_sended, string $status) : bool
+        public function update_status_for_user(int $id_user, int $id_sended, string $status): bool
         {
-            $sended = [ 
+            $sended = [
                 'status' => $status,
             ];
 
             return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
         }
-        
-        
+
         /**
-         * Update a sended status for a sended
-         * @param int $id_sended : Sended id
-         * @param string $status : Status of a the sms (unknown, delivered, failed)
+         * Update a sended status for a sended.
+         *
+         * @param int    $id_sended : Sended id
+         * @param string $status    : Status of a the sms (unknown, delivered, failed)
+         *
          * @return bool : false on error, true on success
          */
-        public function update_status (int $id_sended, string $status) : bool
+        public function update_status(int $id_sended, string $status): bool
         {
-            $sended = [ 
+            $sended = [
                 'status' => $status,
             ];
 
             return (bool) $this->get_model()->update($id_sended, $sended);
         }
 
-
         /**
-         * Return x last sendeds message for a user, order by date
-         * @param int $id_user : User id
+         * Return x last sendeds message for a user, order by date.
+         *
+         * @param int $id_user  : User id
          * @param int $nb_entry : Number of sendeds messages to return
-         * @return array 
+         *
+         * @return array
          */
         public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
         {
             return $this->get_model()->get_lasts_by_date_for_user($id_user, $nb_entry);
         }
 
-
         /**
-         * Return sendeds for a destination and a user
-         * @param int $id_user : User id
-         * @param string $origin : Number who sent the message
+         * Return sendeds for a destination and a user.
+         *
+         * @param int    $id_user : User id
+         * @param string $origin  : Number who sent the message
+         *
          * @return array
          */
         public function gets_by_destination_and_user(int $id_user, string $origin)
         {
             return $this->get_model()->gets_by_destination_and_user($id_user, $origin);
         }
-        
-        
+
         /**
-         * Return sended for an uid and an adapter
-         * @param string $uid : Uid of the sended
+         * Return sended for an uid and an adapter.
+         *
+         * @param string $uid     : Uid of the sended
          * @param string $adapter : Adapter used to send the message
+         *
          * @return array
          */
         public function get_by_uid_and_adapter(string $uid, string $adapter)
@@ -153,11 +151,12 @@ namespace controllers\internals;
             return $this->get_model()->get_by_uid_and_adapter($uid, $adapter);
         }
 
-
         /**
-         * Get number of sended SMS for every date since a date for a specific user
-         * @param int $id_user : user id
-         * @param \DateTime $date : Date since which we want the messages
+         * Get number of sended SMS for every date since a date for a specific user.
+         *
+         * @param int       $id_user : user id
+         * @param \DateTime $date    : Date since which we want the messages
+         *
          * @return array
          */
         public function count_by_day_since_for_user(int $id_user, $date)
@@ -172,16 +171,29 @@ namespace controllers\internals;
 
             return $return;
         }
-        
-        
+
         /**
-         * Find last sended message for a destination and user
-         * @param int $id_user : User id
+         * Find last sended message for a destination and user.
+         *
+         * @param int    $id_user     : User id
          * @param string $destination : Destination number
+         *
          * @return array
          */
-        public function get_last_for_destination_and_user (int $id_user, string $destination)
+        public function get_last_for_destination_and_user(int $id_user, string $destination)
         {
             return $this->get_model()->get_last_for_destination_and_user($id_user, $destination);
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Sended($this->bdd);
+
+            return $this->model;
         }
     }

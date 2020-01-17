@@ -13,27 +13,18 @@ namespace controllers\internals;
 
     class ConditionalGroup extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\ConditionalGroup($this->bdd);
-            return $this->model;
-        } 
-
-
-        /**
-         * Create a new group for a user
-         * @param int $id_user : user id
-         * @param string $name         : Group name
+         * Create a new group for a user.
+         *
+         * @param int    $id_user   : user id
+         * @param string $name      : Group name
          * @param string $condition : Condition for forming group content
+         *
          * @return mixed bool|int : false on error, new group id
          */
-        public function create (int $id_user, string $name, string $condition)
+        public function create(int $id_user, string $name, string $condition)
         {
             $conditional_group = [
                 'id_user' => $id_user,
@@ -47,7 +38,7 @@ namespace controllers\internals;
             {
                 return false;
             }
-            
+
             $id_group = $this->get_model()->insert($conditional_group);
             if (!$id_group)
             {
@@ -55,18 +46,19 @@ namespace controllers\internals;
             }
 
             $internal_event = new Event($this->bdd);
-            $internal_event->create($id_user, 'CONDITIONAL_GROUP_ADD', 'Ajout du groupe conditionnel : ' . $name);
+            $internal_event->create($id_user, 'CONDITIONAL_GROUP_ADD', 'Ajout du groupe conditionnel : '.$name);
 
             return $id_group;
         }
 
-
         /**
-         * Update a group for a user
-         * @param int $id_user : User id
-         * @param int $id_group           : Group id
-         * @param string $name         : Group name
+         * Update a group for a user.
+         *
+         * @param int    $id_user   : User id
+         * @param int    $id_group  : Group id
+         * @param string $name      : Group name
          * @param string $condition : Condition for forming group content
+         *
          * @return bool : False on error, true on success
          */
         public function update_for_user(int $id_user, int $id_group, string $name, string $condition)
@@ -92,26 +84,28 @@ namespace controllers\internals;
             return true;
         }
 
-
         /**
-         * Return a group by his name for a user
-         * @param int $id_user : User id
-         * @param string $name : Group name
+         * Return a group by his name for a user.
+         *
+         * @param int    $id_user : User id
+         * @param string $name    : Group name
+         *
          * @return array
          */
-        public function get_by_name_for_user (int $id_user, string $name)
+        public function get_by_name_for_user(int $id_user, string $name)
         {
             return $this->get_model()->get_by_name_for_user($id_user, $name);
         }
 
-
         /**
-         * Gets the user's contacts that respects a condition
-         * @param int $id_user : User id
+         * Gets the user's contacts that respects a condition.
+         *
+         * @param int    $id_user   : User id
          * @param string $condition : Condition string to verify
+         *
          * @return array
          */
-        public function get_contacts_for_condition_and_user (int $id_user, string $condition) : array
+        public function get_contacts_for_condition_and_user(int $id_user, string $condition): array
         {
             $internal_contacts = new Contact($this->bdd);
             $contacts = $internal_contacts->gets_for_user($id_user);
@@ -122,7 +116,7 @@ namespace controllers\internals;
             {
                 $contact['datas'] = json_decode($contact['datas']);
                 $contact = (object) $contact;
-                
+
                 $datas = ['contact' => $contact];
                 $is_valid = $ruler->evaluate_condition($condition, $datas);
                 if (!$is_valid)
@@ -130,7 +124,19 @@ namespace controllers\internals;
                     unset($contacts[$key]);
                 }
             }
-            
+
             return $contacts;
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\ConditionalGroup($this->bdd);
+
+            return $this->model;
         }
     }

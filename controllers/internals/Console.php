@@ -12,42 +12,40 @@
 namespace controllers\internals;
 
     /**
-     * Class to call the console scripts 
+     * Class to call the console scripts.
      */
     class Console extends \descartes\InternalController
     {
         /**
-         * Start launcher daemon
+         * Start launcher daemon.
          */
-        public function launcher ()
+        public function launcher()
         {
             new \daemons\Launcher();
         }
 
-
         /**
-         * Start sender daemon
+         * Start sender daemon.
          */
-        public function sender ()
+        public function sender()
         {
             new \daemons\Sender();
         }
-        
-        
+
         /**
-         * Start webhook daemon
+         * Start webhook daemon.
          */
-        public function webhook ()
+        public function webhook()
         {
             new \daemons\Webhook();
         }
 
-
         /**
-         * Start a phone daemon
+         * Start a phone daemon.
+         *
          * @param $id_phone : Phone id
          */
-        public function phone ($id_phone)
+        public function phone($id_phone)
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
             $internal_phone = new \controllers\internals\Phone($bdd);
@@ -60,9 +58,11 @@ namespace controllers\internals;
 
             new \daemons\Phone($phone);
         }
-        
+
         /**
          * Cette fonction retourne la fenetre de connexion.
+         *
+         * @param mixed $id_phone
          */
         public function test($id_phone)
         {
@@ -71,11 +71,12 @@ namespace controllers\internals;
             $phone = $internal_phone->get($id_phone);
             if (!$phone)
             {
-                echo "No phone for id : $id_phone\n";
+                echo "No phone for id : {$id_phone}\n";
+
                 return false;
             }
 
-            echo "Found phone for id : $id_phone\n";
+            echo "Found phone for id : {$id_phone}\n";
 
             $adapter_classname = $phone['adapter'];
             $adapter = new $adapter_classname($phone['number'], $phone['adapter_datas']);

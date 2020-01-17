@@ -93,21 +93,24 @@ class Phone extends \descartes\Controller
     public function add()
     {
         $adapters = $this->internal_adapter->list_adapters();
+
         return $this->render('phone/add', ['adapters' => $adapters]);
     }
 
     /**
-     * Create a new phone
+     * Create a new phone.
+     *
      * @param $csrf : CSRF token
-     * @param string  $_POST['number'] : Phone number
-     * @param string  $_POST['adapter'] : Phone adapter
-     * @param array   $_POST['adapter_datas'] : Phone adapter datas
+     * @param string $_POST['number']        : Phone number
+     * @param string $_POST['adapter']       : Phone adapter
+     * @param array  $_POST['adapter_datas'] : Phone adapter datas
      */
     public function create($csrf)
     {
         if (!$this->verify_csrf($csrf))
         {
             \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
@@ -119,14 +122,15 @@ class Phone extends \descartes\Controller
         if (!$number || !$adapter)
         {
             \FlashMessage\FlashMessage::push('danger', 'Des champs obligatoires sont manquants.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        
         $number = \controllers\internals\Tool::parse_phone($number);
         if (!$number)
         {
             \FlashMessage\FlashMessage::push('danger', 'Numéro de téléphone incorrect.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
@@ -134,9 +138,9 @@ class Phone extends \descartes\Controller
         if ($number_exist)
         {
             \FlashMessage\FlashMessage::push('danger', 'Ce numéro de téléphone est déjà utilisé.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
-
 
         $adapters = $this->internal_adapter->list_adapters();
         $find_adapter = false;
@@ -145,6 +149,7 @@ class Phone extends \descartes\Controller
             if ($metas['meta_classname'] === $adapter)
             {
                 $find_adapter = $metas;
+
                 break;
             }
         }
@@ -152,13 +157,14 @@ class Phone extends \descartes\Controller
         if (!$find_adapter)
         {
             \FlashMessage\FlashMessage::push('danger', 'Cet adaptateur n\'existe pas.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
         //If missing required data fields, error
         foreach ($find_adapter['meta_datas_fields'] as $field)
         {
-            if ($field['required'] === false)
+            if (false === $field['required'])
             {
                 continue;
             }
@@ -169,6 +175,7 @@ class Phone extends \descartes\Controller
             }
 
             \FlashMessage\FlashMessage::push('danger', 'Vous n\'avez pas rempli certains champs obligatoires pour l\'adaptateur choisis.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
@@ -182,18 +189,20 @@ class Phone extends \descartes\Controller
         if (!$adapter_working)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez le numéro de téléphone et les réglages.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
-
 
         $success = $this->internal_phone->create($id_user, $number, $adapter, $adapter_datas);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');
+
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
-        
+
         \FlashMessage\FlashMessage::push('success', 'Le téléphone a bien été créé.');
+
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
     }
 }

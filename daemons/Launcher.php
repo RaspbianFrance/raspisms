@@ -1,11 +1,21 @@
 <?php
+
+/*
+ * This file is part of RaspiSMS.
+ *
+ * (c) Pierre-Lin Bonnemaison <plebwebsas@gmail.com>
+ *
+ * This source file is subject to the GPL-3.0 license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace daemons;
 
-use \Monolog\Logger;
-use \Monolog\Handler\StreamHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
- * Main daemon class
+ * Main daemon class.
  */
 class Launcher extends AbstractDaemon
 {
@@ -16,10 +26,10 @@ class Launcher extends AbstractDaemon
 
     public function __construct()
     {
-        $name = "RaspiSMS Daemon Launcher";
-        
+        $name = 'RaspiSMS Daemon Launcher';
+
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = true; //Launcher should be rattach to PID 1
         $additional_signals = [];
@@ -31,13 +41,11 @@ class Launcher extends AbstractDaemon
         parent::start();
     }
 
-
     public function run()
     {
         //Create the internal controllers
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
         $this->internal_phone = new \controllers\internals\Phone($this->bdd);
-
 
         $this->start_sender_daemon();
 
@@ -48,17 +56,15 @@ class Launcher extends AbstractDaemon
 
         sleep(1);
     }
-    
-    
+
     /**
-     * Function to start sender daemon
-     * @return void
+     * Function to start sender daemon.
      */
-    public function start_sender_daemon ()
+    public function start_sender_daemon()
     {
         $name = 'RaspiSMS Daemon Sender';
-        $pid_file = PWD_PID . '/' . $name . '.pid';
-        
+        $pid_file = PWD_PID.'/'.$name.'.pid';
+
         if (file_exists($pid_file))
         {
             return false;
@@ -66,66 +72,60 @@ class Launcher extends AbstractDaemon
 
         //Create a new daemon for sender
         $pid = null;
-        exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
+        exec('php '.PWD.'/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
     }
-    
-    
+
     /**
-     * Function to start webhook daemon
-     * @return void
+     * Function to start webhook daemon.
      */
-    public function start_webhook_daemon ()
+    public function start_webhook_daemon()
     {
         $name = 'RaspiSMS Daemon Webhook';
-        $pid_file = PWD_PID . '/' . $name . '.pid';
-        
+        $pid_file = PWD_PID.'/'.$name.'.pid';
+
         if (file_exists($pid_file))
         {
             return false;
         }
 
         //Create a new daemon for webhook
-        exec('php ' . PWD . '/console.php controllers/internals/Console.php webhook > /dev/null 2>&1 &');
+        exec('php '.PWD.'/console.php controllers/internals/Console.php webhook > /dev/null 2>&1 &');
     }
 
-
     /**
-     * Function to start phones daemons
+     * Function to start phones daemons.
+     *
      * @param array $phones : Phones to start daemon for if the daemon is not already started
-     * @return void
      */
-    public function start_phones_daemons (array $phones)
+    public function start_phones_daemons(array $phones)
     {
         foreach ($phones as $phone)
         {
-            $phone_name = 'RaspiSMS Daemon Phone ' . $phone['number'];
-            $pid_file = PWD_PID . '/' . $phone_name . '.pid';
-            
+            $phone_name = 'RaspiSMS Daemon Phone '.$phone['number'];
+            $pid_file = PWD_PID.'/'.$phone_name.'.pid';
+
             if (file_exists($pid_file))
             {
                 continue;
             }
 
             //Create a new daemon for the phone
-            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone --id_phone=\'' . $phone['id'] . '\' > /dev/null 2>&1 &');
+            exec('php '.PWD.'/console.php controllers/internals/Console.php phone --id_phone=\''.$phone['id'].'\' > /dev/null 2>&1 &');
         }
     }
 
-
     public function on_start()
     {
-        $this->logger->info("Starting Launcher with pid " . getmypid());
+        $this->logger->info('Starting Launcher with pid '.getmypid());
     }
 
-
-    public function on_stop() 
+    public function on_stop()
     {
-        $this->logger->info("Stopping Launcher with pid " . getmypid ());
+        $this->logger->info('Stopping Launcher with pid '.getmypid());
     }
-
 
     public function handle_other_signals($signal)
     {
-        $this->logger->info("Signal not handled by " . $this->name . " Daemon : " . $signal);
+        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
     }
 }

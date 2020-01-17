@@ -12,7 +12,7 @@
 namespace controllers\internals;
 
     /**
-     * Methods to manage user. Not a standard controller as it has nothing to do with user based restrictions and must be usable only by admin
+     * Methods to manage user. Not a standard controller as it has nothing to do with user based restrictions and must be usable only by admin.
      */
     class User extends \descartes\InternalController
     {
@@ -52,9 +52,8 @@ namespace controllers\internals;
             return $this->model_user->remove($id);
         }
 
-
         /**
-         * Check user credentials
+         * Check user credentials.
          *
          * @param string $email    : User email
          * @param string $password : User password
@@ -92,7 +91,6 @@ namespace controllers\internals;
             return (bool) $this->model_user->update_password($id, $password);
         }
 
-
         /**
          * Update user email.
          *
@@ -105,12 +103,11 @@ namespace controllers\internals;
         {
             return (bool) $this->model_user->update_email($id, $email);
         }
-        
-        
+
         /**
          * Update user api key.
          *
-         * @param string $id    : user id
+         * @param string  $id      : user id
          * @param ?string $api_key : new api key
          *
          * @return mixed : false on error, else new api key;
@@ -129,7 +126,8 @@ namespace controllers\internals;
         }
 
         /**
-         * Get a user by his email address
+         * Get a user by his email address.
+         *
          * @param string $email : User email
          *
          * @return mixed boolean | array : false if cannot find user for this email, the user else
@@ -138,21 +136,22 @@ namespace controllers\internals;
         {
             return $this->model_user->get_by_email($email);
         }
-        
-        
+
         /**
-         * Find a user by his id
+         * Find a user by his id.
+         *
          * @param string $id : User id
+         *
          * @return mixed array
          */
-        public function get ($id)
+        public function get($id)
         {
             return $this->model_user->get($id);
         }
-        
-        
+
         /**
-         * Get a user by his api_key address
+         * Get a user by his api_key address.
+         *
          * @param string $api_key : User api key
          *
          * @return mixed boolean | array : false if cannot find user for this api key, the user else
@@ -163,11 +162,13 @@ namespace controllers\internals;
         }
 
         /**
-         * Update a user by his id
+         * Update a user by his id.
+         *
          * @param mixed $id
          * @param mixed $email
          * @param mixed $password
          * @param mixed $admin
+         * @param mixed $api_key
          *
          * @return int : Number of modified user
          */
@@ -184,12 +185,12 @@ namespace controllers\internals;
         }
 
         /**
-         * Create a new user
+         * Create a new user.
          *
-         * @param mixed $email
-         * @param mixed $password
-         * @param mixed $admin
-         * @param ?string $api_key : The api key of the user, if null generate randomly
+         * @param mixed   $email
+         * @param mixed   $password
+         * @param mixed   $admin
+         * @param ?string $api_key  : The api key of the user, if null generate randomly
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
@@ -214,18 +215,19 @@ namespace controllers\internals;
             if (!$success)
             {
                 $this->delete($new_user_id);
+
                 return false;
             }
 
             return $new_user_id;
         }
 
-
         /**
-         * Generate a random api key
+         * Generate a random api key.
+         *
          * @return string : The api key
          */
-        public function generate_random_api_key () : string
+        public function generate_random_api_key(): string
         {
             return bin2hex(random_bytes(16));
         }

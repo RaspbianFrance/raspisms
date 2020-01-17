@@ -32,12 +32,14 @@ namespace controllers\publics;
         }
 
         /**
-         * Try to render a template as a message for preview
-         * @param string $_POST['template'] : Template string
-         * @param int $_POST['id_contact'] : Id of the contact to render the template for
+         * Try to render a template as a message for preview.
+         *
+         * @param string $_POST['template']   : Template string
+         * @param int    $_POST['id_contact'] : Id of the contact to render the template for
+         *
          * @return json string
          */
-        public function render_preview ()
+        public function render_preview()
         {
             $return = [
                 'success' => false,
@@ -46,19 +48,21 @@ namespace controllers\publics;
 
             $template = $_POST['template'] ?? false;
             $id_contact = $_POST['id_contact'] ?? false;
-            
+
             if (!$template || !$id_contact)
             {
                 $return['result'] = 'Veuillez remplir un message.';
                 echo json_encode($return);
+
                 return false;
             }
-            
+
             $contact = $this->internal_contact->get_for_user($_SESSION['user']['id'], $id_contact);
             if (!$contact)
             {
                 $return['result'] = 'Ce contact n\'existe pas.';
                 echo json_encode($return);
+
                 return false;
             }
 
@@ -76,6 +80,7 @@ namespace controllers\publics;
             }
 
             echo json_encode($return);
+
             return true;
         }
     }

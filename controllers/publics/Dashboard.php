@@ -71,7 +71,6 @@ namespace controllers\publics;
             $receiveds = $this->internal_received->get_lasts_by_date_for_user($id_user, 10);
             $events = $this->internal_event->get_lasts_by_date_for_user($id_user, 10);
 
-
             //Récupération du nombre de Sms envoyés et reçus depuis les 7 derniers jours
             $nb_sendeds_by_day = $this->internal_sended->count_by_day_since_for_user($id_user, $formated_date);
             $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $formated_date);

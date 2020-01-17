@@ -13,22 +13,14 @@ namespace controllers\internals;
 
     class Contact extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Contact($this->bdd);
-            return $this->model;
-        } 
-
-        /**
-         * Return a contact for a user by a number
-         * @param int $id_user : user id
-         * @param string $number : Contact number
+         * Return a contact for a user by a number.
+         *
+         * @param int    $id_user : user id
+         * @param string $number  : Contact number
+         *
          * @return array
          */
         public function get_by_number_and_user(int $id_user, string $number)
@@ -36,36 +28,39 @@ namespace controllers\internals;
             return $this->get_model()->get_by_number_and_user($id_user, $number);
         }
 
-
         /**
-         * Return a contact by his name for a user
-         * @param int $id_user : User id
-         * @param string $name : Contact name
+         * Return a contact by his name for a user.
+         *
+         * @param int    $id_user : User id
+         * @param string $name    : Contact name
+         *
          * @return array
          */
         public function get_by_name_and_user(int $id_user, string $name)
         {
             return $this->get_model()->get_by_name_and_user($id_user, $name);
         }
-        
-        
+
         /**
          * Return all contacts of a user.
+         *
          * @param int $id_user : user id
+         *
          * @return array
          */
-        public function gets_for_user (int $id_user)
+        public function gets_for_user(int $id_user)
         {
             return $this->get_model()->gets_for_user($id_user);
         }
 
-
         /**
-         * Create a new contact
-         * @param int $id_user : User id
-         * @param string $number : Contact number
-         * @param string $name : Contact name
-         * @param string $datas : Contact datas
+         * Create a new contact.
+         *
+         * @param int    $id_user : User id
+         * @param string $number  : Contact number
+         * @param string $name    : Contact name
+         * @param string $datas   : Contact datas
+         *
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
         public function create($id_user, $number, $name, $datas)
@@ -89,14 +84,15 @@ namespace controllers\internals;
             return $result;
         }
 
-
         /**
-         * Update a contact
-         * @param int $id_user : User id
-         * @param int $id : Contact id
-         * @param string $number : Contact number
-         * @param string $name : Contact name
-         * @param ?string $datas : Contact datas
+         * Update a contact.
+         *
+         * @param int     $id_user : User id
+         * @param int     $id      : Contact id
+         * @param string  $number  : Contact number
+         * @param string  $name    : Contact name
+         * @param ?string $datas   : Contact datas
+         *
          * @return int : number of modified rows
          */
         public function update_for_user(int $id_user, int $id, string $number, string $name, string $datas)
@@ -110,16 +106,17 @@ namespace controllers\internals;
             return $this->get_model()->update_for_user($id_user, $id, $contact);
         }
 
-
         /**
-         * Import a list of contacts as csv
+         * Import a list of contacts as csv.
+         *
          * @param resource $file_handler : File handler to import contacts from
-         * @param int $id_user : User id
+         * @param int      $id_user      : User id
+         *
          * @return mixed : False on error, number of inserted contacts else
          */
-        public function import_csv (int $id_user, $file_handler)
+        public function import_csv(int $id_user, $file_handler)
         {
-            if (!is_resource($file_handler))
+            if (!\is_resource($file_handler))
             {
                 return false;
             }
@@ -129,14 +126,15 @@ namespace controllers\internals;
             $head = null;
             while ($line = fgetcsv($file_handler))
             {
-                if ($head === null)
+                if (null === $head)
                 {
                     $head = $line;
+
                     continue;
                 }
 
                 $line = array_combine($head, $line);
-                if ($line === false)
+                if (false === $line)
                 {
                     continue;
                 }
@@ -149,12 +147,12 @@ namespace controllers\internals;
                 $datas = [];
                 foreach ($line as $key => $value)
                 {
-                    if ($key == 'name' || $key == 'number')
+                    if ('name' === $key || 'number' === $key)
                     {
                         continue;
                     }
 
-                    if ($value === '')
+                    if ('' === $value)
                     {
                         continue;
                     }
@@ -167,23 +165,24 @@ namespace controllers\internals;
                 $success = $this->create($id_user, $line['number'], $line['name'], $datas);
                 if ($success)
                 {
-                    $nb_insert ++;
+                    ++$nb_insert;
                 }
             }
 
             return $nb_insert;
         }
 
-
         /**
-         * Import a list of contacts as json
+         * Import a list of contacts as json.
+         *
          * @param resource $file_handler : File handler to import contacts from
-         * @param int $id_user : User id
+         * @param int      $id_user      : User id
+         *
          * @return mixed : False on error, number of inserted contacts else
          */
-        public function import_json (int $id_user, $file_handler)
+        public function import_json(int $id_user, $file_handler)
         {
-            if (!is_resource($file_handler))
+            if (!\is_resource($file_handler))
             {
                 return false;
             }
@@ -198,7 +197,7 @@ namespace controllers\internals;
             {
                 $contacts = json_decode($file_content, true);
 
-                if (!is_array($contacts))
+                if (!\is_array($contacts))
                 {
                     return false;
                 }
@@ -206,7 +205,7 @@ namespace controllers\internals;
                 $nb_insert = 0;
                 foreach ($contacts as $contact)
                 {
-                    if (!is_array($contact))
+                    if (!\is_array($contact))
                     {
                         continue;
                     }
@@ -218,11 +217,11 @@ namespace controllers\internals;
 
                     $datas = $contact['datas'] ?? [];
                     $datas = json_encode($datas);
-                    
+
                     $success = $this->create($id_user, $contact['number'], $contact['name'], $datas);
                     if ($success)
                     {
-                        $nb_insert ++;
+                        ++$nb_insert;
                     }
                 }
 
@@ -233,14 +232,15 @@ namespace controllers\internals;
                 return false;
             }
         }
-        
-        
+
         /**
-         * Export the contacts of a user as csv
+         * Export the contacts of a user as csv.
+         *
          * @param int $id_user : User id
+         *
          * @return array : ['headers' => array of headers to return, 'content' => the generated file]
          */
-        public function export_csv (int $id_user) : array
+        public function export_csv(int $id_user): array
         {
             $contacts = $this->get_model()->gets_for_user($id_user);
 
@@ -254,7 +254,7 @@ namespace controllers\internals;
                 $datas = json_decode($contact['datas'], true);
                 foreach ($datas as $key => $value)
                 {
-                    $columns[] = $key;        
+                    $columns[] = $key;
                 }
             }
             $columns = array_unique($columns);
@@ -270,12 +270,14 @@ namespace controllers\internals;
                     if (isset($contact[$column]))
                     {
                         $line[] = $contact[$column];
+
                         continue;
                     }
 
                     if (isset($datas[$column]))
                     {
                         $line[] = $datas[$column];
+
                         continue;
                     }
 
@@ -286,7 +288,7 @@ namespace controllers\internals;
 
             //Php only support csv formatting to file. To get it in string we need to create a tmp in memory file, write in it, and then read the file into a var
             // output up to 5MB is kept in memory, if it becomes bigger it will automatically be written to a temporary file
-            $csv_tmp_file = fopen('php://temp/maxmemory:'. (5*1024*1024), 'r+');
+            $csv_tmp_file = fopen('php://temp/maxmemory:'.(5 * 1024 * 1024), 'r+');
             fputcsv($csv_tmp_file, $columns);
             foreach ($lines as $line)
             {
@@ -300,26 +302,27 @@ namespace controllers\internals;
                 'headers' => [
                     'Content-Disposition: attachment; filename=contacts.csv',
                     'Content-Type: text/csv',
-                    'Content-Length: ' . strlen($csv_string),
+                    'Content-Length: '.\mb_strlen($csv_string),
                 ],
                 'content' => $csv_string,
             ];
         }
-        
-        
+
         /**
-         * Export the contacts of a user as json
+         * Export the contacts of a user as json.
+         *
          * @param int $id_user : User id
+         *
          * @return array : ['headers' => array of headers to return, 'content' => the generated file]
          */
-        public function export_json (int $id_user) : array
+        public function export_json(int $id_user): array
         {
             $contacts = $this->get_model()->gets_for_user($id_user);
 
             foreach ($contacts as &$contact)
             {
-                unset($contact['id']);
-                unset($contact['id_user']);
+                unset($contact['id'], $contact['id_user']);
+
                 $contact['datas'] = json_decode($contact['datas']);
             }
             $content = json_encode($contacts);
@@ -328,10 +331,21 @@ namespace controllers\internals;
                 'headers' => [
                     'Content-Disposition: attachment; filename=contacts.json',
                     'Content-Type: application/json',
-                    'Content-Length: ' . strlen($content),
+                    'Content-Length: '.\mb_strlen($content),
                 ],
                 'content' => $content,
             ];
         }
-        
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Contact($this->bdd);
+
+            return $this->model;
+        }
     }

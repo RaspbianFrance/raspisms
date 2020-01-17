@@ -17,22 +17,17 @@ namespace models;
     class Media extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'media'; }
-        
-        
-        /**
-         * Return an entry by his id for a user
+         * Return an entry by his id for a user.
+         *
          * @param int $id_user : user id
-         * @param int $id : entry id
+         * @param int $id      : entry id
+         *
          * @return array
          */
         public function get_for_user(int $id_user, int $id)
         {
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 AND id = :id
             ';
@@ -43,19 +38,21 @@ namespace models;
             ];
 
             $receiveds = $this->_run_query($query, $params);
+
             return $receiveds[0] ?? [];
         }
 
-
         /**
-         * Return all entries for a user
+         * Return all entries for a user.
+         *
          * @param int $id_user : user id
+         *
          * @return array
          */
         public function gets_for_user(int $id_user)
         {
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
             ';
 
@@ -65,25 +62,26 @@ namespace models;
 
             $receiveds = $this->_run_query($query, $params);
         }
-        
-        
+
         /**
-         * Return a media for a user and a scheduled
-         * @param int $id_user : user id
+         * Return a media for a user and a scheduled.
+         *
+         * @param int $id_user      : user id
          * @param int $id_scheduled : scheduled id
+         *
          * @return array
          */
         public function get_for_scheduled_and_user(int $id_user, int $id_scheduled)
         {
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 AND id_scheduled = :id_scheduled
             ';
 
             $params = [
                 'id_user' => $id_user,
-                'id_scheduled' => $id_scheduled
+                'id_scheduled' => $id_scheduled,
             ];
 
             $receiveds = $this->_run_query($query, $params);
@@ -94,13 +92,13 @@ namespace models;
 
             return $receiveds[0];
         }
-        
-        
+
         /**
-         * Return a list of media for a user
+         * Return a list of media for a user.
+         *
          * @param int $id_user : User id
-         * @param int $limit  : Max results to return
-         * @param int $offset : Number of results to ignore
+         * @param int $limit   : Max results to return
+         * @param int $offset  : Number of results to ignore
          */
         public function list_for_user($id_user, $limit, $offset)
         {
@@ -110,7 +108,7 @@ namespace models;
             $query = ' 
                 SELECT * FROM media
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
+                LIMIT '.$limit.' OFFSET '.$offset;
 
             $params = [
                 'id_user' => $id_user,
@@ -119,12 +117,13 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
-         * Return a list of medias in a group of ids and for a user
-         * @param int $id_user : user id
-         * @param array $ids : ids of medias to find
-         * @return array 
+         * Return a list of medias in a group of ids and for a user.
+         *
+         * @param int   $id_user : user id
+         * @param array $ids     : ids of medias to find
+         *
+         * @return array
          */
         public function gets_in_for_user(int $id_user, $ids)
         {
@@ -137,15 +136,17 @@ namespace models;
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
-            $params['id_user'] = $id_user; 
+            $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
-         * Delete a entry by his id for a user
+         * Delete a entry by his id for a user.
+         *
          * @param int $id_user : User id
-         * @param int $id : Entry id
+         * @param int $id      : Entry id
+         *
          * @return int : Number of removed rows
          */
         public function delete_for_user(int $id_user, int $id)
@@ -157,15 +158,16 @@ namespace models;
             ';
 
             $params = ['id_user' => $id_user, 'id' => $id];
-            
+
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
-        
-        
+
         /**
-         * Delete a entry by his id for a user
-         * @param int $id_user : User id
+         * Delete a entry by his id for a user.
+         *
+         * @param int $id_user      : User id
          * @param int $id_scheduled : Scheduled id
+         *
          * @return int : Number of removed rows
          */
         public function delete_for_scheduled_and_user(int $id_user, int $id_scheduled)
@@ -177,20 +179,20 @@ namespace models;
             ';
 
             $params = ['id_user' => $id_user, 'id_scheduled' => $id_scheduled];
-            
+
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
-
         /**
-         * Update a media sms for a user
-         * @param int $id_user : User id
+         * Update a media sms for a user.
+         *
+         * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $datas : datas to update
+         * @param array $datas   : datas to update
          *
          * @return int : number of modified rows
          */
-        public function update_for_user (int $id_user, int $id, array $datas)
+        public function update_for_user(int $id_user, int $id, array $datas)
         {
             $params = [];
             $sets = [];
@@ -198,13 +200,13 @@ namespace models;
             foreach ($datas as $label => $value)
             {
                 $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_' . $label] = $value;
-                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
+                $params['set_'.$label] = $value;
+                $sets[] = '`'.$label.'` = :set_'.$label.' ';
             }
 
             $query = '
                 UPDATE `media`
-                SET ' . implode(', ', $sets) . '
+                SET '.implode(', ', $sets).'
                 WHERE id = :id
                 AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
             ';
@@ -214,11 +216,12 @@ namespace models;
 
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
-        
-        
+
         /**
-         * Count number of media sms for user
+         * Count number of media sms for user.
+         *
          * @param int $id_user : user id
+         *
          * @return int : Number of media SMS for user
          */
         public function count_for_user($id_user)
@@ -234,5 +237,15 @@ namespace models;
             ];
 
             return $this->_run_query($query, $params)[0]['nb'] ?? 0;
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'media';
         }
     }

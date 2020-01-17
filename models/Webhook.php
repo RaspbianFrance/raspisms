@@ -14,20 +14,25 @@ namespace models;
     class Webhook extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'webhook'; }
-        
-        
-        /**
-         * Find all webhooks for a user and for a type of webhook
-         * @param int $id_user : User id
-         * @param string $type : Webhook type
+         * Find all webhooks for a user and for a type of webhook.
+         *
+         * @param int    $id_user : User id
+         * @param string $type    : Webhook type
+         *
          * @return array
          */
-        public function gets_for_type_and_user (int $id_user, string $type)
+        public function gets_for_type_and_user(int $id_user, string $type)
         {
             return $this->_select($this->get_table_name(), ['id_user' => $id_user, 'type' => $type]);
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'webhook';
         }
     }

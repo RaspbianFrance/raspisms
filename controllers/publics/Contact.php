@@ -151,7 +151,7 @@ namespace controllers\publics;
             $clean_datas = [];
             foreach ($datas as $key => $value)
             {
-                if ($value === "")
+                if ('' === $value)
                 {
                     continue;
                 }
@@ -159,7 +159,7 @@ namespace controllers\publics;
                 $key = mb_ereg_replace('[\W]', '', $key);
                 $clean_datas[$key] = (string) $value;
             }
-            
+
             $clean_datas = json_encode($clean_datas);
 
             if (!$this->internal_contact->create($id_user, $number, $name, $clean_datas))
@@ -191,7 +191,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            if (!array($_POST['contacts']))
+            if (![$_POST['contacts']])
             {
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
@@ -203,22 +203,22 @@ namespace controllers\publics;
                 $number = $contact['number'] ?? false;
                 $id_user = $_SESSION['user']['id'];
                 $datas = $contact['datas'] ?? [];
-                
+
                 if (!$name || !$number)
                 {
                     continue;
                 }
-                
+
                 $number = \controllers\internals\Tool::parse_phone($number);
                 if (!$number)
                 {
                     continue;
                 }
-                
+
                 $clean_datas = [];
                 foreach ($datas as $key => $value)
                 {
-                    if ($value === "")
+                    if ('' === $value)
                     {
                         continue;
                     }
@@ -227,7 +227,7 @@ namespace controllers\publics;
                     $clean_datas[$key] = (string) $value;
                 }
                 $clean_datas = json_encode($clean_datas);
-                
+
                 $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_datas);
             }
 
@@ -243,17 +243,18 @@ namespace controllers\publics;
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
 
-
         /**
-         * Allow to import a contacts list
+         * Allow to import a contacts list.
+         *
          * @param string $csrf : Csrf token
          * @param $_FILES['contacts_list_file'] : A csv file of the contacts to import
          */
-        public function import (string $csrf)
+        public function import(string $csrf)
         {
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
@@ -263,6 +264,7 @@ namespace controllers\publics;
             if (!$upload_array)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir un fichier de contacts à importer.');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
@@ -270,6 +272,7 @@ namespace controllers\publics;
             if (!$read_file['success'])
             {
                 \FlashMessage\FlashMessage::push('danger', $read_file['content']);
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
@@ -277,46 +280,49 @@ namespace controllers\publics;
             $invalid_type = false;
             switch ($read_file['mime_type'])
             {
-                case 'text/csv' :
+                case 'text/csv':
                     $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
+
                     break;
-                
-                case 'application/json' :
+                case 'application/json':
                     $result = $this->internal_contact->import_json($id_user, $read_file['content']);
+
                     break;
-                
-                default :
+                default:
                     $invalid_type = true;
             }
 
             if ($invalid_type)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Le type de fichier n\'est pas valide.');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            if ($result === false)
+            if (false === $result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Le fichier contient des erreurs. Impossible d\'importer les contacts.');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            $msg = $result . ' nouveau contact a été inséré.';
+            $msg = $result.' nouveau contact a été inséré.';
             if ($result > 1)
             {
-                $msg = $result . ' nouveaux contacts ont été insérés.';
+                $msg = $result.' nouveaux contacts ont été insérés.';
             }
 
             \FlashMessage\FlashMessage::push('success', $msg);
+
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
-        
-        
+
         /**
-         * Allow to export a contacts list
+         * Allow to export a contacts list.
+         *
          * @param $format : Format to export contacts to
          */
-        public function export (string $format)
+        public function export(string $format)
         {
             $id_user = $_SESSION['user']['id'];
 
@@ -324,27 +330,29 @@ namespace controllers\publics;
             $invalid_type = false;
             switch ($format)
             {
-                case 'csv' :
+                case 'csv':
                     $result = $this->internal_contact->export_csv($id_user);
+
                     break;
-                
-                case 'json' :
+                case 'json':
                     $result = $this->internal_contact->export_json($id_user);
+
                     break;
-                
-                default :
+                default:
                     $invalid_type = true;
             }
 
             if ($invalid_type)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Le format demandé n\'est pas supporté.');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            if ($result === false)
+            if (false === $result)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Nous ne sommes par parveu à exporté les contacts.');
+
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 

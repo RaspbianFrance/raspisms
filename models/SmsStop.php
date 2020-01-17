@@ -14,20 +14,25 @@ namespace models;
     class SmsStop extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'smsstop'; }
-
-
-        /**
-         * Return a smsstop by his number and user
-         * @param int $id_user : user id
-         * @param string $number :  phone number
+         * Return a smsstop by his number and user.
+         *
+         * @param int    $id_user : user id
+         * @param string $number  :  phone number
+         *
          * @return array
          */
-        public function get_by_number_for_user (int $id_user, string $number)
+        public function get_by_number_for_user(int $id_user, string $number)
         {
             return $this->_select_one($this->get_table_name(), ['number' => $number, 'id_user' => $id_user]);
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'smsstop';
         }
     }

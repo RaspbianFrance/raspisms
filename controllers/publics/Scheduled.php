@@ -88,6 +88,7 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne la page d'ajout d'un scheduled.
+         *
          * @param $prefilled : If we have prefilled some fields (possible values : 'contacts', 'groups', 'conditional_groups', false)
          */
         public function add($prefilled = false)
@@ -100,7 +101,7 @@ namespace controllers\publics;
 
             $contacts = $this->internal_contact->gets_for_user($id_user);
             $phones = $this->internal_phone->gets_for_user($id_user);
-        
+
             $prefilled_contacts = [];
             $prefilled_groups = [];
             $prefilled_conditional_groups = [];
@@ -110,21 +111,21 @@ namespace controllers\publics;
                 $ids = $_GET['ids'] ?? [];
             }
 
-            if ($prefilled === 'contacts')
+            if ('contacts' === $prefilled)
             {
                 foreach ($this->internal_contact->gets_in_for_user($id_user, $ids) as $contact)
                 {
                     $prefilled_contacts[] = $contact['id'];
                 }
             }
-            elseif ($prefilled === 'groups')
+            elseif ('groups' === $prefilled)
             {
                 foreach ($this->internal_group->gets_in_for_user($id_user, $ids) as $group)
                 {
                     $prefilled_groups[] = $group['id'];
                 }
             }
-            elseif ($prefilled === 'conditional_groups')
+            elseif ('conditional_groups' === $prefilled)
             {
                 foreach ($this->internal_conditional_group->gets_in_for_user($id_user, $ids) as $conditional_group)
                 {
@@ -154,6 +155,7 @@ namespace controllers\publics;
             if (!$ids)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez choisir des messages à mettre à jour !');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
@@ -195,7 +197,7 @@ namespace controllers\publics;
                 }
 
                 $media = $this->internal_media->get_for_scheduled_and_user($id_user, $scheduled['id']);
-                $scheduleds[$key]['media'] = $media; 
+                $scheduleds[$key]['media'] = $media;
 
                 $conditional_groups = $this->internal_scheduled->get_conditional_groups($scheduled['id']);
                 foreach ($conditional_groups as $conditional_group)
@@ -220,7 +222,7 @@ namespace controllers\publics;
          * @param string $_POST['numbers']  : Les numeros de téléphone du scheduled
          * @param string $_POST['contacts'] : Les contacts du scheduled
          * @param string $_POST['groups']   : Les groups du scheduled
-         * @param array $_FILES['media'] : The media to link to a scheduled
+         * @param array  $_FILES['media']   : The media to link to a scheduled
          */
         public function create($csrf)
         {
@@ -272,30 +274,31 @@ namespace controllers\publics;
             if (!$numbers && !$contacts && !$groups && !$conditional_groups)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner au moins un destinataire pour le Sms.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
-
 
             if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
-
 
             $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
-
 
             //If mms is enabled, try to process a media to link to the scheduled
             $media = $_FILES['media'] ?? false;
             if (!($_SESSION['user']['settings']['mms'] ?? false) || !$media)
             {
                 \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le '.$at.'.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
@@ -303,10 +306,12 @@ namespace controllers\publics;
             if (!$success)
             {
                 \FlashMessage\FlashMessage::push('success', 'Le SMS a bien été créé mais le média n\'as pas pu être enregistré.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le '.$at.'.');
+
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
 
@@ -329,7 +334,6 @@ namespace controllers\publics;
 
             $scheduleds = $_POST['scheduleds'] ?? [];
 
-
             $nb_update = 0;
             foreach ($scheduleds as $id_scheduled => $scheduled)
             {
@@ -348,8 +352,7 @@ namespace controllers\publics;
                 {
                     continue;
                 }
-                
-                
+
                 if (empty($text))
                 {
                     continue;
@@ -377,8 +380,7 @@ namespace controllers\publics;
                 {
                     continue;
                 }
-                
-                
+
                 if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
                 {
                     continue;
@@ -408,17 +410,18 @@ namespace controllers\publics;
                 }
                  */
 
-                $nb_update += 1;
+                ++$nb_update;
             }
 
-            if ($nb_update != count($scheduleds))
+            if ($nb_update !== \count($scheduleds))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Certains SMS n\'ont pas été mis à jour.');
+
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Tous les SMS ont été mis à jour.');
+
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
-
     }

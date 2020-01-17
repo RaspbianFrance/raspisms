@@ -13,34 +13,26 @@ namespace controllers\internals;
 
     class Scheduled extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Scheduled($this->bdd);
-            return $this->model;
-        } 
-
-        /**
-         * Create a scheduled
+         * Create a scheduled.
+         *
          * @param int $id_user : User to insert scheduled for
          * @param $at : Scheduled date to send
-         * @param string $text : Text of the message
-         * @param ?string $origin : Origin number of the message, null by default
-         * @param bool $flash : Is the sms a flash sms, by default false
-         * @param array $numbers : Numbers to send message to
-         * @param array $contacts_ids : Contact ids to send message to
-         * @param array $groups_ids : Group ids to send message to
-         * @param array $conditional_group_ids : Conditional Groups ids to send message to
+         * @param string  $text                  : Text of the message
+         * @param ?string $origin                : Origin number of the message, null by default
+         * @param bool    $flash                 : Is the sms a flash sms, by default false
+         * @param array   $numbers               : Numbers to send message to
+         * @param array   $contacts_ids          : Contact ids to send message to
+         * @param array   $groups_ids            : Group ids to send message to
+         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         *
          * @return bool : false on error, new id on success
          */
-        public function create (int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function create(int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
-            $scheduled = [ 
+            $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
@@ -58,14 +50,14 @@ namespace controllers\internals;
                     return false;
                 }
             }
-            
-            
+
             $id_scheduled = $this->get_model()->insert($scheduled);
             if (!$id_scheduled)
             {
                 $date = date('Y-m-d H:i:s');
                 $internal_event = new Event($this->bdd);
-                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
+                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le '.$date.'.');
+
                 return false;
             }
 
@@ -97,7 +89,7 @@ namespace controllers\internals;
 
                 $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
             }
-            
+
             $internal_conditional_group = new ConditionalGroup($this->bdd);
             foreach ($conditional_group_ids as $conditional_group_id)
             {
@@ -113,31 +105,31 @@ namespace controllers\internals;
             return $id_scheduled;
         }
 
-
         /**
-         * Update a scheduled
-         * @param int $id_user : User to insert scheduled for
+         * Update a scheduled.
+         *
+         * @param int $id_user      : User to insert scheduled for
          * @param int $id_scheduled : Scheduled id
          * @param $at : Scheduled date to send
-         * @param string $text : Text of the message
-         * @param ?string $origin : Origin number of the message, null by default
-         * @param bool $flash : Is the sms a flash sms, by default false
-         * @param array $numbers : Numbers to send message to
-         * @param array $contacts_ids : Contact ids to send message to
-         * @param array $groups_ids : Group ids to send message to
-         * @param array $conditional_group_ids : Conditional Groups ids to send message to
+         * @param string  $text                  : Text of the message
+         * @param ?string $origin                : Origin number of the message, null by default
+         * @param bool    $flash                 : Is the sms a flash sms, by default false
+         * @param array   $numbers               : Numbers to send message to
+         * @param array   $contacts_ids          : Contact ids to send message to
+         * @param array   $groups_ids            : Group ids to send message to
+         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         *
          * @return bool : false on error, new id on success
          */
-        public function update_for_user (int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
-            $scheduled = [ 
+            $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'origin' => $origin,
                 'flash' => $flash,
             ];
-
 
             if ($origin)
             {
@@ -161,7 +153,7 @@ namespace controllers\internals;
             {
                 $this->get_model()->insert_scheduled_number($id_scheduled, $number);
             }
-            
+
             $internal_contact = new Contact($this->bdd);
             foreach ($contacts_ids as $contact_id)
             {
@@ -185,7 +177,7 @@ namespace controllers\internals;
 
                 $this->get_model()->insert_scheduled_group_relation($id_scheduled, $group_id);
             }
-            
+
             $internal_conditional_group = new ConditionalGroup($this->bdd);
             foreach ($conditional_group_ids as $conditional_group_id)
             {
@@ -201,28 +193,29 @@ namespace controllers\internals;
             return true;
         }
 
-
         /**
-         * Get messages scheduled before a date for a number and a user
+         * Get messages scheduled before a date for a number and a user.
+         *
          * @param int $id_user : User id
          * @param $date : Date before which we want messages
          * @param string $number : Number for which we want messages
+         *
          * @return array
          */
-        public function gets_before_date_for_number_and_user (int $id_user, $date, string $number)
+        public function gets_before_date_for_number_and_user(int $id_user, $date, string $number)
         {
             return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
 
-
         /**
-         * Get all messages to send and the number to use to send theme
+         * Get all messages to send and the number to use to send theme.
+         *
          * @return array : [['id_scheduled', 'text', 'origin', 'destination', 'flash'], ...]
          */
-        public function get_smss_to_send ()
+        public function get_smss_to_send()
         {
             $smss_to_send = [];
-            
+
             $internal_templating = new \controllers\internals\Templating();
             $internal_setting = new \controllers\internals\Setting($this->bdd);
             $internal_group = new \controllers\internals\Group($this->bdd);
@@ -240,7 +233,7 @@ namespace controllers\internals;
                 if (!isset($users_settings[$scheduled['id_user']]))
                 {
                     $users_settings[$scheduled['id_user']] = [];
-                    
+
                     $settings = $internal_setting->gets_for_user($scheduled['id_user']);
                     foreach ($settings as $name => $value)
                     {
@@ -251,7 +244,7 @@ namespace controllers\internals;
                 if (!isset($users_phones[$scheduled['id_user']]))
                 {
                     $phones = $internal_phone->gets_for_user($scheduled['id_user']);
-                    $users_phones[$scheduled['id_user']] = $phones ? $phones : [];;
+                    $users_phones[$scheduled['id_user']] = $phones ? $phones : [];
                 }
 
                 $messages = [];
@@ -268,7 +261,7 @@ namespace controllers\internals;
                         'flash' => $scheduled['flash'],
                     ];
 
-                    if ($message['origin'] == null)
+                    if (null === $message['origin'])
                     {
                         $k = array_rand($users_phones[$scheduled['id_user']]);
                         $rnd_phone = $users_phones[$scheduled['id_user']][$k];
@@ -293,7 +286,6 @@ namespace controllers\internals;
 
                     $messages[] = $message;
                 }
-
 
                 //Add messages for contacts
                 $contacts = $this->get_contacts($scheduled['id']);
@@ -329,14 +321,14 @@ namespace controllers\internals;
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
                     ];
-                    
-                    if ($message['origin'] == null)
+
+                    if (null === $message['origin'])
                     {
                         $k = array_rand($users_phones[$scheduled['id_user']]);
                         $rnd_phone = $users_phones[$scheduled['id_user']][$k];
                         $message['origin'] = $rnd_phone['number'];
                     }
-                    
+
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {
                         $contact['datas'] = json_decode($contact['datas'], true);
@@ -361,7 +353,7 @@ namespace controllers\internals;
                 foreach ($messages as $message)
                 {
                     //Remove empty messages
-                    if (trim($message['text']) == '')
+                    if ('' === trim($message['text']))
                     {
                         continue;
                     }
@@ -372,11 +364,12 @@ namespace controllers\internals;
 
             return $smss_to_send;
         }
-        
-        
+
         /**
-         * Return numbers for a scheduled message
+         * Return numbers for a scheduled message.
+         *
          * @param int $id_scheduled : Scheduled id
+         *
          * @return array
          */
         public function get_numbers(int $id_scheduled)
@@ -384,10 +377,11 @@ namespace controllers\internals;
             return $this->get_model()->get_numbers($id_scheduled);
         }
 
-
         /**
-         * Return contacts for a scheduled message
+         * Return contacts for a scheduled message.
+         *
          * @param int $id_scheduled : Scheduled id
+         *
          * @return array
          */
         public function get_contacts(int $id_scheduled)
@@ -395,25 +389,39 @@ namespace controllers\internals;
             return $this->get_model()->get_contacts($id_scheduled);
         }
 
-
         /**
-         * Return groups for a scheduled message
+         * Return groups for a scheduled message.
+         *
          * @param int $id_scheduled : Scheduled id
+         *
          * @return array
          */
         public function get_groups(int $id_scheduled)
         {
             return $this->get_model()->get_groups($id_scheduled);
         }
-        
-        
+
         /**
-         * Return conditional groups for a scheduled message
+         * Return conditional groups for a scheduled message.
+         *
          * @param int $id_scheduled : Scheduled id
+         *
          * @return array
          */
         public function get_conditional_groups(int $id_scheduled)
         {
             return $this->get_model()->get_conditional_groups($id_scheduled);
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Scheduled($this->bdd);
+
+            return $this->model;
         }
     }

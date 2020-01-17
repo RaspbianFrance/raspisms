@@ -12,7 +12,7 @@
 namespace controllers\internals;
 
     /**
-     * Class to interact with adapters
+     * Class to interact with adapters.
      */
     class Adapter extends \descartes\InternalController
     {
@@ -20,10 +20,11 @@ namespace controllers\internals;
         private const ADAPTERS_META_START = 'meta_';
 
         /**
-         * List adapters using internal metas
+         * List adapters using internal metas.
+         *
          * @return array
          */
-        public function list_adapters ()
+        public function list_adapters()
         {
             $adapters = [];
 
@@ -47,12 +48,12 @@ namespace controllers\internals;
             return $adapters;
         }
 
-
         /**
-        * List Adapters files
-        * @return mixed (false|array) : array of adapters files path
-        */
-        public function list_files ()
+         * List Adapters files.
+         *
+         * @return mixed (false|array) : array of adapters files path
+         */
+        public function list_files()
         {
             if (!is_readable(PWD_ADAPTERS))
             {
@@ -66,32 +67,35 @@ namespace controllers\internals;
             {
                 $len = mb_strlen(self::ADAPTERS_FILES_END);
                 $end = mb_substr($filename, -$len);
-                if ($end !== self::ADAPTERS_FILES_END)
+                if (self::ADAPTERS_FILES_END !== $end)
                 {
                     continue;
                 }
 
-                $adapters_files[] = PWD_ADAPTERS . '/' . $filename;
+                $adapters_files[] = PWD_ADAPTERS.'/'.$filename;
             }
 
             return $adapters_files;
         }
 
         /**
-         * Read constants of an adapter
+         * Read constants of an adapter.
+         *
+         * @param mixed $adapter_file
+         *
          * @return mixed(array|bool) : False on error, array of constants name => value
          */
-        public function read_adapter_metas ($adapter_file)
+        public function read_adapter_metas($adapter_file)
         {
             $metas = [];
-            
+
             if (!is_readable($adapter_file))
             {
                 return false;
             }
 
             $adapter_classname = pathinfo($adapter_file, PATHINFO_FILENAME);
-            $reflection_class = new \ReflectionClass('\adapters\\' . $adapter_classname);
+            $reflection_class = new \ReflectionClass('\adapters\\'.$adapter_classname);
             if (!$reflection_class)
             {
                 return false;
@@ -102,7 +106,7 @@ namespace controllers\internals;
             {
                 $start_with = mb_substr($method->getName(), 0, mb_strlen(self::ADAPTERS_META_START));
 
-                if ($start_with !== self::ADAPTERS_META_START)
+                if (self::ADAPTERS_META_START !== $start_with)
                 {
                     continue;
                 }

@@ -12,7 +12,7 @@
 namespace controllers\publics;
 
     /**
-     * Controller of callback pages, like sms status update notification
+     * Controller of callback pages, like sms status update notification.
      */
     class Callback extends \descartes\Controller
     {
@@ -30,16 +30,17 @@ namespace controllers\publics;
         }
 
         /**
-         * Function call on a sended sms status change notification reception
+         * Function call on a sended sms status change notification reception.
+         *
          * @param string $adapter_name : Name of the adapter to use
+         *
          * @return false : We must always return false, and we respect a random usleep before returning anything
-         *                 in order to prevent bruteforce api key guessing and time guessing
+         *               in order to prevent bruteforce api key guessing and time guessing
          */
-        public function update_sended_status (string $adapter_name)
+        public function update_sended_status(string $adapter_name)
         {
             //Wait between 0.5 and 1.03s in order to counter time guessing bruteforce attack against api key
-            usleep(mt_rand(5,10) / 10 * 1000000 + mt_rand(0, 30000));
-
+            usleep(mt_rand(5, 10) / 10 * 1000000 + mt_rand(0, 30000));
 
             //Search for an adapter
             $find_adapter = false;

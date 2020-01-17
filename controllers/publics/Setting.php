@@ -51,12 +51,13 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
-            
+
             $setting_value = $_POST['setting_value'] ?? false;
 
             if (false === $setting_value)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner une valeure pour le réglage.');
+
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
             }
 
@@ -72,6 +73,7 @@ namespace controllers\publics;
             $_SESSION['user']['settings'] = $settings;
 
             \FlashMessage\FlashMessage::push('success', 'Le réglage a bien été mis à jour.');
+
             return $this->redirect(\descartes\Router::url('Setting', 'show'));
         }
     }

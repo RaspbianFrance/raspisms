@@ -40,14 +40,13 @@ namespace controllers\publics;
         }
 
         /**
-         * Return all conditionnals groups for administration
+         * Return all conditionnals groups for administration.
          *
          * @param mixed $page
          */
         public function list($page = 0)
         {
             $page = (int) $page;
-
 
             $groups = $this->internal_conditional_group->list_for_user($_SESSION['user']['id'], 25, $page);
             $this->render('conditional_group/list', ['groups' => $groups]);
@@ -107,7 +106,7 @@ namespace controllers\publics;
          * Cette fonction insert un nouveau group.
          *
          * @param $csrf : Le jeton CSRF
-         * @param string $_POST['name']     : Le nom du group
+         * @param string $_POST['name']      : Le nom du group
          * @param array  $_POST['condition'] : The condition to used
          */
         public function create($csrf)
@@ -178,14 +177,15 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
         }
-        
-        
+
         /**
-         * Try to get the preview of contacts for a conditionnal group
+         * Try to get the preview of contacts for a conditionnal group.
+         *
          * @param string $_POST['condition'] : Condition to apply
+         *
          * @return json string
          */
-        public function contacts_preview ()
+        public function contacts_preview()
         {
             $return = [
                 'success' => false,
@@ -193,14 +193,14 @@ namespace controllers\publics;
             ];
 
             $condition = $_POST['condition'] ?? false;
-            
+
             if (!$condition)
             {
                 $return['result'] = 'Vous devez renseigner une condition.';
                 echo json_encode($return);
+
                 return false;
             }
-
 
             $internal_ruler = new \controllers\internals\Ruler();
             $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
@@ -208,6 +208,7 @@ namespace controllers\publics;
             {
                 $return['result'] = 'Syntaxe de la condition invalide.';
                 echo json_encode($return);
+
                 return false;
             }
 
@@ -216,6 +217,7 @@ namespace controllers\publics;
             {
                 $return['result'] = 'Aucun contact dans le groupe.';
                 echo json_encode($return);
+
                 return false;
             }
 
@@ -225,16 +227,15 @@ namespace controllers\publics;
                 $contacts_name[] = $contact['name'];
             }
 
-            $return['result'] = "Contacts du groupe : " . implode(', ', $contacts_name);
+            $return['result'] = 'Contacts du groupe : '.implode(', ', $contacts_name);
             $return['success'] = true;
             echo json_encode($return);
 
             return true;
         }
-        
-        
+
         /**
-         * Return the list of groups as JSON
+         * Return the list of groups as JSON.
          */
         public function json_list()
         {

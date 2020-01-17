@@ -49,7 +49,7 @@ namespace controllers\publics;
 
             foreach ($receiveds as $key => $received)
             {
-                if ($received['status'] != 'read')
+                if ('read' !== $received['status'])
                 {
                     $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
                 }
@@ -64,10 +64,10 @@ namespace controllers\publics;
 
             $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
         }
-        
-        
+
         /**
-         * Return all unread receiveds messages
+         * Return all unread receiveds messages.
+         *
          * @param mixed $page
          */
         public function list_unread($page = 0)
@@ -92,7 +92,8 @@ namespace controllers\publics;
         }
 
         /**
-         * Delete Receiveds
+         * Delete Receiveds.
+         *
          * @param array int $_GET['ids'] : Ids of receiveds to delete
          * @param mixed     $csrf
          *
@@ -103,6 +104,7 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
                 return $this->redirect(\descartes\Router::url('Received', 'list'));
             }
 
@@ -132,7 +134,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $receiveds[$key]['origin'] = $this->s($contact['name'], false, true, false) . ' (' . \controllers\internals\Tool::phone_link($received['origin']) . ')';
+                $receiveds[$key]['origin'] = $this->s($contact['name'], false, true, false).' ('.\controllers\internals\Tool::phone_link($received['origin']).')';
             }
 
             $nb_received = \count($receiveds);

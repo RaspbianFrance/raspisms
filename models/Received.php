@@ -17,22 +17,17 @@ namespace models;
     class Received extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'received'; }
-
-        
-        /**
-         * Return an entry by his id for a user
+         * Return an entry by his id for a user.
+         *
          * @param int $id_user : user id
-         * @param int $id : entry id
+         * @param int $id      : entry id
+         *
          * @return array
          */
         public function get_for_user(int $id_user, int $id)
         {
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 AND id = :id
             ';
@@ -43,19 +38,21 @@ namespace models;
             ];
 
             $receiveds = $this->_run_query($query, $params);
+
             return $receiveds[0] ?? [];
         }
-        
-        
+
         /**
-         * Return all entries for a user
+         * Return all entries for a user.
+         *
          * @param int $id_user : user id
+         *
          * @return array
          */
         public function gets_for_user(int $id_user)
         {
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
             ';
 
@@ -66,12 +63,12 @@ namespace models;
             $receiveds = $this->_run_query($query, $params);
         }
 
-
         /**
-         * Return a list of received for a user
+         * Return a list of received for a user.
+         *
          * @param int $id_user : User id
-         * @param int $limit  : Max results to return
-         * @param int $offset : Number of results to ignore
+         * @param int $limit   : Max results to return
+         * @param int $offset  : Number of results to ignore
          */
         public function list_for_user($id_user, $limit, $offset)
         {
@@ -81,7 +78,7 @@ namespace models;
             $query = ' 
                 SELECT * FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
+                LIMIT '.$limit.' OFFSET '.$offset;
 
             $params = [
                 'id_user' => $id_user,
@@ -89,13 +86,13 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
-        
+
         /**
-         * Return a list of unread received for a user
+         * Return a list of unread received for a user.
+         *
          * @param int $id_user : User id
-         * @param int $limit  : Max results to return
-         * @param int $offset : Number of results to ignore
+         * @param int $limit   : Max results to return
+         * @param int $offset  : Number of results to ignore
          */
         public function list_unread_for_user($id_user, $limit, $offset)
         {
@@ -106,7 +103,7 @@ namespace models;
                 SELECT * FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 AND status = \'unread\'
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
+                LIMIT '.$limit.' OFFSET '.$offset;
 
             $params = [
                 'id_user' => $id_user,
@@ -115,12 +112,13 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
-         * Return a list of receiveds in a group of ids and for a user
-         * @param int $id_user : user id
-         * @param array $ids : ids of receiveds to find
-         * @return array 
+         * Return a list of receiveds in a group of ids and for a user.
+         *
+         * @param int   $id_user : user id
+         * @param array $ids     : ids of receiveds to find
+         *
+         * @return array
          */
         public function gets_in_for_user(int $id_user, $ids)
         {
@@ -133,15 +131,17 @@ namespace models;
             $generated_in = $this->_generate_in_from_array($ids);
             $query .= $generated_in['QUERY'];
             $params = $generated_in['PARAMS'];
-            $params['id_user'] = $id_user; 
+            $params['id_user'] = $id_user;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
-         * Delete a entry by his id for a user
+         * Delete a entry by his id for a user.
+         *
          * @param int $id_user : User id
-         * @param int $id : Entry id
+         * @param int $id      : Entry id
+         *
          * @return int : Number of removed rows
          */
         public function delete_for_user(int $id_user, int $id)
@@ -153,20 +153,20 @@ namespace models;
             ';
 
             $params = ['id_user' => $id_user, 'id' => $id];
-            
+
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
 
-
         /**
-         * Update a received sms for a user
-         * @param int $id_user : User id
+         * Update a received sms for a user.
+         *
+         * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $datas : datas to update
+         * @param array $datas   : datas to update
          *
          * @return int : number of modified rows
          */
-        public function update_for_user (int $id_user, int $id, array $datas)
+        public function update_for_user(int $id_user, int $id, array $datas)
         {
             $params = [];
             $sets = [];
@@ -174,13 +174,13 @@ namespace models;
             foreach ($datas as $label => $value)
             {
                 $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_' . $label] = $value;
-                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
+                $params['set_'.$label] = $value;
+                $sets[] = '`'.$label.'` = :set_'.$label.' ';
             }
 
             $query = '
                 UPDATE `received`
-                SET ' . implode(', ', $sets) . '
+                SET '.implode(', ', $sets).'
                 WHERE id = :id
                 AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
             ';
@@ -196,11 +196,12 @@ namespace models;
 
             return $this->_run_query($query, $params, self::ROWCOUNT);
         }
-        
-        
+
         /**
-         * Count number of received sms for user
+         * Count number of received sms for user.
+         *
          * @param int $id_user : user id
+         *
          * @return int : Number of received SMS for user
          */
         public function count_for_user(int $id_user)
@@ -217,11 +218,12 @@ namespace models;
 
             return $this->_run_query($query, $params)[0]['nb'] ?? 0;
         }
-        
-        
+
         /**
-         * Count number of unread received sms for user
+         * Count number of unread received sms for user.
+         *
          * @param int $id_user : user id
+         *
          * @return int : Number of received SMS for user
          */
         public function count_unread_for_user(int $id_user)
@@ -240,12 +242,13 @@ namespace models;
             return $this->_run_query($query, $params)[0]['nb'] ?? 0;
         }
 
-        
         /**
-         * Return x last receiveds message for a user, order by date
-         * @param int $id_user : User id
+         * Return x last receiveds message for a user, order by date.
+         *
+         * @param int $id_user  : User id
          * @param int $nb_entry : Number of receiveds messages to return
-         * @return array 
+         *
+         * @return array
          */
         public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
         {
@@ -256,7 +259,7 @@ namespace models;
                 FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 ORDER BY at ASC
-                LIMIT ' . $nb_entry;
+                LIMIT '.$nb_entry;
 
             $params = [
                 'id_user' => $id_user,
@@ -265,11 +268,12 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
-         * Return receiveds for an origin and a user
-         * @param int $id_user : User id
-         * @param string $origin : Number who sent the message
+         * Return receiveds for an origin and a user.
+         *
+         * @param int    $id_user : User id
+         * @param string $origin  : Number who sent the message
+         *
          * @return array
          */
         public function gets_by_origin_and_user(int $id_user, string $origin)
@@ -289,11 +293,12 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
-         * Get number of sended SMS for every date since a date for a specific user
-         * @param int $id_user : user id
-         * @param \DateTime $date : Date since which we want the messages
+         * Get number of sended SMS for every date since a date for a specific user.
+         *
+         * @param int       $id_user : user id
+         * @param \DateTime $date    : Date since which we want the messages
+         *
          * @return array
          */
         public function count_by_day_since_for_user(int $id_user, $date)
@@ -315,8 +320,10 @@ namespace models;
         }
 
         /**
-         * Return all discussions (ie : numbers we have a message received from or sended to) for a user
+         * Return all discussions (ie : numbers we have a message received from or sended to) for a user.
+         *
          * @param int $id_user : User id
+         *
          * @return array
          */
         public function get_discussions_for_user(int $id_user)
@@ -336,13 +343,16 @@ namespace models;
             ';
 
             $params = ['id_user' => $id_user];
+
             return $this->_run_query($query, $params);
         }
 
         /**
-         * Get SMS received since a date for a user 
+         * Get SMS received since a date for a user.
+         *
          * @param int $id_user : User id
          * @param $date : La date depuis laquelle on veux les SMS (au format 2014-10-25 20:10:05)
+         *
          * @return array : Tableau avec tous les SMS depuis la date
          */
         public function get_since_by_date_for_user(int $id_user, $date)
@@ -353,7 +363,7 @@ namespace models;
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
                 AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 ORDER BY at ASC";
-            
+
             $params = [
                 'date' => $date,
                 'id_user' => $id_user,
@@ -363,10 +373,12 @@ namespace models;
         }
 
         /**
-         * Find messages received since a date for a certain origin and user
+         * Find messages received since a date for a certain origin and user.
+         *
          * @param int $id_user : User id
          * @param $date : Date we want messages sinces
          * @param string $origin : Origin number
+         *
          * @return array
          */
         public function get_since_by_date_for_origin_and_user(int $id_user, $date, string $origin)
@@ -390,21 +402,23 @@ namespace models;
         }
 
         /**
-         * Find destination of last received message for an origin and user
-         * @param int $id_user : User id
-         * @param string $origin : Origin number
+         * Find destination of last received message for an origin and user.
+         *
+         * @param int    $id_user : User id
+         * @param string $origin  : Origin number
+         *
          * @return array
          */
-        public function get_last_for_origin_and_user (int $id_user, string $origin)
+        public function get_last_for_origin_and_user(int $id_user, string $origin)
         {
-            $query = "
+            $query = '
                 SELECT *
                 FROM received
                 WHERE origin = :origin
                 AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 ORDER BY at DESC
                 LIMIT 0,1
-            ";
+            ';
 
             $params = [
                 'origin' => $origin,
@@ -413,6 +427,16 @@ namespace models;
 
             $result = $this->_run_query($query, $params);
 
-            return ($result[0] ?? []);
+            return $result[0] ?? [];
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'received';
         }
     }

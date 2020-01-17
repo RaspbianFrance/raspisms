@@ -13,16 +13,16 @@ namespace controllers\internals;
 
     /**
      * Templating questions relative class
-     * Not a standard controller as it's not linked to a model in any way
+     * Not a standard controller as it's not linked to a model in any way.
      */
     class Templating
     {
         /**
-         * Twig environment
+         * Twig environment.
          */
         private $sandbox;
-        
-        public function __construct ()
+
+        public function __construct()
         {
             $tags = [
                 'if',
@@ -45,23 +45,24 @@ namespace controllers\internals;
             $properties = [];
             $functions = [
                 'date', 'max', 'min', 'random',
-                'range', 
+                'range',
             ];
 
             $policy = new \Twig\Sandbox\SecurityPolicy($tags, $filters, $methods, $properties, $functions);
             $this->sandbox = new \Twig\Extension\SandboxExtension($policy, true);
         }
 
-
         /**
-         * Render a string as a twig template
+         * Render a string as a twig template.
+         *
          * @param string $template : Template string
-         * @param array $datas : Datas to pass to the template
+         * @param array  $datas    : Datas to pass to the template
+         *
          * @return array : keys, success, error, result
          */
-        public function render (string $template, array $datas = [])
+        public function render(string $template, array $datas = [])
         {
-            try 
+            try
             {
                 $loader = new \Twig\Loader\ArrayLoader([
                     'template' => $template,
@@ -69,7 +70,7 @@ namespace controllers\internals;
 
                 $twig = new \Twig\Environment($loader);
                 $result = $twig->render('template', $datas);
-                
+
                 return [
                     'success' => true,
                     'result' => $result,
@@ -83,5 +84,4 @@ namespace controllers\internals;
                 ];
             }
         }
-    
     }

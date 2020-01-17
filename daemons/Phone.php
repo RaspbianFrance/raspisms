@@ -1,11 +1,21 @@
 <?php
+
+/*
+ * This file is part of RaspiSMS.
+ *
+ * (c) Pierre-Lin Bonnemaison <plebwebsas@gmail.com>
+ *
+ * This source file is subject to the GPL-3.0 license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace daemons;
 
-use \Monolog\Logger;
-use \Monolog\Handler\StreamHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
- * Phone daemon class
+ * Phone daemon class.
  */
 class Phone extends AbstractDaemon
 {
@@ -18,17 +28,18 @@ class Phone extends AbstractDaemon
     private $bdd;
 
     /**
-     * Constructor
+     * Constructor.
+     *
      * @param array $phone : A phone table entry
      */
     public function __construct(array $phone)
     {
         $this->phone = $phone;
         $this->msg_queue_id = (int) mb_substr($this->phone['number'], 1);
-        
-        $name = 'RaspiSMS Daemon Phone ' . $this->phone['number'];
+
+        $name = 'RaspiSMS Daemon Phone '.$this->phone['number'];
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = false; //Phone should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
@@ -36,22 +47,21 @@ class Phone extends AbstractDaemon
 
         //Construct the daemon
         parent::__construct($name, $logger, $pid_dir, $no_parent, $additional_signals, $uniq);
-        
+
         parent::start();
     }
-
 
     public function run()
     {
         //Stop after 5 minutes of inactivity to avoid useless daemon
-        if ( (microtime(true) - $this->last_message_at) > 5 * 60 )
+        if ((microtime(true) - $this->last_message_at) > 5 * 60)
         {
             posix_kill(getmypid(), SIGTERM); //Send exit signal to the current process
             return false;
         }
-        
+
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
-        
+
         //Send smss in queue
         $this->send_smss();
 
@@ -61,37 +71,67 @@ class Phone extends AbstractDaemon
         usleep(0.5 * 1000000);
     }
 
+    public function on_start()
+    {
+        //Set last message at to construct time
+        $this->last_message_at = microtime(true);
+
+        $this->msg_queue = msg_get_queue($this->msg_queue_id);
+        $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
+
+        //Instanciate adapter
+        $adapter_class = $this->phone['adapter'];
+        $this->adapter = new $adapter_class($this->phone['number'], $this->phone['adapter_datas']);
+
+        $this->logger->info('Starting Phone daemon with pid '.getmypid());
+    }
+
+    public function on_stop()
+    {
+        //Delete queue on daemon close
+        $this->logger->info('Closing queue : '.$this->msg_queue_id);
+        msg_remove_queue($this->msg_queue);
+
+        $this->logger->info('Stopping Phone daemon with pid '.getmypid());
+    }
+
+    public function handle_other_signals($signal)
+    {
+        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
+    }
 
     /**
-     * Send sms
+     * Send sms.
      */
-    private function send_smss ()
+    private function send_smss()
     {
         $find_message = true;
         while ($find_message)
         {
-            //Call message 
+            //Call message
             $msgtype = null;
             $maxsize = 409600;
             $message = null;
 
             $error_code = null;
-            $success = msg_receive($this->msg_queue, QUEUE_TYPE_SEND_MSG, $msgtype, $maxsize, $message, TRUE, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+            $success = msg_receive($this->msg_queue, QUEUE_TYPE_SEND_MSG, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
 
-            if (!$success && $error_code !== MSG_ENOMSG)
+            if (!$success && MSG_ENOMSG !== $error_code)
             {
-                $this->logger->critical('Error reading MSG SEND Queue, error code : ' . $error);
+                $this->logger->critical('Error reading MSG SEND Queue, error code : '.$error);
+
                 return false;
             }
 
             if (!$message)
             {
                 $find_message = false;
+
                 continue;
             }
-            
+
             $internal_sended = new \controllers\internals\Sended($this->bdd);
-            
+
             //Update last message time
             $this->last_message_at = microtime(true);
 
@@ -99,14 +139,15 @@ class Phone extends AbstractDaemon
             $at = $now->format('Y-m-d H:i:s');
 
             $message['at'] = $at;
-            
-            $this->logger->info('Try send message : ' . json_encode($message));
-            
+
+            $this->logger->info('Try send message : '.json_encode($message));
+
             $sended_sms_uid = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
             if (!$sended_sms_uid)
             {
-                $this->logger->error('Failed send message : ' . json_encode($message));
+                $this->logger->error('Failed send message : '.json_encode($message));
                 $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
+
                 continue;
             }
 
@@ -115,21 +156,20 @@ class Phone extends AbstractDaemon
             $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
             $this->process_for_webhook($message, 'send_sms', $user_settings);
 
-            $this->logger->info('Successfully send message : ' . json_encode($message));
+            $this->logger->info('Successfully send message : '.json_encode($message));
 
             $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
         }
     }
 
-
     /**
-     * Read smss for a number
+     * Read smss for a number.
      */
-    private function read_smss ()
+    private function read_smss()
     {
         $internal_received = new \controllers\internals\Received($this->bdd);
         $internal_setting = new \controllers\internals\Setting($this->bdd);
-        
+
         $smss = $this->adapter->read();
         if (!$smss)
         {
@@ -142,7 +182,7 @@ class Phone extends AbstractDaemon
         //Process smss
         foreach ($smss as $sms)
         {
-            $this->logger->info('Receive message : ' . json_encode($sms));
+            $this->logger->info('Receive message : '.json_encode($sms));
 
             $command_result = $this->process_for_command($sms);
             $this->logger->info('after command');
@@ -156,17 +196,18 @@ class Phone extends AbstractDaemon
             $internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
         }
     }
-    
-    
+
     /**
-     * Process a sms to find if its a command and so execute it
+     * Process a sms to find if its a command and so execute it.
+     *
      * @param array $sms : The sms
+     *
      * @return array : ['text' => new sms text, 'is_command' => bool]
      */
-    private function process_for_command (array $sms)
+    private function process_for_command(array $sms)
     {
         $internal_command = new \controllers\internals\Command($this->bdd);
-        
+
         $is_command = false;
         $command = $internal_command->check_for_command($this->phone['id_user'], $sms['text']);
         if ($command)
@@ -179,22 +220,22 @@ class Phone extends AbstractDaemon
         return ['text' => $sms['text'], 'is_command' => $is_command];
     }
 
-
     /**
-     * Process a sms to transmit a webhook query to webhook daemon if needed
-     * @param array $sms : The sms
-     * @param string $webhook_type : Type of webhook to trigger
-     * @param array $user_settings : Use settings
+     * Process a sms to transmit a webhook query to webhook daemon if needed.
+     *
+     * @param array  $sms           : The sms
+     * @param string $webhook_type  : Type of webhook to trigger
+     * @param array  $user_settings : Use settings
      */
-    private function process_for_webhook (array $sms, string $webhook_type, array $user_settings)
+    private function process_for_webhook(array $sms, string $webhook_type, array $user_settings)
     {
         if (!$user_settings['webhook'])
         {
             return false;
         }
-        
+
         $internal_webhook = new \controllers\internals\Webhook($this->bdd);
-        
+
         $webhooks = $internal_webhook->gets_for_type_and_user($this->phone['id_user'], $webhook_type);
         foreach ($webhooks as $webhook)
         {
@@ -210,21 +251,21 @@ class Phone extends AbstractDaemon
             ];
 
             $error_code = null;
-            $success = msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $message, TRUE, TRUE, $error_code);
+            $success = msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $message, true, true, $error_code);
             if (!$success)
             {
-                $this->logger->critical("Failed send webhook message in queue, error code : " . $error_code);
+                $this->logger->critical('Failed send webhook message in queue, error code : '.$error_code);
             }
         }
     }
-    
-    
+
     /**
-     * Process a sms to transfer it by mail
-     * @param array $sms : The sms
+     * Process a sms to transfer it by mail.
+     *
+     * @param array $sms           : The sms
      * @param array $user_settings : Use settings
      */
-    private function process_for_transfer (array $sms, array $user_settings)
+    private function process_for_transfer(array $sms, array $user_settings)
     {
         if (!$user_settings['transfer'])
         {
@@ -238,41 +279,9 @@ class Phone extends AbstractDaemon
         {
             return false;
         }
-        
-        $this->logger->info('Transfer sms to ' . $user['email'] . ' : ' . json_encode($sms));
+
+        $this->logger->info('Transfer sms to '.$user['email'].' : '.json_encode($sms));
 
         \controllers\internals\Tool::send_email($user['email'], EMAIL_TRANSFER_SMS, ['sms' => $sms]);
-    }
-
-
-    public function on_start()
-    {
-        //Set last message at to construct time
-        $this->last_message_at = microtime(true);
-        
-        $this->msg_queue = msg_get_queue($this->msg_queue_id);
-        $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
-
-        //Instanciate adapter
-        $adapter_class = $this->phone['adapter'];
-        $this->adapter = new $adapter_class($this->phone['number'], $this->phone['adapter_datas']);
-
-        $this->logger->info("Starting Phone daemon with pid " . getmypid());
-    }
-
-
-    public function on_stop() 
-    {
-        //Delete queue on daemon close
-        $this->logger->info("Closing queue : " . $this->msg_queue_id);
-        msg_remove_queue($this->msg_queue);
-
-        $this->logger->info("Stopping Phone daemon with pid " . getmypid ());
-    }
-
-
-    public function handle_other_signals($signal)
-    {
-        $this->logger->info("Signal not handled by " . $this->name . " Daemon : " . $signal);
     }
 }

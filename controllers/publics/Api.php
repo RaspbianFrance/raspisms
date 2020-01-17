@@ -12,11 +12,11 @@
 namespace controllers\publics;
 
     /**
-     * Api to interact with raspisms
+     * Api to interact with raspisms.
      */
     class Api extends \descartes\ApiController
     {
-        CONST DEFAULT_RETURN = [
+        const DEFAULT_RETURN = [
             'error' => 0, //Error code
             'message' => null, //Any message to describe a potential error
             'response' => null, //The content of the response
@@ -24,7 +24,7 @@ namespace controllers\publics;
             'prev' => null, //Link to the previous results
         ];
 
-        CONST ERROR_CODES = [
+        const ERROR_CODES = [
             'NONE' => 0,
             'INVALID_CREDENTIALS' => 1,
             'INVALID_PARAMETER' => 2,
@@ -32,13 +32,12 @@ namespace controllers\publics;
             'CANNOT_CREATE' => 8,
         ];
 
-        CONST ERROR_MESSAGES = [
+        const ERROR_MESSAGES = [
             'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API as GET parameter "api_key".',
             'INVALID_PARAMETER' => 'You have specified an invalid parameter : ',
             'MISSING_PARAMETER' => 'One require parameter is missing : ',
             'CANNOT_CREATE' => 'Cannot create a new entry.',
         ];
-        
 
         private $internal_user;
         private $internal_phone;
@@ -49,13 +48,14 @@ namespace controllers\publics;
         private $user;
 
         /**
-         * Construct the object and quit if failed authentication
+         * Construct the object and quit if failed authentication.
+         *
          * @return void;
          */
         public function __construct()
         {
             parent::__construct();
-            
+
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_user = new \controllers\internals\User($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
@@ -71,7 +71,7 @@ namespace controllers\publics;
             $api_key = $_GET['api_key'] ?? false;
             if ($api_key)
             {
-                $this->user = $this->internal_user->get_by_api_key($api_key); 
+                $this->user = $this->internal_user->get_by_api_key($api_key);
             }
 
             if (!$this->user)
@@ -86,37 +86,38 @@ namespace controllers\publics;
             }
         }
 
-
         /**
          * List all entries of a certain type for the current user, sorted by id.
+         *
          * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone']
-         * @param int $page : Pagination number, Default = 0. Group of 25 results.
+         * @param int    $page       : Pagination number, Default = 0. Group of 25 results.
+         *
          * @return List of entries
          */
-        public function get_entries (string $entry_type, int $page = 0)
+        public function get_entries(string $entry_type, int $page = 0)
         {
             $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone'];
 
-            if (!in_array($entry_type, $entry_types))
+            if (!\in_array($entry_type, $entry_types, true))
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'entry_type must be one of : ' . join(', ', $entry_types) . '.';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'entry_type must be one of : '.implode(', ', $entry_types).'.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
                 return false;
             }
 
-            $controller_str = 'internal_' . $entry_type;
-            $controller = $this->$controller_str;
+            $controller_str = 'internal_'.$entry_type;
+            $controller = $this->{$controller_str};
 
             $page = (int) $page;
             $limit = 25;
             $entries = $controller->list_for_user($this->user['id'], $limit, $page);
 
             //Special case for scheduled, we must add numbers because its a join
-            if ($entry_type === 'scheduled')
+            if ('scheduled' === $entry_type)
             {
                 foreach ($entries as $key => $entry)
                 {
@@ -127,7 +128,7 @@ namespace controllers\publics;
                 }
             }
             //Special case for group we must add contact because its a join
-            elseif ($entry_type === 'group')
+            elseif ('group' === $entry_type)
             {
                 foreach ($entries as $key => $entry)
                 {
@@ -135,11 +136,10 @@ namespace controllers\publics;
                 }
             }
 
-
             $return = self::DEFAULT_RETURN;
             $return['response'] = $entries;
 
-            if (count($entries) == $limit)
+            if (\count($entries) === $limit)
             {
                 $return['next'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'page' => $page + 1], ['api_key' => $this->user['api_key']]);
             }
@@ -153,35 +153,36 @@ namespace controllers\publics;
             $this->json($return);
         }
 
-
         /**
-         * Schedule a message to be send
-         * @param string $_POST['at'] : Date to send message at format Y-m-d H:i:s
-         * @param string $_POST['text'] : Text of the message to send
-         * @param string $_POST['origin'] : Default null. Number to send the message from. If null use a random phone
-         * @param string $_POST['flash'] : Default false. Is the sms a flash sms.
-         * @param string $_POST['numbers'] : Array of numbers to send message to
-         * @param string $_POST['contacts'] : Array of ids of contacts to send message to
-         * @param string $_POST['groups'] : Array of ids of groups to send message to
+         * Schedule a message to be send.
+         *
+         * @param string $_POST['at']                 : Date to send message at format Y-m-d H:i:s
+         * @param string $_POST['text']               : Text of the message to send
+         * @param string $_POST['origin']             : Default null. Number to send the message from. If null use a random phone
+         * @param string $_POST['flash']              : Default false. Is the sms a flash sms.
+         * @param string $_POST['numbers']            : Array of numbers to send message to
+         * @param string $_POST['contacts']           : Array of ids of contacts to send message to
+         * @param string $_POST['groups']             : Array of ids of groups to send message to
          * @param string $_POST['conditional_groups'] : Array of ids of conditional groups to send message to
+         *
          * @return Id of scheduled created
          */
-        public function post_scheduled ()
+        public function post_scheduled()
         {
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $origin = empty($_POST['origin']) ? null : $_POST['origin'];
             $flash = (bool) ($_POST['flash'] ?? false);
-            $numbers = $_POST['numbers'] ?? []; 
-            $contacts = $_POST['contacts'] ?? []; 
-            $groups = $_POST['groups'] ?? []; 
+            $numbers = $_POST['numbers'] ?? [];
+            $contacts = $_POST['contacts'] ?? [];
+            $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
 
             if (!$at || !$text)
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($at ? '' : 'at ') . ($text ? '' : 'text');
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'].($at ? '' : 'at ').($text ? '' : 'text');
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -192,7 +193,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'at must be a date of format "Y-m-d H:i:s".';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -206,6 +207,7 @@ namespace controllers\publics;
                 if (!$number)
                 {
                     unset($numbers[$key]);
+
                     continue;
                 }
 
@@ -216,7 +218,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'You must specify at least one valid number, contact, group or conditional_group.';
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'].'You must specify at least one valid number, contact, group or conditional_group.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -227,7 +229,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'origin : You must specify an origin number among thoses of user phones.';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'origin : You must specify an origin number among thoses of user phones.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -252,23 +254,22 @@ namespace controllers\publics;
             $this->json($return);
         }
 
-
         /**
-         * Delete a scheduled message
+         * Delete a scheduled message.
+         *
          * @param int $id : Id of scheduled message to delete
-         * @return void on success, error else
          */
-        public function delete_scheduled (int $id) 
+        public function delete_scheduled(int $id)
         {
             $success = $this->internal_scheduled->delete_for_user($this->user['id'], $id);
 
             if (!$success)
             {
                 $this->auto_http_code(false);
-                return false;            
+
+                return false;
             }
 
             $this->auto_http_code(true);
         }
-
     }

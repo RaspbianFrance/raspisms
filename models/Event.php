@@ -14,20 +14,25 @@ namespace models;
     class Event extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'event'; }
-
-
-        /**
-         * Gets lasts x events for a user order by date
-         * @param int $id_user : User id
+         * Gets lasts x events for a user order by date.
+         *
+         * @param int $id_user  : User id
          * @param int $nb_entry : Number of events to return
+         *
          * @return array
          */
-        public function get_lasts_by_date_for_user (int $id_user, int $nb_entry)
+        public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
         {
             return $this->_select('event', ['id_user' => $id_user], 'at', true, $nb_entry);
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'event';
         }
     }

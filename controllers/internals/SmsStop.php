@@ -13,23 +13,14 @@ namespace controllers\internals;
 
     class SmsStop extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\SmsStop($this->bdd);
-            return $this->model;
-        }
-
-        
-        /**
-         * Create a new smsstop
-         * @param int $id_user : User id
-         * @param string $number : Number to stop smss for
+         * Create a new smsstop.
+         *
+         * @param int    $id_user : User id
+         * @param string $number  : Number to stop smss for
+         *
          * @return mixed bool|int : False if cannot create smsstop, id of the new smsstop else
          */
         public function create(int $id_user, string $number)
@@ -41,13 +32,14 @@ namespace controllers\internals;
 
             return $this->get_model()->insert($smsstop);
         }
-        
-        
+
         /**
-         * Update a smsstop
-         * @param int $id_user : User id
-         * @param int $id_smsstop : SmsStop id
-         * @param string $number : Number to stop smss for
+         * Update a smsstop.
+         *
+         * @param int    $id_user    : User id
+         * @param int    $id_smsstop : SmsStop id
+         * @param string $number     : Number to stop smss for
+         *
          * @return mixed bool|int : False if cannot create smsstop, id of the new smsstop else
          */
         public function update_for_user(int $id_user, int $id_smsstop, string $number)
@@ -59,15 +51,28 @@ namespace controllers\internals;
             return $this->get_model()->update_for_user($id_user, $id_smsstop, $datas);
         }
 
-
         /**
-         * Return a smsstop by his number and user
-         * @param int $id_user : user id
-         * @param string $number :  phone number
+         * Return a smsstop by his number and user.
+         *
+         * @param int    $id_user : user id
+         * @param string $number  :  phone number
+         *
          * @return array
          */
-        public function get_by_number_for_user (int $id_user, string $number)
+        public function get_by_number_for_user(int $id_user, string $number)
         {
             return $this->get_model()->get_by_number_for_user($id_user, $number);
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\SmsStop($this->bdd);
+
+            return $this->model;
         }
     }

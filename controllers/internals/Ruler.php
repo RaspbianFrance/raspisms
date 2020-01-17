@@ -10,20 +10,20 @@
  */
 
 namespace controllers\internals;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
-    /**
-     * Class to analyse rules used by conditional groups
-     */
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+/**
+ * Class to analyse rules used by conditional groups.
+ */
     class Ruler extends \descartes\InternalController
     {
         private $expression_language;
 
         /**
-         * Constructor
+         * Constructor.
          */
-        public function __construct ()
+        public function __construct()
         {
             $this->expression_language = new ExpressionLanguage();
 
@@ -31,43 +31,47 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
             $this->expression_language->registerProvider(new ExpressionProvider());
         }
 
-
         /**
          * Verify if a condition is valid. i.e we can evaluate it without error.
-         * @param string $condition : The condition to evaluate.
-         * @param array $datas : The datas to made available to condition
+         *
+         * @param string $condition : The condition to evaluate
+         * @param array  $datas     : The datas to made available to condition
+         *
          * @return bool : false if invalid, true else
          */
-        public function validate_condition (string $condition, array $datas = []) : bool
+        public function validate_condition(string $condition, array $datas = []): bool
         {
-            try 
+            try
             {
                 $this->expression_language->evaluate($condition, $datas);
+
                 return true;
             }
             catch (\Exception $e)
             {
                 return false;
-            } 
+            }
         }
-        
-        
+
         /**
-         * Evaluate a condition
-         * @param string $condition : The condition to evaluate.
-         * @param array $datas : The datas to made available to condition
+         * Evaluate a condition.
+         *
+         * @param string $condition : The condition to evaluate
+         * @param array  $datas     : The datas to made available to condition
+         *
          * @return ?bool : false if invalid, true else, null only on error
          */
-        public function evaluate_condition (string $condition, array $datas = []) : ?bool
+        public function evaluate_condition(string $condition, array $datas = []): ?bool
         {
-            try 
+            try
             {
                 $result = $this->expression_language->evaluate($condition, $datas);
+
                 return (bool) $result;
             }
             catch (\Exception $e)
             {
                 return null;
-            } 
+            }
         }
     }

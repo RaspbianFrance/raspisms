@@ -14,31 +14,37 @@ namespace models;
     class Phone extends StandardModel
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        protected function get_table_name() : string { return 'phone'; }
-
-
-        /**
-         * Return a phone by his number and user
-         * @param int $id_user : user id
-         * @param string $number :  phone number
+         * Return a phone by his number and user.
+         *
+         * @param int    $id_user : user id
+         * @param string $number  :  phone number
+         *
          * @return array
          */
-        public function get_by_number_and_user (int $id_user, string $number)
+        public function get_by_number_and_user(int $id_user, string $number)
         {
             return $this->_select_one('phone', ['number' => $number, 'id_user' => $id_user]);
         }
-        
-        
+
         /**
-         * Return a phone by his number
+         * Return a phone by his number.
+         *
          * @param string $number :  phone number
+         *
          * @return array
          */
-        public function get_by_number (string $number)
+        public function get_by_number(string $number)
         {
             return $this->_select_one('phone', ['number' => $number]);
+        }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        protected function get_table_name(): string
+        {
+            return 'phone';
         }
     }

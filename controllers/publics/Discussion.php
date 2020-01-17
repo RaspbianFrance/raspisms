@@ -113,7 +113,7 @@ namespace controllers\publics;
 
             foreach ($receiveds as $received)
             {
-                if ($received['status'] != 'read')
+                if ('read' !== $received['status'])
                 {
                     $this->internal_received->mark_as_read_for_user($id_user, $received['id']);
                 }
@@ -152,10 +152,10 @@ namespace controllers\publics;
         /**
          * Cette fonction permet d'envoyer facilement un sms à un numéro donné.
          *
-         * @param string $csrf             : Le jeton csrf
-         * @param string $_POST['text']    : Le contenu du Sms
+         * @param string $csrf                 : Le jeton csrf
+         * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
-         * @param string $_POST['origin'] : Number to send sms with
+         * @param string $_POST['origin']      : Number to send sms with
          *
          * @return string : json string Le statut de l'envoi
          */

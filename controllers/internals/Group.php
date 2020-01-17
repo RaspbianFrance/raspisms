@@ -16,34 +16,24 @@ namespace controllers\internals;
      */
     class Group extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Group($this->bdd);
-            return $this->model;
-        } 
-
-
-        /**
-         * Create a new group for a user
-         * @param int $id_user : user id
+         * Create a new group for a user.
+         *
+         * @param int    $id_user      : user id
          * @param stirng $name         : Group name
-         * @param array $contacts_ids : Ids of the contacts of the group
+         * @param array  $contacts_ids : Ids of the contacts of the group
+         *
          * @return mixed bool|int : false on error, new group id
          */
-        public function create (int $id_user, string $name, array $contacts_ids)
+        public function create(int $id_user, string $name, array $contacts_ids)
         {
             $group = [
                 'id_user' => $id_user,
                 'name' => $name,
             ];
 
-            
             $id_group = $this->get_model()->insert($group);
             if (!$id_group)
             {
@@ -63,18 +53,19 @@ namespace controllers\internals;
             }
 
             $internal_event = new Event($this->bdd);
-            $internal_event->create($id_user, 'GROUP_ADD', 'Ajout group : ' . $name);
+            $internal_event->create($id_user, 'GROUP_ADD', 'Ajout group : '.$name);
 
             return $id_group;
         }
 
-
         /**
-         * Update a group for a user
-         * @param int $id_user : User id
-         * @param int $id_group           : Group id
+         * Update a group for a user.
+         *
+         * @param int    $id_user      : User id
+         * @param int    $id_group     : Group id
          * @param stirng $name         : Group name
-         * @param array $contacts_ids : Ids of the contacts of the group
+         * @param array  $contacts_ids : Ids of the contacts of the group
+         *
          * @return bool : False on error, true on success
          */
         public function update_for_user(int $id_user, int $id_group, string $name, array $contacts_ids)
@@ -99,7 +90,7 @@ namespace controllers\internals;
 
                 if ($this->get_model()->insert_group_contact_relation($id_group, $contact_id))
                 {
-                    $nb_contact_insert++;
+                    ++$nb_contact_insert;
                 }
             }
 
@@ -111,26 +102,40 @@ namespace controllers\internals;
             return true;
         }
 
-
         /**
-         * Return a group by his name for a user
-         * @param int $id_user : User id
-         * @param string $name : Group name
+         * Return a group by his name for a user.
+         *
+         * @param int    $id_user : User id
+         * @param string $name    : Group name
+         *
          * @return array
          */
-        public function get_by_name_for_user (int $id_user, string $name)
+        public function get_by_name_for_user(int $id_user, string $name)
         {
             return $this->get_model()->get_by_name_for_user($id_user, $name);
         }
 
-
         /**
-         * Get groups contacts
+         * Get groups contacts.
+         *
          * @param int $id_group : Group id
+         *
          * @return array : Contacts of the group
          */
         public function get_contacts($id_group)
         {
             return $this->get_model()->get_contacts($id_group);
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Group($this->bdd);
+
+            return $this->model;
         }
     }

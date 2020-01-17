@@ -13,25 +13,16 @@ namespace controllers\internals;
 
     class Setting extends StandardController
     {
-        protected $model = null;
-
-        /**
-         * Get the model for the Controller
-         * @return \descartes\Model
-         */
-        protected function get_model () : \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Setting($this->bdd);
-            return $this->model;
-        } 
-
+        protected $model;
 
         /**
          * Return all settings of a user.
+         *
          * @param int $id_user : user id
+         *
          * @return array
          */
-        public function gets_for_user (int $id_user)
+        public function gets_for_user(int $id_user)
         {
             $settings = $this->get_model()->gets_for_user($id_user);
             $settings_array = [];
@@ -44,28 +35,30 @@ namespace controllers\internals;
             return $settings_array;
         }
 
-
         /**
          * Update a setting by his name and user id.
-         * @param int $id_user : user id
-         * @param string $name : setting name
-         * @param mixed $value
+         *
+         * @param int    $id_user : user id
+         * @param string $name    : setting name
+         * @param mixed  $value
+         *
          * @return int : number of modified lines
          */
-        public function update_for_user (int $id_user, string $name, $value) : bool
+        public function update_for_user(int $id_user, string $name, $value): bool
         {
             return (bool) $this->get_model()->update_by_name_for_user($id_user, $name, $value);
         }
-        
 
         /**
-         * Create a new setting
-         * @param int $id_user : user id
-         * @param string $name : setting name
-         * @param mixed $value : value of the setting
-         * @return bool 
+         * Create a new setting.
+         *
+         * @param int    $id_user : user id
+         * @param string $name    : setting name
+         * @param mixed  $value   : value of the setting
+         *
+         * @return bool
          */
-        public function create (int $id_user, string $name, $value) : bool
+        public function create(int $id_user, string $name, $value): bool
         {
             $setting = [
                 'id_user' => $id_user,
@@ -76,10 +69,11 @@ namespace controllers\internals;
             return (bool) $this->get_model()->insert($setting);
         }
 
-
         /**
-         * Generate and insert default settings for a user
+         * Generate and insert default settings for a user.
+         *
          * @param int $id_user : user id
+         *
          * @return bool
          */
         public function create_defaults_for_user(int $id_user)
@@ -92,5 +86,17 @@ namespace controllers\internals;
             }
 
             return $all_success;
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Setting($this->bdd);
+
+            return $this->model;
         }
     }

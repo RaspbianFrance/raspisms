@@ -13,7 +13,7 @@ namespace controllers\internals;
 
     /**
      * Some tools frequently used.
-     * Not a standard controller as it's not linked to a model in any way
+     * Not a standard controller as it's not linked to a model in any way.
      */
     class Tool extends \descartes\InternalController
     {
@@ -40,7 +40,7 @@ namespace controllers\internals;
 
                 return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::E164);
             }
-            catch(\Exception $e)
+            catch (\Exception $e)
             {
                 return false;
             }
@@ -62,22 +62,25 @@ namespace controllers\internals;
 
                 return $phone_number_util->format($phone_number_o, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
             }
-            catch(\Exception $e)
+            catch (\Exception $e)
             {
                 return $number;
             }
         }
 
         /**
-         * Format a number and make a link to a discussion with this number
+         * Format a number and make a link to a discussion with this number.
+         *
          * @param string $number : Number to format and make a link for
+         *
          * @return string : Link to the number
          */
-        public static function phone_link ($number)
+        public static function phone_link($number)
         {
-            $number_format = \controllers\internals\Tool::phone_format($number);
+            $number_format = self::phone_format($number);
             $url = \descartes\Router::url('Discussion', 'show', ['number' => $number]);
-            return '<a href="' . self::s($url, false, true, false) . '">' . self::s($number_format, false, true, false) . '</a>';
+
+            return '<a href="'.self::s($url, false, true, false).'">'.self::s($number_format, false, true, false).'</a>';
         }
 
         /**
@@ -132,7 +135,6 @@ namespace controllers\internals;
             return $objectDate && $objectDate->format($format) === $date;
         }
 
-        
         /**
          * Cette fonction retourne un mot de passe généré aléatoirement.
          *
@@ -206,8 +208,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Allow to read an uploaded file
+         * Allow to read an uploaded file.
+         *
          * @param array $file : The array extracted from $_FILES['file']
+         *
          * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error']]
          */
         public static function read_uploaded_file(array $file)
@@ -219,40 +223,41 @@ namespace controllers\internals;
                 'mime_type' => false,
             ];
 
-            if ($file['error'] !== UPLOAD_ERR_OK)
+            if (UPLOAD_ERR_OK !== $file['error'])
             {
                 switch ($file['error'])
                 {
-                    case UPLOAD_ERR_INI_SIZE :
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
+                    case UPLOAD_ERR_INI_SIZE:
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les '.ini_get('upload_max_filesize') / (1000 * 1000).' Mégaoctets.';
+
                         break;
-                    
-                    case UPLOAD_ERR_FORM_SIZE :
+                    case UPLOAD_ERR_FORM_SIZE:
                         $result['content'] = 'Le fichier dépasse la limite de taille.';
+
                         break;
-                    
-                    case UPLOAD_ERR_PARTIAL :
+                    case UPLOAD_ERR_PARTIAL:
                         $result['content'] = 'L\'envoi du fichier a été interrompu.';
-                        break;
 
-                    case UPLOAD_ERR_NO_FILE :
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
                         $result['content'] = 'Aucun fichier n\'a été envoyé.';
+
                         break;
-                    
-                    case UPLOAD_ERR_NO_TMP_DIR :
+                    case UPLOAD_ERR_NO_TMP_DIR:
                         $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
-                        break;
 
-                    case UPLOAD_ERR_CANT_WRITE :
+                        break;
+                    case UPLOAD_ERR_CANT_WRITE:
                         $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
-                        break;
 
-                    case UPLOAD_ERR_EXTENSION :
+                        break;
+                    case UPLOAD_ERR_EXTENSION:
                         $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
+
                         break;
                 }
 
-                return $result;    
+                return $result;
             }
 
             $tmp_filename = $file['tmp_name'] ?? false;
@@ -261,7 +266,7 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $result['mime_type'] = mime_content_type($tmp_filename) == 'text/plain' ? $file['type'] : mime_content_type($tmp_filename);
+            $result['mime_type'] = 'text/plain' === mime_content_type($tmp_filename) ? $file['type'] : mime_content_type($tmp_filename);
 
             $file_handler = fopen($tmp_filename, 'r');
             $result['success'] = true;
@@ -269,11 +274,12 @@ namespace controllers\internals;
 
             return $result;
         }
-        
-        
+
         /**
-         * Allow to upload file
+         * Allow to upload file.
+         *
          * @param array $file : The array extracted from $_FILES['file']
+         *
          * @return array : ['success' => bool, 'content' => file path | error message, 'error_code' => $file['error']]
          */
         public static function upload_file(array $file)
@@ -284,40 +290,41 @@ namespace controllers\internals;
                 'error_code' => $file['error'] ?? 99,
             ];
 
-            if ($file['error'] !== UPLOAD_ERR_OK)
+            if (UPLOAD_ERR_OK !== $file['error'])
             {
                 switch ($file['error'])
                 {
-                    case UPLOAD_ERR_INI_SIZE :
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
+                    case UPLOAD_ERR_INI_SIZE:
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les '.ini_get('upload_max_filesize') / (1000 * 1000).' Mégaoctets.';
+
                         break;
-                    
-                    case UPLOAD_ERR_FORM_SIZE :
+                    case UPLOAD_ERR_FORM_SIZE:
                         $result['content'] = 'Le fichier dépasse la limite de taille.';
+
                         break;
-                    
-                    case UPLOAD_ERR_PARTIAL :
+                    case UPLOAD_ERR_PARTIAL:
                         $result['content'] = 'L\'envoi du fichier a été interrompu.';
-                        break;
 
-                    case UPLOAD_ERR_NO_FILE :
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
                         $result['content'] = 'Aucun fichier n\'a été envoyé.';
+
                         break;
-                    
-                    case UPLOAD_ERR_NO_TMP_DIR :
+                    case UPLOAD_ERR_NO_TMP_DIR:
                         $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
-                        break;
 
-                    case UPLOAD_ERR_CANT_WRITE :
+                        break;
+                    case UPLOAD_ERR_CANT_WRITE:
                         $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
-                        break;
 
-                    case UPLOAD_ERR_EXTENSION :
+                        break;
+                    case UPLOAD_ERR_EXTENSION:
                         $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
+
                         break;
                 }
 
-                return $result;    
+                return $result;
             }
 
             $tmp_filename = $file['tmp_name'] ?? false;
@@ -332,13 +339,13 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $new_file_path = PWD_DATAS . '/' . $md5_filename;
+            $new_file_path = PWD_DATAS.'/'.$md5_filename;
 
             if (file_exists($new_file_path))
             {
                 $result['success'] = true;
                 $result['content'] = $new_file_path;
-                
+
                 return $result;
             }
 
@@ -346,6 +353,7 @@ namespace controllers\internals;
             if (!$success)
             {
                 $result['content'] = 'Impossible d\'écrire le fichier sur le serveur.';
+
                 return $result;
             }
 

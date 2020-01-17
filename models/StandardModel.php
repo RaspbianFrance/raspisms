@@ -13,52 +13,50 @@ namespace models;
 
     /**
      * Abstract class reprensenting the Standard Model
-     * This class implement/define most common methods for models
+     * This class implement/define most common methods for models.
      */
     abstract class StandardModel extends \descartes\Model
     {
         /**
-         * Return table name
-         * @return string 
-         */
-        abstract protected function get_table_name() : string;
-
-        /**
-         * Return all the entries
+         * Return all the entries.
+         *
          * @return array
          */
-        public function get_all ()
+        public function get_all()
         {
             return $this->_select($this->get_table_name());
         }
 
-
         /**
-         * Return an entry by his id
+         * Return an entry by his id.
+         *
          * @param int $id : entry id
+         *
          * @return array
          */
         public function get(int $id)
         {
             return $this->_select_one($this->get_table_name(), ['id' => $id]);
         }
-        
-        
+
         /**
-         * Return an entry by his id for a user
+         * Return an entry by his id for a user.
+         *
          * @param int $id_user : user id
-         * @param int $id : entry id
+         * @param int $id      : entry id
+         *
          * @return array
          */
         public function get_for_user(int $id_user, int $id)
         {
             return $this->_select_one($this->get_table_name(), ['id' => $id, 'id_user' => $id_user]);
         }
-        
-        
+
         /**
-         * Return all entries for a user
+         * Return all entries for a user.
+         *
          * @param int $id_user : user id
+         *
          * @return array
          */
         public function gets_for_user(int $id_user)
@@ -66,25 +64,27 @@ namespace models;
             return $this->_select($this->get_table_name(), ['id_user' => $id_user]);
         }
 
-
         /**
-         * Return a list of entries for a user
-         * @param int $id_user : user id 
-         * @param int $limit  : Number of entry to return
-         * @param int $offset : Number of entry to ignore
+         * Return a list of entries for a user.
+         *
+         * @param int $id_user : user id
+         * @param int $limit   : Number of entry to return
+         * @param int $offset  : Number of entry to ignore
+         *
          * @return array
          */
-        public function list_for_user (int $id_user, $limit, $offset)
+        public function list_for_user(int $id_user, $limit, $offset)
         {
             return $this->_select($this->get_table_name(), ['id_user' => $id_user], null, false, $limit, $offset);
         }
 
-
         /**
-         * Return a list of entries in a group of ids and for a user
-         * @param int $id_user : user id
-         * @param array $ids : ids of entries to find
-         * @return array 
+         * Return a list of entries in a group of ids and for a user.
+         *
+         * @param int   $id_user : user id
+         * @param array $ids     : ids of entries to find
+         *
+         * @return array
          */
         public function gets_in_for_user(int $id_user, $ids)
         {
@@ -92,9 +92,9 @@ namespace models;
             {
                 return [];
             }
-            
+
             $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
+                SELECT * FROM `'.$this->get_table_name().'`
                 WHERE id_user = :id_user 
                 AND id ';
 
@@ -110,22 +110,24 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
-         * Delete a entry by his id for a user
+         * Delete a entry by his id for a user.
+         *
          * @param int $id_user : User id
-         * @param int $id : Entry id
+         * @param int $id      : Entry id
+         *
          * @return int : Number of removed rows
          */
         public function delete_for_user(int $id_user, int $id)
         {
             return $this->_delete($this->get_table_name(), ['id_user' => $id_user, 'id' => $id]);
         }
-        
-        
+
         /**
-         * Delete a entry by his id
+         * Delete a entry by his id.
+         *
          * @param int $id : Entry id
+         *
          * @return int : Number of removed rows
          */
         public function delete(int $id)
@@ -133,24 +135,26 @@ namespace models;
             return $this->_delete($this->get_table_name(), ['id' => $id]);
         }
 
-
         /**
-         * Insert a entry
+         * Insert a entry.
+         *
          * @param array $entry : Entry to insert
+         *
          * @return mixed bool|int : false on error, new entry id else
          */
         public function insert($entry)
         {
             $result = $this->_insert($this->get_table_name(), $entry);
-            return ($result ? $this->_last_id() : false);
+
+            return $result ? $this->_last_id() : false;
         }
 
-
         /**
-         * Update a entry for a user
-         * @param int $id_user : User id
+         * Update a entry for a user.
+         *
+         * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $datas : datas to update
+         * @param array $datas   : datas to update
          *
          * @return int : number of modified rows
          */
@@ -158,11 +162,11 @@ namespace models;
         {
             return $this->_update($this->get_table_name(), $entry, ['id_user' => $id_user, 'id' => $id]);
         }
-        
-        
+
         /**
-         * Update a entry by his id
-         * @param int   $id      : Entry id
+         * Update a entry by his id.
+         *
+         * @param int   $id    : Entry id
          * @param array $datas : datas to update
          *
          * @return int : number of modified rows
@@ -172,14 +176,22 @@ namespace models;
             return $this->_update($this->get_table_name(), $entry, ['id' => $id]);
         }
 
-
         /**
-         * Count number of entry for a user
+         * Count number of entry for a user.
+         *
          * @param int $id_user : User id
+         *
          * @return int : number of entries
          */
         public function count_for_user(int $id_user)
         {
             return $this->_count($this->get_table_name(), ['id_user' => $id_user]);
         }
+
+        /**
+         * Return table name.
+         *
+         * @return string
+         */
+        abstract protected function get_table_name(): string;
     }

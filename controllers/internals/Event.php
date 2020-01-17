@@ -13,42 +13,36 @@ namespace controllers\internals;
 
     class Event extends StandardController
     {
-        protected $model = null;
+        protected $model;
 
         /**
-         * Get the model for the Controller
-         * @return \descartes\Model
+         * Disabled methods.
          */
-        protected function get_model () : \descartes\Model
+        public function update_for_user()
         {
-            $this->model = $this->model ?? new \models\Event($this->bdd);
-            return $this->model;
-        } 
-
+            return false;
+        }
 
         /**
-         * Disabled methods
-         */
-        public function update_for_user() { return false; }
-
-
-        /**
-         * Gets lasts x events for a user order by date
-         * @param int $id_user : User id
+         * Gets lasts x events for a user order by date.
+         *
+         * @param int $id_user  : User id
          * @param int $nb_entry : Number of events to return
+         *
          * @return array
          */
-        public function get_lasts_by_date_for_user (int $id_user, int $nb_entry)
+        public function get_lasts_by_date_for_user(int $id_user, int $nb_entry)
         {
             return $this->get_model()->get_lasts_by_date_for_user($id_user, $nb_entry);
         }
 
-
         /**
-         * Create a new event
-         * @param int $id_user : user id
+         * Create a new event.
+         *
+         * @param int   $id_user : user id
          * @param mixed $type
          * @param mixed $text
+         *
          * @return mixed bool : false on fail, new event id else
          */
         public function create($id_user, $type, $text)
@@ -60,5 +54,17 @@ namespace controllers\internals;
             ];
 
             return $this->get_model()->insert($event);
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Event($this->bdd);
+
+            return $this->model;
         }
     }

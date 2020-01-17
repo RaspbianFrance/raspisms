@@ -70,7 +70,6 @@ namespace controllers\publics;
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
 
-
         /**
          * Update user email.
          *
@@ -117,8 +116,7 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
-        
-        
+
         /**
          * Update user api key.
          *
@@ -147,7 +145,6 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Account', 'show'));
         }
-
 
         /**
          * Delete a user.

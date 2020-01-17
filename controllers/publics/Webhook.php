@@ -30,7 +30,7 @@ namespace controllers\publics;
         }
 
         /**
-         * List all webhooks 
+         * List all webhooks.
          *
          * @param mixed $page
          */
@@ -42,7 +42,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Delete a list of webhooks
+         * Delete a list of webhooks.
          *
          * @param array int $_GET['ids'] : Les id des webhooks à supprimer
          * @param mixed     $csrf
@@ -77,7 +77,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Edit a list of webhooks
+         * Edit a list of webhooks.
          *
          * @param array int $_GET['ids'] : ids of webhooks to edit
          */
@@ -93,10 +93,10 @@ namespace controllers\publics;
         }
 
         /**
-         * Insert a new webhook
+         * Insert a new webhook.
          *
          * @param $csrf : Le jeton CSRF
-         * @param string $_POST['url']   : URL to call on webhook release
+         * @param string $_POST['url']  : URL to call on webhook release
          * @param string $_POST['type'] : Type of webhook, either 'send_sms' or 'receive_sms'
          *
          * @return boolean;
