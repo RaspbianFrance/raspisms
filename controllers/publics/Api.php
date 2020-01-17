@@ -28,11 +28,15 @@ namespace controllers\publics;
             'NONE' => 0,
             'INVALID_CREDENTIALS' => 1,
             'INVALID_PARAMETER' => 2,
+            'MISSING_PARAMETER' => 4,
+            'CANNOT_CREATE' => 8,
         ];
 
         CONST ERROR_MESSAGES = [
             'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API as GET parameter "api_key".',
             'INVALID_PARAMETER' => 'You have specified an invalid parameter : ',
+            'MISSING_PARAMETER' => 'One require parameter is missing : ',
+            'CANNOT_CREATE' => 'Cannot create a new entry.',
         ];
         
 
@@ -147,6 +151,124 @@ namespace controllers\publics;
 
             $this->auto_http_code(true);
             $this->json($return);
+        }
+
+
+        /**
+         * Schedule a message to be send
+         * @param string $_POST['at'] : Date to send message at format Y-m-d H:i:s
+         * @param string $_POST['text'] : Text of the message to send
+         * @param string $_POST['origin'] : Default null. Number to send the message from. If null use a random phone
+         * @param string $_POST['flash'] : Default false. Is the sms a flash sms.
+         * @param string $_POST['numbers'] : Array of numbers to send message to
+         * @param string $_POST['contacts'] : Array of ids of contacts to send message to
+         * @param string $_POST['groups'] : Array of ids of groups to send message to
+         * @param string $_POST['conditional_groups'] : Array of ids of conditional groups to send message to
+         * @return Id of scheduled created
+         */
+        public function post_scheduled ()
+        {
+            $at = $_POST['at'] ?? false;
+            $text = $_POST['text'] ?? false;
+            $origin = empty($_POST['origin']) ? null : $_POST['origin'];
+            $flash = (bool) ($_POST['flash'] ?? false);
+            $numbers = $_POST['numbers'] ?? []; 
+            $contacts = $_POST['contacts'] ?? []; 
+            $groups = $_POST['groups'] ?? []; 
+            $conditional_groups = $_POST['conditional_groups'] ?? [];
+
+            if (!$at || !$text)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($at ? '' : 'at ') . ($text ? '' : 'text');
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                return false;
+            }
+
+            if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s'))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                return false;
+            }
+
+            foreach ($numbers as $key => $number)
+            {
+                $number = \controllers\internals\Tool::parse_phone($number);
+
+                if (!$number)
+                {
+                    unset($numbers[$key]);
+                    continue;
+                }
+
+                $numbers[$key] = $number;
+            }
+
+            if (!$numbers && !$contacts && !$groups && !$conditional_groups)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'You must specify at least one valid number, contact, group or conditional_group.';
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                return false;
+            }
+
+            if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'origin : You must specify an origin number among thoses of user phones.';
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                return false;
+            }
+
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
+            if (!$scheduled_id)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                return false;
+            }
+
+            $return = self::DEFAULT_RETURN;
+            $return['response'] = $scheduled_id;
+            $this->auto_http_code(true);
+            $this->json($return);
+        }
+
+
+        /**
+         * Delete a scheduled message
+         * @param int $id : Id of scheduled message to delete
+         * @return void on success, error else
+         */
+        public function delete_scheduled (int $id) 
+        {
+            $success = $this->internal_scheduled->delete_for_user($this->user['id'], $id);
+
+            if (!$success)
+            {
+                $this->auto_http_code(false);
+                return false;            
+            }
+
+            $this->auto_http_code(true);
         }
 
     }

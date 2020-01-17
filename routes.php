@@ -189,6 +189,12 @@
                 '/api/list/{entry_type}/',
                 '/api/list/{entry_type}/{page}/',
             ],
+            'post_scheduled' => [
+                '/api/scheduled/',
+            ],
+            'delete_scheduled' => [
+                '/api/scheduled/{id}/',
+            ],
         ],
     );
 
