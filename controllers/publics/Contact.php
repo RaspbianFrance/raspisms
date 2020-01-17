@@ -306,10 +306,10 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            $msg = $result.' nouveau contact a été inséré.';
+            $msg = $result . ' nouveau contact a été inséré.';
             if ($result > 1)
             {
-                $msg = $result.' nouveaux contacts ont été insérés.';
+                $msg = $result . ' nouveaux contacts ont été insérés.';
             }
 
             \FlashMessage\FlashMessage::push('success', $msg);

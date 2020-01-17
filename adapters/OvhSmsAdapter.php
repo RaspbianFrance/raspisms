@@ -168,7 +168,7 @@ namespace adapters;
             {
                 $success = true;
 
-                $endpoint = '/sms/'.$this->datas['service_name'].'/virtualNumbers/'.$this->formatted_number.'/jobs';
+                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/jobs';
                 $params = [
                     'message' => $text,
                     'receivers' => [$destination],
@@ -203,7 +203,7 @@ namespace adapters;
             {
                 $success = true;
 
-                $endpoint = '/sms/'.$this->datas['service_name'].'/virtualNumbers/'.$this->formatted_number.'/incoming';
+                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
                 $uids = $this->api->get($endpoint);
 
                 if (!\is_array($uids) || !$uids)
@@ -214,7 +214,7 @@ namespace adapters;
                 $received_smss = [];
                 foreach ($uids as $uid)
                 {
-                    $endpoint = '/sms/'.$this->datas['service_name'].'/virtualNumbers/'.$this->formatted_number.'/incoming/'.$uid;
+                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
                     $sms_details = $this->api->get($endpoint);
 
                     if (!isset($sms_details['creationDatetime'], $sms_details['message'], $sms_details['sender']))
@@ -230,7 +230,7 @@ namespace adapters;
                     ];
 
                     //Remove the sms to prevent double reading as ovh do not offer a filter for unread messages only
-                    $endpoint = '/sms/'.$this->datas['service_name'].'/virtualNumbers/'.$this->formatted_number.'/incoming/'.$uid;
+                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
                     $this->api->delete($endpoint);
                 }
 
@@ -255,12 +255,12 @@ namespace adapters;
                 $success = true;
 
                 //Check service name
-                $endpoint = '/sms/'.$this->datas['service_name'];
+                $endpoint = '/sms/' . $this->datas['service_name'];
                 $response = $this->api->get($endpoint);
                 $success = $success && (bool) $response;
 
                 //Check virtualnumber
-                $endpoint = '/sms/virtualNumbers/'.$this->formatted_number;
+                $endpoint = '/sms/virtualNumbers/' . $this->formatted_number;
                 $response = $this->api->get($endpoint);
 
                 return $success && (bool) $response;

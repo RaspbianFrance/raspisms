@@ -37,9 +37,9 @@ class Phone extends AbstractDaemon
         $this->phone = $phone;
         $this->msg_queue_id = (int) mb_substr($this->phone['number'], 1);
 
-        $name = 'RaspiSMS Daemon Phone '.$this->phone['number'];
+        $name = 'RaspiSMS Daemon Phone ' . $this->phone['number'];
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = false; //Phone should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
@@ -83,21 +83,21 @@ class Phone extends AbstractDaemon
         $adapter_class = $this->phone['adapter'];
         $this->adapter = new $adapter_class($this->phone['number'], $this->phone['adapter_datas']);
 
-        $this->logger->info('Starting Phone daemon with pid '.getmypid());
+        $this->logger->info('Starting Phone daemon with pid ' . getmypid());
     }
 
     public function on_stop()
     {
         //Delete queue on daemon close
-        $this->logger->info('Closing queue : '.$this->msg_queue_id);
+        $this->logger->info('Closing queue : ' . $this->msg_queue_id);
         msg_remove_queue($this->msg_queue);
 
-        $this->logger->info('Stopping Phone daemon with pid '.getmypid());
+        $this->logger->info('Stopping Phone daemon with pid ' . getmypid());
     }
 
     public function handle_other_signals($signal)
     {
-        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
+        $this->logger->info('Signal not handled by ' . $this->name . ' Daemon : ' . $signal);
     }
 
     /**
@@ -118,7 +118,7 @@ class Phone extends AbstractDaemon
 
             if (!$success && MSG_ENOMSG !== $error_code)
             {
-                $this->logger->critical('Error reading MSG SEND Queue, error code : '.$error_code);
+                $this->logger->critical('Error reading MSG SEND Queue, error code : ' . $error_code);
 
                 return false;
             }
@@ -140,12 +140,12 @@ class Phone extends AbstractDaemon
 
             $message['at'] = $at;
 
-            $this->logger->info('Try send message : '.json_encode($message));
+            $this->logger->info('Try send message : ' . json_encode($message));
 
             $sended_sms_uid = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
             if (!$sended_sms_uid)
             {
-                $this->logger->error('Failed send message : '.json_encode($message));
+                $this->logger->error('Failed send message : ' . json_encode($message));
                 $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
 
                 continue;
@@ -156,7 +156,7 @@ class Phone extends AbstractDaemon
             $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
             $this->process_for_webhook($message, 'send_sms', $user_settings);
 
-            $this->logger->info('Successfully send message : '.json_encode($message));
+            $this->logger->info('Successfully send message : ' . json_encode($message));
 
             $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
         }
@@ -182,7 +182,7 @@ class Phone extends AbstractDaemon
         //Process smss
         foreach ($smss as $sms)
         {
-            $this->logger->info('Receive message : '.json_encode($sms));
+            $this->logger->info('Receive message : ' . json_encode($sms));
 
             $command_result = $this->process_for_command($sms);
             $this->logger->info('after command');
@@ -254,7 +254,7 @@ class Phone extends AbstractDaemon
             $success = msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $message, true, true, $error_code);
             if (!$success)
             {
-                $this->logger->critical('Failed send webhook message in queue, error code : '.$error_code);
+                $this->logger->critical('Failed send webhook message in queue, error code : ' . $error_code);
             }
         }
     }
@@ -280,7 +280,7 @@ class Phone extends AbstractDaemon
             return false;
         }
 
-        $this->logger->info('Transfer sms to '.$user['email'].' : '.json_encode($sms));
+        $this->logger->info('Transfer sms to ' . $user['email'] . ' : ' . json_encode($sms));
 
         \controllers\internals\Tool::send_email($user['email'], EMAIL_TRANSFER_SMS, ['sms' => $sms]);
     }

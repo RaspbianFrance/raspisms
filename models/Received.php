@@ -27,7 +27,7 @@ namespace models;
         public function get_for_user(int $id_user, int $id)
         {
             $query = ' 
-                SELECT * FROM `'.$this->get_table_name().'`
+                SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 AND id = :id
             ';
@@ -52,7 +52,7 @@ namespace models;
         public function gets_for_user(int $id_user)
         {
             $query = ' 
-                SELECT * FROM `'.$this->get_table_name().'`
+                SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
             ';
 
@@ -78,7 +78,7 @@ namespace models;
             $query = ' 
                 SELECT * FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                LIMIT '.$limit.' OFFSET '.$offset;
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
 
             $params = [
                 'id_user' => $id_user,
@@ -103,7 +103,7 @@ namespace models;
                 SELECT * FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 AND status = \'unread\'
-                LIMIT '.$limit.' OFFSET '.$offset;
+                LIMIT ' . $limit . ' OFFSET ' . $offset;
 
             $params = [
                 'id_user' => $id_user,
@@ -174,13 +174,13 @@ namespace models;
             foreach ($datas as $label => $value)
             {
                 $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_'.$label] = $value;
-                $sets[] = '`'.$label.'` = :set_'.$label.' ';
+                $params['set_' . $label] = $value;
+                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
             }
 
             $query = '
                 UPDATE `received`
-                SET '.implode(', ', $sets).'
+                SET ' . implode(', ', $sets) . '
                 WHERE id = :id
                 AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
             ';
@@ -259,7 +259,7 @@ namespace models;
                 FROM received
                 WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
                 ORDER BY at ASC
-                LIMIT '.$nb_entry;
+                LIMIT ' . $nb_entry;
 
             $params = [
                 'id_user' => $id_user,

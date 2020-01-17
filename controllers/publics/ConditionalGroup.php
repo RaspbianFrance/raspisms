@@ -227,7 +227,7 @@ namespace controllers\publics;
                 $contacts_name[] = $contact['name'];
             }
 
-            $return['result'] = 'Contacts du groupe : '.implode(', ', $contacts_name);
+            $return['result'] = 'Contacts du groupe : ' . implode(', ', $contacts_name);
             $return['success'] = true;
             echo json_encode($return);
 

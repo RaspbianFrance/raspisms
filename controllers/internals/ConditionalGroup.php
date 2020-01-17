@@ -46,7 +46,7 @@ namespace controllers\internals;
             }
 
             $internal_event = new Event($this->bdd);
-            $internal_event->create($id_user, 'CONDITIONAL_GROUP_ADD', 'Ajout du groupe conditionnel : '.$name);
+            $internal_event->create($id_user, 'CONDITIONAL_GROUP_ADD', 'Ajout du groupe conditionnel : ' . $name);
 
             return $id_group;
         }

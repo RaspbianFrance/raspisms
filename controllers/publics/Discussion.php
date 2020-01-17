@@ -122,7 +122,7 @@ namespace controllers\publics;
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
-                    'md5' => md5($received['at'].$received['text']),
+                    'md5' => md5($received['at'] . $received['text']),
                 ];
             }
 

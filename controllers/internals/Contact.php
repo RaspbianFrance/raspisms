@@ -79,7 +79,7 @@ namespace controllers\internals;
             }
 
             $internal_event = new Event($this->bdd);
-            $internal_event->create($id_user, 'CONTACT_ADD', 'Ajout contact : '.$name.' ('.\controllers\internals\Tool::phone_format($number).')');
+            $internal_event->create($id_user, 'CONTACT_ADD', 'Ajout contact : ' . $name . ' (' . \controllers\internals\Tool::phone_format($number) . ')');
 
             return $result;
         }
@@ -288,7 +288,7 @@ namespace controllers\internals;
 
             //Php only support csv formatting to file. To get it in string we need to create a tmp in memory file, write in it, and then read the file into a var
             // output up to 5MB is kept in memory, if it becomes bigger it will automatically be written to a temporary file
-            $csv_tmp_file = fopen('php://temp/maxmemory:'.(5 * 1024 * 1024), 'r+');
+            $csv_tmp_file = fopen('php://temp/maxmemory:' . (5 * 1024 * 1024), 'r+');
             fputcsv($csv_tmp_file, $columns);
             foreach ($lines as $line)
             {
@@ -302,7 +302,7 @@ namespace controllers\internals;
                 'headers' => [
                     'Content-Disposition: attachment; filename=contacts.csv',
                     'Content-Type: text/csv',
-                    'Content-Length: '.\mb_strlen($csv_string),
+                    'Content-Length: ' . mb_strlen($csv_string),
                 ],
                 'content' => $csv_string,
             ];
@@ -331,7 +331,7 @@ namespace controllers\internals;
                 'headers' => [
                     'Content-Disposition: attachment; filename=contacts.json',
                     'Content-Type: application/json',
-                    'Content-Length: '.\mb_strlen($content),
+                    'Content-Length: ' . mb_strlen($content),
                 ],
                 'content' => $content,
             ];

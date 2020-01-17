@@ -94,7 +94,7 @@ namespace models;
             }
 
             $query = ' 
-                SELECT * FROM `'.$this->get_table_name().'`
+                SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE id_user = :id_user 
                 AND id ';
 

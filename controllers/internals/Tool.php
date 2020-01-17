@@ -80,7 +80,7 @@ namespace controllers\internals;
             $number_format = self::phone_format($number);
             $url = \descartes\Router::url('Discussion', 'show', ['number' => $number]);
 
-            return '<a href="'.self::s($url, false, true, false).'">'.self::s($number_format, false, true, false).'</a>';
+            return '<a href="' . self::s($url, false, true, false) . '">' . self::s($number_format, false, true, false) . '</a>';
         }
 
         /**
@@ -228,7 +228,7 @@ namespace controllers\internals;
                 switch ($file['error'])
                 {
                     case UPLOAD_ERR_INI_SIZE:
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les '.ini_get('upload_max_filesize') / (1000 * 1000).' Mégaoctets.';
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
 
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
@@ -295,7 +295,7 @@ namespace controllers\internals;
                 switch ($file['error'])
                 {
                     case UPLOAD_ERR_INI_SIZE:
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les '.ini_get('upload_max_filesize') / (1000 * 1000).' Mégaoctets.';
+                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
 
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
@@ -339,7 +339,7 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $new_file_path = PWD_DATAS.'/'.$md5_filename;
+            $new_file_path = PWD_DATAS . '/' . $md5_filename;
 
             if (file_exists($new_file_path))
             {

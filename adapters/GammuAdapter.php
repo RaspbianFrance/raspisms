@@ -198,7 +198,7 @@ namespace adapters;
             }
 
             $command_parts = [
-                PWD.'/bin/gammu_get_unread_sms.py',
+                PWD . '/bin/gammu_get_unread_sms.py',
                 escapeshellarg($this->datas['config_file']),
             ];
 

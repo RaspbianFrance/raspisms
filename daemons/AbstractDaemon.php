@@ -96,9 +96,9 @@ abstract class AbstractDaemon
     protected function start()
     {
         //If process must be uniq and a process with the same pid file is already running
-        if (file_exists($this->pid_dir.'/'.$this->name.'.pid') && $this->uniq)
+        if (file_exists($this->pid_dir . '/' . $this->name . '.pid') && $this->uniq)
         {
-            $this->logger->info('Another process named '.$this->name.' is already running.');
+            $this->logger->info('Another process named ' . $this->name . ' is already running.');
 
             return false;
         }
@@ -119,7 +119,7 @@ abstract class AbstractDaemon
                 return true;
             }
 
-            $this->logger->info("Process {$this->name} started as a child with pid ".getmypid().'.');
+            $this->logger->info("Process {$this->name} started as a child with pid " . getmypid() . '.');
 
             //Child script
             $sid = posix_setsid(); //Try to make the child process a main process
@@ -129,7 +129,7 @@ abstract class AbstractDaemon
                 exit(1);
             }
 
-            $this->logger->info('The child process with pid '.getmypid().' is now independent.');
+            $this->logger->info('The child process with pid ' . getmypid() . ' is now independent.');
         }
 
         //Create pid dir if not exists
@@ -138,7 +138,7 @@ abstract class AbstractDaemon
             $success = mkdir($this->pid_dir, 0777, true);
             if (!$success)
             {
-                $this->logger->critical('Cannot create PID directory : '.$this->pid_dir);
+                $this->logger->critical('Cannot create PID directory : ' . $this->pid_dir);
                 exit(2);
             }
         }
@@ -147,7 +147,7 @@ abstract class AbstractDaemon
         cli_set_process_title($this->name);
 
         //Write the pid of the process into a file
-        file_put_contents($this->pid_dir.'/'.$this->name.'.pid', getmypid());
+        file_put_contents($this->pid_dir . '/' . $this->name . '.pid', getmypid());
 
         //Really start the daemon
         $this->on_start();
@@ -162,16 +162,16 @@ abstract class AbstractDaemon
         }
         catch (\Exception $e)
         {
-            $this->logger->critical('Exception : '.$e->getMessage().' in '.$e->getFile().' line '.$e->getLine());
+            $this->logger->critical('Exception : ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
         }
 
         //Stop the daemon
         $this->on_stop();
 
         //Delete pid file
-        if (file_exists($this->pid_dir.'/'.$this->name.'.pid'))
+        if (file_exists($this->pid_dir . '/' . $this->name . '.pid'))
         {
-            unlink($this->pid_dir.'/'.$this->name.'.pid');
+            unlink($this->pid_dir . '/' . $this->name . '.pid');
         }
     }
 

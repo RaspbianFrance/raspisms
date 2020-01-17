@@ -56,7 +56,7 @@ namespace controllers\internals;
             {
                 $date = date('Y-m-d H:i:s');
                 $internal_event = new Event($this->bdd);
-                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le '.$date.'.');
+                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
 
                 return false;
             }

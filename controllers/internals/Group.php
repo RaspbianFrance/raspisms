@@ -53,7 +53,7 @@ namespace controllers\internals;
             }
 
             $internal_event = new Event($this->bdd);
-            $internal_event->create($id_user, 'GROUP_ADD', 'Ajout group : '.$name);
+            $internal_event->create($id_user, 'GROUP_ADD', 'Ajout group : ' . $name);
 
             return $id_group;
         }

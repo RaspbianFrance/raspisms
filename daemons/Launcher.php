@@ -29,7 +29,7 @@ class Launcher extends AbstractDaemon
         $name = 'RaspiSMS Daemon Launcher';
 
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = true; //Launcher should be rattach to PID 1
         $additional_signals = [];
@@ -63,7 +63,7 @@ class Launcher extends AbstractDaemon
     public function start_sender_daemon()
     {
         $name = 'RaspiSMS Daemon Sender';
-        $pid_file = PWD_PID.'/'.$name.'.pid';
+        $pid_file = PWD_PID . '/' . $name . '.pid';
 
         if (file_exists($pid_file))
         {
@@ -72,7 +72,7 @@ class Launcher extends AbstractDaemon
 
         //Create a new daemon for sender
         $pid = null;
-        exec('php '.PWD.'/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
+        exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
     }
 
     /**
@@ -81,7 +81,7 @@ class Launcher extends AbstractDaemon
     public function start_webhook_daemon()
     {
         $name = 'RaspiSMS Daemon Webhook';
-        $pid_file = PWD_PID.'/'.$name.'.pid';
+        $pid_file = PWD_PID . '/' . $name . '.pid';
 
         if (file_exists($pid_file))
         {
@@ -89,7 +89,7 @@ class Launcher extends AbstractDaemon
         }
 
         //Create a new daemon for webhook
-        exec('php '.PWD.'/console.php controllers/internals/Console.php webhook > /dev/null 2>&1 &');
+        exec('php ' . PWD . '/console.php controllers/internals/Console.php webhook > /dev/null 2>&1 &');
     }
 
     /**
@@ -101,8 +101,8 @@ class Launcher extends AbstractDaemon
     {
         foreach ($phones as $phone)
         {
-            $phone_name = 'RaspiSMS Daemon Phone '.$phone['number'];
-            $pid_file = PWD_PID.'/'.$phone_name.'.pid';
+            $phone_name = 'RaspiSMS Daemon Phone ' . $phone['number'];
+            $pid_file = PWD_PID . '/' . $phone_name . '.pid';
 
             if (file_exists($pid_file))
             {
@@ -110,22 +110,22 @@ class Launcher extends AbstractDaemon
             }
 
             //Create a new daemon for the phone
-            exec('php '.PWD.'/console.php controllers/internals/Console.php phone --id_phone=\''.$phone['id'].'\' > /dev/null 2>&1 &');
+            exec('php ' . PWD . '/console.php controllers/internals/Console.php phone --id_phone=\'' . $phone['id'] . '\' > /dev/null 2>&1 &');
         }
     }
 
     public function on_start()
     {
-        $this->logger->info('Starting Launcher with pid '.getmypid());
+        $this->logger->info('Starting Launcher with pid ' . getmypid());
     }
 
     public function on_stop()
     {
-        $this->logger->info('Stopping Launcher with pid '.getmypid());
+        $this->logger->info('Stopping Launcher with pid ' . getmypid());
     }
 
     public function handle_other_signals($signal)
     {
-        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
+        $this->logger->info('Signal not handled by ' . $this->name . ' Daemon : ' . $signal);
     }
 }

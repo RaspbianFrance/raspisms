@@ -104,14 +104,14 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'entry_type must be one of : '.implode(', ', $entry_types).'.';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'entry_type must be one of : ' . implode(', ', $entry_types) . '.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
                 return false;
             }
 
-            $controller_str = 'internal_'.$entry_type;
+            $controller_str = 'internal_' . $entry_type;
             $controller = $this->{$controller_str};
 
             $page = (int) $page;
@@ -184,7 +184,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'].($at ? '' : 'at ').($text ? '' : 'text');
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($at ? '' : 'at ') . ($text ? '' : 'text');
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -195,7 +195,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'at must be a date of format "Y-m-d H:i:s".';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -220,7 +220,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'].'You must specify at least one valid number, contact, group or conditional_group.';
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'You must specify at least one valid number, contact, group or conditional_group.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -231,7 +231,7 @@ namespace controllers\publics;
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'].'origin : You must specify an origin number among thoses of user phones.';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'origin : You must specify an origin number among thoses of user phones.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
@@ -260,6 +260,7 @@ namespace controllers\publics;
          * Delete a scheduled message.
          *
          * @param int $id : Id of scheduled message to delete
+         *
          * @return bool : void
          */
         public function delete_scheduled(int $id)
@@ -274,6 +275,7 @@ namespace controllers\publics;
             }
 
             $this->auto_http_code(true);
+
             return true;
         }
     }

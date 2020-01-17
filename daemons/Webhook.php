@@ -34,7 +34,7 @@ class Webhook extends AbstractDaemon
     {
         $name = 'RaspiSMS Daemon Webhook';
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS.'/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = false; //Sended should be rattach to manager, so manager can stop him easily
         $additional_signals = [];
@@ -60,7 +60,7 @@ class Webhook extends AbstractDaemon
             $success = msg_receive($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $msgtype, $maxsize, $message, true, 0, $error_code);
             if (!$success)
             {
-                $this->logger->critical('Error for webhook queue reading, error code : '.$error_code);
+                $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
             }
 
             if (!$message)
@@ -70,7 +70,7 @@ class Webhook extends AbstractDaemon
                 continue;
             }
 
-            $this->logger->info('Trigger webhook : '.json_encode($message));
+            $this->logger->info('Trigger webhook : ' . json_encode($message));
 
             //Do the webhook http query
             $curl = curl_init();
@@ -92,20 +92,20 @@ class Webhook extends AbstractDaemon
 
         $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
 
-        $this->logger->info('Starting Webhook daemon with pid '.getmypid());
+        $this->logger->info('Starting Webhook daemon with pid ' . getmypid());
     }
 
     public function on_stop()
     {
         //Delete queue on daemon close
-        $this->logger->info('Closing queue : '.QUEUE_ID_WEBHOOK);
+        $this->logger->info('Closing queue : ' . QUEUE_ID_WEBHOOK);
         msg_remove_queue($this->webhook_queue);
 
-        $this->logger->info('Stopping Webhook daemon with pid '.getmypid());
+        $this->logger->info('Stopping Webhook daemon with pid ' . getmypid());
     }
 
     public function handle_other_signals($signal)
     {
-        $this->logger->info('Signal not handled by '.$this->name.' Daemon : '.$signal);
+        $this->logger->info('Signal not handled by ' . $this->name . ' Daemon : ' . $signal);
     }
 }

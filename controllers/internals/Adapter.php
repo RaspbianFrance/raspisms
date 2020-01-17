@@ -72,7 +72,7 @@ namespace controllers\internals;
                     continue;
                 }
 
-                $adapters_files[] = PWD_ADAPTERS.'/'.$filename;
+                $adapters_files[] = PWD_ADAPTERS . '/' . $filename;
             }
 
             return $adapters_files;
@@ -95,7 +95,7 @@ namespace controllers\internals;
             }
 
             $adapter_classname = pathinfo($adapter_file, PATHINFO_FILENAME);
-            $reflection_class = new \ReflectionClass('\adapters\\'.$adapter_classname);
+            $reflection_class = new \ReflectionClass('\adapters\\' . $adapter_classname);
             if (!$reflection_class)
             {
                 return false;

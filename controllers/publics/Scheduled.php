@@ -297,7 +297,7 @@ namespace controllers\publics;
             $media = $_FILES['media'] ?? false;
             if (!($_SESSION['user']['settings']['mms'] ?? false) || !$media)
             {
-                \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le '.$at.'.');
+                \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
 
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
@@ -310,7 +310,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
-            \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le '.$at.'.');
+            \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
 
             return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
         }
