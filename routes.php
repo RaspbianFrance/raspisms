@@ -183,6 +183,13 @@
         'Callback' => [
             'update_sended_status' => '/callback/status/{adapter_name}/',
         ],
+        
+        'Api' => [
+            'get_entries' => [
+                '/api/list/{entry_type}/',
+                '/api/list/{entry_type}/{page}/',
+            ],
+        ],
     );
 
     define('ROUTES', $routes);
