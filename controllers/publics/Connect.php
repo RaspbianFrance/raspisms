@@ -151,8 +151,8 @@ namespace controllers\publics;
          */
         public function logout()
         {
-            session_unset();
             session_destroy();
+            $_SESSION = [];
 
             return $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
