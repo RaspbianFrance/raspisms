@@ -3,3 +3,7 @@
 .php_cs.cache
 vendor/
 composer.lock
+env.*
+phinx.*
+
+!*.dist
