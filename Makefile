@@ -7,25 +7,24 @@ ENV=prod
 all: install
 
 
-vendor: composer.phar composer.json
-	raspisms/composer.phar self-update
-	raspisms/composer.phar install
+vendor: raspisms/composer.phar raspisms/composer.json
+	cd raspisms && ./composer.phar self-update
+	cd raspisms && ./composer.phar install
 
 
 
 migrate: vendor
-	raspisms/vendor/bin/phinx migrate --environment=$(ENV)
+	cd raspisms && ./vendor/bin/phinx migrate --environment=$(ENV)
 
 
 install: vendor migrate
 	chmod -R 750 .
-	install -m750 -d $(INSTALL_DIR)
-	install -d ./src $(INSTALL_DIR)
+	install -m750 -d $(INSTALL_DIR) 
+	cp -Tr raspisms $(INSTALL_DIR)
 
 
 
 clean:
-	rm -rf vendor/
 	
 
 uninstall:
@@ -33,5 +32,5 @@ uninstall:
 
 
 fix:
-	raspisms/tests/php-cs-fixer/run.php fix
-	raspisms/tests/phpstan/run.php analyse
+	cd raspisms && ./tests/php-cs-fixer/run.php fix
+	cd raspisms && ./tests/phpstan/run.php analyse
