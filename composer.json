@@ -1,4 +1,6 @@
 {
+    "name": "raspbianfrance/raspisms",
+    "description": "A web based GSM messages administration tool.",
     "require": {
         "ingenerator/tokenista": "^1.1",
         "ajani/flash-message": "^2.0",
