@@ -18,8 +18,10 @@ migrate: vendor
 
 
 install: vendor migrate
-	install -d $(INSTALL_DIR)
-	install . $(INSTALL_DIR)
+	chmod -R 750 .
+	install -m750 -d $(INSTALL_DIR)
+	cp -a . $(INSTALL_DIR)
+
 
 
 clean:
