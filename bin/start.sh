@@ -19,7 +19,7 @@ fi
 if [ ! -f $LOG_FILE ]
 then
     touch $LOG_FILE
-    chmod 777 $LOG_FILE
+    chmod 700 $LOG_FILE
 fi
 
 #Run command to start daemons
