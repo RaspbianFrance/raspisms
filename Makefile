@@ -18,7 +18,8 @@ migrate: vendor
 
 
 install: vendor migrate
-		
+	cp -r . $(INSTALL_DIR)
+
 
 clean:
 	rm -rf vendor/
