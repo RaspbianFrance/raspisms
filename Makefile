@@ -1,4 +1,4 @@
-.PHONY: all install composer_install vendor migrate clean fix:
+.PHONY: all install composer_install vendor migrate clean fix
 
 INSTALL_DIR=$(DESTDIR)/opt/raspisms2
 ENV=prod
