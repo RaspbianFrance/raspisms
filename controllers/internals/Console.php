@@ -58,4 +58,21 @@ namespace controllers\internals;
 
             new \daemons\Phone($phone);
         }
+
+
+        /**
+         * Create a user
+         * @param $email : User email
+         * @param $password : User password
+         * @param $admin : Is user admin
+         * @param $api_key : User API key, if null random api key is generated 
+         */
+        public function create_user (string $email, string $password, bool $admin, ?string $api_key = null)
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_user = new \controllers\internals\User($bdd);
+
+            $success = $internal_user->create($email, $password, $admin, $api_key);
+            exit ((int) !$success);
+        }
     }
