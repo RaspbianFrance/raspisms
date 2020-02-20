@@ -14,4 +14,12 @@
     }
 
     //Routing current query
-    descartes\Router::route(ROUTES, $_SERVER['REQUEST_URI']);
+    try 
+    {
+        descartes\Router::route(ROUTES, $_SERVER['REQUEST_URI']);
+    }
+    catch (\descartes\exceptions\DescartesException404 $e)
+    {
+        $controller = new \controllers\internals\HttpError();
+        $controller->_404();
+    }
