@@ -35,36 +35,42 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped" id="table-phones">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Numéro</th>
-                                                <th>Adaptateur</th>
-                                                <th style="width:5%;">Sélectionner</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php foreach ($phones as $phone) { ?>
-                                            <tr>
-                                                <td><?php $this->s($phone['id']); ?></td>
-                                                <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['number'])); ?></td>
-                                                <td><?php $this->s($phone['adapter']); ?></td>
-                                                <td><input type="checkbox" value="<?php $this->s($phone['id']); ?>" name="ids[]"></td>
-                                            </tr>
-                                        <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <?php if (!$phones) { ?>
+                                    <p>Aucun téléphone utilisable n'a été ajouté pour le moment.</p>
+                                <?php } else { ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover table-striped" id="table-phones">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Numéro</th>
+                                                    <th>Adaptateur</th>
+                                                    <th style="width:5%;">Sélectionner</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($phones as $phone) { ?>
+                                                <tr>
+                                                    <td><?php $this->s($phone['id']); ?></td>
+                                                    <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['number'])); ?></td>
+                                                    <td><?php $this->s($phone['adapter']); ?></td>
+                                                    <td><input type="checkbox" value="<?php $this->s($phone['id']); ?>" name="ids[]"></td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php } ?>
                                     <div>
                                         <div class="col-xs-6 no-padding">
                                             <a class="btn btn-success" href="<?php echo \descartes\Router::url('Phone', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un téléphone</a>
                                         </div>
-                                        <div class="text-right col-xs-6 no-padding">
-                                            <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                        </div>
+                                        <?php if ($phones) { ?>
+                                            <div class="text-right col-xs-6 no-padding">
+                                                <strong>Action pour la séléction :</strong>
+                                                <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                            </div>
+                                        <?php } ?>
                                     </div>
                                 </div>
                             </form>
