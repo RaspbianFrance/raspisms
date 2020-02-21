@@ -1,6 +1,7 @@
 .gitignore
 .git
 .php_cs.cache
+.credentials*
 vendor/
 composer.lock
 env.*
