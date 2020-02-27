@@ -7,9 +7,9 @@ Wants=network-online.target
 [Service]
 Type=forking
 PIDFile=/var/run/raspisms/RaspiSMS Daemon Launcher.pid
-ExecStart=/opt/raspisms/bin/start.sh
-ExecStop=/opt/raspisms/bin/stop.sh
-WorkingDirectory=/opt/raspisms
+ExecStart=/var/www/raspisms/bin/start.sh
+ExecStop=/var/www/raspisms/bin/stop.sh
+WorkingDirectory=/var/www/raspisms
 Restart=on-failure
 
 [Install]
