@@ -119,10 +119,10 @@
 									<?php } ?>
                                     <div class="form-group">
                                         <label>Numéro à employer : </label>
-                                        <select name="scheduleds[<?php $this->s($scheduled['id']); ?>][origin]" class="form-control">
-                                            <option <?php echo ($scheduled['origin'] ? '' : 'selected="selected"'); ?> value="">N'importe lequel</option>
+                                        <select name="scheduleds[<?php $this->s($scheduled['id']); ?>][id_phone]" class="form-control">
+                                            <option <?php echo ($scheduled['id_phone'] ? '' : 'selected="selected"'); ?> value="">N'importe lequel</option>
                                             <?php foreach ($phones as $phone) { ?>
-                                                <option <?php echo ($scheduled['origin'] == $phone['number'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
+                                                <option <?php echo ($scheduled['id_phone'] == $phone['id'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

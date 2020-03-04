@@ -35,9 +35,9 @@ class Phone extends AbstractDaemon
     public function __construct(array $phone)
     {
         $this->phone = $phone;
-        $this->msg_queue_id = (int) mb_substr($this->phone['number'], 1);
+        $this->msg_queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $this->phone['id']);
 
-        $name = 'RaspiSMS Daemon Phone ' . $this->phone['number'];
+        $name = 'RaspiSMS Daemon Phone ' . $this->phone['id'];
         $logger = new Logger($name);
         $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
@@ -140,6 +140,8 @@ class Phone extends AbstractDaemon
 
             $message['at'] = $at;
 
+            $message['origin'] = $this->phone['number'];
+
             $this->logger->info('Try send message : ' . json_encode($message));
 
             $sended_sms_uid = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
@@ -163,7 +165,7 @@ class Phone extends AbstractDaemon
     }
 
     /**
-     * Read smss for a number.
+     * Read smss for a phone.
      */
     private function read_smss()
     {

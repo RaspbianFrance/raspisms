@@ -160,7 +160,7 @@ namespace controllers\publics;
          *
          * @param string $_POST['at']                 : Date to send message at format Y-m-d H:i:s
          * @param string $_POST['text']               : Text of the message to send
-         * @param string $_POST['origin']             : Default null. Number to send the message from. If null use a random phone
+         * @param string $_POST['id_phone']           : Default null. Id of phone to send the message from. If null use a random phone
          * @param string $_POST['flash']              : Default false. Is the sms a flash sms.
          * @param string $_POST['numbers']            : Array of numbers to send message to
          * @param string $_POST['contacts']           : Array of ids of contacts to send message to
@@ -173,7 +173,7 @@ namespace controllers\publics;
         {
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
-            $origin = empty($_POST['origin']) ? null : $_POST['origin'];
+            $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $flash = (bool) ($_POST['flash'] ?? false);
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
@@ -227,18 +227,18 @@ namespace controllers\publics;
                 return false;
             }
 
-            if ($origin && !$this->internal_phone->get_by_number_and_user($this->user['id'], $origin))
+            if ($id_phone && !$this->internal_phone->get_for_user($this->user['id'], $id_phone))
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'origin : You must specify an origin number among thoses of user phones.';
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone : You must specify an id_phone number among thoses of user phones.';
                 $this->auto_http_code(false);
                 $this->json($return);
 
                 return false;
             }
 
-            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
             if (!$scheduled_id)
             {
                 $return = self::DEFAULT_RETURN;

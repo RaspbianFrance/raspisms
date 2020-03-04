@@ -59,16 +59,15 @@ namespace controllers\internals;
             new \daemons\Phone($phone);
         }
 
-
         /**
-         * Create a user or update an existing user
+         * Create a user or update an existing user.
+         *
          * @param $email : User email
          * @param $password : User password
          * @param $admin : Is user admin
-         * @param $api_key : User API key, if null random api key is generated 
-         * @return void : exit status 1 on error, else 0
+         * @param $api_key : User API key, if null random api key is generated
          */
-        public function create_update_user (string $email, string $password, bool $admin, ?string $api_key = null)
+        public function create_update_user(string $email, string $password, bool $admin, ?string $api_key = null)
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
             $internal_user = new \controllers\internals\User($bdd);
@@ -78,10 +77,9 @@ namespace controllers\internals;
             {
                 $api_key = $api_key ?? $internal_user->generate_random_api_key();
                 $success = $internal_user->update($user['id'], $email, $password, $admin, $api_key);
-                
+
                 exit($success ? 0 : 1);
             }
-
 
             $success = $internal_user->create($email, $password, $admin, $api_key);
             exit($success ? 0 : 1);

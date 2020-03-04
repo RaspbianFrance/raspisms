@@ -55,6 +55,8 @@
 
 .popup-alert
 {
+    margin-top: 25px;
+    margin-left: 25%;
 	width: 50%;
 	position: relative;
 }
@@ -325,4 +327,16 @@ footer
 .contact-datas-container .contact-datas-remove
 {
     color: #c9302c;
+}
+
+
+/* PHONE */
+#adapter-datas-container
+{
+    margin-top: 35px;
+}
+
+#adapter-data-fields-container
+{
+    margin-top: 20px;
 }

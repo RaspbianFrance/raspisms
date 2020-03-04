@@ -214,15 +214,19 @@ namespace controllers\publics;
         }
 
         /**
-         * Cette fonction insert un nouveau scheduled.
+         * Create a new scheduled message
+         * (you must provide at least one entry in any of numbers, contacts, groups or conditional_groups).
          *
          * @param $csrf : Le jeton CSRF
-         * @param string $_POST['name']     : Le nom du scheduled
-         * @param string $_POST['date']     : La date d'envoie du scheduled
-         * @param string $_POST['numbers']  : Les numeros de téléphone du scheduled
-         * @param string $_POST['contacts'] : Les contacts du scheduled
-         * @param string $_POST['groups']   : Les groups du scheduled
-         * @param array  $_FILES['media']   : The media to link to a scheduled
+         * @param string $_POST['at']                 : Date to send message for
+         * @param string $_POST['text']               : Text of the message
+         * @param ?bool  $_POST['flash']              : Is the message a flash message (by default false)
+         * @param ?int   $_POST['id_phone']           : Id of the phone to send message from, if null use random phone
+         * @param ?array $_POST['numbers']            : Numbers to send the message to
+         * @param ?array $_POST['contacts']           : Numbers to send the message to
+         * @param ?array $_POST['groups']             : Numbers to send the message to
+         * @param ?array $_POST['conditional_groups'] : Numbers to send the message to
+         * @param ?array $_FILES['media']             : The media to link to a scheduled
          */
         public function create($csrf)
         {
@@ -237,11 +241,12 @@ namespace controllers\publics;
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $flash = (bool) ($_POST['flash'] ?? false);
-            $origin = empty($_POST['origin']) ? null : $_POST['origin'];
+            $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
+            $media = $_FILES['media'] ?? false;
 
             if (empty($text))
             {
@@ -278,14 +283,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Ce numéro n\'existe pas ou vous n\'en êtes pas propriétaire.');
-
-                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
-            }
-
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -294,7 +292,6 @@ namespace controllers\publics;
             }
 
             //If mms is enabled, try to process a media to link to the scheduled
-            $media = $_FILES['media'] ?? false;
             if (!($_SESSION['user']['settings']['mms'] ?? false) || !$media)
             {
                 \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
@@ -340,7 +337,7 @@ namespace controllers\publics;
                 $id_user = $_SESSION['user']['id'];
                 $at = $scheduled['at'] ?? false;
                 $text = $scheduled['text'] ?? false;
-                $origin = empty($scheduled['origin']) ? null : $scheduled['origin'];
+                $id_phone = empty($scheduled['id_phone']) ? null : $scheduled['id_phone'];
                 $flash = (bool) ($scheduled['flash'] ?? false);
                 $numbers = $scheduled['numbers'] ?? [];
                 $contacts = $scheduled['contacts'] ?? [];
@@ -381,12 +378,7 @@ namespace controllers\publics;
                     continue;
                 }
 
-                if ($origin && !$this->internal_phone->get_by_number_and_user($id_user, $origin))
-                {
-                    continue;
-                }
-
-                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $origin, $flash, $numbers, $contacts, $groups, $conditional_groups);
+                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
 
                 //Check for media
                 /*
@@ -410,7 +402,7 @@ namespace controllers\publics;
                 }
                  */
 
-                ++$nb_update;
+                $nb_update++;
             }
 
             if ($nb_update !== \count($scheduleds))

@@ -57,7 +57,7 @@ namespace adapters;
             $this->api = new Api(
                 $this->datas['app_key'],
                 $this->datas['app_secret'],
-                $this->datas['endpoint'],
+                'ovh-eu',
                 $this->datas['consumer_key']
             );
         }
@@ -85,15 +85,7 @@ namespace adapters;
          */
         public static function meta_description(): string
         {
-            return 'Solution de SMS proposé par le groupe OVH, https://www.ovhtelecom.fr/sms/.';
-        }
-
-        /**
-         * Description of the datas expected by the adapter to help the user. (e.g : A list of expecteds Api credentials fields, with name and value).
-         */
-        public static function meta_datas_help(): string
-        {
-            return 'Clefs API OVH, https://api.ovh.com/createToken/index.cgi.';
+            return 'Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="https://api.ovh.com/createToken/index.cgi">cliquez ici.</a>';
         }
 
         /**
@@ -120,12 +112,6 @@ namespace adapters;
                     'name' => 'consumer_key',
                     'title' => 'Consumer Key',
                     'description' => 'Paramètre "Consumer Key" obtenu lors de la génération de la clef API OVH.',
-                    'required' => true,
-                ],
-                [
-                    'name' => 'endpoint',
-                    'title' => 'Endpoint',
-                    'description' => 'Endpoint de l\'API OVH, voir https://github.com/ovh/php-ovh/#supported-apis.',
                     'required' => true,
                 ],
                 [

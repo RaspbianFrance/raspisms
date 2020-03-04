@@ -16,6 +16,7 @@ namespace controllers\publics;
      */
     class Callback extends \descartes\Controller
     {
+        private $user;
         private $internal_user;
         private $internal_sended;
         private $internal_adapter;
@@ -27,21 +28,33 @@ namespace controllers\publics;
             $this->internal_user = new \controllers\internals\User($bdd);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
+
+
+            //If no user, quit with error
+            $this->user = false;
+            $api_key = $_GET['api_key'] ?? false;
+            if ($api_key)
+            {
+                $this->user = $this->internal_user->get_by_api_key($api_key);
+            }
+
+            if (!$this->user)
+            {
+                http_response_code(401);
+                echo json_encode(['error' => 'Invalid API key. You must provide a valid GET or POST api_key param.']);
+                exit(1);
+            }
         }
 
         /**
          * Function call on a sended sms status change notification reception.
+         * We return nothing, and we let the adapter do his things
          *
          * @param string $adapter_name : Name of the adapter to use
-         *
-         * @return false : We must always return false, and we respect a random usleep before returning anything
-         *               in order to prevent bruteforce api key guessing and time guessing
+         * @return bool : true on success, false on error
          */
         public function update_sended_status(string $adapter_name)
         {
-            //Wait between 0.5 and 1.03s in order to counter time guessing bruteforce attack against api key
-            usleep(mt_rand(5, 10) / 10 * 1000000 + mt_rand(0, 30000));
-
             //Search for an adapter
             $find_adapter = false;
             $adapters = $this->internal_adapter->list_adapters();
@@ -60,16 +73,12 @@ namespace controllers\publics;
 
             //Instanciate adapter, check if status change is supported and if so call status change callback
             $adapter_classname = $find_adapter['meta_classname'];
-
             if (!$find_adapter['meta_support_status_change'])
             {
                 return false;
             }
 
             $callback_return = $adapter_classname::status_change_callback();
-
-            var_dump($callback_return);
-
             if (!$callback_return)
             {
                 return false;
@@ -83,6 +92,6 @@ namespace controllers\publics;
 
             $this->internal_sended->update_status($sended['id'], $callback_return['status']);
 
-            return false;
+            return true;
         }
     }

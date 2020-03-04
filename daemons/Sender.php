@@ -48,7 +48,7 @@ class Sender extends AbstractDaemon
 
         //Get smss and transmit order to send to appropriate phone daemon
         $smss = $this->internal_scheduled->get_smss_to_send();
-        $this->transmit_smss($smss); //Add new queues to array of queues
+        $this->transmit_smss($smss); //Add new queue to array of queues
 
         usleep(0.5 * 1000000);
     }
@@ -63,7 +63,7 @@ class Sender extends AbstractDaemon
         foreach ($smss as $sms)
         {
             //If queue not already exists
-            $queue_id = (int) mb_substr($sms['origin'], 1);
+            $queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $sms['id_phone']);
             if (!msg_queue_exists($queue_id) || !isset($queues[$queue_id]))
             {
                 $this->queues[$queue_id] = msg_get_queue($queue_id);
@@ -73,7 +73,7 @@ class Sender extends AbstractDaemon
                 'id_user' => $sms['id_user'],
                 'id_scheduled' => $sms['id_scheduled'],
                 'text' => $sms['text'],
-                'origin' => $sms['origin'],
+                'id_phone' => $sms['id_phone'],
                 'destination' => $sms['destination'],
                 'flash' => $sms['flash'],
             ];

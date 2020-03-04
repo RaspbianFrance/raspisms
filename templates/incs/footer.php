@@ -11,17 +11,15 @@
 		</audio>
 	<?php } ?>
 
-    <?php if (ENV == 'dev') { ?>
-		<script>
-			<?php while ($message = \FlashMessage\FlashMessage::next()) { ?>
-				alert('<?php $this->s($message['type'] . ' : ' . $message['text']); ?>');
-			<?php } ?>
-		</script>
-    <?php } ?>
-    
     <?php if (! ($_SESSION['user']['settings']['display_help'] ?? false)) { ?>
         <style>.help {display: none;}</style>
     <?php } ?>
+    
+    <div class="popup-alerts-container">
+        <?php while ($message = \FlashMessage\FlashMessage::next()) { ?>
+            <?php $this->render('incs/alert', $message); ?>
+        <?php } ?>
+    </div>
 
     </body>
 </html>

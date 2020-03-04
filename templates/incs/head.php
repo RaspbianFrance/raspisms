@@ -48,20 +48,5 @@
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
 
-		<script>
-			jQuery(document).ready(function ()
-			{
-                <?php if (!empty($_SESSION['errormessage'])) { ?>
-                    showMessage('<?php $this->s($_SESSION['errormessage'], false, true); ?>', 0);
-                    <?php unset($_SESSION['errormessage']); ?> 
-                <?php } ?>
-                
-                <?php if (!empty($_SESSION['successmessage'])) { ?>
-                    showMessage('<?php $this->s($_SESSION['successmessage'], false, true); ?>', 1);
-                    <?php unset($_SESSION['successmessage']); ?> 
-                <?php } ?>
-			});
-		</script>
 	</head>
-	<body>
-	<div class="popup-alerts-container"></div>
+    <body>

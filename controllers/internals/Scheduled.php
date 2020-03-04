@@ -20,30 +20,30 @@ namespace controllers\internals;
          *
          * @param int $id_user : User to insert scheduled for
          * @param $at : Scheduled date to send
-         * @param string  $text                  : Text of the message
-         * @param ?string $origin                : Origin number of the message, null by default
-         * @param bool    $flash                 : Is the sms a flash sms, by default false
-         * @param array   $numbers               : Numbers to send message to
-         * @param array   $contacts_ids          : Contact ids to send message to
-         * @param array   $groups_ids            : Group ids to send message to
-         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         * @param string $text                  : Text of the message
+         * @param ?int   $id_phone              : Id of the phone to send message with, null by default
+         * @param bool   $flash                 : Is the sms a flash sms, by default false
+         * @param array  $numbers               : Numbers to send message to
+         * @param array  $contacts_ids          : Contact ids to send message to
+         * @param array  $groups_ids            : Group ids to send message to
+         * @param array  $conditional_group_ids : Conditional Groups ids to send message to
          *
          * @return bool : false on error, new id on success
          */
-        public function create(int $id_user, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function create(int $id_user, $at, string $text, ?int $id_phone = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
-                'origin' => $origin,
+                'id_phone' => $id_phone,
                 'flash' => $flash,
             ];
 
-            if ($origin)
+            if ($id_phone !== null)
             {
                 $internal_phone = new Phone($this->bdd);
-                $find_phone = $internal_phone->get_by_number_and_user($id_user, $origin);
+                $find_phone = $internal_phone->get_for_user($id_user, $id_phone);
 
                 if (!$find_phone)
                 {
@@ -54,10 +54,6 @@ namespace controllers\internals;
             $id_scheduled = $this->get_model()->insert($scheduled);
             if (!$id_scheduled)
             {
-                $date = date('Y-m-d H:i:s');
-                $internal_event = new Event($this->bdd);
-                $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
-
                 return false;
             }
 
@@ -102,6 +98,10 @@ namespace controllers\internals;
                 $this->get_model()->insert_scheduled_conditional_group_relation($id_scheduled, $conditional_group_id);
             }
 
+            $date = date('Y-m-d H:i:s');
+            $internal_event = new Event($this->bdd);
+            $internal_event->create($id_user, 'SCHEDULED_ADD', 'Ajout d\'un Sms pour le ' . $date . '.');
+
             return $id_scheduled;
         }
 
@@ -111,30 +111,30 @@ namespace controllers\internals;
          * @param int $id_user      : User to insert scheduled for
          * @param int $id_scheduled : Scheduled id
          * @param $at : Scheduled date to send
-         * @param string  $text                  : Text of the message
-         * @param ?string $origin                : Origin number of the message, null by default
-         * @param bool    $flash                 : Is the sms a flash sms, by default false
-         * @param array   $numbers               : Numbers to send message to
-         * @param array   $contacts_ids          : Contact ids to send message to
-         * @param array   $groups_ids            : Group ids to send message to
-         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         * @param string $text                  : Text of the message
+         * @param ?int   $id_phone              : Id of the phone to send message with, null by default
+         * @param bool   $flash                 : Is the sms a flash sms, by default false
+         * @param array  $numbers               : Numbers to send message to
+         * @param array  $contacts_ids          : Contact ids to send message to
+         * @param array  $groups_ids            : Group ids to send message to
+         * @param array  $conditional_group_ids : Conditional Groups ids to send message to
          *
          * @return bool : false on error, new id on success
          */
-        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $origin = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $id_phone = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
-                'origin' => $origin,
+                'id_phone' => $id_phone,
                 'flash' => $flash,
             ];
 
-            if ($origin)
+            if ($id_phone !== null)
             {
                 $internal_phone = new Phone($this->bdd);
-                $find_phone = $internal_phone->get_by_number_and_user($id_user, $origin);
+                $find_phone = $internal_phone->get_for_user($id_user, $id_phone);
 
                 if (!$find_phone)
                 {
@@ -210,7 +210,7 @@ namespace controllers\internals;
         /**
          * Get all messages to send and the number to use to send theme.
          *
-         * @return array : [['id_scheduled', 'text', 'origin', 'destination', 'flash'], ...]
+         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash'], ...]
          */
         public function get_smss_to_send()
         {
@@ -247,6 +247,23 @@ namespace controllers\internals;
                     $users_phones[$scheduled['id_user']] = $phones ? $phones : [];
                 }
 
+                $phone_to_use = null;
+                foreach ($users_phones[$scheduled['id_user']] as $phone)
+                {
+                    if ($phone['id'] !== $scheduled['id_phone'])
+                    {
+                        continue;
+                    }
+
+                    $phone_to_use = $phone;
+                }
+
+                if (null === $phone_to_use)
+                {
+                    $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
+                    $phone_to_use = $users_phones[$scheduled['id_user']][$rnd_key];
+                }
+
                 $messages = [];
 
                 //Add messages for numbers
@@ -256,17 +273,10 @@ namespace controllers\internals;
                     $message = [
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
-                        'origin' => $scheduled['origin'],
+                        'id_phone' => $phone_to_use['id'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
                     ];
-
-                    if (null === $message['origin'])
-                    {
-                        $k = array_rand($users_phones[$scheduled['id_user']]);
-                        $rnd_phone = $users_phones[$scheduled['id_user']][$k];
-                        $message['origin'] = $rnd_phone['number'];
-                    }
 
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {
@@ -317,17 +327,10 @@ namespace controllers\internals;
                     $message = [
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
-                        'origin' => $scheduled['origin'],
+                        'id_phone' => $phone_to_use['id'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
                     ];
-
-                    if (null === $message['origin'])
-                    {
-                        $k = array_rand($users_phones[$scheduled['id_user']]);
-                        $rnd_phone = $users_phones[$scheduled['id_user']][$k];
-                        $message['origin'] = $rnd_phone['number'];
-                    }
 
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {

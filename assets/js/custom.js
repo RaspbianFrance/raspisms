@@ -5,7 +5,7 @@
 /**
  * Cette fonction affiche un message de succès ou d'erreur dans une popup
  */
-function showMessage(message, type)
+function showMessage(message, type, random_id = null)
 {
 	if (type == 1) //Si message de succès
 	{
@@ -16,8 +16,16 @@ function showMessage(message, type)
 		var type = 'alert-danger';
 	}
 
-	var alerthtml = '<div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-3 popup-alert alert ' + type + '"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' + message + '</div>';
+	var alerthtml = '<div id="' + (random_id ? 'popup-' + random_id : '') + '" class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-3 popup-alert alert ' + type + '"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' + message + '</div>';
 	jQuery('body .popup-alerts-container').prepend(alerthtml);
+}
+
+/**
+ * Hide a popup
+ */
+function fadeAlert(popup_id)
+{
+	jQuery('#popup-' + popup_id).fadeOut('slow');
 }
 
 /**
@@ -25,11 +33,12 @@ function showMessage(message, type)
  */
 function verifReceived()
 {
-	jQuery('.popup-alert').fadeOut('slow');
 	jQuery.getJSON(HTTP_PWD + "/received/popup", function( data ) {
 		$.each(data, function(key, val) {
-			showMessage('SMS reçu du ' + val.origin + ' : ' + val.text, 1);
+            var rand_id = Math.random().toString(36).substring(2);
+			showMessage('SMS reçu du ' + val.origin + ' : ' + val.text, 1, rand_id);
 			playReceptionSound();
+            setTimeout(function() { fadeAlert(rand_id); }, 10000);
 		});
 	});
 }

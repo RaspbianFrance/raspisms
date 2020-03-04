@@ -79,14 +79,6 @@ namespace adapters;
         }
 
         /**
-         * Description of the datas expected by the adapter to help the user. (e.g : A list of expecteds Api credentials fields, with name and value).
-         */
-        public static function meta_datas_help(): string
-        {
-            return 'No datas.';
-        }
-
-        /**
          * List of entries we want in datas for the adapter.
          *
          * @return array : Eachline line is a field as an array with keys : name, title, description, required

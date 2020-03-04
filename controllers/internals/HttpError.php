@@ -18,12 +18,11 @@ namespace controllers\internals;
     class HttpError extends \descartes\InternalController
     {
         /**
-         * Return 404 error page
+         * Return 404 error page.
          */
-        public function _404 ()
+        public function _404()
         {
             http_response_code(404);
             $this->render('error/404');
         }
     }
-

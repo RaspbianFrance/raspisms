@@ -108,10 +108,10 @@
                             <?php } ?>
                             <div class="form-group">
                                 <label>Numéro à employer : </label>
-                                <select name="origin" class="form-control">
+                                <select name="id_phone" class="form-control">
                                     <option value="">N'importe lequel</option>
                                     <?php foreach ($phones as $phone) { ?>
-                                        <option value="<?php $this->s($phone['number']); ?>"><?php $this->s($phone['number']); ?></option>
+                                        <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
                                     <?php } ?>
                                 </select>
                             </div>

@@ -44,12 +44,12 @@
                                         Le numéro de téléphone qui enverra et recevra les messages.
                                     </p>
 									<div class="form-group">
-										<input name="" class="form-control" type="tel" id="phone-international-input" placeholder="Numéro de téléphone à utiliser.">
+										<input required="required" name="" class="form-control" type="tel" id="phone-international-input" placeholder="Numéro de téléphone à utiliser.">
 									</div>
 								</div>
                                 <div class="form-group">
                                     <label>Adaptateur logiciel du téléphone : </label>
-                                    <p class="italic small help" id="description-adapter">
+                                    <p class="italic small help" id="description-adapter-general">
                                         L'adaptateur logiciel utilisé par RaspiSMS pour communiquer avec le téléphone. Pour plus d'information, consultez <a href="https://raspisms.raspberry-pi.fr/documentation" target="_blank">la documentation de RaspiSMS</a> concernant les adaptateurs logiciels.
                                     </p>
                                     <select name="adapter" class="form-control" id="adapter-select">
@@ -58,7 +58,6 @@
                                                 value="<?= $adapter['meta_classname'] ?>"
                                                 title="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-description="<?php $this->s($adapter['meta_description']); ?>"
-                                                data-datas-help="<?php $this->s($adapter['meta_datas_help']); ?>"
                                                 data-datas-fields="<?php $this->s(json_encode($adapter['meta_datas_fields'])); ?>"
                                             >
                                                 <?php $this->s($adapter['meta_name']); ?>
@@ -66,7 +65,16 @@
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <div id="adapter-datas-fields-container">
+                                <div id="adapter-datas-container" class="form-group">
+                                    <div id="adapter-datas-description-container">
+                                        <h4>Description de l'adaptateur</h4>
+                                        <div id="adapter-datas-description"></div>
+                                    </div>
+                                    
+                                    <div id="adapter-data-fields-container">
+                                        <h4>Réglages de l'adaptateur</h4>
+                                        <div id="adapter-datas-fields"></div>
+                                    </div>
                                 </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le phone" /> 	
@@ -83,7 +91,7 @@
     function change_adapter ()
     {
         var option = jQuery('#adapter-select').find('option:selected');
-        jQuery('#description-adapter').text(option.attr('data-description'));
+        jQuery('#adapter-datas-description').html(option.attr('data-description'));
         jQuery('#description-adapter-datas').text(option.attr('data-datas-help'));
     
         var datas_fields = option.attr('data-datas-fields');
@@ -102,7 +110,12 @@
                     '</div>';
         });
 
-        jQuery('#adapter-datas-fields-container').html(html);
+        if (html == '')
+        {
+            html = 'Pas de réglages.';
+        }
+
+        jQuery('#adapter-datas-fields').html(html);
     }
 
 	jQuery('document').ready(function($)

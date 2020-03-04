@@ -101,7 +101,7 @@ class Launcher extends AbstractDaemon
     {
         foreach ($phones as $phone)
         {
-            $phone_name = 'RaspiSMS Daemon Phone ' . $phone['number'];
+            $phone_name = 'RaspiSMS Daemon Phone ' . $phone['id'];
             $pid_file = PWD_PID . '/' . $phone_name . '.pid';
 
             if (file_exists($pid_file))
