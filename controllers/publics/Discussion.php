@@ -162,7 +162,7 @@ namespace controllers\publics;
          * @param string $csrf                 : Le jeton csrf
          * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
-         * @param string $_POST['id_phone']      : If of phone to send sms with
+         * @param string $_POST['id_phone']    : If of phone to send sms with
          *
          * @return string : json string Le statut de l'envoi
          */

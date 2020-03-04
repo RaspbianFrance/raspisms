@@ -402,7 +402,7 @@ namespace controllers\publics;
                 }
                  */
 
-                $nb_update++;
+                ++$nb_update;
             }
 
             if ($nb_update !== \count($scheduleds))

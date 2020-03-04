@@ -14,9 +14,9 @@ namespace controllers\publics;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
-    /**
-     * Controller of callback pages, like sms status update notification.
-     */
+/**
+ * Controller of callback pages, like sms status update notification.
+ */
     class Callback extends \descartes\Controller
     {
         private $logger;
@@ -37,7 +37,6 @@ use Monolog\Logger;
             $this->logger = new Logger('Callback ' . uniqid());
             $this->logger->pushHandler(new StreamHandler(PWD_LOGS . '/callback.log', Logger::DEBUG));
 
-
             //If invalid api key, quit with error
             $this->user = false;
             $api_key = $_GET['api_key'] ?? false;
@@ -50,18 +49,19 @@ use Monolog\Logger;
             {
                 http_response_code(401);
                 echo json_encode(['error' => 'Invalid API key. You must provide a valid GET or POST api_key param.']);
-                $this->logger->error('Callback call failed with invalid api key : ' . $api);
+                $this->logger->error('Callback call failed with invalid api key : ' . $api_key);
                 exit(1);
             }
-            
+
             $this->logger->info('Callback call succed for user id : ' . $this->user['id']);
         }
 
         /**
          * Function call on a sended sms status change notification reception.
-         * We return nothing, and we let the adapter do his things
+         * We return nothing, and we let the adapter do his things.
          *
          * @param string $adapter_name : Name of the adapter to use
+         *
          * @return bool : true on success, false on error
          */
         public function update_sended_status(string $adapter_name)
@@ -82,6 +82,7 @@ use Monolog\Logger;
             if (false === $find_adapter)
             {
                 $this->logger->error('Callback status use non existing adapter : ' . $adapter_name);
+
                 return false;
             }
 
@@ -90,6 +91,7 @@ use Monolog\Logger;
             if (!$find_adapter['meta_support_status_change'])
             {
                 $this->logger->error('Callback status use adapter ' . $adapter_name . ' which does not support status change.');
+
                 return false;
             }
 
@@ -97,6 +99,7 @@ use Monolog\Logger;
             if (!$callback_return)
             {
                 $this->logger->error('Callback status with adapter ' . $adapter_name . ' failed on adapter compute.');
+
                 return false;
             }
 
@@ -104,9 +107,10 @@ use Monolog\Logger;
             if (!$sended)
             {
                 $this->logger->error('Callback status try update inexisting message with uid = ' . $callback_return['uid'] . '.');
+
                 return false;
             }
-            
+
             $this->logger->info('Callback status update message with uid ' . $callback_return['uid'] . '.');
             $this->internal_sended->update_status($sended['id'], $callback_return['status']);
 

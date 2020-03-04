@@ -132,7 +132,7 @@ class Phone extends \descartes\Controller
             \FlashMessage\FlashMessage::push('danger', 'Numéro de téléphone incorrect.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
-        } 
+        }
 
         $number_exist = $this->internal_phone->get_by_number($number);
         if ($number_exist)
@@ -185,7 +185,7 @@ class Phone extends \descartes\Controller
         $adapter_classname = $find_adapter['meta_classname'];
         $adapter_instance = new $adapter_classname($number, $adapter_datas);
         $adapter_working = $adapter_instance->test();
-        
+
         if (!$adapter_working)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez le numéro de téléphone et les réglages.');

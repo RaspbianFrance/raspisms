@@ -40,7 +40,7 @@ namespace controllers\internals;
                 'flash' => $flash,
             ];
 
-            if ($id_phone !== null)
+            if (null !== $id_phone)
             {
                 $internal_phone = new Phone($this->bdd);
                 $find_phone = $internal_phone->get_for_user($id_user, $id_phone);
@@ -131,7 +131,7 @@ namespace controllers\internals;
                 'flash' => $flash,
             ];
 
-            if ($id_phone !== null)
+            if (null !== $id_phone)
             {
                 $internal_phone = new Phone($this->bdd);
                 $find_phone = $internal_phone->get_for_user($id_user, $id_phone);

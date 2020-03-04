@@ -19,7 +19,7 @@ use Monolog\Logger;
  */
 class Phone extends AbstractDaemon
 {
-    private $max_inactivity = 5*60;
+    private $max_inactivity = 5 * 60;
     private $msg_queue;
     private $msg_queue_id;
     private $webhook_queue;
