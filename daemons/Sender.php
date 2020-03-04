@@ -29,7 +29,7 @@ class Sender extends AbstractDaemon
     {
         $name = 'RaspiSMS Daemon Sender';
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/daemons.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = false; //Webhook should be rattach to manager, so manager can stop him easily
         $additional_signals = [];

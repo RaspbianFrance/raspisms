@@ -29,7 +29,7 @@ class Launcher extends AbstractDaemon
         $name = 'RaspiSMS Daemon Launcher';
 
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/raspisms.log', Logger::DEBUG));
+        $logger->pushHandler(new StreamHandler(PWD_LOGS . '/daemons.log', Logger::DEBUG));
         $pid_dir = PWD_PID;
         $no_parent = true; //Launcher should be rattach to PID 1
         $additional_signals = [];

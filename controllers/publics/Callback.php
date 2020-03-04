@@ -11,11 +11,15 @@
 
 namespace controllers\publics;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+
     /**
      * Controller of callback pages, like sms status update notification.
      */
     class Callback extends \descartes\Controller
     {
+        private $logger;
         private $user;
         private $internal_user;
         private $internal_sended;
@@ -29,8 +33,12 @@ namespace controllers\publics;
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
 
+            //Logger
+            $this->logger = new Logger('Callback ' . uniqid());
+            $this->logger->pushHandler(new StreamHandler(PWD_LOGS . '/callback.log', Logger::DEBUG));
 
-            //If no user, quit with error
+
+            //If invalid api key, quit with error
             $this->user = false;
             $api_key = $_GET['api_key'] ?? false;
             if ($api_key)
@@ -42,8 +50,11 @@ namespace controllers\publics;
             {
                 http_response_code(401);
                 echo json_encode(['error' => 'Invalid API key. You must provide a valid GET or POST api_key param.']);
+                $this->logger->error('Callback call failed with invalid api key : ' . $api);
                 exit(1);
             }
+            
+            $this->logger->info('Callback call succed for user id : ' . $this->user['id']);
         }
 
         /**
@@ -55,6 +66,8 @@ namespace controllers\publics;
          */
         public function update_sended_status(string $adapter_name)
         {
+            $this->logger->info('Callback status call with adapter name : ' . $adapter_name);
+
             //Search for an adapter
             $find_adapter = false;
             $adapters = $this->internal_adapter->list_adapters();
@@ -68,6 +81,7 @@ namespace controllers\publics;
 
             if (false === $find_adapter)
             {
+                $this->logger->error('Callback status use non existing adapter : ' . $adapter_name);
                 return false;
             }
 
@@ -75,21 +89,25 @@ namespace controllers\publics;
             $adapter_classname = $find_adapter['meta_classname'];
             if (!$find_adapter['meta_support_status_change'])
             {
+                $this->logger->error('Callback status use adapter ' . $adapter_name . ' which does not support status change.');
                 return false;
             }
 
             $callback_return = $adapter_classname::status_change_callback();
             if (!$callback_return)
             {
+                $this->logger->error('Callback status with adapter ' . $adapter_name . ' failed on adapter compute.');
                 return false;
             }
 
             $sended = $this->internal_sended->get_by_uid_and_adapter($callback_return['uid'], $adapter_classname);
             if (!$sended)
             {
+                $this->logger->error('Callback status try update inexisting message with uid = ' . $callback_return['uid'] . '.');
                 return false;
             }
-
+            
+            $this->logger->info('Callback status update message with uid ' . $callback_return['uid'] . '.');
             $this->internal_sended->update_status($sended['id'], $callback_return['status']);
 
             return true;

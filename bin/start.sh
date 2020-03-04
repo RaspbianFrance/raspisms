@@ -3,7 +3,7 @@
 # Script to start RaspiSMS daemons
 #
 PID_DIR="/var/run/raspisms/"
-LOG_FILE="/var/log/raspisms.log"
+LOG_FILE="/var/log/raspisms/daemons.log"
 SCRIPT=$(readlink -f "$0")
 RASPISMS_DIR=$(readlink -f "${SCRIPT%/*}/../")
 CONSOLE_PATH="$RASPISMS_DIR/console.php"
