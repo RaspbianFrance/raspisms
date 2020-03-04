@@ -19,6 +19,7 @@ use Monolog\Logger;
  */
 class Phone extends AbstractDaemon
 {
+    private $max_inactivity = 5*60;
     private $msg_queue;
     private $msg_queue_id;
     private $webhook_queue;
@@ -53,12 +54,7 @@ class Phone extends AbstractDaemon
 
     public function run()
     {
-        //Stop after 5 minutes of inactivity to avoid useless daemon
-        if ((microtime(true) - $this->last_message_at) > 5 * 60)
-        {
-            posix_kill(getmypid(), SIGTERM); //Send exit signal to the current process
-            return false;
-        }
+        usleep(0.5 * 1000000); //Micro sleep for perfs
 
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
 
@@ -68,7 +64,12 @@ class Phone extends AbstractDaemon
         //Read received smss
         $this->read_smss();
 
-        usleep(0.5 * 1000000);
+        //Stop after 5 minutes of inactivity to avoid useless daemon
+        if ((microtime(true) - $this->last_message_at) > $this->max_inactivity)
+        {
+            posix_kill(getmypid(), SIGTERM); //Send exit signal to the current process
+            return false;
+        }
     }
 
     public function on_start()

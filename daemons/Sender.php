@@ -54,7 +54,7 @@ class Sender extends AbstractDaemon
     }
 
     /**
-     * Function to get messages to send and transfer theme to phones daemons.
+     * Function to transfer smss to send to phones daemons.
      *
      * @param array $smss : Smss to send
      */
@@ -80,6 +80,7 @@ class Sender extends AbstractDaemon
 
             msg_send($this->queues[$queue_id], QUEUE_TYPE_SEND_MSG, $msg);
 
+            $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . $queue_id . '.');
             $this->internal_scheduled->delete($sms['id_scheduled']);
         }
     }
@@ -93,13 +94,6 @@ class Sender extends AbstractDaemon
     public function on_stop()
     {
         $this->logger->info('Stopping Sender with pid ' . getmypid());
-
-        //Delete queues on daemon close
-        foreach ($this->queues as $queue_id => $queue)
-        {
-            $this->logger->info('Closing queue : ' . $queue_id);
-            msg_remove_queue($queue);
-        }
     }
 
     public function handle_other_signals($signal)

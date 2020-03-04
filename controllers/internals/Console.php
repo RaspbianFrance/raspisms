@@ -53,7 +53,7 @@ namespace controllers\internals;
             $phone = $internal_phone->get($id_phone);
             if (!$phone)
             {
-                return false;
+                exit(1);
             }
 
             new \daemons\Phone($phone);

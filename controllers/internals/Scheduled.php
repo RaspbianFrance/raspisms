@@ -328,7 +328,7 @@ namespace controllers\internals;
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
                         'id_phone' => $phone_to_use['id'],
-                        'destination' => $number['number'],
+                        'destination' => $contact['number'],
                         'flash' => $scheduled['flash'],
                     ];
 

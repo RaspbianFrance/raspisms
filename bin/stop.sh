@@ -25,6 +25,7 @@ then
 
     if [ $RETURN -eq 0 ]
     then
+        rm -f "$DAEMON_LAUNCHER_PID_FILE"
         printf "success.\n"
     else
         printf "failed.\n"
@@ -42,6 +43,7 @@ do
     printf "."
     PID=$(cat "$f")
     kill_process "$PID"
+    rm -f "$f"
 done
 printf "Done.\n"
 
