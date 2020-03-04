@@ -20,6 +20,7 @@ namespace controllers\publics;
         private $internal_scheduled;
         private $internal_received;
         private $internal_contact;
+        private $internal_phone;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -35,6 +36,7 @@ namespace controllers\publics;
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -74,11 +76,16 @@ namespace controllers\publics;
             $last_received = $this->internal_received->get_last_for_origin_and_user($_SESSION['user']['id'], $number);
 
             $response_number = ($last_received['destination'] ?? $last_sended['origin'] ?? false);
+            $response_phone = false;
+            if ($response_number)
+            {
+                $response_phone = $this->internal_phone->get_by_number_and_user($_SESSION['user']['id'], $response_number);
+            }
 
             $this->render('discussion/show', [
                 'number' => $number,
                 'contact' => $contact,
-                'response_number' => $response_number,
+                'response_phone' => $response_phone,
             ]);
         }
 
@@ -155,7 +162,7 @@ namespace controllers\publics;
          * @param string $csrf                 : Le jeton csrf
          * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
-         * @param string $_POST['origin']      : Number to send sms with
+         * @param string $_POST['id_phone']      : If of phone to send sms with
          *
          * @return string : json string Le statut de l'envoi
          */
@@ -180,7 +187,7 @@ namespace controllers\publics;
             $at = $now;
             $text = $_POST['text'] ?? '';
             $destination = $_POST['destination'] ?? false;
-            $origin = $_POST['origin'] ?? false;
+            $id_phone = $_POST['id_phone'] ?? false;
 
             if (!$destination)
             {
@@ -191,15 +198,15 @@ namespace controllers\publics;
                 return false;
             }
 
-            if (!$origin)
+            if (!$id_phone)
             {
-                $origin = null;
+                $id_phone = null;
             }
 
             //Destinations must be an array of number
             $destinations = [$destination];
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, $origin, false, $destinations))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $destinations))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';
