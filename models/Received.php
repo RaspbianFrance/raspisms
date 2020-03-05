@@ -17,77 +17,6 @@ namespace models;
     class Received extends StandardModel
     {
         /**
-         * Return an entry by his id for a user.
-         *
-         * @param int $id_user : user id
-         * @param int $id      : entry id
-         *
-         * @return array
-         */
-        public function get_for_user(int $id_user, int $id)
-        {
-            $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                AND id = :id
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-                'id' => $id,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-
-            return $receiveds[0] ?? [];
-        }
-
-        /**
-         * Return all entries for a user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return array
-         */
-        public function gets_for_user(int $id_user)
-        {
-            $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-        }
-
-        /**
-         * Return a list of received for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $limit   : Max results to return
-         * @param int $offset  : Number of results to ignore
-         */
-        public function list_for_user($id_user, $limit, $offset)
-        {
-            $limit = (int) $limit;
-            $offset = (int) $offset;
-
-            $query = ' 
-                SELECT * FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
          * Return a list of unread received for a user.
          *
          * @param int $id_user : User id
@@ -101,8 +30,8 @@ namespace models;
 
             $query = ' 
                 SELECT * FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                AND status = \'unread\'
+                WHERE status = \'unread\'
+                AND id_user = :id_user
                 LIMIT ' . $limit . ' OFFSET ' . $offset;
 
             $params = [
@@ -112,112 +41,6 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-        /**
-         * Return a list of receiveds in a group of ids and for a user.
-         *
-         * @param int   $id_user : user id
-         * @param array $ids     : ids of receiveds to find
-         *
-         * @return array
-         */
-        public function gets_in_for_user(int $id_user, $ids)
-        {
-            $query = ' 
-                SELECT * FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-                AND id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($ids);
-            $query .= $generated_in['QUERY'];
-            $params = $generated_in['PARAMS'];
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Delete a entry by his id for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $id      : Entry id
-         *
-         * @return int : Number of removed rows
-         */
-        public function delete_for_user(int $id_user, int $id)
-        {
-            $query = ' 
-                DELETE FROM received
-                WHERE id = :id
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = ['id_user' => $id_user, 'id' => $id];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Update a received sms for a user.
-         *
-         * @param int   $id_user : User id
-         * @param int   $id      : Entry id
-         * @param array $datas   : datas to update
-         *
-         * @return int : number of modified rows
-         */
-        public function update_for_user(int $id_user, int $id, array $datas)
-        {
-            $params = [];
-            $sets = [];
-
-            foreach ($datas as $label => $value)
-            {
-                $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_' . $label] = $value;
-                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
-            }
-
-            $query = '
-                UPDATE `received`
-                SET ' . implode(', ', $sets) . '
-                WHERE id = :id
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            //If try to update destination, also check it does belong to user
-            if ($sets['set_destination'] ?? false)
-            {
-                $query .= ' AND :set_destination IN (SELECT number FROM phone WHERE id_user = :id_user)';
-            }
-
-            $params['id'] = $id;
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Count number of received sms for user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return int : Number of received SMS for user
-         */
-        public function count_for_user(int $id_user)
-        {
-            $query = '
-                SELECT COUNT(id) as nb
-                FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
-        }
 
         /**
          * Count number of unread received sms for user.
@@ -231,7 +54,7 @@ namespace models;
             $query = '
                 SELECT COUNT(id) as nb
                 FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                WHERE id_user = :id_user
                 AND status = \'unread\'
             ';
 
@@ -257,7 +80,7 @@ namespace models;
             $query = '
                 SELECT *
                 FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                WHERE id_user = :id_user
                 ORDER BY at ASC
                 LIMIT ' . $nb_entry;
 
@@ -281,7 +104,7 @@ namespace models;
             $query = '
                 SELECT *
                 FROM received
-                WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                WHERE id_user = :id_user
                 AND origin = :origin
             ';
 
@@ -307,7 +130,7 @@ namespace models;
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM received
                 WHERE at > :date
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 GROUP BY at_ymd
             ";
 
@@ -332,10 +155,10 @@ namespace models;
                     SELECT at, number
                     FROM (
                         SELECT at, destination as number FROM sended
-                        WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                        WHERE id_user = :id_user
                         UNION (
                             SELECT at, origin as number FROM received
-                            WHERE destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                            WHERE id_user = :id_user
                         )
                     ) as discussions
                     GROUP BY number
@@ -361,7 +184,7 @@ namespace models;
                 SELECT *
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 ORDER BY at ASC";
 
             $params = [
@@ -388,7 +211,7 @@ namespace models;
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
                 AND origin = :origin
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 ORDER BY at ASC
             ";
 
@@ -415,7 +238,7 @@ namespace models;
                 SELECT *
                 FROM received
                 WHERE origin = :origin
-                AND destination IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 ORDER BY at DESC
                 LIMIT 0,1
             ';

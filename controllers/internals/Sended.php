@@ -18,6 +18,7 @@ namespace controllers\internals;
         /**
          * Create a sended.
          *
+         * @param int $id_user : Id of user to create sended message for
          * @param $at : Reception date
          * @param $text : Text of the message
          * @param string $origin      : Number of the sender
@@ -29,9 +30,10 @@ namespace controllers\internals;
          *
          * @return bool : false on error, new sended id else
          */
-        public function create($at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
+        public function create(int $id_user, $at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
         {
             $sended = [
+                'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'origin' => $origin,
@@ -141,14 +143,15 @@ namespace controllers\internals;
         /**
          * Return sended for an uid and an adapter.
          *
+         * @param int $id_user : user id
          * @param string $uid     : Uid of the sended
          * @param string $adapter : Adapter used to send the message
          *
          * @return array
          */
-        public function get_by_uid_and_adapter(string $uid, string $adapter)
+        public function get_by_uid_and_adapter_for_user(int $id_user, string $uid, string $adapter)
         {
-            return $this->get_model()->get_by_uid_and_adapter($uid, $adapter);
+            return $this->get_model()->get_by_uid_and_adapter_for_user($id_user, $uid, $adapter);
         }
 
         /**

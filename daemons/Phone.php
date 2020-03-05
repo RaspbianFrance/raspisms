@@ -149,7 +149,7 @@ class Phone extends AbstractDaemon
             if (!$sended_sms_uid)
             {
                 $this->logger->error('Failed send message : ' . json_encode($message));
-                $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
+                $internal_sended->create($this->phone['id_user'], $at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
 
                 continue;
             }
@@ -161,7 +161,7 @@ class Phone extends AbstractDaemon
 
             $this->logger->info('Successfully send message : ' . json_encode($message));
 
-            $internal_sended->create($at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
+            $internal_sended->create($this->phone['id_user'], $at, $message['text'], $message['origin'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
         }
     }
 
@@ -196,7 +196,7 @@ class Phone extends AbstractDaemon
 
             $this->process_for_transfer($sms, $user_settings);
 
-            $internal_received->create($sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
+            $internal_received->create($this->phone['id_user'], $sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
         }
     }
 

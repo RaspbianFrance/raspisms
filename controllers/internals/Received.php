@@ -32,6 +32,7 @@ namespace controllers\internals;
         /**
          * Create a received.
          *
+         * @param $id_user : Id of user to create received for
          * @param $at : Reception date
          * @param $text : Text of the message
          * @param string $origin      : Number of the sender
@@ -41,9 +42,10 @@ namespace controllers\internals;
          *
          * @return bool : false on error, new received id else
          */
-        public function create($at, string $text, string $origin, string $destination, string $status = 'unread', bool $command = false): bool
+        public function create(int $id_user, $at, string $text, string $origin, string $destination, string $status = 'unread', bool $command = false): bool
         {
             $received = [
+                'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'origin' => $origin,

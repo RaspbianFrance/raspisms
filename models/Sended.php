@@ -17,184 +17,6 @@ namespace models;
     class Sended extends StandardModel
     {
         /**
-         * Return an entry by his id for a user.
-         *
-         * @param int $id_user : user id
-         * @param int $id      : entry id
-         *
-         * @return array
-         */
-        public function get_for_user(int $id_user, int $id)
-        {
-            $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-                AND id = :id
-            ';
-
-            $params = [
-                'id' => $id,
-                'id_user' => $id_user,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-
-            return $receiveds[0] ?? [];
-        }
-
-        /**
-         * Return all entries for a user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return array
-         */
-        public function gets_for_user(int $id_user)
-        {
-            $query = ' 
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-        }
-
-        /**
-         * Return a list of sended for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $limit   : Max results to return
-         * @param int $offset  : Number of results to ignore
-         */
-        public function list_for_user($id_user, $limit, $offset)
-        {
-            $limit = (int) $limit;
-            $offset = (int) $offset;
-
-            $query = ' 
-                SELECT * FROM sended
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Return a list of sendeds in a group of ids and for a user.
-         *
-         * @param int   $id_user : user id
-         * @param array $ids     : ids of sendeds to find
-         *
-         * @return array
-         */
-        public function gets_in_for_user(int $id_user, $ids)
-        {
-            $query = ' 
-                SELECT * FROM sended
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-                AND id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($ids);
-            $query .= $generated_in['QUERY'];
-            $params = $generated_in['PARAMS'];
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Delete a entry by his id for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $id      : Entry id
-         *
-         * @return int : Number of removed rows
-         */
-        public function delete_for_user(int $id_user, int $id)
-        {
-            $query = ' 
-                DELETE FROM sended
-                WHERE id = :id
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = ['id_user' => $id_user, 'id' => $id];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Update a sended sms for a user.
-         *
-         * @param int   $id_user : User id
-         * @param int   $id      : Entry id
-         * @param array $datas   : datas to update
-         *
-         * @return int : number of modified rows
-         */
-        public function update_for_user(int $id_user, int $id, array $datas)
-        {
-            $params = [];
-            $sets = [];
-
-            foreach ($datas as $label => $value)
-            {
-                $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_' . $label] = $value;
-                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
-            }
-
-            $query = '
-                UPDATE `sended`
-                SET ' . implode(', ', $sets) . '
-                WHERE id = :id
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            //If try to update origin, also check it does belong to user
-            if ($sets['set_origin'] ?? false)
-            {
-                $query .= ' AND :set_origin IN (SELECT number FROM phone WHERE id_user = :id_user)';
-            }
-
-            $params['id'] = $id;
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Count number of sended sms for user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return int : Number of sended SMS for user
-         */
-        public function count_for_user($id_user)
-        {
-            $query = '
-                SELECT COUNT(id) as nb
-                FROM sended
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
-        }
-
-        /**
          * Return x last sendeds message for a user, order by date.
          *
          * @param int $id_user  : User id
@@ -209,7 +31,7 @@ namespace models;
             $query = '
                 SELECT *
                 FROM sended
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                WHERE id_user = :id_user
                 ORDER BY at ASC
                 LIMIT ' . $nb_entry;
 
@@ -233,7 +55,7 @@ namespace models;
             $query = '
                 SELECT *
                 FROM sended
-                WHERE origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                WHERE id_user = :id_user
                 AND destination = :destination
             ';
 
@@ -248,14 +70,15 @@ namespace models;
         /**
          * Return sended for an uid and an adapter.
          *
+         * @param int $id_user : Id of the user
          * @param string $uid     : Uid of the sended
          * @param string $adapter : Adapter used to send the message
          *
          * @return array
          */
-        public function get_by_uid_and_adapter(string $uid, string $adapter)
+        public function get_by_uid_and_adapter_for_user(int $id_user, string $uid, string $adapter)
         {
-            return $this->_select_one('sended', ['uid' => $uid, 'adapter' => $adapter]);
+            return $this->_select_one('sended', ['id_user' => $id_user, 'uid' => $uid, 'adapter' => $adapter]);
         }
 
         /**
@@ -272,7 +95,7 @@ namespace models;
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM sended
                 WHERE at > :date
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 GROUP BY at_ymd
             ";
 
@@ -298,7 +121,7 @@ namespace models;
                 SELECT *
                 FROM sended
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 ORDER BY at ASC";
 
             $params = [
@@ -323,7 +146,7 @@ namespace models;
                 SELECT *
                 FROM sended
                 WHERE destination = :destination
-                AND origin IN (SELECT number FROM phone WHERE id_user = :id_user)
+                AND id_user = :id_user
                 ORDER BY at DESC
                 LIMIT 0,1
             ';

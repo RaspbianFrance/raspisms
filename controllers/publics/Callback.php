@@ -103,7 +103,7 @@ use Monolog\Logger;
                 return false;
             }
 
-            $sended = $this->internal_sended->get_by_uid_and_adapter($callback_return['uid'], $adapter_classname);
+            $sended = $this->internal_sended->get_by_uid_and_adapter_for_user($this->user['id'], $callback_return['uid'], $adapter_classname);
             if (!$sended)
             {
                 $this->logger->error('Callback status try update inexisting message with uid = ' . $callback_return['uid'] . '.');
@@ -112,7 +112,7 @@ use Monolog\Logger;
             }
 
             $this->logger->info('Callback status update message with uid ' . $callback_return['uid'] . '.');
-            $this->internal_sended->update_status($sended['id'], $callback_return['status']);
+            $this->internal_sended->update_status_for_user($this->user['id'], $sended['id'], $callback_return['status']);
 
             return true;
         }
