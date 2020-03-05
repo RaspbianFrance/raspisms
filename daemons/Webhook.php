@@ -57,8 +57,8 @@ class Webhook extends AbstractDaemon
             $message = null;
 
             $error_code = null;
-            $success = msg_receive($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $msgtype, $maxsize, $message, true, 0, $error_code);
-            if (!$success)
+            $success = msg_receive($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+            if (!$success && MSG_ENOMSG !== $error_code)
             {
                 $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
             }
