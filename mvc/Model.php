@@ -632,7 +632,15 @@
 					return false;
 				}
 
-				$params[$nom] = $datas[$nom];
+				//Gestion des booléan à false 
+				if ($field['TYPE'] == "TINYINT"){
+					if ($datas[$nom] == false)
+						$params[$nom] = 0;
+					else 
+						$params[$nom] = 1;
+				}else{
+					$params[$nom] = $datas[$nom];
+				}
 				$fieldNames[] = $nom;
 			}
 
