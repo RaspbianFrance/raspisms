@@ -32,6 +32,9 @@
 
 			<div class="row">
 				<div class="col-lg-12">
+                    <?php if (!count($phones)) { ?>
+                        <div class="alert alert-danger">Pour pouvoir envoyez un SMS vous devez d'abord <a href="<?= \descartes\Router::url('Phone', 'add'); ?>">créer au moins un téléphone.</a></div>
+                    <?php } ?>
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title"><i class="fa fa-send fa-fw"></i> Création d'un nouveau SMS</h3>
@@ -106,15 +109,17 @@
                                     </div>
                                 </div>
                             <?php } ?>
-                            <div class="form-group">
-                                <label>Numéro à employer : </label>
-                                <select name="id_phone" class="form-control">
-                                    <option value="">N'importe lequel</option>
-                                    <?php foreach ($phones as $phone) { ?>
-                                        <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
+                            <?php if (count($phones)) { ?>
+                                <div class="form-group">
+                                    <label>Numéro à employer : </label>
+                                    <select name="id_phone" class="form-control">
+                                        <option value="">N'importe lequel</option>
+                                        <?php foreach ($phones as $phone) { ?>
+                                            <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            <?php } ?>
                             <a class="btn btn-danger" href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>">Annuler</a>
                             <input type="submit" class="btn btn-success" value="Enregistrer le SMS" /> 	
                         </form>
