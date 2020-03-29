@@ -97,6 +97,12 @@ namespace adapters;
         {
             return [
                 [
+                    'name' => 'service_name',
+                    'title' => 'Service Name',
+                    'description' => 'Service Name de votre service SMS chez OVH. Il s\'agit du nom associé à votre service SMS dans la console OVH, probablement quelque chose comme "sms-xxxxx-1" ou "xxxx" est votre identifiant client OVH.',
+                    'required' => true,
+                ],
+                [
                     'name' => 'app_key',
                     'title' => 'Application Key',
                     'description' => 'Paramètre "Application Key" obtenu lors de la génération de la clef API OVH.',
@@ -112,12 +118,6 @@ namespace adapters;
                     'name' => 'consumer_key',
                     'title' => 'Consumer Key',
                     'description' => 'Paramètre "Consumer Key" obtenu lors de la génération de la clef API OVH.',
-                    'required' => true,
-                ],
-                [
-                    'name' => 'service_name',
-                    'title' => 'Service Name',
-                    'description' => 'Service Name de votre service SMS chez OVH. Il s\'agit du nom associé à votre service SMS dans la console OVH, probablement quelque chose comme "sms-xxxxx-1" ou "xxxx" est votre identifiant client OVH.',
                     'required' => true,
                 ],
             ];
