@@ -42,6 +42,7 @@
                                                 <th>#</th>
                                                 <th>Email</th>
                                                 <th>Admin</th>
+                                                <th>Status</th>
                                                 <th style="width:5%;">Sélectionner</th>
                                             </tr>
                                         </thead>
@@ -51,6 +52,7 @@
                                                 <td><?php $this->s($user['id']); ?></td>
                                                 <td><?php $this->s($user['email']); ?></td>
                                                 <td><?php $this->s($user['admin']); ?></td>
+                                                <td><?php $this->s($user['status']); ?></td>
                                                 <td><input type="checkbox" value="<?php $this->s($user['id']); ?>" name="ids[]"></td>
                                             </tr>
                                         <?php } ?>
@@ -63,6 +65,8 @@
                                         </div>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 0]); ?>"><span class="fa fa-pause"></span> Suspendre</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 1]); ?>"><span class="fa fa-play"></span> Activer</button>
                                             <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     </div>

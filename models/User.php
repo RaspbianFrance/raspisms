@@ -16,6 +16,9 @@ namespace models;
      */
     class User extends \descartes\Model
     {
+        const STATUS_SUSPENDED = 'suspended';
+        const STATUS_ACTIVE = 'active';
+
         /**
          * Find a user by his id.
          *

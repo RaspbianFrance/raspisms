@@ -48,6 +48,44 @@ class User extends \descartes\Controller
         $users = $this->internal_user->list(25, $page);
         $this->render('user/list', ['users' => $users]);
     }
+    
+    
+    /**
+     * Update status of users
+     *
+     * @param array int $_GET['ids'] : User ids
+     * @param mixed     $csrf
+     * @param int $status : 1 -> active, 0 -> suspended
+     *
+     * @return boolean;
+     */
+    public function update_status ($csrf, int $status)
+    {
+        if (!$this->verify_csrf($csrf))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        if ($status == 0)
+        {
+            $status = \models\User::STATUS_SUSPENDED;
+        }
+        else
+        {
+            $status = \models\User::STATUS_ACTIVE;
+        }
+
+        $ids = $_GET['ids'] ?? [];
+        foreach ($ids as $id)
+        {
+            $this->internal_user->update_status($id, $status);
+        }
+
+        return $this->redirect(\descartes\Router::url('User', 'list'));
+    }
+
 
     /**
      * Cette fonction va supprimer une liste de users.
@@ -112,6 +150,7 @@ class User extends \descartes\Controller
         $email = $_POST['email'] ?? false;
         $password = $_POST['password'] ?? \controllers\internals\Tool::generate_password(rand(6, 12));
         $admin = $_POST['admin'] ?? false;
+        $status = 'active';
 
         if (!$email)
         {
@@ -127,7 +166,7 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        $user_id = $this->internal_user->create($email, $password, $admin);
+        $user_id = $this->internal_user->create($email, $password, $admin, $status);
         if (!$user_id)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce user.');

@@ -156,6 +156,7 @@
             'add' => '/user/add/',
             'create' => '/user/create/{csrf}/',
             'delete' => '/user/delete/{csrf}/',
+            'update_status' => '/user/delete/{status}/{csrf}/',
         ],
 
         'Phone' => [

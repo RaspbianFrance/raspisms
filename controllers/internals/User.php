@@ -104,6 +104,20 @@ namespace controllers\internals;
         {
             return (bool) $this->model_user->update_email($id, $email);
         }
+        
+        
+        /**
+         * Update user status.
+         *
+         * @param string $id    : user id
+         * @param string $status : new status
+         *
+         * @return boolean;
+         */
+        public function update_status($id, $status)
+        {
+            return (bool) $this->model_user->update($id, ['status' => $status]);
+        }
 
         /**
          * Update user api key.
@@ -170,16 +184,18 @@ namespace controllers\internals;
          * @param mixed $password
          * @param mixed $admin
          * @param mixed $api_key
+         * @param string $status : User status
          *
          * @return int : Number of modified user
          */
-        public function update($id, $email, $password, $admin, $api_key)
+        public function update($id, $email, $password, $admin, $api_key, $status)
         {
             $user = [
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'admin' => $admin,
                 'api_key' => $api_key,
+                'status' => $status,
             ];
 
             return $this->model_user->update($id, $user);
@@ -192,16 +208,18 @@ namespace controllers\internals;
          * @param mixed   $password
          * @param mixed   $admin
          * @param ?string $api_key  : The api key of the user, if null generate randomly
+         * @param string $status : User status, default \models\User::STATUS_ACTIVE
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
-        public function create($email, $password, $admin, ?string $api_key = null)
+        public function create($email, $password, $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE)
         {
             $user = [
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'admin' => $admin,
                 'api_key' => $api_key ?? $this->generate_random_api_key(),
+                'status' => $status,
             ];
 
             $new_user_id = $this->model_user->insert($user);

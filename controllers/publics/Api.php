@@ -30,6 +30,7 @@ namespace controllers\publics;
             'INVALID_PARAMETER' => 2,
             'MISSING_PARAMETER' => 4,
             'CANNOT_CREATE' => 8,
+            'SUSPENDED_USER' => 16,
         ];
 
         const ERROR_MESSAGES = [
@@ -37,6 +38,7 @@ namespace controllers\publics;
             'INVALID_PARAMETER' => 'You have specified an invalid parameter : ',
             'MISSING_PARAMETER' => 'One require parameter is missing : ',
             'CANNOT_CREATE' => 'Cannot create a new entry.',
+            'SUSPENDED_USER' => 'This user account is currently suspended.',
         ];
 
         private $internal_user;
@@ -85,6 +87,17 @@ namespace controllers\publics;
                 $this->json($return);
 
                 exit(self::ERROR_CODES['INVALID_CREDENTIALS']);
+            }
+            
+            if ($this->user['status'] !== \models\User::STATUS_ACTIVE)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['SUSPENDED_USER'];
+                $return['message'] = self::ERROR_MESSAGES['SUSPENDED_USER'];
+                $this->auto_http_code(false);
+                $this->json($return);
+
+                exit(self::ERROR_CODES['SUSPENDED_USER']);
             }
         }
 

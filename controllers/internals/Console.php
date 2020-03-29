@@ -66,8 +66,9 @@ namespace controllers\internals;
          * @param $password : User password
          * @param $admin : Is user admin
          * @param $api_key : User API key, if null random api key is generated
+         * @param $status : User status, default \models\User::STATUS_ACTIVE
          */
-        public function create_update_user(string $email, string $password, bool $admin, ?string $api_key = null)
+        public function create_update_user(string $email, string $password, bool $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE)
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
             $internal_user = new \controllers\internals\User($bdd);
@@ -76,12 +77,34 @@ namespace controllers\internals;
             if ($user)
             {
                 $api_key = $api_key ?? $internal_user->generate_random_api_key();
-                $success = $internal_user->update($user['id'], $email, $password, $admin, $api_key);
+                $success = $internal_user->update($user['id'], $email, $password, $admin, $api_key, $status);
 
                 exit($success ? 0 : 1);
             }
 
-            $success = $internal_user->create($email, $password, $admin, $api_key);
+            $success = $internal_user->create($email, $password, $admin, $api_key, $status);
+            exit($success ? 0 : 1);
+        }
+
+        /**
+         *
+         * Update a user status
+         *
+         * @param string $email : User email
+         * @param string $status : User status, default \models\User::STATUS_ACTIVE
+         */
+        public function update_user_status (string $email, string $status)
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_user = new \controllers\internals\User($bdd);
+
+            $user = $internal_user->get_by_email($email);
+            if (!$user)
+            {
+                exit(1);
+            }
+
+            $success = $internal_user->update_status($user['id'], $status);
             exit($success ? 0 : 1);
         }
     }

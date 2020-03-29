@@ -85,9 +85,11 @@ namespace adapters;
          */
         public static function meta_description(): string
         {
-            $callback = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_name' => self::meta_name()], ['api_key' => $_SESSION['user']['api_key'] ?? '<your_api_key>']); 
+            $callback = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_name' => self::meta_name()], ['api_key' => $_SESSION['user']['api_key'] ?? '<your_api_key>']);
+            $generate_credentials_url = 'https://eu.api.ovh.com/createToken/index.cgi?GET=/sms&GET=/sms/*&POST=/sms/*&PUT=/sms/*&DELETE=/sms/*&';
+
             return '
-                Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="https://api.ovh.com/createToken/index.cgi">cliquez ici.</a>
+                Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="' . $generate_credentials_url . '">cliquez ici.</a>
                 <br/>
                 <br/>
                 <div class="alert alert-info">Adresse URL de callback de changement d\'état : <b>' . $callback . '</b></div>

@@ -64,6 +64,13 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Connect', 'login'));
             }
 
+            if ($user['status'] !== \models\User::STATUS_ACTIVE)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Votre compte est actuellement suspendu.');
+
+                return $this->redirect(\descartes\Router::url('Connect', 'login'));
+            }
+
             $settings = $this->internal_setting->gets_for_user($user['id']);
             $user['settings'] = $settings;
 
