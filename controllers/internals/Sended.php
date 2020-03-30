@@ -19,9 +19,9 @@ namespace controllers\internals;
          * Create a sended.
          *
          * @param int $id_user : Id of user to create sended message for
+         * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $origin      : Number of the sender
          * @param string $destination : Number of the receiver
          * @param string $uid         : Uid of the sms on the adapter service used
          * @param string $adapter     : Name of the adapter service used to send the message
@@ -30,10 +30,11 @@ namespace controllers\internals;
          *
          * @return bool : false on error, new sended id else
          */
-        public function create(int $id_user, $at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
         {
             $sended = [
                 'id_user' => $id_user,
+                'id_phone' => $id_phone,
                 'at' => $at,
                 'text' => $text,
                 'origin' => $origin,
@@ -45,38 +46,6 @@ namespace controllers\internals;
             ];
 
             return (bool) $this->get_model()->insert($sended);
-        }
-
-        /**
-         * Update a sended for a user.
-         *
-         * @param int $id_user   : user id
-         * @param int $id_sended : Sended id
-         * @param $at : Reception date
-         * @param $text : Text of the message
-         * @param string  $origin      : Number of the sender
-         * @param string  $destination : Number of the receiver
-         * @param string  $uid         : Uid of the sms on the adapter service used
-         * @param string  $adapter     : Name of the adapter service used to send the message
-         * @param bool    $flash       : Is the sms a flash
-         * @param ?string $status      : Status of a the sms. By default null -> unknown
-         *
-         * @return bool : false on error, true on success
-         */
-        public function update_for_user(int $id_user, int $id_sended, $at, string $text, string $origin, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = null): bool
-        {
-            $sended = [
-                'at' => $at,
-                'text' => $text,
-                'origin' => $origin,
-                'destination' => $destination,
-                'uid' => $uid,
-                'adapter' => $adapter,
-                'flash' => $flash,
-                'status' => $status,
-            ];
-
-            return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
         }
 
         /**

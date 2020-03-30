@@ -28,45 +28,45 @@ namespace controllers\internals;
         }
 
         /**
-         * Return a phone by his number.
+         * Return a phone by his name
          *
-         * @param string $number : Phone number
+         * @param string $name : Phone name
          *
          * @return array
          */
-        public function get_by_number(string $number)
+        public function get_by_name(string $name)
         {
-            return $this->get_model()->get_by_number($number);
+            return $this->get_model()->get_by_name($name);
         }
 
         /**
-         * Return a phone for a user by a number.
+         * Return a phone for a user by a name
          *
          * @param int    $id_user : user id
-         * @param string $number  : Phone number
+         * @param string $name  : Phone name
          *
          * @return array
          */
-        public function get_by_number_and_user(int $id_user, string $number)
+        public function get_by_name_and_user(int $id_user, string $name)
         {
-            return $this->get_model()->get_by_number_and_user($id_user, $number);
+            return $this->get_model()->get_by_name_and_user($id_user, $name);
         }
 
         /**
          * Create a phone.
          *
          * @param int         $id_user       : User to insert phone for
-         * @param string      $number        : The number of the phone
+         * @param string      $name        : The name of the phone
          * @param string      $adapter       : The adapter to use the phone
          * @param string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          *
          * @return bool : false on error, true on success
          */
-        public function create(int $id_user, string $number, string $adapter, string $adapter_datas): bool
+        public function create(int $id_user, string $name, string $adapter, string $adapter_datas): bool
         {
             $phone = [
                 'id_user' => $id_user,
-                'number' => $number,
+                'name' => $name,
                 'adapter' => $adapter,
                 'adapter_datas' => $adapter_datas,
             ];
@@ -79,17 +79,17 @@ namespace controllers\internals;
          *
          * @param int    $id_user       : User to insert phone for
          * @param int    $id            : Phone id
-         * @param string $number        : The number of the phone
+         * @param string $name        : The name of the phone
          * @param string $adapter       : The adapter to use the phone
          * @param array  $adapter_datas : An array of the datas of the adapter (for example credentials for an api)
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id, string $number, string $adapter, array $adapter_datas): bool
+        public function update_for_user(int $id_user, int $id, string $name, string $adapter, array $adapter_datas): bool
         {
             $phone = [
                 'id_user' => $id_user,
-                'number' => $number,
+                'name' => $name,
                 'adapter' => $adapter,
                 'adapter_datas' => json_encode($adapter_datas),
             ];

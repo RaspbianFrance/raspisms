@@ -55,7 +55,7 @@
                                             <tbody>
                                             <?php foreach ($sendeds as $sended) { ?>
                                                     <tr>
-                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($sended['origin'])); ?></td>
+                                                        <td class="no-wrap"><?php $this->s($sended['phone_name'] ?? 'Inconnu'); ?></td>
                                                         <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($sended['destination'])); ?></td>
                                                         <td><?php $this->s($sended['text']); ?></td>
                                                         <td><?php $this->s($sended['at']); ?></td>

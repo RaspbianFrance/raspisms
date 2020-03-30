@@ -101,7 +101,7 @@ class Phone extends \descartes\Controller
      * Create a new phone.
      *
      * @param $csrf : CSRF token
-     * @param string $_POST['number']        : Phone number
+     * @param string $_POST['name']        : Phone name
      * @param string $_POST['adapter']       : Phone adapter
      * @param array  $_POST['adapter_datas'] : Phone adapter datas
      */
@@ -115,29 +115,21 @@ class Phone extends \descartes\Controller
         }
 
         $id_user = $_SESSION['user']['id'];
-        $number = $_POST['number'] ?? false;
+        $name = $_POST['name'] ?? false;
         $adapter = $_POST['adapter'] ?? false;
         $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
 
-        if (!$number || !$adapter)
+        if (!$name || !$adapter)
         {
             \FlashMessage\FlashMessage::push('danger', 'Des champs obligatoires sont manquants.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $number = \controllers\internals\Tool::parse_phone($number);
-        if (!$number)
+        $name_exist = $this->internal_phone->get_by_name($name);
+        if ($name_exist)
         {
-            \FlashMessage\FlashMessage::push('danger', 'Numéro de téléphone incorrect.');
-
-            return $this->redirect(\descartes\Router::url('Phone', 'add'));
-        }
-
-        $number_exist = $this->internal_phone->get_by_number($number);
-        if ($number_exist)
-        {
-            \FlashMessage\FlashMessage::push('danger', 'Ce numéro de téléphone est déjà utilisé.');
+            \FlashMessage\FlashMessage::push('danger', 'Ce nom est déjà utilisé pour un autre téléphone.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
@@ -181,9 +173,9 @@ class Phone extends \descartes\Controller
 
         $adapter_datas = json_encode($adapter_datas);
 
-        //Check adapter is working correctly with thoses numbers and datas
+        //Check adapter is working correctly with thoses names and datas
         $adapter_classname = $find_adapter['meta_classname'];
-        $adapter_instance = new $adapter_classname($number, $adapter_datas);
+        $adapter_instance = new $adapter_classname($name, $adapter_datas);
         $adapter_working = $adapter_instance->test();
 
         if (!$adapter_working)
@@ -193,7 +185,7 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $success = $this->internal_phone->create($id_user, $number, $adapter, $adapter_datas);
+        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_datas);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');

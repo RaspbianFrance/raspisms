@@ -44,6 +44,23 @@ namespace controllers\publics;
             $page = (int) $page;
             $limit = 25;
             $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id'], $limit, $page);
+
+            foreach ($sendeds as &$sended)
+            {
+                if ($sended['id_phone'] === null)
+                {
+                    continue;
+                }
+
+                $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $sended['id_phone']);
+                if (!$phone)
+                {
+                    continue;
+                }
+
+                $sended['phone_name'] = $phone['name'];
+            }
+
             $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);
         }
 

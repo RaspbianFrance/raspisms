@@ -39,12 +39,12 @@
 						<div class="panel-body">
 							<form action="<?php echo \descartes\Router::url('Phone', 'create', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
 								<div class="form-group">
-                                    <label>Numéro de téléphone</label>
+                                    <label>Nom du téléphone</label>
                                     <p class="italic small help">
-                                        Le numéro de téléphone qui enverra et recevra les messages.
+                                        Le nom du téléphone qui enverra et recevra les messages.
                                     </p>
 									<div class="form-group">
-										<input required="required" name="" class="form-control" type="tel" id="phone-international-input" placeholder="Numéro de téléphone à utiliser.">
+										<input required="required" name="name" class="form-control" placeholder="Nom du téléphone">
 									</div>
 								</div>
                                 <div class="form-group">
@@ -125,15 +125,6 @@
         jQuery('#adapter-select').on('change', function (e)
         {
             change_adapter();
-        });
-
-        var number_input = jQuery('#phone-international-input')[0];
-        var iti_number_input = window.intlTelInput(number_input, {
-            hiddenInput: 'number',
-			defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
-			preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
-			nationalMode: true,
-			utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
         });
 	});
 </script>

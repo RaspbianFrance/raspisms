@@ -14,28 +14,28 @@ namespace models;
     class Phone extends StandardModel
     {
         /**
-         * Return a phone by his number and user.
+         * Return a phone by his name and user.
          *
          * @param int    $id_user : user id
-         * @param string $number  :  phone number
+         * @param string $name  :  phone name
          *
          * @return array
          */
-        public function get_by_number_and_user(int $id_user, string $number)
+        public function get_by_name_and_user(int $id_user, string $name)
         {
-            return $this->_select_one('phone', ['number' => $number, 'id_user' => $id_user]);
+            return $this->_select_one('phone', ['name' => $name, 'id_user' => $id_user]);
         }
 
         /**
-         * Return a phone by his number.
+         * Return a phone by his name.
          *
-         * @param string $number :  phone number
+         * @param string $name :  phone name
          *
          * @return array
          */
-        public function get_by_number(string $number)
+        public function get_by_name(string $name)
         {
-            return $this->_select_one('phone', ['number' => $number]);
+            return $this->_select_one('phone', ['name' => $name]);
         }
 
         /**

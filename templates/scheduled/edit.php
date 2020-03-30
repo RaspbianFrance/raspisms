@@ -122,7 +122,7 @@
                                         <select name="scheduleds[<?php $this->s($scheduled['id']); ?>][id_phone]" class="form-control">
                                             <option <?php echo ($scheduled['id_phone'] ? '' : 'selected="selected"'); ?> value="">N'importe lequel</option>
                                             <?php foreach ($phones as $phone) { ?>
-                                                <option <?php echo ($scheduled['id_phone'] == $phone['id'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
+                                                <option <?php echo ($scheduled['id_phone'] == $phone['id'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['name']); ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

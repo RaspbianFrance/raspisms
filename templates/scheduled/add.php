@@ -115,7 +115,7 @@
                                     <select name="id_phone" class="form-control">
                                         <option value="">N'importe lequel</option>
                                         <?php foreach ($phones as $phone) { ?>
-                                            <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['number']); ?></option>
+                                            <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['name']); ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>

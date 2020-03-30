@@ -42,7 +42,7 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-phones">
                                             <thead>
                                                 <tr>
-                                                    <th>Numéro</th>
+                                                    <th>Nom</th>
                                                     <th>Adaptateur</th>
                                                     <th style="width:5%;">Sélectionner</th>
                                                 </tr>
@@ -50,7 +50,7 @@
                                             <tbody>
                                             <?php foreach ($phones as $phone) { ?>
                                                 <tr>
-                                                    <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['number'])); ?></td>
+                                                    <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['name'])); ?></td>
                                                     <td><?php $this->s($phone['adapter']); ?></td>
                                                     <td><input type="checkbox" value="<?php $this->s($phone['id']); ?>" name="ids[]"></td>
                                                 </tr>
