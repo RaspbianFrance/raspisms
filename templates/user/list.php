@@ -39,7 +39,6 @@
                                     <table class="table table-bordered table-hover table-striped" id="table-users">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
                                                 <th>Email</th>
                                                 <th>Admin</th>
                                                 <th>Status</th>
@@ -49,7 +48,6 @@
                                         <tbody>
                                         <?php foreach ($users as $user) { ?>
                                             <tr>
-                                                <td><?php $this->s($user['id']); ?></td>
                                                 <td><?php $this->s($user['email']); ?></td>
                                                 <td><?php $this->s($user['admin']); ?></td>
                                                 <td><?php $this->s($user['status']); ?></td>

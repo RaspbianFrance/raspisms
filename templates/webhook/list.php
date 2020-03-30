@@ -40,7 +40,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-webhooks">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Url</th>
                                                     <th>Type de webhook</th>
                                                     <th style="width:5%;">Sélectionner</th>
@@ -49,7 +48,6 @@
                                             <tbody>
                                             <?php foreach ($webhooks as $webhook) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($webhook['id']); ?></td>
                                                         <td><?php $this->s($webhook['url']); ?></td>
                                                         <td><?php $this->s($webhook['type'] == 'send_sms' ? 'Envoi de SMS' : 'Reception de SMS'); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($webhook['id']); ?>"></td>

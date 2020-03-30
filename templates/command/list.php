@@ -42,7 +42,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-commands">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Nom</th>
                                                     <th>Script</th>
                                                     <th>Admin obligatoire</th>
@@ -52,7 +51,6 @@
                                             <tbody>
                                             <?php foreach ($commands as $command) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($command['id']); ?></td>
                                                         <td><?php $this->s($command['name']); ?></td>
                                                         <td><?php $this->s($command['script']); ?></td>
                                                         <td><?php echo $command['admin'] ? 'Oui' : 'Non' ; ?></td>

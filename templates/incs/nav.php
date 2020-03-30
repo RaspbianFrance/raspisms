@@ -38,7 +38,7 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#smss"><i class="fa fa-fw fa-envelope"></i> SMS <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="smss" class="collapse <?php echo in_array($page, array('scheduleds', 'sendeds', 'receiveds')) ? 'in' : ''; ?>">
+						<ul id="smss" class="collapse <?php echo in_array($page, array('scheduleds', 'sendeds', 'receiveds', 'receiveds_unread')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'scheduleds' ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo \descartes\Router::url('Scheduled', 'list'); ?>"><i class="fa fa-fw fa-send"></i> Nouveau SMS</a>
 							</li>

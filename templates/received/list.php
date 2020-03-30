@@ -42,7 +42,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-receiveds">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>De</th>
                                                     <th>À</th>
                                                     <th>Message</th>
@@ -55,7 +54,6 @@
                                             <tbody>
                                             <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($received['id']); ?></td>
                                                         <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['origin'])); ?></td>
                                                         <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['destination'])); ?></td>
                                                         <td><?php $this->s($received['text']); ?></td>

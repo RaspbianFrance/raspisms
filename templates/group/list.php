@@ -42,7 +42,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-groupes">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Nom</th>
                                                     <th>Nombre de contacts</th>
                                                     <th style="width:5%;">Sélectionner</th>
@@ -51,7 +50,6 @@
                                             <tbody>
                                                 <?php foreach ($groups as $group) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($group['id']); ?></td>
                                                         <td><?php $this->s($group['name']); ?></td>
                                                         <td><?php $this->s($group['nb_contacts']); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($group['id']); ?>"></td>

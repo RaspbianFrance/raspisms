@@ -44,7 +44,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-contacts">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Nom</th>
                                                     <th>Numéro</th>
                                                     <th style="width:5%;">Sélectionner</th>
@@ -53,7 +52,6 @@
                                             <tbody>
                                             <?php foreach ($contacts as $contact) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($contact['id']); ?></td>
                                                         <td><?php $this->s($contact['name']); ?></td>
                                                         <td><?php echo(\controllers\internals\Tool::phone_link($contact['number'])); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($contact['id']); ?>"></td>

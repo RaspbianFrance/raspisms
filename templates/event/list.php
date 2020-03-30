@@ -42,7 +42,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-events">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Type</th>
                                                     <th>Date</th>
                                                     <th>Texte</th>
@@ -52,7 +51,6 @@
                                             <tbody>
                                             <?php foreach ($events as $event) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($event['id']); ?></td>
                                                         <td><span class="fa fa-fw <?php echo \controllers\internals\Tool::event_type_to_icon($event['type']); ?>"></span></td>
                                                         <td><?php $this->s($event['at']); ?></td>
                                                         <td><?php $this->s($event['text']); ?></td>

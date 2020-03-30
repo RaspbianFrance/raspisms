@@ -42,7 +42,6 @@
                                         <table class="table table-bordered table-hover table-striped" id="table-scheduleds">
                                             <thead>
                                                 <tr>
-                                                    <th>#</th>
                                                     <th>Date</th>
                                                     <th>Contenu</th>
                                                     <th style="width:5%;">Sélectionner</th>
@@ -51,7 +50,6 @@
                                             <tbody>
                                             <?php foreach ($scheduleds as $scheduled) { ?>
                                                     <tr>
-                                                        <td><?php $this->s($scheduled['id']); ?></td>
                                                         <td><?php $this->s($scheduled['at']); ?></td>
                                                         <td><?php $this->s($scheduled['text']); ?></td>
                                                         <td><input type="checkbox" name="ids[]" value="<?php $this->s($scheduled['id']); ?>"></td>
