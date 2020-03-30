@@ -23,10 +23,9 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param string      $number : Phone number the adapter is used for
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
-        public function __construct(string $number, string $datas);
+        public function __construct(string $datas);
 
         /**
          * Classname of the adapter.

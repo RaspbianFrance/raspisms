@@ -21,11 +21,6 @@ namespace adapters;
     class TestAdapter implements AdapterInterface
     {
         /**
-         * Phone number using the adapter.
-         */
-        private $number;
-
-        /**
          * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
         private $datas;
@@ -43,12 +38,10 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param string      $number : Phone number the adapter is used for
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
-        public function __construct(string $number, string $datas)
+        public function __construct(string $datas)
         {
-            $this->number = $number;
             $this->datas = $datas;
         }
 
@@ -167,7 +160,6 @@ namespace adapters;
         /**
          * Method called on reception of a status update notification for a SMS.
          *
-         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
          */
         public static function status_change_callback()
         {

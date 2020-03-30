@@ -82,7 +82,7 @@ class Phone extends AbstractDaemon
 
         //Instanciate adapter
         $adapter_class = $this->phone['adapter'];
-        $this->adapter = new $adapter_class($this->phone['number'], $this->phone['adapter_datas']);
+        $this->adapter = new $adapter_class($this->phone['adapter_datas']);
 
         $this->logger->info('Starting Phone daemon with pid ' . getmypid());
     }
@@ -196,7 +196,7 @@ class Phone extends AbstractDaemon
 
             $this->process_for_transfer($sms, $user_settings);
 
-            $internal_received->create($this->phone['id_user'], $sms['at'], $sms['text'], $sms['origin'], $sms['destination'], 'unread', $is_command);
+            $internal_received->create($this->phone['id_user'], $this->phone['id'], $sms['at'], $sms['text'], $sms['origin'], 'unread', $is_command);
         }
     }
 

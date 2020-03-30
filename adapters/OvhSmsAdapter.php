@@ -23,11 +23,6 @@ namespace adapters;
     class OvhSmsAdapter implements AdapterInterface
     {
         /**
-         * Phone number using the adapter.
-         */
-        private $number;
-
-        /**
          * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
         private $datas;
@@ -48,10 +43,8 @@ namespace adapters;
          * @param string      $number : Phone number the adapter is used for
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
-        public function __construct(string $number, string $datas)
+        public function __construct(string $datas)
         {
-            $this->number = $number;
-            $this->formatted_number = str_replace('+', '00', $number);
             $this->datas = json_decode($datas, true);
 
             $this->api = new Api(
@@ -60,6 +53,9 @@ namespace adapters;
                 'ovh-eu',
                 $this->datas['consumer_key']
             );
+            
+            $this->number = $this->datas['number'];
+            $this->formatted_number = str_replace('+', '00', $this->number);
         }
 
         /**
@@ -108,6 +104,12 @@ namespace adapters;
                     'name' => 'service_name',
                     'title' => 'Service Name',
                     'description' => 'Service Name de votre service SMS chez OVH. Il s\'agit du nom associé à votre service SMS dans la console OVH, probablement quelque chose comme "sms-xxxxx-1" ou "xxxx" est votre identifiant client OVH.',
+                    'required' => true,
+                ],
+                [
+                    'name' => 'number',
+                    'title' => 'Numéro',
+                    'description' => 'Numéro virtuel du téléphone chez OVH.',
                     'required' => true,
                 ],
                 [
@@ -220,7 +222,6 @@ namespace adapters;
                         'at' => (new \DateTime($sms_details['creationDatetime']))->format('Y-m-d H:i:s'),
                         'text' => $sms_details['message'],
                         'origin' => $sms_details['sender'],
-                        'destination' => $this->number,
                     ];
 
                     //Remove the sms to prevent double reading as ovh do not offer a filter for unread messages only

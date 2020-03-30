@@ -33,12 +33,10 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param string      $number : Phone number the adapter is used for
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
         public function __construct(string $number, string $datas)
         {
-            $this->number = $number;
             $this->datas = json_decode($datas, true);
         }
 
@@ -178,7 +176,7 @@ namespace adapters;
         }
 
         /**
-         * Method called to read SMSs of the number.
+         * Method called to read SMSs of the phone
          *
          * @return array : Array of the sms reads
          */
@@ -213,7 +211,6 @@ namespace adapters;
                     'at' => $decode['at'],
                     'text' => $decode['text'],
                     'origin' => $decode['number'],
-                    'destination' => $this->number,
                 ];
             }
 
