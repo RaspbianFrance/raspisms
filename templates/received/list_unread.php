@@ -54,8 +54,14 @@
                                             <tbody>
                                             <?php foreach ($receiveds as $received) { ?>
                                                     <tr>
-                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['origin'])); ?></td>
-                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($received['destination'])); ?></td>
+                                                        <td class="no-wrap">
+                                                            <?php if ($received['contact'] ?? false) { ?>
+                                                                <?php echo \controllers\internals\Tool::phone_link($received['origin']) . ' (' . $received['contact'] . ')'; ?>
+                                                            <?php } else { ?>
+                                                                <?php echo \controllers\internals\Tool::phone_link($received['origin']); ?>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td class="no-wrap"><?php $this->s($received['phone_name'] ?? 'Inconnu'); ?></td>
                                                         <td><?php $this->s($received['text']); ?></td>
                                                         <td><?php $this->s($received['at']); ?></td>
                                                         <td><?php echo ($received['status'] == 'read' ? 'Lu' : 'Non lu'); ?></td>

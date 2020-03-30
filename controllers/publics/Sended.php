@@ -30,6 +30,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_contact = new \controllers\internals\Contact($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -45,20 +46,22 @@ namespace controllers\publics;
             $limit = 25;
             $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id'], $limit, $page);
 
-            foreach ($sendeds as &$sended)
+            foreach ($sendeds as $key => $sended)
             {
-                if ($sended['id_phone'] === null)
+                if ($sended['id_phone'] !== null)
                 {
-                    continue;
+                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $sended['id_phone']);
+                    if ($phone)
+                    {
+                        $sendeds[$key]['phone_name'] = $phone['name'];
+                    }
                 }
 
-                $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $sended['id_phone']);
-                if (!$phone)
+                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $sended['destination']);
+                if ($contact)
                 {
-                    continue;
+                    $sendeds[$key]['contact'] = $contact['name'];
                 }
-
-                $sended['phone_name'] = $phone['name'];
             }
 
             $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);

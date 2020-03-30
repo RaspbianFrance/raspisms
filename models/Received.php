@@ -225,7 +225,7 @@ namespace models;
         }
 
         /**
-         * Find destination of last received message for an origin and user.
+         * Find last received message for an origin and user.
          *
          * @param int    $id_user : User id
          * @param string $origin  : Origin number

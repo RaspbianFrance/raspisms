@@ -56,7 +56,13 @@
                                             <?php foreach ($sendeds as $sended) { ?>
                                                     <tr>
                                                         <td class="no-wrap"><?php $this->s($sended['phone_name'] ?? 'Inconnu'); ?></td>
-                                                        <td class="no-wrap"><?php echo(\controllers\internals\Tool::phone_link($sended['destination'])); ?></td>
+                                                        <td class="no-wrap">
+                                                            <?php if ($sended['contact'] ?? false) { ?>
+                                                                <?php echo \controllers\internals\Tool::phone_link($sended['destination']) . ' (' . $sended['contact'] . ')'; ?>
+                                                            <?php } else { ?>
+                                                                <?php echo \controllers\internals\Tool::phone_link($sended['destination']); ?>
+                                                            <?php } ?>
+                                                        </td>
                                                         <td><?php $this->s($sended['text']); ?></td>
                                                         <td><?php $this->s($sended['at']); ?></td>
 

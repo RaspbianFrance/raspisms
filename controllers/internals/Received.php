@@ -33,56 +33,28 @@ namespace controllers\internals;
          * Create a received.
          *
          * @param $id_user : Id of user to create received for
+         * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
          * @param string $origin      : Number of the sender
-         * @param string $destination : Number of the receiver
          * @param string $status      : Status of the received message
          * @param bool   $command     : Is the sms a command
          *
          * @return bool : false on error, new received id else
          */
-        public function create(int $id_user, $at, string $text, string $origin, string $destination, string $status = 'unread', bool $command = false): bool
+        public function create(int $id_user, int $id_phone, $at, string $text, string $origin, string $status = 'unread', bool $command = false): bool
         {
             $received = [
                 'id_user' => $id_user,
+                'id_phone' => $id_phone,
                 'at' => $at,
                 'text' => $text,
                 'origin' => $origin,
-                'destination' => $destination,
                 'status' => $status,
                 'command' => $command,
             ];
 
             return (bool) $this->get_model()->insert($received);
-        }
-
-        /**
-         * Update a received for a user.
-         *
-         * @param int $id_user     : user id
-         * @param int $id_received : received id
-         * @param $at : Reception date
-         * @param $text : Text of the message
-         * @param string $origin      : Number of the sender
-         * @param string $destination : Number of the receiver
-         * @param string $status      : Status of the received message
-         * @param bool   $command     : Is the sms a command
-         *
-         * @return bool : false on error, true on success
-         */
-        public function update_for_user(int $id_user, int $id_received, $at, string $text, string $origin, string $destination, string $status = 'unread', bool $command = false): bool
-        {
-            $received = [
-                'at' => $at,
-                'text' => $text,
-                'origin' => $origin,
-                'destination' => $destination,
-                'status' => $status,
-                'command' => $command,
-            ];
-
-            return (bool) $this->get_model()->update_for_user($id_user, $id_received, $received);
         }
 
         /**
@@ -218,7 +190,7 @@ namespace controllers\internals;
         }
 
         /**
-         * Find destination of last received message for an origin and user.
+         * Find last received message for an origin and user.
          *
          * @param int    $id_user : User id
          * @param string $origin  : Origin number

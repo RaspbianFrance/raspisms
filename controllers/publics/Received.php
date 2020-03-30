@@ -54,12 +54,20 @@ namespace controllers\publics;
                     $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
                 }
 
-                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
+                if ($received['id_phone'] !== null)
                 {
-                    continue;
+                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
+                    if ($phone)
+                    {
+                        $receiveds[$key]['phone_name'] = $phone['name'];
+                    }
                 }
 
-                $receiveds[$key]['origin'] = $contact['name'] . ' (' . $received['origin'] . ')';
+                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']);
+                if ($contact)
+                {
+                    $receiveds[$key]['contact'] = $contact['name'];
+                }
             }
 
             $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
@@ -80,12 +88,20 @@ namespace controllers\publics;
             {
                 $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
 
-                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
+                if ($received['id_phone'] !== null)
                 {
-                    continue;
+                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
+                    if ($phone)
+                    {
+                        $receiveds[$key]['phone_name'] = $phone['name'];
+                    }
                 }
 
-                $receiveds[$key]['origin'] = $contact['name'] . ' (' . $received['origin'] . ')';
+                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']);
+                if ($contact)
+                {
+                    $receiveds[$key]['contact'] = $contact['name'];
+                }
             }
 
             $this->render('received/list_unread', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
