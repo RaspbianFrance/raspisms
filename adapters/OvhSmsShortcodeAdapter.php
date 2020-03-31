@@ -14,13 +14,9 @@ namespace adapters;
     use Ovh\Api;
 
     /**
-     * Interface for phones adapters
-     * Phone's adapters allow RaspiSMS to use a platform to communicate with a phone number.
-     * Its an adapter between internal and external code, as an API, command line software, physical modem, etc.
-     *
-     * All Phone Adapters must implement this interface
+     * OVH SMS service with a shortcode allowing responses
      */
-    class OvhSmsAdapter implements AdapterInterface
+    class OvhSmsShortcodeAdapter implements AdapterInterface
     {
         /**
          * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
@@ -53,9 +49,6 @@ namespace adapters;
                 'ovh-eu',
                 $this->datas['consumer_key']
             );
-            
-            $this->number = $this->datas['number'];
-            $this->formatted_number = str_replace('+', '00', $this->number);
         }
 
         /**
@@ -72,7 +65,7 @@ namespace adapters;
          */
         public static function meta_name(): string
         {
-            return 'OVH SMS';
+            return 'OVH SMS Shortcode';
         }
 
         /**
@@ -104,12 +97,6 @@ namespace adapters;
                     'name' => 'service_name',
                     'title' => 'Service Name',
                     'description' => 'Service Name de votre service SMS chez OVH. Il s\'agit du nom associé à votre service SMS dans la console OVH, probablement quelque chose comme "sms-xxxxx-1" ou "xxxx" est votre identifiant client OVH.',
-                    'required' => true,
-                ],
-                [
-                    'name' => 'number',
-                    'title' => 'Numéro',
-                    'description' => 'Numéro virtuel du téléphone chez OVH.',
                     'required' => true,
                 ],
                 [
@@ -172,10 +159,11 @@ namespace adapters;
             {
                 $success = true;
 
-                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/jobs';
+                $endpoint = '/sms/' . $this->datas['service_name'] . '/jobs';
                 $params = [
                     'message' => $text,
                     'receivers' => [$destination],
+                    'senderForResponse' => true,
                 ];
 
                 $response = $this->api->post($endpoint, $params);
@@ -207,7 +195,7 @@ namespace adapters;
             {
                 $success = true;
 
-                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
+                $endpoint = '/sms/' . $this->datas['service_name'] . '/incoming';
                 $uids = $this->api->get($endpoint);
 
                 if (!\is_array($uids) || !$uids)
@@ -218,7 +206,7 @@ namespace adapters;
                 $received_smss = [];
                 foreach ($uids as $uid)
                 {
-                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
+                    $endpoint = '/sms/' . $this->datas['service_name'] . '/incoming/' . $uid;
                     $sms_details = $this->api->get($endpoint);
 
                     if (!isset($sms_details['creationDatetime'], $sms_details['message'], $sms_details['sender']))
@@ -233,7 +221,7 @@ namespace adapters;
                     ];
 
                     //Remove the sms to prevent double reading as ovh do not offer a filter for unread messages only
-                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
+                    $endpoint = '/sms/' . $this->datas['service_name'] . '/incoming/' . $uid;
                     $this->api->delete($endpoint);
                 }
 
@@ -262,11 +250,7 @@ namespace adapters;
                 $response = $this->api->get($endpoint);
                 $success = $success && (bool) $response;
 
-                //Check virtualnumber
-                $endpoint = '/sms/virtualNumbers/' . $this->formatted_number;
-                $response = $this->api->get($endpoint);
-
-                return $success && (bool) $response;
+                return $success;
             }
             catch (\Exception $e)
             {
