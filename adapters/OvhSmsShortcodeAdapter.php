@@ -100,6 +100,14 @@ namespace adapters;
                     'required' => true,
                 ],
                 [
+                    'name' => 'sender',
+                    'title' => 'Nom de l\'expéditeur',
+                    'description' => 'Nom de l\'expéditeur à afficher à la place du numéro (11 caractères max).<br/>
+                                      <b>Laissez vide pour ne pas utiliser d\'expéditeur nommé.</b><br/>
+                                      Le nom doit avoir été validé au préallable. <b>Si vous utilisez un expéditeur nommé, le destinataire ne pourra pas répondre.</b>',
+                    'required' => false,
+                ],
+                [
                     'name' => 'app_key',
                     'title' => 'Application Key',
                     'description' => 'Paramètre "Application Key" obtenu lors de la génération de la clef API OVH.',
@@ -165,6 +173,12 @@ namespace adapters;
                     'receivers' => [$destination],
                     'senderForResponse' => true,
                 ];
+
+                if ($this->datas['sender'])
+                {
+                    $params['sender'] = $this->datas['sender'];
+                    $params['senderForResponse'] = false;
+                }
 
                 $response = $this->api->post($endpoint, $params);
 
@@ -244,6 +258,11 @@ namespace adapters;
             try
             {
                 $success = true;
+    
+                if ($this->datas['sender'] && mb_strlen($this->datas['sender']))
+                {
+                    return false;
+                }
 
                 //Check service name
                 $endpoint = '/sms/' . $this->datas['service_name'];
