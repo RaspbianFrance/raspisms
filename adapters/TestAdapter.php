@@ -80,6 +80,15 @@ namespace adapters;
         {
             return [];
         }
+        
+        
+        /**
+         * Does the implemented service support reading smss.
+         */
+        public static function meta_support_read(): bool
+        {
+            return true;
+        }
 
         /**
          * Does the implemented service support flash smss.

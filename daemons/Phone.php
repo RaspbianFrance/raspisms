@@ -173,6 +173,11 @@ class Phone extends AbstractDaemon
         $internal_received = new \controllers\internals\Received($this->bdd);
         $internal_setting = new \controllers\internals\Setting($this->bdd);
 
+        if (!$this->adapter->meta_support_read())
+        {
+            return true;
+        }
+        
         $smss = $this->adapter->read();
         if (!$smss)
         {

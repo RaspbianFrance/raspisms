@@ -52,6 +52,11 @@ namespace adapters;
         public static function meta_datas_fields(): array;
 
         /**
+         * Does the implemented service support reading smss.
+         */
+        public static function meta_support_read(): bool;
+
+        /**
          * Does the implemented service support flash smss.
          */
         public static function meta_support_flash(): bool;

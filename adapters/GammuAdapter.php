@@ -21,11 +21,6 @@ namespace adapters;
     class GammuAdapter implements AdapterInterface
     {
         /**
-         * Phone number using the adapter.
-         */
-        private $number;
-
-        /**
          * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
         private $datas;
@@ -35,7 +30,7 @@ namespace adapters;
          *
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
-        public function __construct(string $number, string $datas)
+        public function __construct(string $datas)
         {
             $this->datas = json_decode($datas, true);
         }
@@ -87,6 +82,14 @@ namespace adapters;
                     'required' => false,
                 ],
             ];
+        }
+
+        /**
+         * Does the implemented service support reading smss.
+         */
+        public static function meta_support_read(): bool
+        {
+            return true;
         }
 
         /**
