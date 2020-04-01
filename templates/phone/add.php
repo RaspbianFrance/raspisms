@@ -77,7 +77,7 @@
                                     </div>
                                 </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
-								<input type="submit" class="btn btn-success" value="Enregistrer le phone" /> 	
+								<input type="submit" class="btn btn-success" value="Enregistrer le téléphone" /> 	
 							</form>
 						</div>
 					</div>
