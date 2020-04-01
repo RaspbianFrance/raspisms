@@ -81,7 +81,10 @@ jQuery(document).ready(function()
         e.preventDefault();
         jQuery(this).addClass('btn-warning');
         jQuery(this).removeClass('btn-confirm');
-        jQuery(this).html('<span class="fa fa-trash-o"></span> Valider la suppression');
+    
+        var btn_text = jQuery(this).attr('data-confirm-text') ? jQuery(this).attr('data-confirm-text') : '<span class="fa fa-trash-o"></span> Valider la suppression';
+
+        jQuery(this).html(btn_text);
         return false;
     });
 

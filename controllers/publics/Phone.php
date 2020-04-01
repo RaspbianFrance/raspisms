@@ -171,11 +171,38 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
+        //If field phone number is invalid
+        foreach ($find_adapter['meta_datas_fields'] as $field)
+        {
+            if (false === ($field['number'] ?? false))
+            {
+                continue;
+            }
+
+            if (!empty($adapter_datas[$field['name']]))
+            {
+                $adapter_datas[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_datas[$field['name']]);
+
+                if ($adapter_datas[$field['name']])
+                {
+                    continue;
+                }
+            }
+
+            var_dump($field);
+            var_dump($adapter_datas[$field['name']]);
+            die();
+
+            \FlashMessage\FlashMessage::push('danger', 'Vous avez fourni un numéro de téléphone avec un format invalide.');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
         $adapter_datas = json_encode($adapter_datas);
 
         //Check adapter is working correctly with thoses names and datas
         $adapter_classname = $find_adapter['meta_classname'];
-        $adapter_instance = new $adapter_classname($name, $adapter_datas);
+        $adapter_instance = new $adapter_classname($adapter_datas);
         $adapter_working = $adapter_instance->test();
 
         if (!$adapter_working)

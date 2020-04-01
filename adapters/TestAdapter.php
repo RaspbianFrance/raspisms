@@ -52,6 +52,15 @@ namespace adapters;
         {
             return __CLASS__;
         }
+        
+        /**
+         * Uniq name of the adapter
+         * It should be the classname of the adapter un snakecase
+         */
+        public static function meta_uid() : string
+        {
+            return 'test_adapter';
+        }
 
         /**
          * Name of the adapter.
@@ -117,42 +126,85 @@ namespace adapters;
          */
         public function send(string $destination, string $text, bool $flash = false)
         {
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'uid' => null,
+            ];
+
             $uid = uniqid();
 
             $at = (new \DateTime())->format('Y-m-d H:i:s');
-            file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash]) . "\n", FILE_APPEND);
+            $success = file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash]) . "\n", FILE_APPEND);
+            if ($success === false)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot write in file : ' . $this->test_file_write;
+                return $response;
+            }
+            
 
-            return uniqid();
+            $response['uid'] = $uid;
+            return $response;
         }
 
         /**
          * Method called to read SMSs of the number.
          *
-         * @return array : Array of the sms reads
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      array 'sms' => Array of the sms reads
+         * ]
          */
         public function read(): array
         {
-            $file_contents = file_get_contents($this->test_file_read);
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'smss' => [],
+            ];
 
-            //Empty file to avoid dual read
-            file_put_contents($this->test_file_read, '');
-
-            $smss = explode("\n", $file_contents);
-
-            $return = [];
-
-            foreach ($smss as $key => $sms)
+            try 
             {
-                $decode_sms = json_decode($sms, true);
-                if (null === $decode_sms)
+                $file_contents = file_get_contents($this->test_file_read);
+                if ($file_contents === false)
                 {
-                    continue;
+                    $response['error'] = true;
+                    $response['error_message'] = 'Cannot read file : ' . $this->test_file_read;
+                    return $response;
                 }
 
-                $return[] = $decode_sms;
-            }
+                //Empty file to avoid dual read
+                $success = file_put_contents($this->test_file_read, '');
+                if ($success === false)
+                {
+                    $response['error'] = true;
+                    $response['error_message'] = 'Cannot write in file : ' . $this->test_file_read;
+                    return $response;
+                }
 
-            return $return;
+                $smss = explode("\n", $file_contents);
+
+                foreach ($smss as $key => $sms)
+                {
+                    $decode_sms = json_decode($sms, true);
+                    if (null === $decode_sms)
+                    {
+                        continue;
+                    }
+
+                    $response['smss'][] = $decode_sms;
+                }
+
+                return $response;
+            }
+            catch (\Throwable $t)
+            {
+                $response['error'] = true;
+                $response['error_message'] = $t->getMessage();
+                return $response;
+            }
         }
 
         /**
@@ -182,21 +234,21 @@ namespace adapters;
 
             $return = [
                 'uid' => $uid,
-                'status' => 'unknown',
+                'status' => \models\Sended::STATUS_UNKNOWN,
             ];
 
             switch ($status)
             {
-                case 'delivered':
-                    $return['status'] = 'delivered';
+                case \models\Sended::STATUS_DELIVERED:
+                    $return['status'] = \models\Sended::STATUS_DELIVERED;
 
                     break;
-                case 'failed':
-                    $return['status'] = 'failed';
+                case \models\Sended::STATUS_FAILED:
+                    $return['status'] = \models\Sended::STATUS_FAILED;
 
                     break;
                 default:
-                    $return['status'] = 'unknown';
+                    $return['status'] = \models\Sended::STATUS_UNKNOWN;
 
                     break;
             }

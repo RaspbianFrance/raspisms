@@ -60,20 +60,20 @@ use Monolog\Logger;
          * Function call on a sended sms status change notification reception.
          * We return nothing, and we let the adapter do his things.
          *
-         * @param string $adapter_name : Name of the adapter to use
+         * @param string $adapter_uid : Uid of the adapter to use
          *
          * @return bool : true on success, false on error
          */
-        public function update_sended_status(string $adapter_name)
+        public function update_sended_status(string $adapter_uid)
         {
-            $this->logger->info('Callback status call with adapter name : ' . $adapter_name);
+            $this->logger->info('Callback status call with adapter uid : ' . $adapter_uid);
 
             //Search for an adapter
             $find_adapter = false;
             $adapters = $this->internal_adapter->list_adapters();
             foreach ($adapters as $adapter)
             {
-                if (mb_strtolower($adapter['meta_name']) === mb_strtolower($adapter_name))
+                if (mb_strtolower($adapter['meta_uid']) === $adapter_uid)
                 {
                     $find_adapter = $adapter;
                 }
@@ -81,7 +81,7 @@ use Monolog\Logger;
 
             if (false === $find_adapter)
             {
-                $this->logger->error('Callback status use non existing adapter : ' . $adapter_name);
+                $this->logger->error('Callback status use non existing adapter : ' . $adapter_uid);
 
                 return false;
             }
@@ -90,7 +90,7 @@ use Monolog\Logger;
             $adapter_classname = $find_adapter['meta_classname'];
             if (!$find_adapter['meta_support_status_change'])
             {
-                $this->logger->error('Callback status use adapter ' . $adapter_name . ' which does not support status change.');
+                $this->logger->error('Callback status use adapter ' . $adapter_uid . ' which does not support status change.');
 
                 return false;
             }
@@ -98,7 +98,7 @@ use Monolog\Logger;
             $callback_return = $adapter_classname::status_change_callback();
             if (!$callback_return)
             {
-                $this->logger->error('Callback status with adapter ' . $adapter_name . ' failed on adapter compute.');
+                $this->logger->error('Callback status with adapter ' . $adapter_uid . ' failed because adapter cannot process datas with success.');
 
                 return false;
             }
@@ -111,7 +111,14 @@ use Monolog\Logger;
                 return false;
             }
 
-            $this->logger->info('Callback status update message with uid ' . $callback_return['uid'] . '.');
+            //Do not update if current status is delivered or failed
+            if ($sended['status'] === \models\Sended::STATUS_DELIVERED || $sended['status'] === \models\Sended::STATUS_FAILED)
+            {
+                $this->logger->info('Callback status update message ignore because status is already ' . $sended['status'] . '.');
+                return false;
+            }
+
+            $this->logger->info('Callback status update message with uid ' . $callback_return['uid'] . ' to ' . $callback_return['status'] . '.');
             $this->internal_sended->update_status_for_user($this->user['id'], $sended['id'], $callback_return['status']);
 
             return true;

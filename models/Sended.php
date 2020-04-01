@@ -16,6 +16,10 @@ namespace models;
      */
     class Sended extends StandardModel
     {
+        const STATUS_UNKNOWN = 'unknown';
+        const STATUS_DELIVERED = 'delivered';
+        const STATUS_FAILED = 'failed';
+
         /**
          * Return x last sendeds message for a user, order by date.
          *

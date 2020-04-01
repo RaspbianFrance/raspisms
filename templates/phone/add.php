@@ -98,16 +98,40 @@
         datas_fields = JSON.parse(datas_fields);
 
 
+        var numbers = [];
+
         var html = '';
         jQuery.each(datas_fields, function (index, field)
         {
-            html += '<div class="form-group">' +
-                        '<label>' + field.title + '</label>' +
-                        '<p class="italic small help">' + field.description + '</p>' +
-                        '<div class="form-group">' + 
-                            '<input name="adapter_datas[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' >' +
-                        '</div>' +
-                    '</div>';
+            if (!field.number)
+            {
+                html += '<div class="form-group">' +
+                            '<label>' + field.title + '</label>' +
+                            '<p class="italic small help">' + field.description + '</p>' +
+                            '<div class="form-group">' + 
+                                '<input name="adapter_datas[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') +  '>' +
+                            '</div>' +
+                        '</div>';
+            }
+            else
+            {
+                var random_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                html += '' +
+                '<div class="form-group">' +
+                    '<label>' + field.title + '</label>' +
+                    '<p class="italic small help">' + field.description + '</p>' +
+                    '<div class="form-group">' + 
+                        '<input name="" class="form-control phone-international-input" type="tel" id="' + random_id + '" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') + '>' +
+                    '</div>' +
+                '</div>';
+
+                var number = {
+                    'id': random_id, 
+                    'name': field.name,
+                };
+
+                numbers.push(number);
+            }
         });
 
         if (html == '')
@@ -116,6 +140,17 @@
         }
 
         jQuery('#adapter-datas-fields').html(html);
+        
+        for (i = 0; i < numbers.length; i++)
+        {
+            var iti_number_input = window.intlTelInput(document.getElementById(numbers[i].id), {
+                hiddenInput: 'adapter_datas[' + numbers[i].name + ']',
+                defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
+                preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
+                nationalMode: true,
+                utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js',
+            });
+        }
     }
 
 	jQuery('document').ready(function($)

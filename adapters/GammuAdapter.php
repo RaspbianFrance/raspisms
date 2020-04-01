@@ -42,6 +42,15 @@ namespace adapters;
         {
             return __CLASS__;
         }
+        
+        /**
+         * Uniq name of the adapter
+         * It should be the classname of the adapter un snakecase
+         */
+        public static function meta_uid() : string
+        {
+            return 'gammu_adapter';
+        }
 
         /**
          * Name of the adapter.
@@ -115,13 +124,25 @@ namespace adapters;
          * @param string $text        : Text of the SMS to send
          * @param bool   $flash       : Is the SMS a Flash SMS
          *
-         * @return mixed : Uid of the sended message if send, False else
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      ?string 'uid' => Uid of the sms created on success, null on error
+         * ]
          */
         public function send(string $destination, string $text, bool $flash = false)
         {
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'uid' => null,
+            ];
+
             if (!$this->unlock_sim())
             {
-                return false;
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot unlock SIM.';
+                return $response;
             }
 
             $command_parts = [
@@ -147,13 +168,17 @@ namespace adapters;
             $result = $this->exec_command($command_parts);
             if (0 !== $result['return'])
             {
-                return false;
+                $response['error'] = true;
+                $response['error_message'] = 'Gammu command failed.';
+                return $response;
             }
 
             $find_ok = $this->search_for_string($result['output'], 'ok');
             if (!$find_ok)
             {
-                return false;
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot find output OK.';
+                return $response;
             }
 
             $uid = false;
@@ -172,22 +197,37 @@ namespace adapters;
 
             if (false === $uid)
             {
-                return false;
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot retrieve sms uid.';
+                return $response;
             }
 
-            return $uid;
+            $response['uid'] = $uid;
+            return $response;
         }
 
         /**
-         * Method called to read SMSs of the phone
+         * Method called to read SMSs of the number.
          *
-         * @return array : Array of the sms reads
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      array 'sms' => Array of the sms reads
+         * ]
          */
         public function read(): array
         {
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'smss' => [],
+            ];
+
             if (!$this->unlock_sim())
             {
-                return [];
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot unlock sim.';
+                return $response;
             }
 
             $command_parts = [
@@ -198,10 +238,11 @@ namespace adapters;
             $return = $this->exec_command($command_parts);
             if (0 !== $return['return'])
             {
-                return [];
+                $response['error'] = true;
+                $response['error_message'] = 'Gammu command return failed.';
+                return $response;
             }
 
-            $smss = [];
             foreach ($return['output'] as $line)
             {
                 $decode = json_decode($line, true);
@@ -210,14 +251,14 @@ namespace adapters;
                     continue;
                 }
 
-                $smss[] = [
+                $response['smss'][] = [
                     'at' => $decode['at'],
                     'text' => $decode['text'],
                     'origin' => $decode['number'],
                 ];
             }
 
-            return $smss;
+            return $response;
         }
 
         /**
@@ -235,7 +276,7 @@ namespace adapters;
         /**
          * Method called on reception of a status update notification for a SMS.
          *
-         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
+         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms (\models\Sended::STATUS_UNKNOWN, \models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED)]
          */
         public static function status_change_callback()
         {

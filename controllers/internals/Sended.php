@@ -26,18 +26,17 @@ namespace controllers\internals;
          * @param string $uid         : Uid of the sms on the adapter service used
          * @param string $adapter     : Name of the adapter service used to send the message
          * @param bool   $flash       : Is the sms a flash
-         * @param string $status      : Status of a the sms. By default 'unknown'
+         * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return bool : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = 'unknown'): bool
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = \models\Sended::STATUS_UNKNOWN): bool
         {
             $sended = [
                 'id_user' => $id_user,
                 'id_phone' => $id_phone,
                 'at' => $at,
                 'text' => $text,
-                'origin' => $origin,
                 'destination' => $destination,
                 'uid' => $uid,
                 'adapter' => $adapter,

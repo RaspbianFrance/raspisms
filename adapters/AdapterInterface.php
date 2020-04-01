@@ -31,6 +31,12 @@ namespace adapters;
          * Classname of the adapter.
          */
         public static function meta_classname(): string;
+        
+        /**
+         * Uniq name of the adapter
+         * It should be the classname of the adapter un snakecase
+         */
+        public static function meta_uid() : string;
 
         /**
          * Name of the adapter.
@@ -73,14 +79,22 @@ namespace adapters;
          * @param string $text        : Text of the SMS to send
          * @param bool   $flash       : Is the SMS a Flash SMS
          *
-         * @return mixed Uid of the sended message if send, False else
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      array 'uid' => Uid of the sms created on success
+         * ]
          */
         public function send(string $destination, string $text, bool $flash = false);
 
         /**
-         * Method called to read unread SMSs of the number.
+         * Method called to read SMSs of the number.
          *
-         * @return array : Array of the sms reads
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      array 'sms' => Array of the sms reads
+         * ]
          */
         public function read(): array;
 
@@ -95,7 +109,7 @@ namespace adapters;
         /**
          * Method called on reception of a status update notification for a SMS.
          *
-         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
+         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms (\models\Sended::STATUS_UNKNOWN, \models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED)]
          */
         public static function status_change_callback();
     }

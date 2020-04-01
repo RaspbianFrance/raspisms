@@ -36,7 +36,6 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param string      $number : Phone number the adapter is used for
          * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
          */
         public function __construct(string $datas)
@@ -61,6 +60,16 @@ namespace adapters;
         {
             return __CLASS__;
         }
+        
+        
+        /**
+         * Uniq name of the adapter
+         * It should be the classname of the adapter un snakecase
+         */
+        public static function meta_uid() : string
+        {
+            return 'ovh_sms_virtual_number_adapter';
+        }
 
         /**
          * Name of the adapter.
@@ -77,7 +86,7 @@ namespace adapters;
          */
         public static function meta_description(): string
         {
-            $callback = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_name' => self::meta_name()], ['api_key' => $_SESSION['user']['api_key'] ?? '<your_api_key>']);
+            $callback = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => self::meta_uid()], ['api_key' => $_SESSION['user']['api_key'] ?? '<your_api_key>']);
             $generate_credentials_url = 'https://eu.api.ovh.com/createToken/index.cgi?GET=/sms&GET=/sms/*&POST=/sms/*&PUT=/sms/*&DELETE=/sms/*&';
 
             return '
@@ -107,6 +116,7 @@ namespace adapters;
                     'title' => 'Numéro',
                     'description' => 'Numéro de téléphone virtuel chez OVH.',
                     'required' => true,
+                    'number' => true,
                 ],
                 [
                     'name' => 'app_key',
@@ -164,6 +174,12 @@ namespace adapters;
          */
         public function send(string $destination, string $text, bool $flash = false)
         {
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'uid' => null,
+            ];
+
             try
             {
                 $success = true;
@@ -179,39 +195,57 @@ namespace adapters;
                 $nb_invalid_receivers = \count(($response['invalidReceivers'] ?? []));
                 if ($nb_invalid_receivers > 0)
                 {
-                    return false;
+                    $response['error'] = true;
+                    $response['error_message'] = 'Invalid receiver';
+                    return $response;
                 }
 
-                $uids = $response['ids'] ?? [];
+                $uid = $response['ids'][0] ?? false;
+                if (!$uid)
+                {
+                    $response['error'] = true;
+                    $response['error_message'] = 'Cannot retrieve uid';
+                    return $response;
+                }
 
-                return $uids[0] ?? false;
+                $response['uid'] = $uid;
+                return $response;
             }
-            catch (\Exception $e)
+            catch (\Throwable $t)
             {
-                return false;
+                $response['error'] = true;
+                $response['error_message'] = $t->getMessage();
+                return $response;
             }
         }
 
         /**
          * Method called to read SMSs of the number.
          *
-         * @return array : Array of the sms reads
+         * @return array : [
+         *      bool 'error' => false if no error, true else
+         *      ?string 'error_message' => null if no error, else error message
+         *      array 'sms' => Array of the sms reads
+         * ]
          */
         public function read(): array
         {
+            $response = [
+                'error' => false,
+                'error_message' => null,
+                'smss' => [],
+            ];
+
             try
             {
-                $success = true;
-
                 $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
                 $uids = $this->api->get($endpoint);
-
-                if (!\is_array($uids) || !$uids)
+                
+                if (!is_array($uids) || !$uids)
                 {
-                    return [];
+                    return $response;
                 }
 
-                $received_smss = [];
                 foreach ($uids as $uid)
                 {
                     $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
@@ -222,7 +256,7 @@ namespace adapters;
                         continue;
                     }
 
-                    $received_smss[] = [
+                    $response['smss'][] = [
                         'at' => (new \DateTime($sms_details['creationDatetime']))->format('Y-m-d H:i:s'),
                         'text' => $sms_details['message'],
                         'origin' => $sms_details['sender'],
@@ -233,11 +267,13 @@ namespace adapters;
                     $this->api->delete($endpoint);
                 }
 
-                return $received_smss;
+                return $response;
             }
-            catch (\Exception $e)
+            catch (\Throwable $t)
             {
-                return [];
+                $response['error'] = true;
+                $response['error_message'] = $t->getMessage();
+                return $response;
             }
         }
 
@@ -251,6 +287,7 @@ namespace adapters;
         {
             try
             {
+                return true;
                 $success = true;
 
                 //Check service name
@@ -264,7 +301,7 @@ namespace adapters;
 
                 return $success && (bool) $response;
             }
-            catch (\Exception $e)
+            catch (\Throwable $t)
             {
                 return false;
             }
@@ -273,7 +310,7 @@ namespace adapters;
         /**
          * Method called on reception of a status update notification for a SMS.
          *
-         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms ('unknown', 'delivered', 'failed')]
+         * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms (\models\Sended::STATUS_UNKNOWN, \models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED)]
          */
         public static function status_change_callback()
         {
@@ -288,16 +325,16 @@ namespace adapters;
             switch ($dlr)
             {
                 case 1:
-                    $status = 'delivered';
+                    $status = \models\Sended::STATUS_DELIVERED;
 
                     break;
                 case 2:
                 case 16:
-                    $status = 'failed';
+                    $status = \models\Sended::STATUS_FAILED;
 
                     break;
                 default:
-                    $status = 'unknown';
+                    $status = \models\Sended::STATUS_UNKNOWN;
 
                     break;
             }

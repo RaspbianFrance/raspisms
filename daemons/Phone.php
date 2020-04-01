@@ -145,11 +145,11 @@ class Phone extends AbstractDaemon
 
             $this->logger->info('Try send message : ' . json_encode($message));
 
-            $sended_sms_uid = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
-            if (!$sended_sms_uid)
+            $response = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
+            if ($response['error'])
             {
-                $this->logger->error('Failed send message : ' . json_encode($message));
-                $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash'], 'failed');
+                $this->logger->error('Failed send message : ' . json_encode($message) . ' with error : ' . $response['error_message']);
+                $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $response['uid'] ?? uniqid(), $this->phone['adapter'], $message['flash'], \models\Sended::STATUS_FAILED);
 
                 continue;
             }
@@ -161,7 +161,7 @@ class Phone extends AbstractDaemon
 
             $this->logger->info('Successfully send message : ' . json_encode($message));
 
-            $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $sended_sms_uid, $this->phone['adapter'], $message['flash']);
+            $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $response['uid'], $this->phone['adapter'], $message['flash']);
         }
     }
 
@@ -178,8 +178,15 @@ class Phone extends AbstractDaemon
             return true;
         }
         
-        $smss = $this->adapter->read();
-        if (!$smss)
+        $response = $this->adapter->read();
+
+        if ($response['error'])
+        {
+            $this->logger->info('Error reading received smss : ' . $response['error_message']);
+            return false;
+        }
+
+        if (!$response['smss'])
         {
             return true;
         }
@@ -188,12 +195,11 @@ class Phone extends AbstractDaemon
         $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
 
         //Process smss
-        foreach ($smss as $sms)
+        foreach ($response['smss'] as $sms)
         {
             $this->logger->info('Receive message : ' . json_encode($sms));
 
             $command_result = $this->process_for_command($sms);
-            $this->logger->info('after command');
             $sms['text'] = $command_result['text'];
             $is_command = $command_result['is_command'];
 

@@ -160,9 +160,9 @@ abstract class AbstractDaemon
                 $this->run();
             }
         }
-        catch (\Exception $e)
+        catch (\Throwable $t)
         {
-            $this->logger->critical('Exception : ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine());
+            $this->logger->critical('Exception : ' . $t->getMessage() . ' in ' . $t->getFile() . ' line ' . $t->getLine());
         }
 
         //Stop the daemon

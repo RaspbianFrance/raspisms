@@ -102,7 +102,8 @@
 									</div>
 									<div class="panel-body">
                                         <div class="text-center">
-                                            <a class="btn btn-success" href="<?= \descartes\Router::url('Account', 'update_api_key', ['csrf' => $_SESSION['csrf']]); ?>"><i class="fa fa-refresh"></i> Générer une nouvelle clef API</a>	
+                                            <div class="alert alert-warning text-left">Si vous générez une nouvelle clef API la clef actuelle sera supprimée. Pensez à mettre à jour toutes les callbacks chez les services externes.</div>
+                                            <a class="btn btn-success btn-confirm" href="<?= \descartes\Router::url('Account', 'update_api_key', ['csrf' => $_SESSION['csrf']]); ?>" data-confirm-text="<i class='fa fa-refresh'></i> Confirmer la mise à jour"><i class="fa fa-refresh"></i> Générer une nouvelle clef API</a>	
                                         </div>
 									</div>
 								</div>

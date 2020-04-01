@@ -182,7 +182,7 @@
         ],
 
         'Callback' => [
-            'update_sended_status' => '/callback/status/{adapter_name}/',
+            'update_sended_status' => '/callback/status/{adapter_uid}/',
         ],
         
         'Api' => [
