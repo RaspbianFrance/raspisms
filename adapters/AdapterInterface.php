@@ -71,6 +71,11 @@ namespace adapters;
          * Does the implemented service support status change.
          */
         public static function meta_support_status_change(): bool;
+        
+        /**
+         * Does the implemented service support reception callback.
+         */
+        public static function meta_support_reception(): bool;
 
         /**
          * Method called to send a SMS to a number.
@@ -112,4 +117,21 @@ namespace adapters;
          * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms (\models\Sended::STATUS_UNKNOWN, \models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED)]
          */
         public static function status_change_callback();
+        
+        /**
+         * Method called on reception of a sms notification.
+         *
+         * @return array : [
+         *      bool 'error' => false on success, true on error
+         *      ?string 'error_message' => null on success, error message else
+         *      array 'sms' => array [
+         *          string 'at' : Recepetion date format Y-m-d H:i:s,
+         *          string 'text' : SMS body,
+         *          string 'origin' : SMS sender,
+         *          int 'id_phone' : Phone id the sms was received by,
+         *      ]
+         *
+         * ]
+         */
+        //public static function reception_callback() : array;
     }
