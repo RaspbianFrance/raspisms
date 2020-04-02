@@ -16,6 +16,9 @@ namespace models;
      */
     class Received extends StandardModel
     {
+        const STATUS_UNREAD = 'unread';
+        const STATUS_READ = 'read';
+
         /**
          * Return a list of unread received for a user.
          *
