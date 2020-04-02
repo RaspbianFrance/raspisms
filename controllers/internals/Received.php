@@ -262,7 +262,7 @@ namespace controllers\internals;
             ];
 
             $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_RECEIVE, $sended);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_RECEIVE, $received);
 
             $internal_user = new User($this->bdd);
             $internal_user->transfer_received($id_user, $received);

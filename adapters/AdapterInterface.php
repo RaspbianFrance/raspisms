@@ -75,7 +75,7 @@ namespace adapters;
         /**
          * Does the implemented service support reception callback.
          */
-        public static function meta_support_reception(): bool;
+        //public static function meta_support_reception(): bool;
 
         /**
          * Method called to send a SMS to a number.

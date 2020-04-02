@@ -166,8 +166,8 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        $user_id = $this->internal_user->create($email, $password, $admin, $status);
-        if (!$user_id)
+        $id_user = $this->internal_user->create($email, $password, $admin, $status);
+        if (!$id_user)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce user.');
 

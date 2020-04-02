@@ -116,9 +116,9 @@ namespace controllers\publics;
             }
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
-            $token = $Tokenista->generate(3600, ['user_id' => $user['id']]);
+            $token = $Tokenista->generate(3600, ['id_user' => $user['id']]);
 
-            $reset_link = \descartes\Router::url('Connect', 'reset_password', ['user_id' => $user['id'], 'token' => $token]);
+            $reset_link = \descartes\Router::url('Connect', 'reset_password', ['id_user' => $user['id'], 'token' => $token]);
 
             \controllers\internals\Tool::send_email($email, EMAIL_RESET_PASSWORD, ['reset_link' => $reset_link]);
 
@@ -128,17 +128,17 @@ namespace controllers\publics;
         /**
          * Cette fonction permet à un utilisateur de re-définir son mot de passe.
          *
-         * @param int       $user_id           : L'id du user dont on veut modifier le password
+         * @param int       $id_user           : L'id du user dont on veut modifier le password
          * @param string    $token             : Le token permetttant de vérifier que l'opération est légitime
          * @param optionnal $_POST['password'] : Le nouveau password à utiliser
          */
-        public function reset_password($user_id, $token)
+        public function reset_password($id_user, $token)
         {
             $password = $_POST['password'] ?? false;
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
 
-            if (!$Tokenista->isValid($token, ['user_id' => $user_id]))
+            if (!$Tokenista->isValid($token, ['id_user' => $id_user]))
             {
                 return $this->render('connect/reset-password-invalid');
             }
@@ -148,7 +148,7 @@ namespace controllers\publics;
                 return $this->render('connect/reset-password');
             }
 
-            $this->internal_user->update_password($user_id, $password);
+            $this->internal_user->update_password($id_user, $password);
 
             return $this->render('connect/reset-password-done');
         }

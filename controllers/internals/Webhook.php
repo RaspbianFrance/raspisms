@@ -90,7 +90,7 @@ class Webhook extends StandardController
 
     /**
      * Trigger a webhook and transmit the signal to webhook daemon if needed.
-     * @param int $user_id : User to trigger the webhook for
+     * @param int $id_user : User to trigger the webhook for
      * @param string $type  : Type of webhook to trigger
      * @param array  $sms           : The sms [
      *      int 'id' => SMS id,
@@ -101,10 +101,10 @@ class Webhook extends StandardController
      * ]
      * @return bool : False if no trigger, true else
      */
-    private function trigger (int $user_id, string $type, array $sms)
+    public function trigger (int $id_user, string $type, array $sms)
     {
         $internal_setting = new Setting($this->bdd);
-        $settings = $internal_setting->gets_for_user($user_id);
+        $settings = $internal_setting->gets_for_user($id_user);
 
         if (!$settings['webhook'] ?? false)
         {

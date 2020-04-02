@@ -222,23 +222,23 @@ namespace controllers\internals;
                 'status' => $status,
             ];
 
-            $new_user_id = $this->model_user->insert($user);
+            $new_id_user = $this->model_user->insert($user);
 
-            if (!$new_user_id)
+            if (!$new_id_user)
             {
                 return false;
             }
 
-            $success = $this->internal_setting->create_defaults_for_user($new_user_id);
+            $success = $this->internal_setting->create_defaults_for_user($new_id_user);
 
             if (!$success)
             {
-                $this->delete($new_user_id);
+                $this->delete($new_id_user);
 
                 return false;
             }
 
-            return $new_user_id;
+            return $new_id_user;
         }
 
         /**
@@ -265,10 +265,10 @@ namespace controllers\internals;
          *
          * @return bool : False if no transfer, true else
          */
-        public function transfer_received (int $id_user, array $received) : 
+        public function transfer_received (int $id_user, array $received) : bool
         {
             $internal_setting = new Setting($this->bdd);
-            $settings = $internal_setting->gets_for_user($user_id);
+            $settings = $internal_setting->gets_for_user($id_user);
 
             if (!$settings['transfer'] ?? false)
             {
