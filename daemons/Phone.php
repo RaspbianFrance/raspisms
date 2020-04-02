@@ -78,7 +78,6 @@ class Phone extends AbstractDaemon
         $this->last_message_at = microtime(true);
 
         $this->msg_queue = msg_get_queue($this->msg_queue_id);
-        $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
 
         //Instanciate adapter
         $adapter_class = $this->phone['adapter'];
@@ -106,6 +105,8 @@ class Phone extends AbstractDaemon
      */
     private function send_smss()
     {
+        $internal_sended = new \controllers\internals\Sended($this->bdd);
+        
         $find_message = true;
         while ($find_message)
         {
@@ -131,37 +132,21 @@ class Phone extends AbstractDaemon
                 continue;
             }
 
-            $internal_sended = new \controllers\internals\Sended($this->bdd);
-
             //Update last message time
             $this->last_message_at = microtime(true);
 
-            $now = new \DateTime();
-            $at = $now->format('Y-m-d H:i:s');
 
-            $message['at'] = $at;
-
-            $message['id_phone'] = $this->phone['id'];
-
+            //Do message sending            
             $this->logger->info('Try send message : ' . json_encode($message));
-
-            $response = $this->adapter->send($message['destination'], $message['text'], $message['flash']);
+        
+            $response = $internal_sended->send($this->adapter, $this->phone['id_user'], $this->phone['id'], $message['text'], $message['destination'], $message['flash']);
             if ($response['error'])
             {
                 $this->logger->error('Failed send message : ' . json_encode($message) . ' with error : ' . $response['error_message']);
-                $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $response['uid'] ?? uniqid(), $this->phone['adapter'], $message['flash'], \models\Sended::STATUS_FAILED);
-
                 continue;
             }
-
-            //Run webhook
-            $internal_setting = new \controllers\internals\Setting($this->bdd);
-            $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
-            $this->process_for_webhook($message, 'send_sms', $user_settings);
-
+        
             $this->logger->info('Successfully send message : ' . json_encode($message));
-
-            $internal_sended->create($this->phone['id_user'], $this->phone['id'], $at, $message['text'], $message['destination'], $response['uid'], $this->phone['adapter'], $message['flash']);
         }
     }
 
@@ -171,7 +156,6 @@ class Phone extends AbstractDaemon
     private function read_smss()
     {
         $internal_received = new \controllers\internals\Received($this->bdd);
-        $internal_setting = new \controllers\internals\Setting($this->bdd);
 
         if (!$this->adapter->meta_support_read())
         {
@@ -191,111 +175,20 @@ class Phone extends AbstractDaemon
             return true;
         }
 
-        //Get users settings
-        $user_settings = $internal_setting->gets_for_user($this->phone['id_user']);
-
         //Process smss
         foreach ($response['smss'] as $sms)
         {
             $this->logger->info('Receive message : ' . json_encode($sms));
-
-            $command_result = $this->process_for_command($sms);
-            $sms['text'] = $command_result['text'];
-            $is_command = $command_result['is_command'];
-
-            $this->process_for_webhook($sms, 'receive_sms', $user_settings);
-
-            $this->process_for_transfer($sms, $user_settings);
-
-            $internal_received->create($this->phone['id_user'], $this->phone['id'], $sms['at'], $sms['text'], $sms['origin'], 'unread', $is_command);
-        }
-    }
-
-    /**
-     * Process a sms to find if its a command and so execute it.
-     *
-     * @param array $sms : The sms
-     *
-     * @return array : ['text' => new sms text, 'is_command' => bool]
-     */
-    private function process_for_command(array $sms)
-    {
-        $internal_command = new \controllers\internals\Command($this->bdd);
-
-        $is_command = false;
-        $command = $internal_command->check_for_command($this->phone['id_user'], $sms['text']);
-        if ($command)
-        {
-            $is_command = true;
-            $sms['text'] = $command['updated_text'];
-            exec($command['command']);
-        }
-
-        return ['text' => $sms['text'], 'is_command' => $is_command];
-    }
-
-    /**
-     * Process a sms to transmit a webhook query to webhook daemon if needed.
-     *
-     * @param array  $sms           : The sms
-     * @param string $webhook_type  : Type of webhook to trigger
-     * @param array  $user_settings : Use settings
-     */
-    private function process_for_webhook(array $sms, string $webhook_type, array $user_settings)
-    {
-        if (!$user_settings['webhook'])
-        {
-            return false;
-        }
-
-        $internal_webhook = new \controllers\internals\Webhook($this->bdd);
-
-        $webhooks = $internal_webhook->gets_for_type_and_user($this->phone['id_user'], $webhook_type);
-        foreach ($webhooks as $webhook)
-        {
-            $message = [
-                'url' => $webhook['url'],
-                'datas' => [
-                    'webhook_type' => $webhook['type'],
-                    'at' => $sms['at'],
-                    'text' => $sms['text'],
-                    'origin' => $sms['origin'],
-                    'destination' => $sms['destination'],
-                ],
-            ];
-
-            $error_code = null;
-            $success = msg_send($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $message, true, true, $error_code);
-            if (!$success)
+            $response = $internal_received->receive($this->phone['id_user'], $this->phone['id'], $sms['text'], $sms['origin']);
+            
+            if ($response['error'])
             {
-                $this->logger->critical('Failed send webhook message in queue, error code : ' . $error_code);
+                $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+                continue;
             }
+
+            $this->logger->info('Message received successfully.');
         }
     }
 
-    /**
-     * Process a sms to transfer it by mail.
-     *
-     * @param array $sms           : The sms
-     * @param array $user_settings : Use settings
-     */
-    private function process_for_transfer(array $sms, array $user_settings)
-    {
-        if (!$user_settings['transfer'])
-        {
-            return false;
-        }
-
-        $internal_user = new \controllers\internals\User($this->bdd);
-        $user = $internal_user->get($this->phone['id_user']);
-
-        if (!$user)
-        {
-            return false;
-        }
-
-        $this->logger->info('Transfer sms to ' . $user['email'] . ' : ' . json_encode($sms));
-
-        \controllers\internals\Tool::send_email($user['email'], EMAIL_TRANSFER_SMS, ['sms' => $sms]);
-    }
 }

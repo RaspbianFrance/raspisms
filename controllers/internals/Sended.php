@@ -28,9 +28,9 @@ namespace controllers\internals;
          * @param bool   $flash       : Is the sms a flash
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
-         * @return bool : false on error, new sended id else
+         * @return mixed : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = \models\Sended::STATUS_UNKNOWN): bool
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = \models\Sended::STATUS_UNKNOWN)
         {
             $sended = [
                 'id_user' => $id_user,
@@ -44,7 +44,7 @@ namespace controllers\internals;
                 'status' => $status,
             ];
 
-            return (bool) $this->get_model()->insert($sended);
+            return $this->get_model()->insert($sended);
         }
 
         /**
@@ -167,4 +167,53 @@ namespace controllers\internals;
 
             return $this->model;
         }
+
+        /**
+         * Send a SMS message
+         * @param \adapters\AdapterInterface $adapter : Adapter object to use to send the message
+         * @param int $id_user : Id of user to create sended message for
+         * @param int $id_phone : Id of the phone the message was send with
+         * @param $text : Text of the message
+         * @param string $destination : Number of the receiver
+         * @param bool   $flash       : Is the sms a flash. By default false.
+         * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
+         * @return array : [
+         *      bool 'error' => false if success, true else
+         *      ?string 'error_message' => null if success, error message else
+         * ]
+         */
+        public function send (\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, string $status = \models\Sended::STATUS_UNKNOWN) : array
+        {
+            $return = [
+                'error' => false,
+                'error_message' => null,
+            ];
+
+            $at = (new \DateTime())->format('Y-m-d H:i:s');
+            $response = $adapter->send($destination, $text, $flash);
+
+            if ($response['error'])
+            {
+                $return['error'] = true;
+                $return['error_message'] = $response['error_message'];
+                $status = \models\Sended::STATUS_FAILED;
+                $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+                return $return;
+            }
+
+            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+
+            $sended = [
+                'id' => $sended_id,
+                'at' => $at,
+                'text' => $text,
+                'destination' => $destination,
+                'origin' => $id_phone,
+            ];
+
+            $internal_webhook = new Webhook($this->bdd);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND, $sended);
+            return $return;
+        }
+
     }

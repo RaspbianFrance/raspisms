@@ -250,4 +250,50 @@ namespace controllers\internals;
         {
             return bin2hex(random_bytes(16));
         }
+
+
+        /**
+         * Transfer a received sms to user email
+         * @param int $id_user : User id
+         * @param array $received : [
+         *      int 'id' => sms id,
+         *      string 'at' => sms reception date,
+         *      string 'text' => sms content,
+         *      string 'destination' => id of phone the sms was sent to
+         *      string 'origin' => phone number that sent the sms
+         * ]
+         *
+         * @return bool : False if no transfer, true else
+         */
+        public function transfer_received (int $id_user, array $received) : 
+        {
+            $internal_setting = new Setting($this->bdd);
+            $settings = $internal_setting->gets_for_user($user_id);
+
+            if (!$settings['transfer'] ?? false)
+            {
+                return false;
+            }
+
+            $user = $this->get($id_user);
+            if (!$user)
+            {
+                return false;
+            }
+
+            $internal_phone = new Phone($this->bdd);
+            $phone = $internal_phone->get_for_user($id_user, $destination);
+            if (!$phone)
+            {
+                return false;
+            }
+
+            $mailer = new Mailer();
+            return $mailer->enqueue($user['email'], EMAIL_TRANSFER_SMS, [
+                'at' => $received['at'],
+                'origin' => $received['origin'],
+                'destination' => $phone['name'],
+                'text' => $received['text'],
+            ]);
+        }
     }

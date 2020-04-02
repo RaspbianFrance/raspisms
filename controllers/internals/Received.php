@@ -40,9 +40,9 @@ namespace controllers\internals;
          * @param string $status      : Status of the received message
          * @param bool   $command     : Is the sms a command
          *
-         * @return bool : false on error, new received id else
+         * @return mixed : false on error, new received id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $origin, string $status = 'unread', bool $command = false): bool
+        public function create(int $id_user, int $id_phone, $at, string $text, string $origin, string $status = 'unread', bool $command = false)
         {
             $received = [
                 'id_user' => $id_user,
@@ -54,7 +54,7 @@ namespace controllers\internals;
                 'command' => $command,
             ];
 
-            return (bool) $this->get_model()->insert($received);
+            return $this->get_model()->insert($received);
         }
 
         /**
@@ -212,5 +212,60 @@ namespace controllers\internals;
             $this->model = $this->model ?? new \models\Received($this->bdd);
 
             return $this->model;
+        }
+        
+        /**
+         * Receive a SMS message
+         * @param int $id_user : Id of user to create sended message for
+         * @param int $id_phone : Id of the phone the message was sent to
+         * @param $text : Text of the message
+         * @param string $origin : Number of the sender
+         * @param string $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
+         * @return array : [
+         *      bool 'error' => false if success, true else
+         *      ?string 'error_message' => null if success, error message else
+         * ]
+         */
+        public function receive (int $id_user, int $id_phone, string $text, string $origin, string $status = \models\Received::STATUS_UNREAD) : array
+        {
+            $return = [
+                'error' => false,
+                'error_message' => null,
+            ];
+
+            $at = (new \DateTime())->format('Y-m-d H:i:s');
+            $is_command = false;
+
+            //Process the message to check plus potentially execute command and anonymize text
+            $internal_command = new Command($this->bdd);
+            $response = $internal_command->analyze_and_process($id_user, $text);
+            if ($response !== false) //Received sms is a command an we must use anonymized text
+            {
+                $is_command = true;
+                $text = $response;
+            }
+
+            $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command);
+            if (!$received_id)
+            {
+                $return['error'] = true;
+                $return['error_message'] = 'Impossible to insert the sms in database.';
+                return $return;
+            }
+
+            $received = [
+                'id' => $received_id,
+                'at' => $at,
+                'text' => $text,
+                'destination' => $id_phone,
+                'origin' => $origin,
+            ];
+
+            $internal_webhook = new Webhook($this->bdd);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_RECEIVE, $sended);
+
+            $internal_user = new User($this->bdd);
+            $internal_user->transfer_received($id_user, $received);
+            return $return;
         }
     }

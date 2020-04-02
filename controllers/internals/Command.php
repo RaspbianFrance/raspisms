@@ -69,14 +69,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Analyse a message to check if it's a command and extract it.
+         * Analyse a message to check if it's a command so execute it
          *
          * @param int    $id_user : User id to search a command for
-         * @param string $message : Text of the message to analyse
+         * @param string $message : Message to analyse
          *
-         * @return mixed : false on error, array with new text and command to execute ['updated_text' => string, 'command' => string]
+         * @return mixed bool|string : false if not a valid command, anonymized message if valid command
          */
-        public function check_for_command(int $id_user, string $message)
+        public function analyze_and_process (int $id_user, string $message)
         {
             $extracted_command = [];
 
@@ -131,10 +131,9 @@ namespace controllers\internals;
             $args = $decode_message['args'] ?? '';
             $generated_command .= ' ' . escapeshellcmd($args);
 
-            return [
-                'updated_text' => $updated_text,
-                'command' => $generated_command,
-            ];
+            exec($generated_command);
+
+            return $updated_text;
         }
 
         /**

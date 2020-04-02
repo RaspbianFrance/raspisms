@@ -61,6 +61,8 @@ class Webhook extends AbstractDaemon
             if (!$success && MSG_ENOMSG !== $error_code)
             {
                 $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
+                $find_message = false;
+                continue;
             }
 
             if (!$message)
