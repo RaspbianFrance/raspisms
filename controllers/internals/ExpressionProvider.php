@@ -18,7 +18,17 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
 {
     public function getFunctions()
     {
+        //Override default constant() function to make it return null
+        //This will prevent the use of constant() func to read constants with security impact (such as session, db credentials, etc.)
+        $neutralized_constant = new ExpressionFunction('constant', function ($str) {
+            return null;
+        }, function ($arguments, $str) {
+            return null;
+        });
+
+
         return [
+            $neutralized_constant,
             ExpressionFunction::fromPhp('is_null', 'exists'),
             ExpressionFunction::fromPhp('mb_strtolower', 'lower'),
             ExpressionFunction::fromPhp('mb_strtoupper', 'upper'),
