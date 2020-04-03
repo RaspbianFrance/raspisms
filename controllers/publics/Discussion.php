@@ -75,17 +75,16 @@ namespace controllers\publics;
             $last_sended = $this->internal_sended->get_last_for_destination_and_user($_SESSION['user']['id'], $number);
             $last_received = $this->internal_received->get_last_for_origin_and_user($_SESSION['user']['id'], $number);
 
-            $response_number = ($last_received['destination'] ?? $last_sended['origin'] ?? false);
-            $response_phone = false;
-            if ($response_number)
+            $response_phone_id = ($last_received['id_phone'] ?? $last_sended['id_phone'] ?? false);
+            if ($response_phone_id)
             {
-                $response_phone = $this->internal_phone->get_by_number_and_user($_SESSION['user']['id'], $response_number);
+                $response_phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $response_phone_id);
             }
 
             $this->render('discussion/show', [
                 'number' => $number,
                 'contact' => $contact,
-                'response_phone' => $response_phone,
+                'response_phone' => $response_phone ?? false,
             ]);
         }
 
