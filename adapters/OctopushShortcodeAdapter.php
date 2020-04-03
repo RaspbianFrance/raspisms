@@ -17,6 +17,9 @@ namespace adapters;
 class OctopushShortcodeAdapter implements AdapterInterface
 {
     const ERROR_CODE_OK = '000';
+    const SMS_TYPE_LOWCOST = 'XXX';
+    const SMS_TYPE_PREMIUM = 'FR';
+    const SMS_TYPE_INTERNATIONAL = 'WWW';
 
     /**
      * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
@@ -168,7 +171,11 @@ class OctopushShortcodeAdapter implements AdapterInterface
      * @param string $text        : Text of the SMS to send
      * @param bool   $flash       : Is the SMS a Flash SMS
      *
-     * @return mixed Uid of the sended message if send, False else
+     * @return array : [
+     *      bool 'error' => false if no error, true else
+     *      ?string 'error_message' => null if no error, else error message
+     *      array 'uid' => Uid of the sms created on success
+     * ]
      */
     public function send(string $destination, string $text, bool $flash = false)
     {
@@ -186,6 +193,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
                 'sms_text' => $text,
                 'sms_recipients' => str_replace('+', '00', $destination), //Must use 00 instead of + notation
                 'sms_sender' => '12345',
+                'sms_type' => self::SMS_TYPE_LOWCOST,
             ];
 
             if ($this->sender !== null)
@@ -204,7 +212,38 @@ class OctopushShortcodeAdapter implements AdapterInterface
             $response = curl_exec($curl);
             curl_close($curl);
 
-            var_dump($response);
+            if ($response === false)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'HTTP query failed.';
+                return $response;
+            }
+
+            $response_decode = json_decode($response, true);
+            if ($response_decode === null)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Invalid JSON for response.';
+                return $response;
+            }
+
+            if ($response_decode['error_code'] != self::ERROR_CODE_OK)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Response indicate error code : ' . $response_decode['error_code'];
+                return $response;
+            }
+
+            $uid = $response_decode['ticket'] ?? false;
+            if (!$uid)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot extract SMS uid';
+                return $response;
+            }
+
+            $response['uid'] = $uid;
+            return $response;
         }
         catch (\Throwable $t)
         {
@@ -292,8 +331,38 @@ class OctopushShortcodeAdapter implements AdapterInterface
      */
     public static function status_change_callback()
     {
-        var_dump($_REQUEST);
-        return false;
+        header('Connection: close');
+        header('Content-Encoding: none');
+        header('Content-Length: 0');
+
+        $uid = $_POST['message_id'] ?? false;
+        $status = $_POST['status'] ?? false;
+
+        if ($uid === false || $status === false)
+        {
+            return false;
+        }
+
+        switch ($status)
+        {
+            case 'DELIVERED':
+                $status = \models\Sended::STATUS_DELIVERED;
+                break;
+           
+            case 'NOT_ALLOWED':
+            case 'INVALID_DESTINATION_ADDRESS':
+            case 'OUT_OF_DATE':
+            case 'EXPIRED':
+            case 'BLACKLISTED_NUMBER':
+                $status = \models\Sended::STATUS_FAILED;
+                break;
+
+            default :
+                $status = \models\Sended::STATUS_UNKNOWN;
+                break;
+        }
+
+        return ['uid' => $uid, 'status' => $status];
     }
 
 
@@ -313,6 +382,40 @@ class OctopushShortcodeAdapter implements AdapterInterface
      */
     public static function reception_callback() : array
     {
-        return [];
+        $response = [
+            'error' => false,
+            'error_message' => null,
+            'uid' => null,
+        ];
+
+        header('Connection: close');
+        header('Content-Encoding: none');
+        header('Content-Length: 0');
+
+        $number = $_POST['number'] ?? false;
+        $text = $_POST['text'] ?? false;
+        $at = $_POST['reception_date'] ?? false;
+
+        if (!$number || !$text || !$at)
+        {
+            $response['error'] = true;
+            $response['error_message'] = 'One required data of the callback is missing.';
+            return $response;
+        }
+
+        $origin = \controllers\internals\Tool::parse_phone('+' . mb_substr($number, 2));
+        if (!$origin)
+        {
+            $response['error'] = true;
+            $response['error_message'] = 'Invalid origin number : ' . mb_substr($number, 2);
+            return $response;
+        }
+
+        $response['sms'] = [
+            'at' => $at,
+            'text' => $text,
+            'origin' => $origin,
+        ];
+        return $response;
     }
 }

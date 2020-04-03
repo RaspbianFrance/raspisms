@@ -64,7 +64,7 @@ namespace controllers\internals;
             }
             catch (\Exception $e)
             {
-                return $number;
+                return false;
             }
         }
 

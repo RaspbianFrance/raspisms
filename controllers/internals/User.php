@@ -19,12 +19,14 @@ namespace controllers\internals;
         private $model_user;
         private $internal_event;
         private $internal_setting;
+        private $internal_phone;
 
         public function __construct(\PDO $bdd)
         {
             $this->model_user = new \models\User($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
             $this->internal_setting = new \controllers\internals\Setting($bdd);
+            $this->internal_phone = new Phone($bdd);
         }
 
         /**
@@ -267,8 +269,7 @@ namespace controllers\internals;
          */
         public function transfer_received (int $id_user, array $received) : bool
         {
-            $internal_setting = new Setting($this->bdd);
-            $settings = $internal_setting->gets_for_user($id_user);
+            $settings = $this->internal_setting->gets_for_user($id_user);
 
             if (!$settings['transfer'] ?? false)
             {
@@ -281,8 +282,7 @@ namespace controllers\internals;
                 return false;
             }
 
-            $internal_phone = new Phone($this->bdd);
-            $phone = $internal_phone->get_for_user($id_user, $destination);
+            $phone = $this->internal_phone->get_for_user($id_user, $destination);
             if (!$phone)
             {
                 return false;

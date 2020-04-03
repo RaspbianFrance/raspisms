@@ -23,6 +23,7 @@ use Monolog\Logger;
         private $user;
         private $internal_user;
         private $internal_sended;
+        private $internal_received;
         private $internal_adapter;
 
         public function __construct()
@@ -31,6 +32,7 @@ use Monolog\Logger;
 
             $this->internal_user = new \controllers\internals\User($bdd);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
+            $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
 
             //Logger
@@ -172,14 +174,16 @@ use Monolog\Logger;
                 return false;
             }
 
-            $response = $internal_received->receive($this->user['id'], $id_phone, $response['sms']['text'], $response['sms']['origin'], $response['sms']['at']);
+            $sms = $response['sms'];
+
+            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at']);
             if ($response['error'])
             {
                 $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
                 return false;
             }
 
-            $this->logger->info('Callback reception successfully received message ' . json_encode($response['sms']));
+            $this->logger->info('Callback reception successfully received message : ' . json_encode($sms));
             return true;
         }
     }
