@@ -68,14 +68,14 @@ namespace adapters;
         public static function meta_support_flash(): bool;
 
         /**
-         * Does the implemented service support status change.
+         * Does the implemented service support status change callback.
          */
         public static function meta_support_status_change(): bool;
         
         /**
          * Does the implemented service support reception callback.
          */
-        //public static function meta_support_reception(): bool;
+        public static function meta_support_reception(): bool;
 
         /**
          * Method called to send a SMS to a number.
@@ -98,7 +98,15 @@ namespace adapters;
          * @return array : [
          *      bool 'error' => false if no error, true else
          *      ?string 'error_message' => null if no error, else error message
-         *      array 'sms' => Array of the sms reads
+         *      array 'smss' => Array of the sms reads
+         *      [
+         *          [
+         *              string 'at' => sms reception date,
+         *              string 'text' => sms text,
+         *              string 'origin' => phone number who sent the sms
+         *          ],
+         *          ...
+         *      ]
          * ]
          */
         public function read(): array;
@@ -128,10 +136,9 @@ namespace adapters;
          *          string 'at' : Recepetion date format Y-m-d H:i:s,
          *          string 'text' : SMS body,
          *          string 'origin' : SMS sender,
-         *          int 'id_phone' : Phone id the sms was received by,
          *      ]
          *
          * ]
          */
-        //public static function reception_callback() : array;
+        public static function reception_callback() : array;
     }

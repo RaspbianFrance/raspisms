@@ -220,20 +220,21 @@ namespace controllers\internals;
          * @param int $id_phone : Id of the phone the message was sent to
          * @param $text : Text of the message
          * @param string $origin : Number of the sender
+         * @param ?string $at : Message reception date, if null use current date
          * @param string $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
          * @return array : [
          *      bool 'error' => false if success, true else
          *      ?string 'error_message' => null if success, error message else
          * ]
          */
-        public function receive (int $id_user, int $id_phone, string $text, string $origin, string $status = \models\Received::STATUS_UNREAD) : array
+        public function receive (int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD) : array
         {
             $return = [
                 'error' => false,
                 'error_message' => null,
             ];
 
-            $at = (new \DateTime())->format('Y-m-d H:i:s');
+            $at = $at ?? (new \DateTime())->format('Y-m-d H:i:s');
             $is_command = false;
 
             //Process the message to check plus potentially execute command and anonymize text

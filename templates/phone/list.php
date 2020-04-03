@@ -44,6 +44,7 @@
                                                 <tr>
                                                     <th>Nom</th>
                                                     <th>Adaptateur</th>
+                                                    <th>Callbacks</th>
                                                     <th style="width:5%;">Sélectionner</th>
                                                 </tr>
                                             </thead>
@@ -52,6 +53,21 @@
                                                 <tr>
                                                     <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['name'])); ?></td>
                                                     <td><?php $this->s($phone['adapter']); ?></td>
+                                                    <td>
+                                                        <div class="bold">Reception d'un SMS : </div>
+                                                        <?php if ($phone['callback_reception'] ?? false) { ?>
+                                                            <div><code><?= $phone['callback_reception']; ?></code></div>
+                                                        <?php } else { ?>
+                                                            <div>Non disponible.</div>
+                                                        <?php } ?>
+                                                        <br/>
+                                                        <div class="bold">Changement de status d'un SMS : </div>
+                                                        <?php if ($phone['callback_status'] ?? false) { ?>
+                                                            <div><code><?= $phone['callback_status']; ?></code></div>
+                                                        <?php } else { ?>
+                                                            <div>Non disponible.</div>
+                                                        <?php } ?>
+                                                    </td>
                                                     <td><input type="checkbox" value="<?php $this->s($phone['id']); ?>" name="ids[]"></td>
                                                 </tr>
                                             <?php } ?>

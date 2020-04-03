@@ -112,7 +112,15 @@ namespace adapters;
          */
         public static function meta_support_status_change(): bool
         {
-            return true;
+            return false;
+        }
+
+        /**
+         * Does the implemented service support reception callback.
+         */
+        public static function meta_support_reception(): bool
+        {
+            return false;
         }
 
         /**
@@ -254,5 +262,25 @@ namespace adapters;
             }
 
             return $return;
+        }
+        
+        
+        /**
+         * Method called on reception of a sms notification.
+         *
+         * @return array : [
+         *      bool 'error' => false on success, true on error
+         *      ?string 'error_message' => null on success, error message else
+         *      array 'sms' => array [
+         *          string 'at' : Recepetion date format Y-m-d H:i:s,
+         *          string 'text' : SMS body,
+         *          string 'origin' : SMS sender,
+         *      ]
+         *
+         * ]
+         */
+        public static function reception_callback() : array
+        {
+            return [];
         }
     }

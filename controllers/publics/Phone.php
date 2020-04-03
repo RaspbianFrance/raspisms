@@ -36,19 +36,39 @@ class Phone extends \descartes\Controller
     public function list($page = 0)
     {
         $id_user = $_SESSION['user']['id'];
+        $api_key = $_SESSION['user']['api_key'];
         $page = (int) $page;
         $phones = $this->internal_phone->list_for_user($id_user, 25, $page);
 
         $adapters = [];
-        $adapters_metas = $this->internal_adapter->list_adapters();
-        foreach ($adapters_metas as $adapter_metas)
+        $adapters = $this->internal_adapter->list_adapters();
+        foreach ($adapters as $key => $adapter)
         {
-            $adapters[$adapter_metas['meta_classname']] = $adapter_metas['meta_name'];
+            unset($adapters[$key]);
+            $adapters[$adapter['meta_classname']] = $adapter;
         }
 
         foreach ($phones as &$phone)
         {
-            $phone['adapter'] = $adapters[$phone['adapter']] ?? 'Inconnu';
+            $adapter = $adapters[$phone['adapter']] ?? false;
+
+            if (!$adapter)
+            {
+                $phone['adapter'] = 'Inconnu';
+                continue;
+            }
+
+            $phone['adapter'] = $adapter['meta_name'];
+
+            if ($adapter['meta_support_reception'])
+            {
+                $phone['callback_reception'] = \descartes\Router::url('Callback', 'reception', ['adapter_uid' => $adapter['meta_uid'], 'id_phone' => $phone['id']], ['api_key' => $api_key]);
+            }
+
+            if ($adapter['meta_support_status_change'])
+            {
+                $phone['callback_status'] = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => $adapter['meta_uid']], ['api_key' => $api_key]);
+            }
         }
 
         $this->render('phone/list', ['phones' => $phones]);
@@ -207,7 +227,7 @@ class Phone extends \descartes\Controller
 
         if (!$adapter_working)
         {
-            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez le numéro de téléphone et les réglages.');
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez les réglages.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }

@@ -86,14 +86,10 @@ namespace adapters;
          */
         public static function meta_description(): string
         {
-            $callback = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => self::meta_uid()], ['api_key' => $_SESSION['user']['api_key'] ?? '<your_api_key>']);
             $generate_credentials_url = 'https://eu.api.ovh.com/createToken/index.cgi?GET=/sms&GET=/sms/*&POST=/sms/*&PUT=/sms/*&DELETE=/sms/*&';
 
             return '
                 Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="' . $generate_credentials_url . '">cliquez ici.</a>
-                <br/>
-                <br/>
-                <div class="alert alert-info">Adresse URL de callback de changement d\'état : <b>' . $callback . '</b></div>
             ';
         }
 
@@ -161,6 +157,14 @@ namespace adapters;
         public static function meta_support_status_change(): bool
         {
             return true;
+        }
+
+        /**
+         * Does the implemented service support reception callback.
+         */
+        public static function meta_support_reception(): bool
+        {
+            return false;
         }
 
         /**
@@ -340,5 +344,24 @@ namespace adapters;
             }
 
             return ['uid' => $uid, 'status' => $status];
+        }
+        
+        /**
+         * Method called on reception of a sms notification.
+         *
+         * @return array : [
+         *      bool 'error' => false on success, true on error
+         *      ?string 'error_message' => null on success, error message else
+         *      array 'sms' => array [
+         *          string 'at' : Recepetion date format Y-m-d H:i:s,
+         *          string 'text' : SMS body,
+         *          string 'origin' : SMS sender,
+         *      ]
+         *
+         * ]
+         */
+        public static function reception_callback() : array
+        {
+            return [];
         }
     }

@@ -123,4 +123,63 @@ use Monolog\Logger;
 
             return true;
         }
+        
+        
+        /**
+         * Function call on sms reception notification
+         * We return nothing, and we let the adapter do his things.
+         *
+         * @param string $adapter_uid : Uid of the adapter to use
+         * @param int $id_phone : Phone id
+         *
+         * @return bool : true on success, false on error
+         */
+        public function reception (string $adapter_uid, int $id_phone)
+        {
+            $this->logger->info('Callback reception call with adapter uid : ' . $adapter_uid);
+
+            //Search for an adapter
+            $find_adapter = false;
+            $adapters = $this->internal_adapter->list_adapters();
+            foreach ($adapters as $adapter)
+            {
+                if (mb_strtolower($adapter['meta_uid']) === $adapter_uid)
+                {
+                    $find_adapter = $adapter;
+                }
+            }
+
+            if (false === $find_adapter)
+            {
+                $this->logger->error('Callback reception use non existing adapter : ' . $adapter_uid);
+
+                return false;
+            }
+
+            //Instanciate adapter, check if status change is supported and if so call status change callback
+            $adapter_classname = $find_adapter['meta_classname'];
+            if (!$find_adapter['meta_support_reception'])
+            {
+                $this->logger->error('Callback recepetion use adapter ' . $adapter_uid . ' which does not support reception.');
+
+                return false;
+            }
+
+            $response = $adapter_classname::reception_callback();
+            if ($response['error'])
+            {
+                $this->logger->error('Callback reception with adapter ' . $adapter_uid . ' failed : ' . $response['error_message']);
+                return false;
+            }
+
+            $response = $internal_received->receive($this->user['id'], $id_phone, $response['sms']['text'], $response['sms']['origin'], $response['sms']['at']);
+            if ($response['error'])
+            {
+                $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+                return false;
+            }
+
+            $this->logger->info('Callback reception successfully received message ' . json_encode($response['sms']));
+            return true;
+        }
     }

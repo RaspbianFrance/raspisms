@@ -116,6 +116,15 @@ namespace adapters;
         {
             return false;
         }
+        
+        /**
+         * Does the implemented service support reception callback.
+         */
+        public static function meta_support_reception(): bool
+        {
+            return false;
+        }
+
 
         /**
          * Method called to send a SMS to a number.
@@ -366,5 +375,25 @@ namespace adapters;
             }
 
             return (bool) $find;
+        }
+        
+        
+        /**
+         * Method called on reception of a sms notification.
+         *
+         * @return array : [
+         *      bool 'error' => false on success, true on error
+         *      ?string 'error_message' => null on success, error message else
+         *      array 'sms' => array [
+         *          string 'at' : Recepetion date format Y-m-d H:i:s,
+         *          string 'text' : SMS body,
+         *          string 'origin' : SMS sender,
+         *      ]
+         *
+         * ]
+         */
+        public static function reception_callback() : array
+        {
+            return [];
         }
     }

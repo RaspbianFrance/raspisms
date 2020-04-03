@@ -56,7 +56,6 @@
                                         <?php foreach ($adapters as $adapter) { ?>
                                             <option 
                                                 value="<?= $adapter['meta_classname'] ?>"
-                                                title="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-datas-fields="<?php $this->s(json_encode($adapter['meta_datas_fields'])); ?>"
                                             >

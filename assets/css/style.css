@@ -23,6 +23,11 @@
 	font-style: italic;
 }
 
+.bold
+{
+    font-weight: bold;
+}
+
 .float-right
 {
     float: right;
