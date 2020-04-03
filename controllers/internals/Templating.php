@@ -32,9 +32,9 @@ namespace controllers\internals;
 
             $filters = [
                 'abs', 'capitalize', 'country_name', 'currency_name',
-                'currency_symbol', 'date', 'date_modify', 'default',
+                'currency_symbol', 'date', 'date_modify', 'default', 'escape',
                 'first', 'format', 'format_currency', 'format_datetime',
-                'format_number', 'join', 'keys', 'language_name',
+                'format_number', 'join', 'json_encode', 'keys', 'language_name',
                 'last', 'length', 'locale_name', 'lower', 'number_format',
                 'replace', 'reverse', 'round', 'slice',
                 'sort', 'spaceless', 'split', 'timezone_name',
@@ -68,7 +68,17 @@ namespace controllers\internals;
                     'template' => $template,
                 ]);
 
-                $twig = new \Twig\Environment($loader);
+                $twig = new \Twig\Environment($loader, [
+                    'debug' => false,
+                    'charset' => 'utf-8',
+                    'cache' => false,
+                    'auto_reload' => false,
+                    'strict_variables' => false,
+                    'autoescape' => false,
+                    'optimizations' => -1,
+                ]);
+
+                $twig->addExtension($this->sandbox);
                 $result = $twig->render('template', $datas);
 
                 return [
