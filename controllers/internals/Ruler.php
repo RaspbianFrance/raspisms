@@ -43,13 +43,17 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
         {
             try
             {
-                $this->expression_language->evaluate($condition, $datas);
+                $this->expression_language->parse($condition, array_keys($datas));
 
                 return true;
             }
             catch (\Exception $e)
             {
                 return false;
+            }
+            catch (\Throwable $t)
+            {
+                //Just ignore non critical php warning and notice
             }
         }
 
