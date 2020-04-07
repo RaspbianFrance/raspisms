@@ -38,14 +38,10 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne tous les receiveds, sous forme d'un tableau permettant l'administration de ces receiveds.
-         *
-         * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $limit = 25;
-            $receiveds = $this->internal_received->list_for_user($_SESSION['user']['id'], $limit, $page);
+            $receiveds = $this->internal_received->list_for_user($_SESSION['user']['id']);
 
             foreach ($receiveds as $key => $received)
             {
@@ -70,19 +66,15 @@ namespace controllers\publics;
                 }
             }
 
-            $this->render('received/list', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
+            $this->render('received/list', ['receiveds' => $receiveds, 'nb_results' => \count($receiveds)]);
         }
 
         /**
          * Return all unread receiveds messages.
-         *
-         * @param mixed $page
          */
-        public function list_unread($page = 0)
+        public function list_unread()
         {
-            $page = (int) $page;
-            $limit = 25;
-            $receiveds = $this->internal_received->list_unread_for_user($_SESSION['user']['id'], $limit, $page);
+            $receiveds = $this->internal_received->list_unread_for_user($_SESSION['user']['id']);
 
             foreach ($receiveds as $key => $received)
             {
@@ -104,7 +96,7 @@ namespace controllers\publics;
                 }
             }
 
-            $this->render('received/list_unread', ['receiveds' => $receiveds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($receiveds)]);
+            $this->render('received/list_unread', ['receiveds' => $receiveds, 'nb_results' => \count($receiveds)]);
         }
 
         /**

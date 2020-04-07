@@ -37,13 +37,10 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne tous les contacts, sous forme d'un tableau permettant l'administration de ces contacts.
-         *
-         * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $contacts = $this->internal_contact->list_for_user($_SESSION['user']['id'], 25, $page);
+            $contacts = $this->internal_contact->list_for_user($_SESSION['user']['id']);
 
             return $this->render('contact/list', ['contacts' => $contacts]);
         }

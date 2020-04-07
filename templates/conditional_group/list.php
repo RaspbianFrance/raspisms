@@ -39,12 +39,12 @@
                                     <p>Aucun groupe n'a été formé pour le moment.</p>
                                 <?php } else { ?>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-hover table-striped" id="table-groupes">
+                                        <table class="table table-bordered table-hover table-striped datatable" id="table-groupes">
                                             <thead>
                                                 <tr>
                                                     <th>Nom</th>
                                                     <th>Condition</th>
-                                                    <th style="width:5%;">Sélectionner</th>
+                                                    <th class="checkcolumn">&#10003;</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

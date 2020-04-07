@@ -40,11 +40,9 @@ namespace controllers\publics;
          *
          * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $limit = 25;
-            $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id'], $limit, $page);
+            $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id']);
 
             foreach ($sendeds as $key => $sended)
             {
@@ -64,7 +62,7 @@ namespace controllers\publics;
                 }
             }
 
-            $this->render('sended/list', ['sendeds' => $sendeds, 'page' => $page, 'limit' => $limit, 'nb_results' => \count($sendeds)]);
+            $this->render('sended/list', ['sendeds' => $sendeds, 'nb_results' => \count($sendeds)]);
         }
 
         /**

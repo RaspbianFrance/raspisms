@@ -44,13 +44,10 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne tous les scheduleds, sous forme d'un tableau permettant l'administration de ces scheduleds.
-         *
-         * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $scheduleds = $this->internal_scheduled->list_for_user($_SESSION['user']['id'], 25, $page);
+            $scheduleds = $this->internal_scheduled->list_for_user($_SESSION['user']['id']);
             $this->render('scheduled/list', ['scheduleds' => $scheduleds]);
         }
 

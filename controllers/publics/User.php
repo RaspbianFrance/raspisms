@@ -39,13 +39,10 @@ class User extends \descartes\Controller
 
     /**
      * Cette fonction retourne tous les users, sous forme d'un tableau permettant l'administration de ces users.
-     *
-     * @param mixed $page
      */
-    public function list($page = 0)
+    public function list()
     {
-        $page = (int) $page;
-        $users = $this->internal_user->list(25, $page);
+        $users = $this->internal_user->list();
         $this->render('user/list', ['users' => $users]);
     }
     

@@ -37,12 +37,10 @@ namespace controllers\publics;
          *
          * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $limit = 25;
-            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id'], $limit, $page);
-            $this->render('smsstop/list', ['page' => $page, 'smsstops' => $smsstops, 'limit' => $limit, 'nb_results' => \count($smsstops)]);
+            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id']);
+            $this->render('smsstop/list', ['smsstops' => $smsstops, 'nb_results' => \count($smsstops)]);
         }
 
         /**

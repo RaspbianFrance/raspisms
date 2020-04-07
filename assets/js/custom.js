@@ -74,7 +74,19 @@ function playReceptionSound ()
 
 jQuery(document).ready(function()
 {
-	var verifReceivedInterval = setInterval(verifReceived, 10000);
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+    });
+	
+    var verifReceivedInterval = setInterval(verifReceived, 10000);
     
     jQuery('body').on('click', '.btn-confirm', function (e)
     {

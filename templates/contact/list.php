@@ -41,12 +41,12 @@
                                     <p>Aucun contact n'est enregistré pour le moment.</p>
                                 <?php } else { ?>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-hover table-striped" id="table-contacts">
+                                        <table class="table table-bordered table-hover table-striped datatable" id="table-contacts">
                                             <thead>
                                                 <tr>
                                                     <th>Nom</th>
                                                     <th>Numéro</th>
-                                                    <th style="width:5%;">Sélectionner</th>
+                                                    <th class="checkcolumn">&#10003;</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

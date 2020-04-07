@@ -345,3 +345,14 @@ footer
 {
     margin-top: 20px;
 }
+
+/* DATATABLES */
+.dataTables_paginate
+{
+    margin-bottom: 20px !important;
+}
+
+.checkcolumn
+{
+    width: 20px;
+}

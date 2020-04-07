@@ -39,13 +39,10 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne tous les groups, sous forme d'un tableau permettant l'administration de ces groups.
-         *
-         * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $groups = $this->internal_group->list_for_user($_SESSION['user']['id'], 25, $page);
+            $groups = $this->internal_group->list_for_user($_SESSION['user']['id']);
 
             foreach ($groups as $key => $group)
             {

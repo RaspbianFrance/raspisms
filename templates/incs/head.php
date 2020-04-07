@@ -37,6 +37,9 @@
 		<!-- International Phone Number, JS and CSS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/intlTelInput/intlTelInput.min.js"></script>
 		<link href="<?php echo HTTP_PWD_CSS; ?>/intlTelInput.min.css" rel="stylesheet">
+		<!-- DataTables -->
+		<link href="<?php echo HTTP_PWD_CSS; ?>/datatables/datatables.min.css" rel="stylesheet" type="text/css">
+		<script src="<?php echo HTTP_PWD_JS; ?>/datatables/datatables.min.js"></script>
 		
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/custom.js"></script>

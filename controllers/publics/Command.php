@@ -31,13 +31,10 @@ namespace controllers\publics;
 
         /**
          * Cette fonction retourne tous les users, sous forme d'un tableau permettant l'administration de ces users.
-         *
-         * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $commands = $this->internal_command->list_for_user($_SESSION['user']['id'], 25, $page);
+            $commands = $this->internal_command->list_for_user($_SESSION['user']['id']);
             $this->render('command/list', ['commands' => $commands]);
         }
 

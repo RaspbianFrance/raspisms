@@ -44,7 +44,7 @@
                                                 <tr>
                                                     <th>Date</th>
                                                     <th>Contenu</th>
-                                                    <th style="width:5%;">Sélectionner</th>
+                                                    <th class="checkcolumn">&#10003;</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

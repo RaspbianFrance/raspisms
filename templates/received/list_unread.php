@@ -39,7 +39,7 @@
                                     <p>Aucun SMS non lu à afficher.</p>
                                 <?php } else { ?>
                                     <div class="table-receiveds">
-                                        <table class="table table-bordered table-hover table-striped" id="table-receiveds">
+                                        <table class="table table-bordered table-hover table-striped datatable" id="table-receiveds">
                                             <thead>
                                                 <tr>
                                                     <th>De</th>
@@ -48,7 +48,7 @@
                                                     <th>Date</th>
                                                     <th>Status</th>
                                                     <th>Commande</th>
-                                                    <?php if ($_SESSION['user']['admin']) { ?><th>Sélectionner</th><?php } ?>
+                                                    <?php if ($_SESSION['user']['admin']) { ?><th class="checkcolumn">&#10003;</th><?php } ?>
                                                 </tr>
                                             </thead>
                                             <tbody>

@@ -39,7 +39,7 @@
                                     <p>Aucun SMS n'a été reçu pour le moment.</p>
                                 <?php } else { ?>
                                     <div class="table-receiveds">
-                                        <table class="table table-bordered table-hover table-striped" id="table-receiveds">
+                                        <table class="table table-bordered table-hover table-striped datatable" id="table-receiveds">
                                             <thead>
                                                 <tr>
                                                     <th>De</th>
@@ -48,7 +48,7 @@
                                                     <th>Date</th>
                                                     <th>Status</th>
                                                     <th>Commande</th>
-                                                    <?php if ($_SESSION['user']['admin']) { ?><th>Sélectionner</th><?php } ?>
+                                                    <?php if ($_SESSION['user']['admin']) { ?><th class="checkcolumn">&#10003;</th><?php } ?>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -79,16 +79,6 @@
                                                 <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Received', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                             </div>
                                         <?php } ?>
-                                        <ul class="pager">
-                                            <?php if ($page) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('Received', 'list', array('page' => $page - 1)); ?>"><span aria-hidden="true">&larr;</span> Précèdents</a></li>
-                                            <?php } ?>
-                                            <?php $this->s('Page : ' . ($page + 1)); ?>
-
-                                            <?php if ($limit == $nb_results) { ?>
-                                                    <li><a href="<?php echo \descartes\Router::url('Received', 'list', array('page' => $page + 1)); ?>">Suivants <span aria-hidden="true">&rarr;</span></a></li>
-                                            <?php } ?>
-                                        </ul>
                                     </div>
                                 <?php } ?>
                             </form>

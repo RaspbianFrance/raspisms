@@ -38,7 +38,7 @@
                                 Aucune discussion n'est en cours actuellement.
                             <?php } else { ?>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped" id="table-discussions">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-discussions">
                                         <thead>
                                             <tr>
                                                 <th>Date du dernier message</th>

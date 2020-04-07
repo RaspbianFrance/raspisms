@@ -30,15 +30,12 @@ class Phone extends \descartes\Controller
 
     /**
      * Cette fonction retourne tous les phones, sous forme d'un tableau permettant l'administration de ces phones.
-     *
-     * @param mixed $page
      */
-    public function list($page = 0)
+    public function list()
     {
         $id_user = $_SESSION['user']['id'];
         $api_key = $_SESSION['user']['api_key'];
-        $page = (int) $page;
-        $phones = $this->internal_phone->list_for_user($id_user, 25, $page);
+        $phones = $this->internal_phone->list_for_user($id_user);
 
         $adapters = [];
         $adapters = $this->internal_adapter->list_adapters();

@@ -36,13 +36,13 @@
                         <div class="panel-body">
                             <form method="GET">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped" id="table-users">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-users">
                                         <thead>
                                             <tr>
                                                 <th>Email</th>
                                                 <th>Admin</th>
                                                 <th>Status</th>
-                                                <th style="width:5%;">Sélectionner</th>
+                                                <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
                                         <tbody>

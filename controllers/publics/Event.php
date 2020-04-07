@@ -38,12 +38,10 @@ namespace controllers\publics;
          *
          * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $limit = 25;
-            $events = $this->internal_event->list_for_user($_SESSION['user']['id'], $limit, $page);
-            $this->render('event/list', ['events' => $events, 'limit' => $limit, 'page' => $page, 'nb_results' => \count($events)]);
+            $events = $this->internal_event->list_for_user($_SESSION['user']['id']);
+            $this->render('event/list', ['events' => $events, 'nb_results' => \count($events)]);
         }
 
         /**

@@ -34,10 +34,9 @@ namespace controllers\publics;
          *
          * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-            $webhooks = $this->internal_webhook->list_for_user($_SESSION['user']['id'], 25, $page);
+            $webhooks = $this->internal_webhook->list_for_user($_SESSION['user']['id']);
             $this->render('webhook/list', ['webhooks' => $webhooks]);
         }
 
