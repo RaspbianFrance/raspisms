@@ -187,14 +187,15 @@ namespace controllers\internals;
          * @param mixed $admin
          * @param mixed $api_key
          * @param string $status : User status
+         * @param bool $encrypt_password : Should the password be encrypted, by default true
          *
          * @return int : Number of modified user
          */
-        public function update($id, $email, $password, $admin, $api_key, $status)
+        public function update($id, $email, $password, $admin, $api_key, $status, bool $encrypt_password = true)
         {
             $user = [
                 'email' => $email,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => $encrypt_password ? password_hash($password, PASSWORD_DEFAULT) : $password,
                 'admin' => $admin,
                 'api_key' => $api_key,
                 'status' => $status,
@@ -211,14 +212,15 @@ namespace controllers\internals;
          * @param mixed   $admin
          * @param ?string $api_key  : The api key of the user, if null generate randomly
          * @param string $status : User status, default \models\User::STATUS_ACTIVE
+         * @param bool $encrypt_password : Should the password be encrypted, by default true
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
-        public function create($email, $password, $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE)
+        public function create($email, $password, $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE, bool $encrypt_password = true)
         {
             $user = [
                 'email' => $email,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => $encrypt_password ? password_hash($password, PASSWORD_DEFAULT) : $password,
                 'admin' => $admin,
                 'api_key' => $api_key ?? $this->generate_random_api_key(),
                 'status' => $status,
