@@ -10,7 +10,7 @@
     $http_server_port = isset($_SERVER['SERVER_PORT']) ? ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'] : '';
     $https = $_SERVER['HTTPS'] ?? false;
 
-    if ( !isset($_SERVER['SERVER_PORT']) || ($_SERVER['SERVER_PORT'] == 80 && !$https) || ($_SERVER['SERVER_PORT'] === 443 && $https) )
+    if ( !isset($_SERVER['SERVER_PORT']) || ($_SERVER['SERVER_PORT'] == 80 && !$https) || ($_SERVER['SERVER_PORT'] == 443 && $https) )
     {
         $http_server_port = '';
     }
