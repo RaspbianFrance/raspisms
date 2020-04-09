@@ -64,6 +64,15 @@
         {
             try
             {
+                //Must convert bool to 1 or 0 because of some strange inconsistent behavior between PHP versions
+                foreach ($datas as $key => $value)
+                {
+                    if (is_bool($value))
+                    {
+                        $datas[$key] = (int) $value;
+                    }
+                }
+
                 $query = $this->pdo->prepare($query);
                 $query->setFetchMode($return_type);
                 $query->execute($datas);
