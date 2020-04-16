@@ -52,17 +52,17 @@
 .popup-alerts-container
 {
 	position: fixed;
-	left: 0;
+	left: 25%;
 	top: 0;
 	z-index: 9998;
-	width: 100%;
+	width: 50%;
 }
 
 .popup-alert
 {
     margin-top: 25px;
-    margin-left: 25%;
-	width: 50%;
+    margin-left: 0;
+	width: 100%;
 	position: relative;
 }
 
