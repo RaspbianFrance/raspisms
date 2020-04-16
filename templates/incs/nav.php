@@ -8,7 +8,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">RaspiSMS</a>
+                <a class="navbar-brand" href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>"><img class="logo" src="<?= HTTP_PWD_IMG; ?>/logo.png" alt="RaspiSMS" /></a>
 			</div>
 
             <!-- Top Menu Items -->

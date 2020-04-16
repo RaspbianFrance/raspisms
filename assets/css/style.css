@@ -71,8 +71,17 @@ footer
 {
 	color: #aaaaaa;
 	font-size: 0.8em;
-	padding-top: 1em;
-	padding-bottom: 0.3em;
+	padding-top: 50px;
+	padding-bottom: 25px;
+    line-height: 2em;
+}
+
+footer img
+{
+    width: 100px;
+    display: inline-block;
+    margin-bottom: 15px;
+    opacity: 0.7;
 }
 
 /** GROUPES **/
@@ -121,6 +130,16 @@ footer
 }
 
 /** MENU **/
+.logo
+{
+    height: 100%;
+}
+
+.navbar-brand
+{
+    padding: 13px 15px;
+}
+
 .navbar
 {
 	border: none;

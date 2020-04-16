@@ -1,6 +1,7 @@
-	<footer class="text-center">
-		RaspiSMS a été créé pour vous par le site <a href="https://raspberry-pi.fr">Raspberry Pi FR</a>, site dédié à la Raspberry Pi<br/>
-        Copyright 2014-<?= date('Y'); ?>. RaspiSMS est un programme sous <a href="https://www.gnu.org/licenses/gpl.txt" rel="nofollow">licence GNU GPL V3</a>.<br/>
+    <footer class="text-center">
+        <img src="<?= HTTP_PWD_IMG; ?>/logo.png"/><br/>
+        Copyright 2014-<?= date('Y'); ?> - RaspiSMS est un logiciel libre distribué sous <a href="https://www.gnu.org/licenses/gpl.txt">licence GNU GPL V3</a>.<br/>
+        RaspiSMS est disponible en auto-hébergement, ou <a href="https://raspisms.fr">en mode SaaS</a>.
     </footer>
 
 	<?php if ($_SESSION['user']['settings']['sms_reception_sound'] ?? false) { ?>
