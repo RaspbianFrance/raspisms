@@ -50,6 +50,8 @@ class Launcher extends AbstractDaemon
         $this->start_sender_daemon();
 
         $this->start_webhook_daemon();
+        
+        $this->start_mailer_daemon();
 
         $phones = $this->internal_phone->get_all();
         $this->start_phones_daemons($phones);
@@ -73,6 +75,25 @@ class Launcher extends AbstractDaemon
         //Create a new daemon for sender
         $pid = null;
         exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
+    }
+    
+    
+    /**
+     * Function to start mailer daemon.
+     */
+    public function start_mailer_daemon()
+    {
+        $name = 'RaspiSMS Daemon Mailer';
+        $pid_file = PWD_PID . '/' . $name . '.pid';
+
+        if (file_exists($pid_file))
+        {
+            return false;
+        }
+
+        //Create a new daemon for sender
+        $pid = null;
+        exec('php ' . PWD . '/console.php controllers/internals/Console.php mailer > /dev/null 2>&1 &');
     }
 
     /**

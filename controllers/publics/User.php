@@ -171,7 +171,8 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-        $email_send = \controllers\internals\Tool::send_email($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
+        $mailer = new \controllers\internals\Mailer();
+        $email_send = $mailer->enqueue($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
         if (!$email_send)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible d\'envoyer l\'e-mail à l\'utilisateur.');

@@ -119,8 +119,9 @@ namespace controllers\publics;
             $token = $Tokenista->generate(3600, ['id_user' => $user['id']]);
 
             $reset_link = \descartes\Router::url('Connect', 'reset_password', ['id_user' => $user['id'], 'token' => $token]);
-
-            \controllers\internals\Tool::send_email($email, EMAIL_RESET_PASSWORD, ['reset_link' => $reset_link]);
+            
+            $mailer = new \controllers\internals\Mailer();
+            $email_send = $mailer->enqueue($email, EMAIL_RESET_PASSWORD, ['reset_link' => $reset_link]);
 
             return $this->render('connect/send-reset-password');
         }
