@@ -88,13 +88,6 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'list'));
         }
 
-        if (!\controllers\internals\Tool::is_admin())
-        {
-            \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour supprimer un utilisateur !');
-
-            return $this->redirect(\descartes\Router::url('Phone', 'list'));
-        }
-
         $ids = $_GET['ids'] ?? [];
         foreach ($ids as $id)
         {
