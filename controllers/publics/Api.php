@@ -182,7 +182,7 @@ namespace controllers\publics;
          *
          * @return : Id of scheduled created
          */
-        public function post_scheduled()
+        public function post_scheduled ()
         {
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
@@ -192,6 +192,11 @@ namespace controllers\publics;
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
+
+            if (!$at)
+            {
+                $at = (new \DateTime())->format('Y-m-d H:i:s');
+            }
 
             if (!$at || !$text)
             {

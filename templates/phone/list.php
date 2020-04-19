@@ -42,6 +42,7 @@
                                         <table class="table table-bordered table-hover table-striped datatable" id="table-phones">
                                             <thead>
                                                 <tr>
+                                                    <th>ID</th>
                                                     <th>Nom</th>
                                                     <th>Adaptateur</th>
                                                     <th>Callbacks</th>
@@ -51,7 +52,8 @@
                                             <tbody>
                                             <?php foreach ($phones as $phone) { ?>
                                                 <tr>
-                                                    <td><?php $this->s(\controllers\internals\Tool::phone_format($phone['name'])); ?></td>
+                                                    <td><?php $this->s($phone['id']); ?></td>
+                                                    <td><?php $this->s($phone['name']); ?></td>
                                                     <td><?php $this->s($phone['adapter']); ?></td>
                                                     <td>
                                                         <div class="bold">Reception d'un SMS : </div>
