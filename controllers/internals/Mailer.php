@@ -22,18 +22,18 @@ class Mailer extends \descartes\Controller
         $this->log->pushHandler(new StreamHandler(PWD_LOGS . '/mail.log', Logger::DEBUG));
 
         $this->mail = new PHPMailer(true);
-        $mail->SMTPDebug = SMTP::DEBUG_OFF;
-        $mail->isSMTP();
-        $mail->Host       = MAIL['SMTP']['HOST'];
-        $mail->SMTPAuth   = true;
-        $mail->Username   = MAIL['SMTP']['USER'];
-        $mail->Password   = MAIL['SMTP']['PASS'];
-        $mail->Port       = MAIL['SMTP']['PORT'];
-        $mail->setFrom(MAIL['FROM']);
+        $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
+        $this->mail->isSMTP();
+        $this->mail->Host       = MAIL['SMTP']['HOST'];
+        $this->mail->SMTPAuth   = true;
+        $this->mail->Username   = MAIL['SMTP']['USER'];
+        $this->mail->Password   = MAIL['SMTP']['PASS'];
+        $this->mail->Port       = MAIL['SMTP']['PORT'];
+        $this->mail->setFrom(MAIL['FROM']);
 
         if (MAIL['SMTP']['TLS'])
         {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
     }
 
@@ -127,7 +127,7 @@ class Mailer extends \descartes\Controller
      * @param array $datas : Datas to inject into email template
      * @return bool : true on success, false on error
      */
-    public function enqueue (string $destination, string $settings, string $datas) : bool
+    public function enqueue (string $destination, array $settings, array $datas) : bool
     {
         $response = $this->generate_body($settings, $datas);
 

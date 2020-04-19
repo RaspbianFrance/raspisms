@@ -39,6 +39,14 @@ namespace controllers\internals;
         {
             new \daemons\Webhook();
         }
+        
+        /**
+         * Start mailer daemon.
+         */
+        public function mailer()
+        {
+            new \daemons\Mailer();
+        }
 
         /**
          * Start a phone daemon.

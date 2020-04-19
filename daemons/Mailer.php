@@ -55,7 +55,7 @@ class Mailer extends AbstractDaemon
             $message = null;
 
             $error_code = null;
-            $success = msg_receive($this->mailer_queue, QUEUE_TYPE_MAIL, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+            $success = msg_receive($this->mailer_queue, QUEUE_TYPE_EMAIL, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
             if (!$success && MSG_ENOMSG !== $error_code)
             {
                 $this->logger->critical('Error for mailer queue reading, error code : ' . $error_code);
@@ -90,7 +90,7 @@ class Mailer extends AbstractDaemon
     public function on_start()
     {
         //Set last message at to construct time
-        $this->mailer_queue = msg_get_queue(QUEUE_ID_MAIL);
+        $this->mailer_queue = msg_get_queue(QUEUE_ID_EMAIL);
 
         $this->logger->info('Starting Mailer daemon with pid ' . getmypid());
     }
@@ -98,7 +98,7 @@ class Mailer extends AbstractDaemon
     public function on_stop()
     {
         //Delete queue on daemon close
-        $this->logger->info('Closing queue : ' . QUEUE_ID_MAIL);
+        $this->logger->info('Closing queue : ' . QUEUE_ID_EMAIL);
         msg_remove_queue($this->mailer_queue);
 
         $this->logger->info('Stopping Mailer daemon with pid ' . getmypid());

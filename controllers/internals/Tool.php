@@ -190,24 +190,6 @@ namespace controllers\internals;
         }
 
         /**
-         * Cette fonction s'occupe d'envoyer les emails.
-         *
-         * @param string $to       : L'adresse mail à laquelle envoyer le mail
-         * @param array  $settings : Les settings du mail, type, sujet, template
-         * @param array  $datas    : Les données à fournir au template du mail
-         */
-        public static function send_email($to, $settings, $datas = [])
-        {
-            $controller = new \descartes\Controller();
-
-            ob_start();
-            $controller->render($settings['template'], $datas);
-            $content = ob_get_clean();
-
-            return @mail($to, $settings['subject'], $content);
-        }
-
-        /**
          * Allow to read an uploaded file.
          *
          * @param array $file : The array extracted from $_FILES['file']
