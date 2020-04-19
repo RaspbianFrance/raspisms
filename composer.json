@@ -10,7 +10,8 @@
         "robmorgan/phinx": "^0.11.1",
         "monolog/monolog": "^2.0",
         "ovh/ovh": "^2.0",
-        "twilio/sdk": "^6.1"
+        "twilio/sdk": "^6.1",
+        "symfony/yaml": "^5.0"
     },
     "require-dev": {
     }
