@@ -145,7 +145,7 @@ class User extends \descartes\Controller
         }
 
         $email = $_POST['email'] ?? false;
-        $password = $_POST['password'] ?? \controllers\internals\Tool::generate_password(rand(6, 12));
+        $password = !empty($_POST['password']) ? $_POST['password'] : \controllers\internals\Tool::generate_password(rand(6, 12));
         $admin = $_POST['admin'] ?? false;
         $status = 'active';
 

@@ -22,7 +22,8 @@ class Mailer extends \descartes\Controller
         $this->log->pushHandler(new StreamHandler(PWD_LOGS . '/mail.log', Logger::DEBUG));
 
         $this->mail = new PHPMailer(true);
-        $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
+        $this->mail->CharSet    = 'utf-8';
+        $this->mail->SMTPDebug  = SMTP::DEBUG_OFF;
         $this->mail->isSMTP();
         $this->mail->Host       = MAIL['SMTP']['HOST'];
         $this->mail->SMTPAuth   = true;

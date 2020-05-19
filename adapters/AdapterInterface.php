@@ -58,25 +58,26 @@ namespace adapters;
         public static function meta_datas_fields(): array;
 
         /**
-         * Does the implemented service support reading smss.
-         */
-        public static function meta_support_read(): bool;
-
-        /**
          * Does the implemented service support flash smss.
          */
         public static function meta_support_flash(): bool;
 
         /**
-         * Does the implemented service support status change callback.
+         * Does the implemented service support reading smss.
          */
-        public static function meta_support_status_change(): bool;
+        public static function meta_support_read(): bool;
         
         /**
          * Does the implemented service support reception callback.
          */
         public static function meta_support_reception(): bool;
 
+
+        /**
+         * Does the implemented service support status change callback.
+         */
+        public static function meta_support_status_change(): bool;
+        
         /**
          * Method called to send a SMS to a number.
          *
