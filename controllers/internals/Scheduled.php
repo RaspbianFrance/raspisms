@@ -335,7 +335,7 @@ namespace controllers\internals;
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {
                         $contact['datas'] = json_decode($contact['datas'], true);
-                        $datas = ['contact' => $contact];
+                        $datas = ['contact' => $contact['datas']];
                         $render = $internal_templating->render($scheduled['text'], $datas);
 
                         if (!$render['success'])

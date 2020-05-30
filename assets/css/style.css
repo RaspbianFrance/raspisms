@@ -365,6 +365,12 @@ footer img
     margin-top: 20px;
 }
 
+#adapter-datas-fields
+{
+    padding-top: 15px;
+    padding-left: 15px;
+}
+
 /* DATATABLES */
 .dataTables_paginate
 {
@@ -374,4 +380,12 @@ footer img
 .checkcolumn
 {
     width: 20px;
+}
+
+/*
+ * FORMS 
+ */
+.form-group
+{
+    margin-bottom: 30px;
 }

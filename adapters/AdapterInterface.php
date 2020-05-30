@@ -88,7 +88,7 @@ namespace adapters;
          * @return array : [
          *      bool 'error' => false if no error, true else
          *      ?string 'error_message' => null if no error, else error message
-         *      array 'uid' => Uid of the sms created on success
+         *      ?string 'uid' => Uid of the sms created on success
          * ]
          */
         public function send(string $destination, string $text, bool $flash = false);

@@ -69,7 +69,7 @@ namespace controllers\publics;
             $contact['datas'] = json_decode($contact['datas'], true);
 
             $datas = [
-                'contact' => $contact,
+                'contact' => $contact['datas'],
             ];
 
             $result = $this->internal_templating->render($template, $datas);
