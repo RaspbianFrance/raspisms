@@ -193,6 +193,11 @@ namespace controllers\publics;
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
 
+            $numbers = is_array($numbers) ? $numbers : [$numbers];
+            $contacts = is_array($contacts) ? $contacts : [$contacts];
+            $groups = is_array($groups) ? $groups : [$groups];
+            $conditional_groups = is_array($conditional_groups) ? $conditional_groups : [$conditional_groups];
+
             if (!$at)
             {
                 $at = (new \DateTime())->format('Y-m-d H:i:s');
