@@ -28,6 +28,7 @@ namespace controllers\internals;
                 'if',
                 'for',
                 'apply',
+                'set',
             ];
 
             $filters = [
