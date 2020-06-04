@@ -72,7 +72,7 @@ namespace controllers\publics;
 
             //If no user, quit with error
             $this->user = false;
-            $api_key = $_GET['api_key'] ?? false;
+            $api_key = $_GET['api_key'] ?? $_POST['api_key'] ?? false;
             if ($api_key)
             {
                 $this->user = $this->internal_user->get_by_api_key($api_key);
