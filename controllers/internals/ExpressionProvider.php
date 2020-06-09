@@ -26,10 +26,17 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             return null;
         });
 
+        //Exists must be personnalized because it inverse is_null
+        $exists = new ExpressionFunction('exists', function ($var) {
+            return sprintf('!is_null(%1$s)', $str);
+        }, function ($arguments, $var) {
+            return !is_null($var);
+        });
+
 
         return [
             $neutralized_constant,
-            ExpressionFunction::fromPhp('is_null', 'exists'),
+            $exists,
             ExpressionFunction::fromPhp('mb_strtolower', 'lower'),
             ExpressionFunction::fromPhp('mb_strtoupper', 'upper'),
             ExpressionFunction::fromPhp('mb_substr', 'substr'),
