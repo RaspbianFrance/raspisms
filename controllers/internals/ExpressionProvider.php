@@ -33,6 +33,7 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             ExpressionFunction::fromPhp('mb_strtolower', 'lower'),
             ExpressionFunction::fromPhp('mb_strtoupper', 'upper'),
             ExpressionFunction::fromPhp('mb_substr', 'substr'),
+            ExpressionFunction::fromPhp('mb_strlen', 'strlen'),
             ExpressionFunction::fromPhp('abs', 'abs'),
             ExpressionFunction::fromPhp('strtotime', 'date'),
         ];
