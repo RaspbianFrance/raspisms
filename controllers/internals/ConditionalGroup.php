@@ -117,7 +117,7 @@ namespace controllers\internals;
                 $contact['datas'] = json_decode($contact['datas']);
                 $contact = (object) $contact;
 
-                $datas = ['contact' => $contact];
+                $datas = ['contact' => $contact->datas];
                 $is_valid = $ruler->evaluate_condition($condition, $datas);
                 if (!$is_valid)
                 {
