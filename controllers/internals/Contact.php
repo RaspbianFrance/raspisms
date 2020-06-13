@@ -286,8 +286,6 @@ namespace controllers\internals;
 
                         continue;
                     }
-
-                    $line[] = null;
                 }
                 $lines[] = $line;
             }
