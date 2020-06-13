@@ -260,10 +260,7 @@ namespace controllers\internals;
         {
             $contacts = $this->get_model()->gets_for_user($id_user);
 
-            $columns = [
-                'contact_name',
-                'contact_number',
-            ];
+            $columns = [0, 1];
 
             foreach ($contacts as $contact)
             {
@@ -280,16 +277,9 @@ namespace controllers\internals;
             {
                 $datas = json_decode($contact['datas'], true);
 
-                $line = [];
+                $line = [$contact['name'], $contact['number']];
                 foreach ($columns as $column)
                 {
-                    if (isset($contact[$column]))
-                    {
-                        $line[] = $contact[$column];
-
-                        continue;
-                    }
-
                     if (isset($datas[$column]))
                     {
                         $line[] = $datas[$column];
