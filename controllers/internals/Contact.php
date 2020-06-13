@@ -162,10 +162,17 @@ namespace controllers\internals;
                 }
                 $datas = json_encode($datas);
 
-                $success = $this->create($id_user, $line['number'], $line['name'], $datas);
-                if ($success)
+                try 
                 {
-                    ++$nb_insert;
+                    $success = $this->create($id_user, $line['number'], $line['name'], $datas);
+                    if ($success)
+                    {
+                        ++$nb_insert;
+                    }
+                }
+                catch (\Exception $e)
+                {
+                    continue;
                 }
             }
 
@@ -218,10 +225,17 @@ namespace controllers\internals;
                     $datas = $contact['datas'] ?? [];
                     $datas = json_encode($datas);
 
-                    $success = $this->create($id_user, $contact['number'], $contact['name'], $datas);
-                    if ($success)
+                    try
                     {
-                        ++$nb_insert;
+                        $success = $this->create($id_user, $contact['number'], $contact['name'], $datas);
+                        if ($success)
+                        {
+                            ++$nb_insert;
+                        }
+                    }
+                    catch (\Exception $e)
+                    {
+                        continue;
                     }
                 }
 
