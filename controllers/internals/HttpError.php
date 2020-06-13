@@ -25,4 +25,13 @@ namespace controllers\internals;
             http_response_code(404);
             $this->render('error/404');
         }
+
+        /**
+         * Return unknown error page
+         */
+        public function unknown ()
+        {
+            http_response_code(500);
+            $this->render('error/unknown');
+        }
     }

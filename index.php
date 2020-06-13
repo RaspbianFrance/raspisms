@@ -23,3 +23,8 @@
         $controller = new \controllers\internals\HttpError();
         $controller->_404();
     }
+    catch (\Throwable $e)
+    {
+        $controller = new \controllers\internals\HttpError();
+        $controller->unknown();
+    }
