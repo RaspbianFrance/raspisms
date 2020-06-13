@@ -139,15 +139,17 @@ namespace controllers\internals;
                     continue;
                 }
 
-                if (!isset($line['name'], $line['number']))
+                if (!isset($line[array_keys($line)[0]], $line[array_keys($line)[1]]))
                 {
                     continue;
                 }
 
                 $datas = [];
+                $i = 0;
                 foreach ($line as $key => $value)
                 {
-                    if ('name' === $key || 'number' === $key)
+                    $i++;
+                    if ($i < 3)
                     {
                         continue;
                     }
@@ -164,7 +166,7 @@ namespace controllers\internals;
 
                 try 
                 {
-                    $success = $this->create($id_user, $line['number'], $line['name'], $datas);
+                    $success = $this->create($id_user, $line[array_keys($line)[1]], $line[array_keys($line)[0]], $datas);
                     if ($success)
                     {
                         ++$nb_insert;
@@ -259,8 +261,8 @@ namespace controllers\internals;
             $contacts = $this->get_model()->gets_for_user($id_user);
 
             $columns = [
-                'name',
-                'number',
+                'contact_name',
+                'contact_number',
             ];
 
             foreach ($contacts as $contact)
