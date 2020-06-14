@@ -123,7 +123,7 @@ namespace controllers\publics;
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce webhook.');
 
-                return $this->redirect(\descartes\Router::url('webhooks', 'add'));
+                return $this->redirect(\descartes\Router::url('Webhook', 'add'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'La webhook a bien été créé.');

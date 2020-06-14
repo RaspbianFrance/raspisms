@@ -25,6 +25,7 @@
     }
     catch (\Throwable $e)
     {
+        error_log($e);
         $controller = new \controllers\internals\HttpError();
         $controller->unknown();
     }

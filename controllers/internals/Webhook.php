@@ -27,6 +27,12 @@ class Webhook extends StandardController
      */
     public function create(int $id_user, string $url, string $type)
     {
+        //Must ensure http(s) protocole for protection against ssrf
+        if (!mb_ereg_match('^http(s?)://', $url))
+        {
+            return false;
+        }
+
         $webhook = [
             'id_user' => $id_user,
             'url' => $url,
@@ -54,6 +60,12 @@ class Webhook extends StandardController
      */
     public function update_for_user(int $id_user, int $id, string $url, string $type)
     {
+        //Must ensure http(s) protocole for protection against ssrf
+        if (!mb_ereg_match('^http(s?)://', $url))
+        {
+            return false;
+        }
+
         $datas = [
             'url' => $url,
             'type' => $type,
