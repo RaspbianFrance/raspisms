@@ -161,7 +161,7 @@ namespace controllers\publics;
 
             if ($page > 0)
             {
-                $return['next'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'page' => $page - 1], ['api_key' => $this->user['api_key']]);
+                $return['prev'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'page' => $page - 1], ['api_key' => $this->user['api_key']]);
             }
 
             $this->auto_http_code(true);
