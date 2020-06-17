@@ -78,6 +78,11 @@ namespace controllers\internals;
          */
         public function analyze_and_process (int $id_user, string $message)
         {
+            if (!ENABLE_COMMAND)
+            {
+                return false;
+            }
+
             $extracted_command = [];
 
             $decode_message = json_decode(trim($message), true);
@@ -127,7 +132,13 @@ namespace controllers\internals;
             $decode_message['password'] = '******';
             $updated_text = json_encode($decode_message);
 
-            $generated_command = PWD_SCRIPTS . '/' . $find_command['script'];
+            $script = $find_command['script'];
+            while (str_replace('..', '', $script) !== $script)
+            {
+                $script = str_replace('..', '', $script);
+            }
+
+            $generated_command = PWD_SCRIPTS . '/' . escapeshellarg($script);
             $args = $decode_message['args'] ?? '';
             $generated_command .= ' ' . escapeshellcmd($args);
 

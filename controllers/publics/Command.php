@@ -27,6 +27,14 @@ namespace controllers\publics;
             $this->internal_event = new \controllers\internals\Event($bdd);
 
             \controllers\internals\Tool::verifyconnect();
+
+            if (!ENABLE_COMMAND)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Les commandes sont désactivées.');
+                $this->redirect(\descartes\Router::url('Dashboard', 'show'));
+
+                exit(0);
+            }
         }
 
         /**

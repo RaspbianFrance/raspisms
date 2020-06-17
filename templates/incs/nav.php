@@ -80,9 +80,11 @@
 							</li>
 						</ul>
                     </li>
-					<li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
-						<a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
-                    </li>
+                    <?php if (ENABLE_COMMAND) { ?>
+                        <li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
+                        </li>
+					<?php } ?>
                     <?php if ($_SESSION['user']['settings']['webhook'] ?? false) { ?>
                         <li <?php echo $page == 'webhooks' ? 'class="active"' : ''; ?>>
                             <a href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>"><i class="fa fa-fw fa-plug"></i> Webhooks</a>
