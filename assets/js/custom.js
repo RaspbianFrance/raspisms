@@ -85,6 +85,12 @@ jQuery(document).ready(function()
             'orderable': false,
         }],
     });
+    
+    jQuery('.datatable').on('draw.dt', function (){
+        jQuery('body :checkbox').off('shiftcheckbox');
+        jQuery('body :checkbox').shiftcheckbox();
+    });
+
 	
     var verifReceivedInterval = setInterval(verifReceived, 10000);
     
@@ -114,8 +120,6 @@ jQuery(document).ready(function()
 			}
 		}
 	});
-
-    jQuery('body :checkbox').shiftcheckbox();
 
 	jQuery('body').on('submit', '.send-message-discussion', function (e) 
 	{
