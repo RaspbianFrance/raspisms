@@ -31,14 +31,16 @@ namespace controllers\publics;
             'MISSING_PARAMETER' => 4,
             'CANNOT_CREATE' => 8,
             'SUSPENDED_USER' => 16,
+            'CANNOT_DELETE' => 32,
         ];
 
         const ERROR_MESSAGES = [
-            'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API as GET parameter "api_key".',
+            'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API key as GET or POST parameter "api_key".',
             'INVALID_PARAMETER' => 'You have specified an invalid parameter : ',
             'MISSING_PARAMETER' => 'One require parameter is missing : ',
             'CANNOT_CREATE' => 'Cannot create a new entry.',
             'SUSPENDED_USER' => 'This user account is currently suspended.',
+            'CANNOT_DELETE' => 'Cannot delete this entry.',
         ];
 
         private $internal_user;
@@ -72,7 +74,7 @@ namespace controllers\publics;
 
             //If no user, quit with error
             $this->user = false;
-            $api_key = $_GET['api_key'] ?? $_POST['api_key'] ?? false;
+            $api_key = $_GET['api_key'] ?? $_POST['api_key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? false;
             if ($api_key)
             {
                 $this->user = $this->internal_user->get_by_api_key($api_key);
@@ -119,9 +121,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'entry_type must be one of : ' . implode(', ', $entry_types) . '.';
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             $controller_str = 'internal_' . $entry_type;
@@ -165,7 +165,7 @@ namespace controllers\publics;
             }
 
             $this->auto_http_code(true);
-            $this->json($return);
+            return $this->json($return);
         }
 
         /**
@@ -209,9 +209,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($at ? '' : 'at ') . ($text ? '' : 'text');
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s'))
@@ -220,9 +218,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             foreach ($numbers as $key => $number)
@@ -245,9 +241,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'You must specify at least one valid number, contact, group or conditional_group.';
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             if ($id_phone && !$this->internal_phone->get_for_user($this->user['id'], $id_phone))
@@ -256,9 +250,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone : You must specify an id_phone number among thoses of user phones.';
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
@@ -268,15 +260,13 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
                 $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
                 $this->auto_http_code(false);
-                $this->json($return);
-
-                return false;
+                return $this->json($return);
             }
 
             $return = self::DEFAULT_RETURN;
             $return['response'] = $scheduled_id;
             $this->auto_http_code(true);
-            $this->json($return);
+            return $this->json($return);
         }
 
         /**
@@ -288,17 +278,20 @@ namespace controllers\publics;
          */
         public function delete_scheduled(int $id)
         {
+            $return = self::DEFAULT_RETURN;
             $success = $this->internal_scheduled->delete_for_user($this->user['id'], $id);
 
             if (!$success)
             {
+                $return['error'] = self::ERROR_CODES['CANNOT_DELETE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_DELETE'];
                 $this->auto_http_code(false);
 
-                return false;
+                return $this->json($return);
             }
 
+            $return['response'] = true;
             $this->auto_http_code(true);
-
-            return true;
+            return $this->json($return);
         }
     }
