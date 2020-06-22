@@ -1,0 +1,21 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CodeStyle
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on: [push]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: PHPStan
+        uses: docker://oskarstark/phpstan-ga
+        with:
+          args: analyse --configuration="./tests/phpstan/config.neon" --autoload-file="./descartes/load.php"
+          
+
