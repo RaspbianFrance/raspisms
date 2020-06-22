@@ -16,6 +16,6 @@ jobs:
       - name: PHPStan
         uses: docker://oskarstark/phpstan-ga
         with:
-          args: analyse --configuration="./tests/phpstan/config.neon" --autoload-file="./descartes/load.php"
+          args: analyse --configuration="./tests/phpstan/config.neon" --autoload-file="./descartes/load.php" --level=0
           
 
