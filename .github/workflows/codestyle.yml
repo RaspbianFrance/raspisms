@@ -8,14 +8,14 @@ on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  phpstan:
-    name: PHPStan
+  php-cs-fixer:
+    name: PHP-CS-Fixer
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: PHPStan
-        uses: docker://oskarstark/phpstan-ga
+      - name: PHP-CS-Fixer
+        uses: docker://oskarstark/php-cs-fixer-ga
         with:
-          args: analyse --configuration="./tests/phpstan/config.neon" --autoload-file="./descartes/load.php" --level=0
+          args: --config="./tests/php-cs-fixer/php_cs.config" 
           
 
