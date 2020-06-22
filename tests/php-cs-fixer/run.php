@@ -13,17 +13,11 @@
     }
 
     $lint_commands = [
-        'php ' . __DIR__ . '/php-cs-fixer.phar -v --dry-run --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../controllers/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar -v --dry-run --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../models/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar -v --dry-run --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../daemons/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar -v --dry-run --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../adapters/',
+        'php ' . __DIR__ . '/php-cs-fixer.phar -v --dry-run --config="' . __DIR__ . '/php_cs.config" fix',
     ];
     
     $fix_commands = [
-        'php ' . __DIR__ . '/php-cs-fixer.phar --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../controllers/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../models/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../daemons/',
-        'php ' . __DIR__ . '/php-cs-fixer.phar --config="' . __DIR__ . '/php_cs.config" fix ' . __DIR__ . '/../../adapters/',
+        'php ' . __DIR__ . '/php-cs-fixer.phar --config="' . __DIR__ . '/php_cs.config" fix',
     ];
 
 

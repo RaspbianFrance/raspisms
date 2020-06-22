@@ -201,11 +201,6 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 'sms_type' => self::SMS_TYPE_LOWCOST,
             ];
 
-            if ($this->sender !== null)
-            {
-                $datas['sms_sender'] = $this->sender;
-            }
-
             $endpoint = $this->api_url . '/sms/json';
 
             $curl = curl_init();

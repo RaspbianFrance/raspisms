@@ -11,10 +11,7 @@
     }
 
     $analyse_commands = [
-        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../controllers/',
-        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../models/',
-        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../adapters/',
-        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ' . __DIR__ . '/../../daemons/',
+        'php ' . __DIR__ . '/phpstan.phar analyse --configuration="'. __DIR__ .'/config.neon" --autoload-file=' . __DIR__ . '/../../descartes/load.php ',
     ];
 
 

@@ -1,5 +1,11 @@
 parameters:
     reportUnmatchedIgnoredErrors: false
 
+    paths:
+        - %rootDir%/../../controllers/
+        - %rootDir%/../../models/
+        - %rootDir%/../../adapters/
+        - %rootDir%/../../daemons/
+
     ignoreErrors:
         - '#Constant RASPISMS_[a-zA-Z0-9\\_]+ not found.#'
