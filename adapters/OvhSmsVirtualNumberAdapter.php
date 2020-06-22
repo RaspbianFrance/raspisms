@@ -29,6 +29,11 @@ namespace adapters;
         private $api;
 
         /**
+         * Number used
+         */
+        private $number;
+
+        /**
          * Number formated to be compatible with http query according to the ovh way.
          */
         private $formatted_number;
