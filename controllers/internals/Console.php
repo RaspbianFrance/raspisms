@@ -77,7 +77,7 @@ namespace controllers\internals;
          * @param $status : User status, default \models\User::STATUS_ACTIVE
          * @param bool $encrypt_password : Should the password be encrypted, by default true
          *
-         * @return exit code 0 on success | 1 on error
+         * exit code 0 on success | 1 on error
          */
         public function create_update_user(string $email, string $password, bool $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE, bool $encrypt_password = true)
         {
