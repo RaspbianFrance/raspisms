@@ -8,10 +8,15 @@ on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  php-cs-fixer:
+  trigger_deb_build:
     name: Trigger .deb build
     runs-on: ubuntu-latest
     steps:
       - name: Make curl request
-        run: curl -X POST "${{ secrets.DEB_REPOSITORY }}/dispatches" -u "${{ secrets.DEB_ACCESS_TOKEN }}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json"  --data '{"event_type": "build_application"}'
+        run: |
+          curl -X POST "${{ secrets.DEB_REPOSITORY }}/dispatches" \
+          -u "${{ secrets.DEB_ACCESS_TOKEN }}" \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Content-Type: application/json" \
+          --data '{"event_type": "build"}'
 
