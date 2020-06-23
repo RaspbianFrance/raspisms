@@ -50,7 +50,7 @@ class Launcher extends AbstractDaemon
         $this->start_sender_daemon();
 
         $this->start_webhook_daemon();
-        
+
         $this->start_mailer_daemon();
 
         $phones = $this->internal_phone->get_all();
@@ -76,8 +76,7 @@ class Launcher extends AbstractDaemon
         $pid = null;
         exec('php ' . PWD . '/console.php controllers/internals/Console.php sender > /dev/null 2>&1 &');
     }
-    
-    
+
     /**
      * Function to start mailer daemon.
      */

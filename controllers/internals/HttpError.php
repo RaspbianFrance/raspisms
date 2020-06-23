@@ -27,9 +27,9 @@ namespace controllers\internals;
         }
 
         /**
-         * Return unknown error page
+         * Return unknown error page.
          */
-        public function unknown ()
+        public function unknown()
         {
             http_response_code(500);
             $this->render('error/unknown');

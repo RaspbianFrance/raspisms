@@ -17,7 +17,7 @@ namespace controllers\internals;
 
         public function __construct(?\PDO $bdd = null)
         {
-            if ($bdd === null)
+            if (null === $bdd)
             {
                 $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             }

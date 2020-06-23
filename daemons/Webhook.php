@@ -62,6 +62,7 @@ class Webhook extends AbstractDaemon
             {
                 $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
                 $find_message = false;
+
                 continue;
             }
 

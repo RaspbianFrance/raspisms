@@ -39,7 +39,7 @@ namespace controllers\internals;
         {
             new \daemons\Webhook();
         }
-        
+
         /**
          * Start mailer daemon.
          */
@@ -98,13 +98,12 @@ namespace controllers\internals;
         }
 
         /**
+         * Update a user status.
          *
-         * Update a user status
-         *
-         * @param string $email : User email
+         * @param string $email  : User email
          * @param string $status : User status, default \models\User::STATUS_ACTIVE
          */
-        public function update_user_status (string $email, string $status)
+        public function update_user_status(string $email, string $status)
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
             $internal_user = new \controllers\internals\User($bdd);

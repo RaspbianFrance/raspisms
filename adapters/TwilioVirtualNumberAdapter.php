@@ -14,7 +14,7 @@ namespace adapters;
 use Twilio\Rest\Client;
 
 /**
- * Twilio SMS service with a virtual number adapter
+ * Twilio SMS service with a virtual number adapter.
  */
 class TwilioVirtualNumberAdapter implements AdapterInterface
 {
@@ -24,17 +24,17 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
     private $datas;
 
     /**
-     * Twilio Api client
+     * Twilio Api client.
      */
     private $client;
 
     /**
-     * Twilio virtual number to use
+     * Twilio virtual number to use.
      */
     private $number;
 
     /**
-     * Callback address Twilio must call on SMS status change
+     * Callback address Twilio must call on SMS status change.
      */
     private $status_change_callback;
 
@@ -65,12 +65,11 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
         return __CLASS__;
     }
 
-
     /**
      * Uniq name of the adapter
-     * It should be the classname of the adapter un snakecase
+     * It should be the classname of the adapter un snakecase.
      */
-    public static function meta_uid() : string
+    public static function meta_uid(): string
     {
         return 'twilio_virtual_number_adapter';
     }
@@ -174,10 +173,10 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
      * @param bool   $flash       : Is the SMS a Flash SMS
      *
      * @return array : [
-     *      bool 'error' => false if no error, true else
-     *      ?string 'error_message' => null if no error, else error message
-     *      array 'uid' => Uid of the sms created on success
-     * ]
+     *               bool 'error' => false if no error, true else
+     *               ?string 'error_message' => null if no error, else error message
+     *               array 'uid' => Uid of the sms created on success
+     *               ]
      */
     public function send(string $destination, string $text, bool $flash = false)
     {
@@ -198,20 +197,23 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
                 ]
             );
 
-            if ($message->errorCode !== null)
+            if (null !== $message->errorCode)
             {
                 $response['error'] = true;
                 $response['error_message'] = $message->errorMessage;
+
                 return $response;
             }
 
             $response['uid'] = $message->sid;
+
             return $response;
         }
         catch (\Throwable $t)
         {
             $response['error'] = true;
             $response['error_message'] = $t->getMessage();
+
             return $response;
         }
     }
@@ -220,10 +222,10 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
      * Method called to read SMSs of the number.
      *
      * @return array : [
-     *      bool 'error' => false if no error, true else
-     *      ?string 'error_message' => null if no error, else error message
-     *      array 'sms' => Array of the sms reads
-     * ]
+     *               bool 'error' => false if no error, true else
+     *               ?string 'error_message' => null if no error, else error message
+     *               array 'sms' => Array of the sms reads
+     *               ]
      */
     public function read(): array
     {
@@ -241,7 +243,7 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
 
             foreach ($messages as $record)
             {
-                if ($record->direction != 'inbound')
+                if ('inbound' !== $record->direction)
                 {
                     continue;
                 }
@@ -265,6 +267,7 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
         {
             $response['error'] = true;
             $response['error_message'] = $t->getMessage();
+
             return $response;
         }
     }
@@ -284,7 +287,7 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
             foreach ($phone_numbers as $record)
             {
                 //If not the same number, return false
-                if ($record->phoneNumber != $this->number)
+                if ($record->phoneNumber !== $this->number)
                 {
                     continue;
                 }
@@ -317,16 +320,17 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
 
         switch ($status)
         {
-        case 'delivered' :
+        case 'delivered':
             $status = \models\Sended::STATUS_DELIVERED;
-            break;
 
-        case 'failed' :
+            break;
+        case 'failed':
             $status = \models\Sended::STATUS_FAILED;
-            break;
 
-        default :
+            break;
+        default:
             $status = \models\Sended::STATUS_UNKNOWN;
+
             break;
         }
 
@@ -337,17 +341,17 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
      * Method called on reception of a sms notification.
      *
      * @return array : [
-     *      bool 'error' => false on success, true on error
-     *      ?string 'error_message' => null on success, error message else
-     *      array 'sms' => array [
-     *          string 'at' : Recepetion date format Y-m-d H:i:s,
-     *          string 'text' : SMS body,
-     *          string 'origin' : SMS sender,
-     *      ]
+     *               bool 'error' => false on success, true on error
+     *               ?string 'error_message' => null on success, error message else
+     *               array 'sms' => array [
+     *               string 'at' : Recepetion date format Y-m-d H:i:s,
+     *               string 'text' : SMS body,
+     *               string 'origin' : SMS sender,
+     *               ]
      *
      * ]
      */
-    public static function reception_callback() : array
+    public static function reception_callback(): array
     {
         return [];
     }

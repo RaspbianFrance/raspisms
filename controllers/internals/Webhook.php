@@ -88,32 +88,21 @@ class Webhook extends StandardController
     }
 
     /**
-     * Get the model for the Controller.
-     *
-     * @return \descartes\Model
-     */
-    protected function get_model(): \descartes\Model
-    {
-        $this->model = $this->model ?? new \models\Webhook($this->bdd);
-
-        return $this->model;
-    }
-
-
-    /**
      * Trigger a webhook and transmit the signal to webhook daemon if needed.
-     * @param int $id_user : User to trigger the webhook for
-     * @param string $type  : Type of webhook to trigger
-     * @param array  $sms           : The sms [
-     *      int 'id' => SMS id,
-     *      string 'at' => SMS date,
-     *      string 'text' => sms body,
-     *      string 'origin' => sms origin (number or phone id)
-     *      string 'destination' => sms destination (number or phone id)
-     * ]
+     *
+     * @param int    $id_user : User to trigger the webhook for
+     * @param string $type    : Type of webhook to trigger
+     * @param array  $sms     : The sms [
+     *                        int 'id' => SMS id,
+     *                        string 'at' => SMS date,
+     *                        string 'text' => sms body,
+     *                        string 'origin' => sms origin (number or phone id)
+     *                        string 'destination' => sms destination (number or phone id)
+     *                        ]
+     *
      * @return bool : False if no trigger, true else
      */
-    public function trigger (int $id_user, string $type, array $sms)
+    public function trigger(int $id_user, string $type, array $sms)
     {
         $internal_setting = new Setting($this->bdd);
         $settings = $internal_setting->gets_for_user($id_user);
@@ -141,7 +130,20 @@ class Webhook extends StandardController
             $error_code = null;
             $queue = msg_get_queue(QUEUE_ID_WEBHOOK);
             $success = msg_send($queue, QUEUE_TYPE_WEBHOOK, $message, true, true, $error_code);
+
             return (bool) $success;
         }
+    }
+
+    /**
+     * Get the model for the Controller.
+     *
+     * @return \descartes\Model
+     */
+    protected function get_model(): \descartes\Model
+    {
+        $this->model = $this->model ?? new \models\Webhook($this->bdd);
+
+        return $this->model;
     }
 }

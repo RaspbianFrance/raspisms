@@ -20,19 +20,22 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
     {
         //Override default constant() function to make it return null
         //This will prevent the use of constant() func to read constants with security impact (such as session, db credentials, etc.)
-        $neutralized_constant = new ExpressionFunction('constant', function ($str) {
+        $neutralized_constant = new ExpressionFunction('constant', function ($str)
+        {
             return null;
-        }, function ($arguments, $str) {
+        }, function ($arguments, $str)
+        {
             return null;
         });
 
         //Exists must be personnalized because it inverse is_null
-        $exists = new ExpressionFunction('exists', function ($var) {
+        $exists = new ExpressionFunction('exists', function ($var)
+        {
             return sprintf('!is_null(%1$s)', $str);
-        }, function ($arguments, $var) {
-            return !is_null($var);
+        }, function ($arguments, $var)
+        {
+            return null !== $var;
         });
-
 
         return [
             $neutralized_constant,

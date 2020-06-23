@@ -148,7 +148,7 @@ namespace controllers\internals;
                 $i = 0;
                 foreach ($line as $key => $value)
                 {
-                    $i++;
+                    ++$i;
                     if ($i < 3)
                     {
                         continue;
@@ -164,7 +164,7 @@ namespace controllers\internals;
                 }
                 $datas = json_encode($datas);
 
-                try 
+                try
                 {
                     $success = $this->create($id_user, $line[array_keys($line)[1]], $line[array_keys($line)[0]], $datas);
                     if ($success)

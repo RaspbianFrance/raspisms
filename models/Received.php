@@ -44,7 +44,6 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
-
         /**
          * Count number of unread received sms for user.
          *

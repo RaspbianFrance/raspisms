@@ -45,18 +45,17 @@ class User extends \descartes\Controller
         $users = $this->internal_user->list();
         $this->render('user/list', ['users' => $users]);
     }
-    
-    
+
     /**
-     * Update status of users
+     * Update status of users.
      *
      * @param array int $_GET['ids'] : User ids
      * @param mixed     $csrf
-     * @param int $status : 1 -> active, 0 -> suspended
+     * @param int       $status      : 1 -> active, 0 -> suspended
      *
      * @return boolean;
      */
-    public function update_status ($csrf, int $status)
+    public function update_status($csrf, int $status)
     {
         if (!$this->verify_csrf($csrf))
         {
@@ -65,7 +64,7 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'list'));
         }
 
-        if ($status == 0)
+        if (0 === $status)
         {
             $status = \models\User::STATUS_SUSPENDED;
         }
@@ -82,7 +81,6 @@ class User extends \descartes\Controller
 
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
-
 
     /**
      * Cette fonction va supprimer une liste de users.

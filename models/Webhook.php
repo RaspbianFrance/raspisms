@@ -16,7 +16,6 @@ namespace models;
         const TYPE_SEND = 'send_sms';
         const TYPE_RECEIVE = 'receive_sms';
 
-
         /**
          * Find all webhooks for a user and for a type of webhook.
          *

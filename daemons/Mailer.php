@@ -60,6 +60,7 @@ class Mailer extends AbstractDaemon
             {
                 $this->logger->critical('Error for mailer queue reading, error code : ' . $error_code);
                 $find_message = false;
+
                 continue;
             }
 
@@ -77,6 +78,7 @@ class Mailer extends AbstractDaemon
             if (!$success)
             {
                 $this->logger->error('Failed sending email');
+
                 continue;
             }
 

@@ -106,12 +106,11 @@ namespace controllers\internals;
         {
             return (bool) $this->model_user->update_email($id, $email);
         }
-        
-        
+
         /**
          * Update user status.
          *
-         * @param string $id    : user id
+         * @param string $id     : user id
          * @param string $status : new status
          *
          * @return boolean;
@@ -181,13 +180,13 @@ namespace controllers\internals;
         /**
          * Update a user by his id.
          *
-         * @param mixed $id
-         * @param mixed $email
-         * @param mixed $password
-         * @param mixed $admin
-         * @param mixed $api_key
-         * @param string $status : User status
-         * @param bool $encrypt_password : Should the password be encrypted, by default true
+         * @param mixed  $id
+         * @param mixed  $email
+         * @param mixed  $password
+         * @param mixed  $admin
+         * @param mixed  $api_key
+         * @param string $status           : User status
+         * @param bool   $encrypt_password : Should the password be encrypted, by default true
          *
          * @return int : Number of modified user
          */
@@ -210,9 +209,9 @@ namespace controllers\internals;
          * @param mixed   $email
          * @param mixed   $password
          * @param mixed   $admin
-         * @param ?string $api_key  : The api key of the user, if null generate randomly
-         * @param string $status : User status, default \models\User::STATUS_ACTIVE
-         * @param bool $encrypt_password : Should the password be encrypted, by default true
+         * @param ?string $api_key          : The api key of the user, if null generate randomly
+         * @param string  $status           : User status, default \models\User::STATUS_ACTIVE
+         * @param bool    $encrypt_password : Should the password be encrypted, by default true
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
@@ -255,21 +254,21 @@ namespace controllers\internals;
             return bin2hex(random_bytes(16));
         }
 
-
         /**
-         * Transfer a received sms to user email
-         * @param int $id_user : User id
+         * Transfer a received sms to user email.
+         *
+         * @param int   $id_user  : User id
          * @param array $received : [
-         *      int 'id' => sms id,
-         *      string 'at' => sms reception date,
-         *      string 'text' => sms content,
-         *      string 'destination' => id of phone the sms was sent to
-         *      string 'origin' => phone number that sent the sms
-         * ]
+         *                        int 'id' => sms id,
+         *                        string 'at' => sms reception date,
+         *                        string 'text' => sms content,
+         *                        string 'destination' => id of phone the sms was sent to
+         *                        string 'origin' => phone number that sent the sms
+         *                        ]
          *
          * @return bool : False if no transfer, true else
          */
-        public function transfer_received (int $id_user, array $received) : bool
+        public function transfer_received(int $id_user, array $received): bool
         {
             $settings = $this->internal_setting->gets_for_user($id_user);
 
@@ -291,6 +290,7 @@ namespace controllers\internals;
             }
 
             $mailer = new Mailer();
+
             return $mailer->enqueue($user['email'], EMAIL_TRANSFER_SMS, [
                 'at' => $received['at'],
                 'origin' => $received['origin'],

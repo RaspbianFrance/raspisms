@@ -106,7 +106,7 @@ class Phone extends AbstractDaemon
     private function send_smss()
     {
         $internal_sended = new \controllers\internals\Sended($this->bdd);
-        
+
         $find_message = true;
         while ($find_message)
         {
@@ -135,17 +135,17 @@ class Phone extends AbstractDaemon
             //Update last message time
             $this->last_message_at = microtime(true);
 
-
-            //Do message sending            
+            //Do message sending
             $this->logger->info('Try send message : ' . json_encode($message));
-        
+
             $response = $internal_sended->send($this->adapter, $this->phone['id_user'], $this->phone['id'], $message['text'], $message['destination'], $message['flash']);
             if ($response['error'])
             {
                 $this->logger->error('Failed send message : ' . json_encode($message) . ' with error : ' . $response['error_message']);
+
                 continue;
             }
-        
+
             $this->logger->info('Successfully send message : ' . json_encode($message));
         }
     }
@@ -161,12 +161,13 @@ class Phone extends AbstractDaemon
         {
             return true;
         }
-        
+
         $response = $this->adapter->read();
 
         if ($response['error'])
         {
             $this->logger->info('Error reading received smss : ' . $response['error_message']);
+
             return false;
         }
 
@@ -180,15 +181,15 @@ class Phone extends AbstractDaemon
         {
             $this->logger->info('Receive message : ' . json_encode($sms));
             $response = $internal_received->receive($this->phone['id_user'], $this->phone['id'], $sms['text'], $sms['origin']);
-            
+
             if ($response['error'])
             {
                 $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+
                 continue;
             }
 
             $this->logger->info('Message received successfully.');
         }
     }
-
 }

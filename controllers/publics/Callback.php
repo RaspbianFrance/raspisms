@@ -114,9 +114,10 @@ use Monolog\Logger;
             }
 
             //Do not update if current status is delivered or failed
-            if ($sended['status'] === \models\Sended::STATUS_DELIVERED || $sended['status'] === \models\Sended::STATUS_FAILED)
+            if (\models\Sended::STATUS_DELIVERED === $sended['status'] || \models\Sended::STATUS_FAILED === $sended['status'])
             {
                 $this->logger->info('Callback status update message ignore because status is already ' . $sended['status'] . '.');
+
                 return false;
             }
 
@@ -125,18 +126,17 @@ use Monolog\Logger;
 
             return true;
         }
-        
-        
+
         /**
          * Function call on sms reception notification
          * We return nothing, and we let the adapter do his things.
          *
          * @param string $adapter_uid : Uid of the adapter to use
-         * @param int $id_phone : Phone id
+         * @param int    $id_phone    : Phone id
          *
          * @return bool : true on success, false on error
          */
-        public function reception (string $adapter_uid, int $id_phone)
+        public function reception(string $adapter_uid, int $id_phone)
         {
             $this->logger->info('Callback reception call with adapter uid : ' . $adapter_uid);
 
@@ -171,6 +171,7 @@ use Monolog\Logger;
             if ($response['error'])
             {
                 $this->logger->error('Callback reception with adapter ' . $adapter_uid . ' failed : ' . $response['error_message']);
+
                 return false;
             }
 
@@ -180,10 +181,12 @@ use Monolog\Logger;
             if ($response['error'])
             {
                 $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+
                 return false;
             }
 
             $this->logger->info('Callback reception successfully received message : ' . json_encode($sms));
+
             return true;
         }
     }

@@ -64,7 +64,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Connect', 'login'));
             }
 
-            if ($user['status'] !== \models\User::STATUS_ACTIVE)
+            if (\models\User::STATUS_ACTIVE !== $user['status'])
             {
                 \FlashMessage\FlashMessage::push('danger', 'Votre compte est actuellement suspendu.');
 
@@ -119,7 +119,7 @@ namespace controllers\publics;
             $token = $Tokenista->generate(3600, ['id_user' => $user['id']]);
 
             $reset_link = \descartes\Router::url('Connect', 'reset_password', ['id_user' => $user['id'], 'token' => $token]);
-            
+
             $mailer = new \controllers\internals\Mailer();
             $email_send = $mailer->enqueue($email, EMAIL_RESET_PASSWORD, ['reset_link' => $reset_link]);
 

@@ -14,7 +14,7 @@ namespace adapters;
     use Ovh\Api;
 
     /**
-     * OVH SMS service with a virtual number adapter
+     * OVH SMS service with a virtual number adapter.
      */
     class OvhSmsVirtualNumberAdapter implements AdapterInterface
     {
@@ -29,7 +29,7 @@ namespace adapters;
         private $api;
 
         /**
-         * Number used
+         * Number used.
          */
         private $number;
 
@@ -41,7 +41,7 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
          */
         public function __construct(string $datas)
         {
@@ -53,7 +53,7 @@ namespace adapters;
                 'ovh-eu',
                 $this->datas['consumer_key']
             );
-            
+
             $this->number = $this->datas['number'];
             $this->formatted_number = str_replace('+', '00', $this->number);
         }
@@ -65,13 +65,12 @@ namespace adapters;
         {
             return __CLASS__;
         }
-        
-        
+
         /**
          * Uniq name of the adapter
-         * It should be the classname of the adapter un snakecase
+         * It should be the classname of the adapter un snakecase.
          */
-        public static function meta_uid() : string
+        public static function meta_uid(): string
         {
             return 'ovh_sms_virtual_number_adapter';
         }
@@ -180,10 +179,10 @@ namespace adapters;
          * @param bool   $flash       : Is the SMS a Flash SMS
          *
          * @return array : [
-         *      bool 'error' => false if no error, true else
-         *      ?string 'error_message' => null if no error, else error message
-         *      array 'uid' => Uid of the sms created on success
-         * ]
+         *               bool 'error' => false if no error, true else
+         *               ?string 'error_message' => null if no error, else error message
+         *               array 'uid' => Uid of the sms created on success
+         *               ]
          */
         public function send(string $destination, string $text, bool $flash = false)
         {
@@ -210,6 +209,7 @@ namespace adapters;
                 {
                     $response['error'] = true;
                     $response['error_message'] = 'Invalid receiver';
+
                     return $response;
                 }
 
@@ -218,16 +218,19 @@ namespace adapters;
                 {
                     $response['error'] = true;
                     $response['error_message'] = 'Cannot retrieve uid';
+
                     return $response;
                 }
 
                 $response['uid'] = $uid;
+
                 return $response;
             }
             catch (\Throwable $t)
             {
                 $response['error'] = true;
                 $response['error_message'] = $t->getMessage();
+
                 return $response;
             }
         }
@@ -236,10 +239,10 @@ namespace adapters;
          * Method called to read SMSs of the number.
          *
          * @return array : [
-         *      bool 'error' => false if no error, true else
-         *      ?string 'error_message' => null if no error, else error message
-         *      array 'sms' => Array of the sms reads
-         * ]
+         *               bool 'error' => false if no error, true else
+         *               ?string 'error_message' => null if no error, else error message
+         *               array 'sms' => Array of the sms reads
+         *               ]
          */
         public function read(): array
         {
@@ -253,8 +256,8 @@ namespace adapters;
             {
                 $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
                 $uids = $this->api->get($endpoint);
-                
-                if (!is_array($uids) || !$uids)
+
+                if (!\is_array($uids) || !$uids)
                 {
                     return $response;
                 }
@@ -286,6 +289,7 @@ namespace adapters;
             {
                 $response['error'] = true;
                 $response['error_message'] = $t->getMessage();
+
                 return $response;
             }
         }
@@ -354,22 +358,22 @@ namespace adapters;
 
             return ['uid' => $uid, 'status' => $status];
         }
-        
+
         /**
          * Method called on reception of a sms notification.
          *
          * @return array : [
-         *      bool 'error' => false on success, true on error
-         *      ?string 'error_message' => null on success, error message else
-         *      array 'sms' => array [
-         *          string 'at' : Recepetion date format Y-m-d H:i:s,
-         *          string 'text' : SMS body,
-         *          string 'origin' : SMS sender,
-         *      ]
+         *               bool 'error' => false on success, true on error
+         *               ?string 'error_message' => null on success, error message else
+         *               array 'sms' => array [
+         *               string 'at' : Recepetion date format Y-m-d H:i:s,
+         *               string 'text' : SMS body,
+         *               string 'origin' : SMS sender,
+         *               ]
          *
          * ]
          */
-        public static function reception_callback() : array
+        public static function reception_callback(): array
         {
             return [];
         }

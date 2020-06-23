@@ -46,7 +46,7 @@ namespace controllers\publics;
 
             foreach ($sendeds as $key => $sended)
             {
-                if ($sended['id_phone'] !== null)
+                if (null !== $sended['id_phone'])
                 {
                     $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $sended['id_phone']);
                     if ($phone)

@@ -90,8 +90,8 @@ namespace controllers\publics;
 
                 exit(self::ERROR_CODES['INVALID_CREDENTIALS']);
             }
-            
-            if ($this->user['status'] !== \models\User::STATUS_ACTIVE)
+
+            if (\models\User::STATUS_ACTIVE !== $this->user['status'])
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['SUSPENDED_USER'];
@@ -121,6 +121,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'entry_type must be one of : ' . implode(', ', $entry_types) . '.';
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
@@ -165,6 +166,7 @@ namespace controllers\publics;
             }
 
             $this->auto_http_code(true);
+
             return $this->json($return);
         }
 
@@ -182,7 +184,7 @@ namespace controllers\publics;
          *
          * @return : Id of scheduled created
          */
-        public function post_scheduled ()
+        public function post_scheduled()
         {
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
@@ -193,10 +195,10 @@ namespace controllers\publics;
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
 
-            $numbers = is_array($numbers) ? $numbers : [$numbers];
-            $contacts = is_array($contacts) ? $contacts : [$contacts];
-            $groups = is_array($groups) ? $groups : [$groups];
-            $conditional_groups = is_array($conditional_groups) ? $conditional_groups : [$conditional_groups];
+            $numbers = \is_array($numbers) ? $numbers : [$numbers];
+            $contacts = \is_array($contacts) ? $contacts : [$contacts];
+            $groups = \is_array($groups) ? $groups : [$groups];
+            $conditional_groups = \is_array($conditional_groups) ? $conditional_groups : [$conditional_groups];
 
             if (!$at)
             {
@@ -209,6 +211,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($at ? '' : 'at ') . ($text ? '' : 'text');
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
@@ -218,6 +221,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
@@ -241,6 +245,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'You must specify at least one valid number, contact, group or conditional_group.';
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
@@ -250,6 +255,7 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone : You must specify an id_phone number among thoses of user phones.';
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
@@ -260,12 +266,14 @@ namespace controllers\publics;
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
                 $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
                 $this->auto_http_code(false);
+
                 return $this->json($return);
             }
 
             $return = self::DEFAULT_RETURN;
             $return['response'] = $scheduled_id;
             $this->auto_http_code(true);
+
             return $this->json($return);
         }
 
@@ -292,6 +300,7 @@ namespace controllers\publics;
 
             $return['response'] = true;
             $this->auto_http_code(true);
+
             return $this->json($return);
         }
     }

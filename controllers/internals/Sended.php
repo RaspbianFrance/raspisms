@@ -18,7 +18,7 @@ namespace controllers\internals;
         /**
          * Create a sended.
          *
-         * @param int $id_user : Id of user to create sended message for
+         * @param int $id_user  : Id of user to create sended message for
          * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
@@ -111,7 +111,7 @@ namespace controllers\internals;
         /**
          * Return sended for an uid and an adapter.
          *
-         * @param int $id_user : user id
+         * @param int    $id_user : user id
          * @param string $uid     : Uid of the sended
          * @param string $adapter : Adapter used to send the message
          *
@@ -157,32 +157,22 @@ namespace controllers\internals;
         }
 
         /**
-         * Get the model for the Controller.
+         * Send a SMS message.
          *
-         * @return \descartes\Model
-         */
-        protected function get_model(): \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Sended($this->bdd);
-
-            return $this->model;
-        }
-
-        /**
-         * Send a SMS message
-         * @param \adapters\AdapterInterface $adapter : Adapter object to use to send the message
-         * @param int $id_user : Id of user to create sended message for
-         * @param int $id_phone : Id of the phone the message was send with
+         * @param \adapters\AdapterInterface $adapter  : Adapter object to use to send the message
+         * @param int                        $id_user  : Id of user to create sended message for
+         * @param int                        $id_phone : Id of the phone the message was send with
          * @param $text : Text of the message
          * @param string $destination : Number of the receiver
          * @param bool   $flash       : Is the sms a flash. By default false.
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
+         *
          * @return array : [
-         *      bool 'error' => false if success, true else
-         *      ?string 'error_message' => null if success, error message else
-         * ]
+         *               bool 'error' => false if success, true else
+         *               ?string 'error_message' => null if success, error message else
+         *               ]
          */
-        public function send (\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, string $status = \models\Sended::STATUS_UNKNOWN) : array
+        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, string $status = \models\Sended::STATUS_UNKNOWN): array
         {
             $return = [
                 'error' => false,
@@ -198,6 +188,7 @@ namespace controllers\internals;
                 $return['error_message'] = $response['error_message'];
                 $status = \models\Sended::STATUS_FAILED;
                 $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+
                 return $return;
             }
 
@@ -213,7 +204,19 @@ namespace controllers\internals;
 
             $internal_webhook = new Webhook($this->bdd);
             $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND, $sended);
+
             return $return;
         }
 
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Sended($this->bdd);
+
+            return $this->model;
+        }
     }

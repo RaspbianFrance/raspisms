@@ -38,7 +38,7 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
          */
         public function __construct(string $datas)
         {
@@ -52,12 +52,12 @@ namespace adapters;
         {
             return __CLASS__;
         }
-        
+
         /**
          * Uniq name of the adapter
-         * It should be the classname of the adapter un snakecase
+         * It should be the classname of the adapter un snakecase.
          */
-        public static function meta_uid() : string
+        public static function meta_uid(): string
         {
             return 'test_adapter';
         }
@@ -89,8 +89,7 @@ namespace adapters;
         {
             return [];
         }
-        
-        
+
         /**
          * Does the implemented service support reading smss.
          */
@@ -131,10 +130,10 @@ namespace adapters;
          * @param bool   $flash       : Is the SMS a Flash SMS
          *
          * @return array : [
-         *      bool 'error' => false if no error, true else
-         *      ?string 'error_message' => null if no error, else error message
-         *      array 'uid' => Uid of the sms created on success
-         * ]
+         *               bool 'error' => false if no error, true else
+         *               ?string 'error_message' => null if no error, else error message
+         *               array 'uid' => Uid of the sms created on success
+         *               ]
          */
         public function send(string $destination, string $text, bool $flash = false)
         {
@@ -148,15 +147,16 @@ namespace adapters;
 
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $success = file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash]) . "\n", FILE_APPEND);
-            if ($success === false)
+            if (false === $success)
             {
                 $response['error'] = true;
                 $response['error_message'] = 'Cannot write in file : ' . $this->test_file_write;
+
                 return $response;
             }
-            
 
             $response['uid'] = $uid;
+
             return $response;
         }
 
@@ -164,10 +164,10 @@ namespace adapters;
          * Method called to read SMSs of the number.
          *
          * @return array : [
-         *      bool 'error' => false if no error, true else
-         *      ?string 'error_message' => null if no error, else error message
-         *      array 'sms' => Array of the sms reads
-         * ]
+         *               bool 'error' => false if no error, true else
+         *               ?string 'error_message' => null if no error, else error message
+         *               array 'sms' => Array of the sms reads
+         *               ]
          */
         public function read(): array
         {
@@ -177,22 +177,24 @@ namespace adapters;
                 'smss' => [],
             ];
 
-            try 
+            try
             {
                 $file_contents = file_get_contents($this->test_file_read);
-                if ($file_contents === false)
+                if (false === $file_contents)
                 {
                     $response['error'] = true;
                     $response['error_message'] = 'Cannot read file : ' . $this->test_file_read;
+
                     return $response;
                 }
 
                 //Empty file to avoid dual read
                 $success = file_put_contents($this->test_file_read, '');
-                if ($success === false)
+                if (false === $success)
                 {
                     $response['error'] = true;
                     $response['error_message'] = 'Cannot write in file : ' . $this->test_file_read;
+
                     return $response;
                 }
 
@@ -215,6 +217,7 @@ namespace adapters;
             {
                 $response['error'] = true;
                 $response['error_message'] = $t->getMessage();
+
                 return $response;
             }
         }
@@ -232,7 +235,6 @@ namespace adapters;
 
         /**
          * Method called on reception of a status update notification for a SMS.
-         *
          */
         public static function status_change_callback()
         {
@@ -267,23 +269,22 @@ namespace adapters;
 
             return $return;
         }
-        
-        
+
         /**
          * Method called on reception of a sms notification.
          *
          * @return array : [
-         *      bool 'error' => false on success, true on error
-         *      ?string 'error_message' => null on success, error message else
-         *      array 'sms' => array [
-         *          string 'at' : Recepetion date format Y-m-d H:i:s,
-         *          string 'text' : SMS body,
-         *          string 'origin' : SMS sender,
-         *      ]
+         *               bool 'error' => false on success, true on error
+         *               ?string 'error_message' => null on success, error message else
+         *               array 'sms' => array [
+         *               string 'at' : Recepetion date format Y-m-d H:i:s,
+         *               string 'text' : SMS body,
+         *               string 'origin' : SMS sender,
+         *               ]
          *
          * ]
          */
-        public static function reception_callback() : array
+        public static function reception_callback(): array
         {
             return [];
         }

@@ -50,7 +50,7 @@ namespace controllers\publics;
                     $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
                 }
 
-                if ($received['id_phone'] !== null)
+                if (null !== $received['id_phone'])
                 {
                     $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
                     if ($phone)
@@ -80,7 +80,7 @@ namespace controllers\publics;
             {
                 $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
 
-                if ($received['id_phone'] !== null)
+                if (null !== $received['id_phone'])
                 {
                     $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
                     if ($phone)

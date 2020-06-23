@@ -12,7 +12,7 @@
 namespace adapters;
 
 /**
- * Octopush SMS service with a shortcode adapter
+ * Octopush SMS service with a shortcode adapter.
  */
 class OctopushVirtualNumberAdapter implements AdapterInterface
 {
@@ -27,30 +27,30 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
     private $datas;
 
     /**
-     * Octopush login
+     * Octopush login.
      */
     private $login;
 
     /**
-     * Octopush api key
+     * Octopush api key.
      */
     private $api_key;
 
     /**
-     * Number phone to use
+     * Number phone to use.
      */
     private $number;
 
     /**
-     * Number phone to use formated for octopush compatibility
+     * Number phone to use formated for octopush compatibility.
      */
     private $formatted_number;
 
     /**
-     * Octopush api baseurl
+     * Octopush api baseurl.
      */
     private $api_url = 'https://www.octopush-dm.com/api';
-    
+
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
      *
@@ -75,12 +75,11 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         return __CLASS__;
     }
 
-
     /**
      * Uniq name of the adapter
-     * It should be the classname of the adapter un snakecase
+     * It should be the classname of the adapter un snakecase.
      */
-    public static function meta_uid() : string
+    public static function meta_uid(): string
     {
         return 'octopush_virtual_number_adapter';
     }
@@ -101,6 +100,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
     public static function meta_description(): string
     {
         $credentials_url = 'https://www.octopush-dm.com/api-logins';
+
         return '
                 Envoi de SMS avec un numéro virtuel en utilisant <a target="_blank" href="https://www.octopush.com/">Octopush</a>. Pour trouver vos clés API Octopush <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a>
             ';
@@ -133,7 +133,6 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 'required' => true,
                 'number' => true,
             ],
-
         ];
     }
 
@@ -177,10 +176,10 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
      * @param bool   $flash       : Is the SMS a Flash SMS
      *
      * @return array : [
-     *      bool 'error' => false if no error, true else
-     *      ?string 'error_message' => null if no error, else error message
-     *      array 'uid' => Uid of the sms created on success
-     * ]
+     *               bool 'error' => false if no error, true else
+     *               ?string 'error_message' => null if no error, else error message
+     *               array 'uid' => Uid of the sms created on success
+     *               ]
      */
     public function send(string $destination, string $text, bool $flash = false)
     {
@@ -212,25 +211,28 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             $response = curl_exec($curl);
             curl_close($curl);
 
-            if ($response === false)
+            if (false === $response)
             {
                 $response['error'] = true;
                 $response['error_message'] = 'HTTP query failed.';
+
                 return $response;
             }
 
             $response_decode = json_decode($response, true);
-            if ($response_decode === null)
+            if (null === $response_decode)
             {
                 $response['error'] = true;
                 $response['error_message'] = 'Invalid JSON for response.';
+
                 return $response;
             }
 
-            if ($response_decode['error_code'] != self::ERROR_CODE_OK)
+            if (self::ERROR_CODE_OK !== $response_decode['error_code'])
             {
                 $response['error'] = true;
                 $response['error_message'] = 'Response indicate error code : ' . $response_decode['error_code'];
+
                 return $response;
             }
 
@@ -239,16 +241,19 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             {
                 $response['error'] = true;
                 $response['error_message'] = 'Cannot extract SMS uid';
+
                 return $response;
             }
 
             $response['uid'] = $uid;
+
             return $response;
         }
         catch (\Throwable $t)
         {
             $response['error'] = true;
             $response['error_message'] = $t->getMessage();
+
             return $response;
         }
     }
@@ -257,10 +262,10 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
      * Method called to read SMSs of the number.
      *
      * @return array : [
-     *      bool 'error' => false if no error, true else
-     *      ?string 'error_message' => null if no error, else error message
-     *      array 'sms' => Array of the sms reads
-     * ]
+     *               bool 'error' => false if no error, true else
+     *               ?string 'error_message' => null if no error, else error message
+     *               array 'sms' => Array of the sms reads
+     *               ]
      */
     public function read(): array
     {
@@ -283,7 +288,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             {
                 return false;
             }
-            
+
             $datas = [
                 'user_login' => $this->login,
                 'api_key' => $this->api_key,
@@ -300,18 +305,18 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             $response = curl_exec($curl);
             curl_close($curl);
 
-            if ($response === false)
+            if (false === $response)
             {
                 return false;
             }
 
             $response_decode = json_decode($response, true);
-            if ($response_decode === null)
+            if (null === $response_decode)
             {
                 return false;
             }
 
-            if ($response_decode['error_code'] != self::ERROR_CODE_OK)
+            if (self::ERROR_CODE_OK !== $response_decode['error_code'])
             {
                 return false;
             }
@@ -338,7 +343,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         $uid = $_POST['message_id'] ?? false;
         $status = $_POST['status'] ?? false;
 
-        if ($uid === false || $status === false)
+        if (false === $uid || false === $status)
         {
             return false;
         }
@@ -347,40 +352,40 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         {
             case 'DELIVERED':
                 $status = \models\Sended::STATUS_DELIVERED;
+
                 break;
-           
             case 'NOT_ALLOWED':
             case 'INVALID_DESTINATION_ADDRESS':
             case 'OUT_OF_DATE':
             case 'EXPIRED':
             case 'BLACKLISTED_NUMBER':
                 $status = \models\Sended::STATUS_FAILED;
-                break;
 
-            default :
+                break;
+            default:
                 $status = \models\Sended::STATUS_UNKNOWN;
+
                 break;
         }
 
         return ['uid' => $uid, 'status' => $status];
     }
 
-
     /**
      * Method called on reception of a sms notification.
      *
      * @return array : [
-     *      bool 'error' => false on success, true on error
-     *      ?string 'error_message' => null on success, error message else
-     *      array 'sms' => array [
-     *          string 'at' : Recepetion date format Y-m-d H:i:s,
-     *          string 'text' : SMS body,
-     *          string 'origin' : SMS sender,
-     *      ]
+     *               bool 'error' => false on success, true on error
+     *               ?string 'error_message' => null on success, error message else
+     *               array 'sms' => array [
+     *               string 'at' : Recepetion date format Y-m-d H:i:s,
+     *               string 'text' : SMS body,
+     *               string 'origin' : SMS sender,
+     *               ]
      *
      * ]
      */
-    public static function reception_callback() : array
+    public static function reception_callback(): array
     {
         $response = [
             'error' => false,
@@ -400,6 +405,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         {
             $response['error'] = true;
             $response['error_message'] = 'One required data of the callback is missing.';
+
             return $response;
         }
 
@@ -408,6 +414,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         {
             $response['error'] = true;
             $response['error_message'] = 'Invalid origin number : ' . mb_substr($number, 2);
+
             return $response;
         }
 
@@ -416,6 +423,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             'text' => $text,
             'origin' => $origin,
         ];
+
         return $response;
     }
 }

@@ -28,7 +28,7 @@ namespace controllers\internals;
         }
 
         /**
-         * Return a phone by his name
+         * Return a phone by his name.
          *
          * @param string $name : Phone name
          *
@@ -40,10 +40,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Return a phone for a user by a name
+         * Return a phone for a user by a name.
          *
          * @param int    $id_user : user id
-         * @param string $name  : Phone name
+         * @param string $name    : Phone name
          *
          * @return array
          */
@@ -56,7 +56,7 @@ namespace controllers\internals;
          * Create a phone.
          *
          * @param int         $id_user       : User to insert phone for
-         * @param string      $name        : The name of the phone
+         * @param string      $name          : The name of the phone
          * @param string      $adapter       : The adapter to use the phone
          * @param string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          *
@@ -79,7 +79,7 @@ namespace controllers\internals;
          *
          * @param int    $id_user       : User to insert phone for
          * @param int    $id            : Phone id
-         * @param string $name        : The name of the phone
+         * @param string $name          : The name of the phone
          * @param string $adapter       : The adapter to use the phone
          * @param array  $adapter_datas : An array of the datas of the adapter (for example credentials for an api)
          *

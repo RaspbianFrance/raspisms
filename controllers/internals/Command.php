@@ -69,14 +69,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Analyse a message to check if it's a command so execute it
+         * Analyse a message to check if it's a command so execute it.
          *
          * @param int    $id_user : User id to search a command for
          * @param string $message : Message to analyse
          *
          * @return mixed bool|string : false if not a valid command, anonymized message if valid command
          */
-        public function analyze_and_process (int $id_user, string $message)
+        public function analyze_and_process(int $id_user, string $message)
         {
             if (!ENABLE_COMMAND)
             {

@@ -52,6 +52,7 @@ class Phone extends \descartes\Controller
             if (!$adapter)
             {
                 $phone['adapter'] = 'Inconnu';
+
                 continue;
             }
 
@@ -111,7 +112,7 @@ class Phone extends \descartes\Controller
      * Create a new phone.
      *
      * @param $csrf : CSRF token
-     * @param string $_POST['name']        : Phone name
+     * @param string $_POST['name']          : Phone name
      * @param string $_POST['adapter']       : Phone adapter
      * @param array  $_POST['adapter_datas'] : Phone adapter datas
      */

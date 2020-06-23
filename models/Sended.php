@@ -74,7 +74,7 @@ namespace models;
         /**
          * Return sended for an uid and an adapter.
          *
-         * @param int $id_user : Id of the user
+         * @param int    $id_user : Id of the user
          * @param string $uid     : Uid of the sended
          * @param string $adapter : Adapter used to send the message
          *

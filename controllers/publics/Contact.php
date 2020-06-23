@@ -303,7 +303,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            $msg = ($result == 1 ? '1' : 'Pas de') . ' nouveau contact inséré.';
+            $msg = (1 === $result ? '1' : 'Pas de') . ' nouveau contact inséré.';
             if ($result > 1)
             {
                 $msg = $result . ' nouveaux contacts ont été insérés.';

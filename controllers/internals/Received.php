@@ -36,9 +36,9 @@ namespace controllers\internals;
          * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $origin      : Number of the sender
-         * @param string $status      : Status of the received message
-         * @param bool   $command     : Is the sms a command
+         * @param string $origin  : Number of the sender
+         * @param string $status  : Status of the received message
+         * @param bool   $command : Is the sms a command
          *
          * @return mixed : false on error, new received id else
          */
@@ -203,31 +203,21 @@ namespace controllers\internals;
         }
 
         /**
-         * Get the model for the Controller.
+         * Receive a SMS message.
          *
-         * @return \descartes\Model
-         */
-        protected function get_model(): \descartes\Model
-        {
-            $this->model = $this->model ?? new \models\Received($this->bdd);
-
-            return $this->model;
-        }
-        
-        /**
-         * Receive a SMS message
-         * @param int $id_user : Id of user to create sended message for
+         * @param int $id_user  : Id of user to create sended message for
          * @param int $id_phone : Id of the phone the message was sent to
          * @param $text : Text of the message
-         * @param string $origin : Number of the sender
-         * @param ?string $at : Message reception date, if null use current date
-         * @param string $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
+         * @param string  $origin : Number of the sender
+         * @param ?string $at     : Message reception date, if null use current date
+         * @param string  $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
+         *
          * @return array : [
-         *      bool 'error' => false if success, true else
-         *      ?string 'error_message' => null if success, error message else
-         * ]
+         *               bool 'error' => false if success, true else
+         *               ?string 'error_message' => null if success, error message else
+         *               ]
          */
-        public function receive (int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD) : array
+        public function receive(int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD): array
         {
             $return = [
                 'error' => false,
@@ -240,8 +230,8 @@ namespace controllers\internals;
             //Process the message to check plus potentially execute command and anonymize text
             $internal_command = new Command($this->bdd);
             $response = $internal_command->analyze_and_process($id_user, $text);
-            if ($response !== false) //Received sms is a command an we must use anonymized text
-            {
+            if (false !== $response)
+            { //Received sms is a command an we must use anonymized text
                 $is_command = true;
                 $text = $response;
             }
@@ -251,6 +241,7 @@ namespace controllers\internals;
             {
                 $return['error'] = true;
                 $return['error_message'] = 'Impossible to insert the sms in database.';
+
                 return $return;
             }
 
@@ -267,6 +258,19 @@ namespace controllers\internals;
 
             $internal_user = new User($this->bdd);
             $internal_user->transfer_received($id_user, $received);
+
             return $return;
+        }
+
+        /**
+         * Get the model for the Controller.
+         *
+         * @return \descartes\Model
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Received($this->bdd);
+
+            return $this->model;
         }
     }

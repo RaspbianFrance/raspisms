@@ -17,7 +17,7 @@ namespace models;
          * Return a phone by his name and user.
          *
          * @param int    $id_user : user id
-         * @param string $name  :  phone name
+         * @param string $name    :  phone name
          *
          * @return array
          */
