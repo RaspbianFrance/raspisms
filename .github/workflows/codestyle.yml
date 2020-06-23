@@ -16,6 +16,22 @@ jobs:
       - name: PHP-CS-Fixer
         uses: docker://oskarstark/php-cs-fixer-ga
         with:
-          args: --config="./tests/php-cs-fixer/php_cs.config" 
+          args: --config="./tests/php-cs-fixer/php_cs.config"
+
+      - name: Config git
+        run: |
+          git config --global user.email "raspbianfrance@gmail.com"
+          git config --global user.name "Github Actions Bot"
+
+      - name: Commit changes
+        run: |
+          git add --all
+          git commit -m "Fix codestyle."
+
+      - name: Push changes # push the modif to repo
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
           
 
