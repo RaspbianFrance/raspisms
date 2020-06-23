@@ -284,7 +284,7 @@ namespace controllers\internals;
                 return false;
             }
 
-            $phone = $this->internal_phone->get_for_user($id_user, $destination);
+            $phone = $this->internal_phone->get_for_user($id_user, $received['destination']);
             if (!$phone)
             {
                 return false;
