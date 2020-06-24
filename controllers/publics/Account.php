@@ -156,6 +156,13 @@ namespace controllers\publics;
          */
         public function delete($csrf)
         {
+            if (!ENABLE_ACCOUNT_DELETION)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Fonctionnalité désactivée.');
+
+                return $this->redirect(\descartes\Router::url('Account', 'show'));
+            }
+
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
