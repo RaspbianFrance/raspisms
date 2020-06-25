@@ -7,7 +7,7 @@ L'application est compatible avec de nombreux services, depuis les API HTTP tier
 
 L'application est sous licence libre et est disponible en auto-hébergement ou [**en mode SaaS**](https://raspisms.fr)
 
-![](./github/imgs/dashboard.png)
+![](./.github/imgs/dashboard.png)
 
 ## Installation
 
