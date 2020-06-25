@@ -1,7 +1,7 @@
-# RaspiSMS
-RaspiSMS est un logiciel dedié à l'envoie et à la gestion de SMS depuis un ordinateur.
-Il a été originellement conçu pour la Raspberry Pi.
+# RaspiSMS - Application web de SMS 
 
-RaspiSMS est une création de https://raspberry-pi.fr et est distribué sous license GNU/GPL v3
+RaspiSMS vous offre une interface simple et puissante pour gérer vos communication par SMS depuis un ordinateur.
 
-Une documentation plus complète sur RaspiSMS est disponible à l'adresse https://raspisms.raspberry-pi.fr/
+C'est une application libre, disponible en mode SaaS ou en auto-hébergement et adaptable à de nombreux services de SMS professionnels comme OVH, Twillio, etc.
+
+Envoyez des SMS depuis internet, gérez, organisez et enrichissez vos contacts, créez des groupes dynamiques des messages personnalisés et bien plus encore.
