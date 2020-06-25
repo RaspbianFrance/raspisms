@@ -1,5 +1,4 @@
 # RaspiSMS
-> Envoyez des SMS depuis internet, gérez, organisez et enrichissez vos contacts, créez des groupes dynamiques des messages personnalisés et bien plus encore.
 
 RaspiSMS est une application web d'envoi et de réception de SMS, avec gestion des contacts et des groupes, le support de listes de diffusion dynamiques ou de SMS personnalisés.
 
@@ -37,9 +36,9 @@ C'est aussi un moyen simple de nous remercier pour notre travail et de financer 
 
 ## Meta
 
-RaspiSMS est un logiciel créé par [https://raspberry-pi.fr] – [@RaspberryPiFR](https://twitter.com/raspberrypifr) – raspbianfrance@gmail.com
+RaspiSMS est un logiciel créé par https://raspberry-pi.fr – [@RaspberryPiFR](https://twitter.com/raspberrypifr) – raspbianfrance@gmail.com
 
-Site officiel du projet : [https://raspisms.fr].
+Site officiel du projet : https://raspisms.fr.
 
 Distribué sous license GNU/GPLv3. Voir ``LICENSE`` pour plus d'informations.
 
