@@ -137,8 +137,6 @@ class Webhook extends StandardController
 
     /**
      * Get the model for the Controller.
-     *
-     * @return \descartes\Model
      */
     protected function get_model(): \descartes\Model
     {

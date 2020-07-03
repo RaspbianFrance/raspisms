@@ -149,8 +149,6 @@ namespace controllers\internals;
 
         /**
          * Get the model for the Controller.
-         *
-         * @return \descartes\Model
          */
         protected function get_model(): \descartes\Model
         {

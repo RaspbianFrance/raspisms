@@ -68,6 +68,7 @@ class Phone extends AbstractDaemon
         if ((microtime(true) - $this->last_message_at) > $this->max_inactivity)
         {
             posix_kill(getmypid(), SIGTERM); //Send exit signal to the current process
+
             return false;
         }
     }

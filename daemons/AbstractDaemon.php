@@ -66,7 +66,6 @@ abstract class AbstractDaemon
     /**
      * Used to handle properly SIGINT, SIGTERM, SIGCHLD and SIGHUP.
      *
-     * @param int   $signal
      * @param mixed $signinfo
      */
     protected function handle_signal(int $signal, $signinfo)

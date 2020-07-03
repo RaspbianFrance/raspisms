@@ -75,8 +75,6 @@ namespace models;
 
         /**
          * Return table name.
-         *
-         * @return string
          */
         protected function get_table_name(): string
         {

@@ -102,8 +102,6 @@ namespace controllers\internals;
          *
          * @param int    $id_user   : User id
          * @param string $condition : Condition string to verify
-         *
-         * @return array
          */
         public function get_contacts_for_condition_and_user(int $id_user, string $condition): array
         {
@@ -130,8 +128,6 @@ namespace controllers\internals;
 
         /**
          * Get the model for the Controller.
-         *
-         * @return \descartes\Model
          */
         protected function get_model(): \descartes\Model
         {

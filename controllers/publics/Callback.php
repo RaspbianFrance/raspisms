@@ -14,9 +14,9 @@ namespace controllers\publics;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
-/**
- * Controller of callback pages, like sms status update notification.
- */
+    /**
+     * Controller of callback pages, like sms status update notification.
+     */
     class Callback extends \descartes\Controller
     {
         private $logger;

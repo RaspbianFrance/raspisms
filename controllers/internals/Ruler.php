@@ -13,9 +13,9 @@ namespace controllers\internals;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-/**
- * Class to analyse rules used by conditional groups.
- */
+    /**
+     * Class to analyse rules used by conditional groups.
+     */
     class Ruler extends \descartes\InternalController
     {
         private $expression_language;
