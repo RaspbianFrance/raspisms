@@ -302,7 +302,18 @@ namespace controllers\publics;
                     break;
 
                 default:
-                    $invalid_type = true;
+                    if ($read_file['extension'] === 'csv')
+                    {
+                        $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
+                    }
+                    elseif ($read_file['extension'] === 'json')
+                    {
+                        $result = $this->internal_contact->import_json($id_user, $read_file['content']);
+                    }
+                    else
+                    {
+                        $invalid_type = true;
+                    }
             }
 
             if ($invalid_type)

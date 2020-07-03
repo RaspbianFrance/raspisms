@@ -214,6 +214,7 @@ namespace controllers\internals;
                 'content' => 'Une erreur inconnue est survenue.',
                 'error_code' => $file['error'] ?? 99,
                 'mime_type' => false,
+                'extension' => false,
             ];
 
             if (UPLOAD_ERR_OK !== $file['error'])
@@ -265,7 +266,8 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $result['mime_type'] = 'text/plain' === mime_content_type($tmp_filename) ? $file['type'] : mime_content_type($tmp_filename);
+            $result['extension'] = pathinfo($file['name'])['extension'];
+            $result['mime_type'] = mime_content_type($tmp_filename);
 
             $file_handler = fopen($tmp_filename, 'r');
             $result['success'] = true;
