@@ -83,7 +83,7 @@ namespace adapters;
                 [
                     'name' => 'config_file',
                     'title' => 'Fichier de configuration',
-                    'description' => 'Chemin vers le fichier de configuration que Gammu devra utilisé pour se connecter au téléphone .',
+                    'description' => 'Chemin vers le fichier de configuration que Gammu devra utiliser pour se connecter au téléphone .',
                     'required' => true,
                 ],
                 [
