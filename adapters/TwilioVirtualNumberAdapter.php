@@ -92,7 +92,8 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
         $credentials_url = 'https://www.twilio.com/console';
 
         return '
-                Solution de SMS avec numéro virtuel proposé par <a target="_blank" href="https://www.twilio.com/sms">Twilio</a>. Pour trouver vos clés API Twilio <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a>
+                Solution de SMS avec numéro virtuel proposé par <a target="_blank" href="https://www.twilio.com/sms">Twilio</a>. Pour trouver vos clés API Twilio <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a><br/>
+                Pour plus d\'information sur l\'utilisation de l\'adaptateur, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/twilio_virtual_number.html" target="_blank">la documentation sur l\'adaptateur Twilio Numéro Virtuel.</a>
             ';
     }
 

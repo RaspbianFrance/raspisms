@@ -96,7 +96,8 @@ class OctopushShortcodeAdapter implements AdapterInterface
         $credentials_url = 'https://www.octopush-dm.com/api-logins';
 
         return '
-                Envoi de SMS avec un shortcode en utilisant <a target="_blank" href="https://www.octopush.com/">Octopush</a>. Pour trouver vos clés API Octopush <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a>
+                Envoi de SMS avec un shortcode en utilisant <a target="_blank" href="https://www.octopush.com/">Octopush</a>. Pour trouver vos clés API Octopush <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a><br/>
+                Pour plus d\'information sur l\'utilisation de l\'adaptateur, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/octopush_shortcode.html" target="_blank">la documentation sur l\'adaptateur Octopush Shortcode.</a>
             ';
     }
 

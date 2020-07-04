@@ -81,7 +81,8 @@ namespace adapters;
             $generate_credentials_url = 'https://eu.api.ovh.com/createToken/index.cgi?GET=/sms&GET=/sms/*&POST=/sms/*&PUT=/sms/*&DELETE=/sms/*&';
 
             return '
-                Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="' . $generate_credentials_url . '">cliquez ici.</a>
+                Solution de SMS proposé par le groupe <a target="_blank" href="https://www.ovhtelecom.fr/sms/">OVH</a>. Pour générer les clefs API OVH, <a target="_blank" href="' . $generate_credentials_url . '">cliquez ici.</a><br/>
+                Pour plus d\'information sur l\'utilisation de l\'adaptateur, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/ovh_shortcode.html" target="_blank">la documentation sur l\'adaptateur OVH Shortcode.</a>
             ';
         }
 

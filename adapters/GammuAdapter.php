@@ -67,7 +67,9 @@ namespace adapters;
          */
         public static function meta_description(): string
         {
-            return 'Utilisation du logiciel Gammu qui doit être installé sur le serveur et configuré. Voir https://wammu.eu.';
+            return 'Utilisation du logiciel Gammu qui doit être installé sur le serveur et configuré. Voir <a target="_blank" href="https://wammu.eu">https://wammu.eu</a>.<br/>
+                    Pour plus d\'information sur l\'utilisation de l\'adaptateur, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/gammu.html" target="_blank">la documentation sur l\'adaptateur Gammu.</a>
+            ';
         }
 
         /**
@@ -81,7 +83,7 @@ namespace adapters;
                 [
                     'name' => 'config_file',
                     'title' => 'Fichier de configuration',
-                    'description' => 'Chemin vers le fichier de configuration que Gammu devra utilisé pour se connecter au téléphone.',
+                    'description' => 'Chemin vers le fichier de configuration que Gammu devra utilisé pour se connecter au téléphone .',
                     'required' => true,
                 ],
                 [
