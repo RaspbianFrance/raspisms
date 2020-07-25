@@ -63,7 +63,7 @@
                                                             <div>Non disponible.</div>
                                                         <?php } ?>
                                                         <br/>
-                                                        <div class="bold">Changement de status d'un SMS : </div>
+                                                        <div class="bold">Changement de statut d'un SMS : </div>
                                                         <?php if ($phone['callback_status'] ?? false) { ?>
                                                             <div><code><?= $phone['callback_status']; ?></code></div>
                                                         <?php } else { ?>
