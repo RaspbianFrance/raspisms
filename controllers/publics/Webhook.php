@@ -121,7 +121,7 @@ namespace controllers\publics;
 
             if (!$this->internal_webhook->create($_SESSION['user']['id'], $url, $type))
             {
-                \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce webhook.');
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce webhook, vérifiez qu\'il s\'agit bien d\'une URL HTTP(S) valide.');
 
                 return $this->redirect(\descartes\Router::url('Webhook', 'add'));
             }

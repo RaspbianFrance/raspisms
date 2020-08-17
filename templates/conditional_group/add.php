@@ -42,7 +42,7 @@
 									<label>Nom du groupe conditionnel</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-users"></span></span>
-										<input name="name" class="form-control" type="text" placeholder="Nom groupe" autofocus required>
+										<input name="name" class="form-control" type="text" placeholder="Nom groupe" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
@@ -51,7 +51,7 @@
                                         Les conditions vous permettent de définir dynamiquement les contacts qui appartiennent au groupe en utilisant leurs données additionnelles. Pour plus d'informations consultez la documentation relative à <a href="#">l'utilisation des groupes conditionnels.</a><br/>
                                         Vous pouvez prévisualiser les contacts qui feront parti du groupe en cliquant sur le bouton <b>"Prévisualiser les contacts"</b>.
                                     </p>
-									<input class="form-control" name="condition" placeholder="Ex : contact.datas.gender == 'male'"/>
+									<input class="form-control" name="condition" placeholder="Ex : contact.gender == 'male'" value="<?php $this->s($_SESSION['previous_http_post']['condition'] ?? '') ?>"/>
                                     <div class="scheduled-preview-container">
                                         <a class="btn btn-info preview-button" href="#">Prévisualiser les contacts</a>
                                     </div>

@@ -39,14 +39,14 @@
 								<div class="form-group">
 									<label>URL cible</label>
 									<div class="form-group">
-										<input name="url" class="form-control" type="text" placeholder="http://example.fr/webhook/" autofocus required>
+										<input name="url" class="form-control" type="text" placeholder="http://example.fr/webhook/" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['url'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Type de Webhook</label>
 									<select name="type" class="form-control" required>
-                                        <option value="receive_sms">Réception d'un SMS</option>
-                                        <option value="send_sms">Envoi d'un SMS</option>
+                                        <option value="receive_sms" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'receive_sms' ? 'selected' : ''  ?>>Réception d'un SMS</option>
+                                        <option value="send_sms" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'send_sms' ? 'selected' : ''  ?>>Envoi d'un SMS</option>
 									</select>
 								</div>	
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Annuler</a>

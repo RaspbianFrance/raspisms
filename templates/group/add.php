@@ -42,12 +42,12 @@
 									<label>Nom du groupe</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-users"></span></span>
-										<input name="name" class="form-control" type="text" placeholder="Nom groupe" autofocus required>
+										<input name="name" class="form-control" type="text" placeholder="Nom groupe" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Contacts du groupe</label>
-									<input class="add-contacts form-control" name="contacts[]"/>
+									<input class="add-contacts form-control" name="contacts[]" value="<?php $this->s(json_encode($_SESSION['previous_http_post']['contacts'] ?? [])); ?>"/>
 								</div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Group', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le groupe" /> 	

@@ -41,21 +41,21 @@
 								<div class="form-group">
 									<label>Nom commande</label>
 									<div class="form-group">
-										<input name="name" class="form-control" type="text" placeholder="Nom commande" autofocus required>
+                                    <input name="name" class="form-control" type="text" placeholder="Nom commande" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Commande à appeler (la commande sera appelée depuis le dossier "<?php echo PWD_SCRIPTS; ?>")</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-link"></span></span>
-										<input name="script" class="form-control" type="text" placeholder="Ex : chauffage/monter.sh" autofocus required>
+										<input name="script" class="form-control" type="text" placeholder="Ex : chauffage/monter.sh" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['script'] ?? ''); ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Niveau administrateur obligatoire</label>
 									<div class="form-group">
-										<input name="admin" type="radio" value="1" required /> Oui 
-										<input name="admin" type="radio" value="0" required /> Non
+                                        <input name="admin" type="radio" value="1" required <?= (isset($_SESSION['previous_http_post']['admin']) && (bool) $_SESSION['previous_http_post']['admin']) ? 'checked' : ''; ?>/> Oui 
+										<input name="admin" type="radio" value="0" required <?= (isset($_SESSION['previous_http_post']['admin']) && !(bool) $_SESSION['previous_http_post']['admin']) ? '' : 'checked'; ?>/> Non
 									</div>
 								</div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Command', 'list'); ?>">Annuler</a>

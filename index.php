@@ -13,6 +13,10 @@
         $_SESSION['csrf'] = str_shuffle(uniqid().uniqid());
     }
 
+    //Save previous $_POST for re-populate forms on validation errors
+    $_SESSION['previous_http_post'] = $_SESSION['http_post'] ?? [];
+    $_SESSION['http_post'] = $_POST;
+
     //Routing current query
     try 
     {

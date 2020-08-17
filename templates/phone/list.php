@@ -5,7 +5,7 @@
 ?>
 <div id="wrapper">
 <?php
-	$this->render('incs/nav', ['page' => 'phone'])
+	$this->render('incs/nav', ['page' => 'phones'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">

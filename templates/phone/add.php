@@ -44,7 +44,7 @@
                                         Le nom du téléphone qui enverra et recevra les messages.
                                     </p>
 									<div class="form-group">
-										<input required="required" name="name" class="form-control" placeholder="Nom du téléphone">
+                                    <input required="required" name="name" class="form-control" placeholder="Nom du téléphone" value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>
                                 <div class="form-group">
@@ -58,6 +58,7 @@
                                                 value="<?= $adapter['meta_classname'] ?>"
                                                 data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                 data-datas-fields="<?php $this->s(json_encode($adapter['meta_datas_fields'])); ?>"
+                                                <?= ($_SESSION['previous_http_post']['adapter'] ?? '') == $adapter['meta_classname'] ? 'selected' : ''  ?>
                                             >
                                                 <?php $this->s($adapter['meta_name']); ?>
                                             </option>

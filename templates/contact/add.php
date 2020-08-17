@@ -42,15 +42,15 @@
 									<label>Nom contact</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-user"></span></span>
-										<input name="name" class="form-control" type="text" placeholder="Nom contact" autofocus required>
+										<input name="name" class="form-control" type="text" placeholder="Nom contact" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Numéro de téléphone du contact</label>
 									<div class="form-group">
-										<input name="" class="form-control" type="tel" id="phone-international-input">
+										<input name="" class="form-control" type="tel" id="phone-international-input" value="<?php $this->s($_SESSION['previous_http_post']['number'] ?? '') ?>">
 									</div>
-								</div>
+                                </div>
 								<div class="form-group">
                                     <label>Données du contact</label>
                                     <p class="italic small help" id="description-datas">
@@ -58,6 +58,16 @@
                                         Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact. Utilisez uniquement des lettres, des chiffres et des underscore pour les noms de données, ni espace ni caractères spéciaux.
                                     </p>
                                     <div class="contact-datas-container">
+                                        <?php foreach ($_SESSION['previous_http_post']['datas'] ?? [] as $key => $value) { ?>
+                                            <?php if ($value == null) { continue; } ?>
+                                            <div class="form-group">
+                                            <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*" value="<?php $this->s($key) ?>">
+                                                 : 
+                                                <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée" value="<?php $this->s($value) ?>">
+                                                <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>
+                                            </div>
+                                            
+                                        <?php } ?>
                                         <div class="form-group">
                                             <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
                                              : 

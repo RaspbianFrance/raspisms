@@ -49,7 +49,7 @@
                                         Vous pouvez obtenir une prévisualisation du résultat pour un contact en cliquant sur le boutton <b>"Prévisualiser"</b>.
                                     </p>
                                 <?php } ?>
-                                <textarea name="text" class="form-control" required></textarea>
+                                <textarea name="text" class="form-control" required><?php $this->s($_SESSION['previous_http_post']['text'] ?? '') ?></textarea>
                                 <?php if ($_SESSION['user']['settings']['templating']) { ?>
                                     <div class="scheduled-preview-container">
                                         <label>Prévisualiser pour : </label>
@@ -74,7 +74,7 @@
                             <?php } ?>
                             <div class="form-group">
                                 <label>Date d'envoi du SMS</label>
-                                <input name="at" class="form-control form-datetime auto-width" type="text" value="<?php $this->s($now); ?>" readonly>
+                                <input name="at" class="form-control form-datetime auto-width" type="text" readonly value="<?php $this->s($_SESSION['previous_http_post']['at'] ?? $now) ?>">
                             </div>	
                             <div class="form-group">
                                 <label>Numéros cibles</label>
@@ -88,24 +88,24 @@
                             </div>
                             <div class="form-group">
                                 <label>Contacts cibles</label>
-                                <input class="add-contacts form-control" name="contacts[]" value="<?php $this->s(json_encode($prefilled_contacts)); ?>" />
+                                <input class="add-contacts form-control" name="contacts[]" value="<?php $this->s(json_encode($_SESSION['previous_http_post']['contacts'] ?? $prefilled_contacts)) ?>" />
                             </div>
                             <div class="form-group">
                                 <label>Groupes cibles</label>
-                                <input class="add-groupes form-control" name="groups[]" value="<?php $this->s(json_encode($prefilled_groups)); ?>" />
+                                <input class="add-groupes form-control" name="groups[]" value="<?php $this->s(json_encode($_SESSION['previous_http_post']['groups'] ?? $prefilled_groups)) ?>" />
                             </div>
                             <?php if ($_SESSION['user']['settings']['conditional_group'] ?? false) { ?>
                                 <div class="form-group">
                                     <label>Groupes conditionnels cibles</label>
-                                    <input class="add-conditional-groups form-control" name="conditional_groups[]" value="<?php $this->s(json_encode($prefilled_conditional_groups)); ?>"/>
+                                    <input class="add-conditional-groups form-control" name="conditional_groups[]" value="<?php $this->s(json_encode($_SESSION['previous_http_post']['conditional_groups'] ?? $prefilled_conditional_groups)) ?>" />
                                 </div>
                             <?php } ?>
                             <?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
                                 <div class="form-group">
                                     <label>Envoyer comme un SMS Flash : </label>
                                     <div class="form-group">
-                                        <input name="flash" type="radio" value="1" required /> Oui 
-                                        <input name="flash" type="radio" value="0" required checked/> Non
+                                        <input name="flash" type="radio" value="1" required <?= (isset($_SESSION['previous_http_post']['flash']) && (bool) $_SESSION['previous_http_post']['flash']) ? 'checked' : ''; ?>/> Oui 
+                                        <input name="flash" type="radio" value="0" required <?= (!isset($_SESSION['previous_http_post']['flash']) || (isset($_SESSION['previous_http_post']['flash']) && !(bool) $_SESSION['previous_http_post']['flash'])) ? 'checked' : ''; ?>/> Non
                                     </div>
                                 </div>
                             <?php } ?>
@@ -115,7 +115,7 @@
                                     <select name="id_phone" class="form-control">
                                         <option value="">N'importe lequel</option>
                                         <?php foreach ($phones as $phone) { ?>
-                                            <option value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['name']); ?></option>
+                                            <option value="<?php $this->s($phone['id']); ?>" <?= ($_SESSION['previous_http_post']['id_phone'] ?? '') == $phone['id'] ? 'selected' : ''  ?>><?php $this->s($phone['name']); ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>

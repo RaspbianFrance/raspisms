@@ -42,22 +42,22 @@
 									<label>Adresse e-mail</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-at"></span></span>
-										<input name="email" class="form-control" type="email" placeholder="Adresse e-mail de l'utilisateur" autofocus required>
+										<input name="email" class="form-control" type="email" placeholder="Adresse e-mail de l'utilisateur" autofocus required value="<?php $this->s($_SESSION['previous_http_post']['email'] ?? '') ?>">
 									</div>
 								</div>	
 								<div class="form-group">
 									<label>Mot de passe (laissez vide pour générer le mot de passe automatiquement)</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-lock"></span></span>
-										<input name="password" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur" >
+										<input name="password" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur">
 									</div>
 								</div>
 								<?php if (isset($_SESSION['user']['admin']) && $_SESSION['user']['admin']) { ?>
 									<div class="form-group">
 										<label>Niveau administrateur : </label>
 										<div class="form-group">
-											<input name="admin" type="radio" value="1" required /> Oui 
-											<input name="admin" type="radio" value="0" required /> Non
+											<input name="admin" type="radio" value="1" required <?= (isset($_SESSION['previous_http_post']['admin']) && (bool) $_SESSION['previous_http_post']['admin']) ? 'checked' : ''; ?>/> Oui 
+											<input name="admin" type="radio" value="0" required <?= (isset($_SESSION['previous_http_post']['admin']) && !(bool) $_SESSION['previous_http_post']['admin']) ? 'checked' : ''; ?>/> Non
 										</div>
 									</div>
 								<?php } ?>	
