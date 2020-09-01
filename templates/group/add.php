@@ -68,7 +68,8 @@
 				data: '<?php echo \descartes\Router::url('Contact', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
-				name: 'contacts[]'
+                name: 'contacts[]',
+                maxSelection: null,
 			});
 		});
 	});

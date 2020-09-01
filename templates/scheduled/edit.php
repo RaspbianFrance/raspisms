@@ -170,7 +170,8 @@
 			jQuery(this).magicSuggest({
 				data: '<?php echo \descartes\Router::url('Contact', 'json_list'); ?>',
 				valueField: 'id',
-				displayField: 'name',
+                displayField: 'name',
+                maxSelection: null,
 			});
 		});
 
@@ -180,6 +181,7 @@
 				data: '<?php echo \descartes\Router::url('Group', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
+                maxSelection: null,
 			});
 		});
         
@@ -190,6 +192,7 @@
 				data: '<?php echo \descartes\Router::url('ConditionalGroup', 'json_list'); ?>',
 				valueField: 'id',
 				displayField: 'name',
+                maxSelection: null,
 			});
 		});
         
