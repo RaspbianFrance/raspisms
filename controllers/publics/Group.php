@@ -169,6 +169,11 @@ namespace controllers\publics;
             $nb_groups_update = 0;
             foreach ($groups as $id => $group)
             {
+                foreach ($group['contacts_ids'] as $key => $value)
+                {
+                    $group['contacts_ids'][$key] = (int) $value;
+                }
+
                 $nb_groups_update += (int) $this->internal_group->update_for_user($_SESSION['user']['id'], $id, $group['name'], $group['contacts_ids']);
             }
 
