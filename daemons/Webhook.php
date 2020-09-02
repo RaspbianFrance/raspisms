@@ -82,9 +82,12 @@ class Webhook extends AbstractDaemon
             $promises[] = $this->guzzle_client->postAsync($message['url'], ['form_params' => $message['datas']]);
         }
 
-        try {
+        try
+        {
             $responses = \GuzzleHttp\Promise\unwrap($promises);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $this->logger->info('Webhook : ' . json_encode($message) . 'failed with ' . $e->getMessage());
         }
 

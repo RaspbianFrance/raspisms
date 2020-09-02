@@ -26,7 +26,7 @@ namespace adapters;
         private $datas;
 
         /**
-         * API URL
+         * API URL.
          */
         private $api_url = 'https://jsonplaceholder.typicode.com/posts';
 
