@@ -24,6 +24,7 @@ class Webhook extends AbstractDaemon
     private $phone;
     private $adapter;
     private $bdd;
+    private $guzzle_client;
 
     /**
      * Constructor.
@@ -40,6 +41,8 @@ class Webhook extends AbstractDaemon
         $additional_signals = [];
         $uniq = true; //Sender should be uniq
 
+        $this->guzzle_client = new \GuzzleHttp\Client();
+
         //Construct the daemon
         parent::__construct($name, $logger, $pid_dir, $no_parent, $additional_signals, $uniq);
 
@@ -49,6 +52,7 @@ class Webhook extends AbstractDaemon
     public function run()
     {
         $find_message = true;
+        $promises = [];
         while ($find_message)
         {
             //Call message
@@ -75,14 +79,13 @@ class Webhook extends AbstractDaemon
 
             $this->logger->info('Trigger webhook : ' . json_encode($message));
 
-            //Do the webhook http query
-            $curl = curl_init();
-            curl_setopt($curl, CURLOPT_URL, $message['url']);
-            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $message['datas']);
-            curl_exec($curl);
-            curl_close($curl);
+            $promises[] = $this->guzzle_client->postAsync($message['url'], ['form_params' => $message['datas']]);
+        }
+
+        try {
+            $responses = \GuzzleHttp\Promise\unwrap($promises);
+        } catch (\Exception $e) {
+            $this->logger->info('Webhook : ' . json_encode($message) . 'failed with ' . $e->getMessage());
         }
 
         usleep(0.5 * 1000000);
