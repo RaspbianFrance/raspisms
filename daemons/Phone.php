@@ -148,7 +148,7 @@ class Phone extends AbstractDaemon
 
         foreach ($tasks as $task)
         {
-            $task['process']->run();
+            $task['process']->start();
         }
 
         $done = false;
