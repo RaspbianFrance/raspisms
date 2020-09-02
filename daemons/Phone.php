@@ -13,6 +13,8 @@ namespace daemons;
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 /**
  * Phone daemon class.
@@ -106,7 +108,7 @@ class Phone extends AbstractDaemon
      */
     private function send_smss()
     {
-        $internal_sended = new \controllers\internals\Sended($this->bdd);
+        $tasks = [];
 
         $find_message = true;
         while ($find_message)
@@ -138,16 +140,37 @@ class Phone extends AbstractDaemon
 
             //Do message sending
             $this->logger->info('Try send message : ' . json_encode($message));
+            $this->logger->info('with : ' . join(' ', [PWD . '/console.php', 'controllers/internals/Console.php', 'send_sms', '--id_phone=' . escapeshellarg($this->phone['id']), '--message=' . escapeshellarg(json_encode($message))]));
 
-            $response = $internal_sended->send($this->adapter, $this->phone['id_user'], $this->phone['id'], $message['text'], $message['destination'], $message['flash']);
-            if ($response['error'])
+            $process = new Process([PWD . '/console.php', 'controllers/internals/Console.php', 'send_sms', '--id_phone=' . $this->phone['id'], '--message=' . json_encode($message)]);
+            $tasks[] = ['message' => $message, 'process' => $process];
+        }
+
+        foreach ($tasks as $task)
+        {
+            $task['process']->run();
+        }
+
+        $done = false;
+        while (! $done)
+        {
+            usleep(0.001 * 1000000); //Micro sleep for perfs
+            
+            $done = true;
+            foreach ($tasks as $task)
             {
-                $this->logger->error('Failed send message : ' . json_encode($message) . ' with error : ' . $response['error_message']);
+                if ($task['process']->isRunning()) {
+                    $done = false;
+                    continue;
+                }
 
-                continue;
+                if (!$task['process']->isSuccessful()) {
+                    $this->logger->error('Failed send message : ' . json_encode($task['message']) . ' with : ' . $task['process']->getErrorOutput() . $task['process']->getOutput());
+                    continue;
+                }
+        
+                $this->logger->info('Successfully send message : ' . json_encode($task['message']));
             }
-
-            $this->logger->info('Successfully send message : ' . json_encode($message));
         }
     }
 

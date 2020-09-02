@@ -15,7 +15,7 @@
 		$class = str_replace('\\', '/', $class); #Gestion des namespaces
 
 		if (file_exists(PWD . '/' . $class . '.php'))
-		{
+        {
 			require_once(PWD . '/' . $class . '.php');
         }
 

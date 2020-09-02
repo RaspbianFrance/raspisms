@@ -68,6 +68,42 @@ namespace controllers\internals;
         }
 
         /**
+         * Send a SMS using a phone
+         *
+         * @param $id_phone : Phone id
+         */
+        public function send_sms($id_phone, $message)
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_sended = new \controllers\internals\Sended($bdd);
+            $internal_phone = new \controllers\internals\Phone($bdd);
+
+            $id_phone = (int) $id_phone;
+
+            $phone = $internal_phone->get($id_phone);
+            if (!$phone)
+            {
+                exit(1);
+            }
+
+            $message = json_decode($message, true);
+
+            $adapter_class = $phone['adapter'];
+            $adapter = new $adapter_class($phone['adapter_datas']);
+            $response = $internal_sended->send($adapter, $phone['id_user'], $phone['id'], $message['text'], $message['destination'], $message['flash']);
+
+            var_dump($adapter);
+
+            if ($response['error'])
+            {
+                echo $response['error_message'] . "gfuck";
+                exit(1);
+            }
+
+            exit(0);
+        }
+
+        /**
          * Create a user or update an existing user.
          *
          * @param $email : User email

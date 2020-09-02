@@ -12,7 +12,8 @@
         "ovh/ovh": "^2.0",
         "twilio/sdk": "^6.1",
         "symfony/yaml": "^5.0",
-        "phpmailer/phpmailer": "^6.1"
+        "phpmailer/phpmailer": "^6.1",
+        "symfony/process": "^5.1"
     },
     "require-dev": {
     }
