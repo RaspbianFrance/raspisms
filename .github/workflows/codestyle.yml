@@ -27,6 +27,7 @@ jobs:
         run: |
           git add --all
           git commit -m "Fix codestyle." || exit 0
+          echo ${{ github.head_ref }}
 
       - name: Push changes # push the modif to repo
         uses: ad-m/github-push-action@master
