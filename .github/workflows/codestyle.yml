@@ -27,12 +27,14 @@ jobs:
         run: |
           git add --all
           git commit -m "Fix codestyle." || exit 0
-
-      - name: Push changes # push the modif to repo
+      
+      - name: Get branch name
         run: |
           git_branch=${{ github.ref }}
           git_branch=${git_branch#refs/heads/}
           echo $git_branch
+
+      - name: Push changes # push the modif to repo
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
