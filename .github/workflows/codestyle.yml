@@ -33,6 +33,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force: true
-          branch: ${{ github.head_ref }}
+          branch: 'dev2.0'
           
 
