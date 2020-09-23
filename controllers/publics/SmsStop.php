@@ -39,8 +39,22 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $smsstops = $this->internal_sms_stop->list_for_user($_SESSION['user']['id']);
-            $this->render('smsstop/list', ['smsstops' => $smsstops, 'nb_results' => \count($smsstops)]);
+            $this->render('smsstop/list');
+        }
+        
+        /**
+         * Return smsstops as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_sms_stop->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
+            {
+                $entity['number_formatted'] = \controllers\internals\Tool::phone_link($entity['number']);
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

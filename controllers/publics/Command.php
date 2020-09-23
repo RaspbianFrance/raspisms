@@ -42,8 +42,17 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $commands = $this->internal_command->list_for_user($_SESSION['user']['id']);
-            $this->render('command/list', ['commands' => $commands]);
+            $this->render('command/list');
+        }
+        
+        /**
+         * Return commands as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_command->list_for_user($_SESSION['user']['id']);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

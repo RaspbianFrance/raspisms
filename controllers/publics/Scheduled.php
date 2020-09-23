@@ -47,8 +47,18 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $scheduleds = $this->internal_scheduled->list_for_user($_SESSION['user']['id']);
-            $this->render('scheduled/list', ['scheduleds' => $scheduleds]);
+            $this->render('scheduled/list');
+        }
+        
+        /**
+         * Return scheduleds as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_scheduled->list_for_user($_SESSION['user']['id']);
+
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

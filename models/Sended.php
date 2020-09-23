@@ -19,6 +19,48 @@ namespace models;
         const STATUS_UNKNOWN = 'unknown';
         const STATUS_DELIVERED = 'delivered';
         const STATUS_FAILED = 'failed';
+        
+        /**
+         * Return a list of sended messages for a user.
+         * Add a column contact_name and phone_name when available
+         *
+         * @param int $id_user : user id
+         * @param ?int $limit   : Number of entry to return or null
+         * @param ?int $offset  : Number of entry to ignore or null
+         *
+         * @return array
+         */
+        public function list_for_user(int $id_user, $limit, $offset)
+        {
+            $query = '
+                SELECT sended.*, contact.name as contact_name, phone.name as phone_name
+                FROM sended
+                LEFT JOIN contact
+                ON contact.number = sended.destination
+                AND contact.id_user = sended.id_user
+                LEFT JOIN phone
+                ON phone.id = sended.id_phone
+                WHERE sended.id_user = :id_user
+            ';
+
+            if ($limit !== null)
+            {
+                $limit = (int) $limit;
+
+                $query .= ' LIMIT ' . $limit;
+                if ($offset !== null)
+                {
+                    $offset = (int) $offset;
+                    $query .= ' OFFSET ' . $offset;
+                }
+            }
+            
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
 
         /**
          * Return x last sendeds message for a user, order by date.

@@ -42,28 +42,24 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $sendeds = $this->internal_sended->list_for_user($_SESSION['user']['id']);
+            $this->render('sended/list');
+        }
 
-            foreach ($sendeds as $key => $sended)
+        /**
+         * Return sendeds as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_sended->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
             {
-                if (null !== $sended['id_phone'])
-                {
-                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $sended['id_phone']);
-                    if ($phone)
-                    {
-                        $sendeds[$key]['phone_name'] = $phone['name'];
-                    }
-                }
-
-                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $sended['destination']);
-                if ($contact)
-                {
-                    $sendeds[$key]['contact'] = $contact['name'];
-                }
+                $entity['destination_formatted'] = \controllers\internals\Tool::phone_link($entity['destination']);
             }
 
-            $this->render('sended/list', ['sendeds' => $sendeds, 'nb_results' => \count($sendeds)]);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
+            
 
         /**
          * Cette fonction va supprimer une liste de sendeds.

@@ -136,7 +136,10 @@
 			var messageInputContainer = jQuery('.message-input-container').outerHeight();
 			var footerHeight = jQuery('footer').outerHeight();
 
-			var containerHeight = Math.floor(windowHeight - (containerPosition.top + footerHeight * 2 + messageInputContainer));
+            console.log(windowHeight);
+            console.log(containerPosition.top);
+
+			var containerHeight = Math.floor(windowHeight - (containerPosition.top + messageInputContainer) - 20); //-20 px for aesthetic
 
 			jQuery('.discussion-container').outerHeight(containerHeight);
 		}

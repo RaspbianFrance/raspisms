@@ -24,10 +24,8 @@
         ],
 
         'Command' => [
-            'list' => [
-                '/command/',
-                '/command/p/{page}/',
-            ],
+            'list' => '/command/',
+            'list_json' => '/command/json/',
             'add' => '/command/add/',
             'create' => '/command/create/{csrf}/',
             'delete' => '/command/delete/{csrf}/',
@@ -36,10 +34,8 @@
         ],
 
         'Contact' => [
-            'list' => [
-                '/contact/',
-                '/contact/p/{page}/',
-            ],
+            'list' => '/contact/',
+            'list_json' => '/contact/json/',
             'add' => '/contact/add/',
             'create' => '/contact/create/{csrf}/',
             'delete' => '/contact/delete/{csrf}/',
@@ -55,6 +51,7 @@
                 '/discussion/',
                 '/discussion/p/{page}/',
             ],
+            'list_json' => '/discussion/json/',
             'show' => '/discussion/show/{number}/',
             'send' => '/discussion/send/{csrf}/',
             'get_messages' => '/discussion/getmessage/{number}/{transaction_id}/',
@@ -65,14 +62,13 @@
                 '/event/',
                 '/event/p/{page}/',
             ],
+            'list_json' => '/event/json/',
             'delete' => '/event/delete/{csrf}/',
         ],
 
         'Group' => [
-            'list' => [
-                '/group/',
-                '/group/p/{page}/',
-            ],
+            'list' => '/group/',
+            'list_json' => '/group/json/',
             'add' => '/group/add/',
             'create' => '/group/create/{csrf}/',
             'delete' => '/group/delete/{csrf}/',
@@ -82,10 +78,8 @@
         ],
         
         'ConditionalGroup' => [
-            'list' => [
-                '/conditional_group/',
-                '/conditional_group/p/{page}/',
-            ],
+            'list' => '/conditional_group/',
+            'list_json' => '/conditional_group/json/',
             'add' => '/conditional_group/add/',
             'create' => '/conditional_group/create/{csrf}/',
             'delete' => '/conditional_group/delete/{csrf}/',
@@ -96,14 +90,11 @@
         ],
 
         'Received' => [
-            'list' => [
-                '/received/',
-                '/received/p/{page}/',
-            ],
-            'list_unread' => [
-                '/unread/',
-                '/unread/p/{page}/',
-            ],
+            'list' => '/received/',
+            'list_json' => '/received/json/',
+            'list_unread' => '/unread/',
+            'list_unread_json' => '/unread/json/',
+            'mark_as' => '/mark/{status}/{csrf}/',
             'delete' => '/received/delete/{csrf}/',
             'popup' => '/received/popup/',
         ],
@@ -113,6 +104,7 @@
                 '/scheduled/',
                 '/scheduled/p/{page}/',
             ],
+            'list_json' => '/scheduled/json/',
             'add' => [
                 '/scheduled/add/',
                 '/scheduled/add/{prefilled}/',
@@ -128,6 +120,7 @@
                 '/sended/',
                 '/sended/p/{page}/',
             ],
+            'list_json' => '/sended/json/',
             'delete' => '/sended/delete/{csrf}/',
         ],
 
@@ -137,10 +130,8 @@
         ],
 
         'SmsStop' => [
-            'list' => [
-                '/smsstop/',
-                '/smsstop/p/{page}/',
-            ],
+            'list' => '/smsstop/',
+            'list_json' => '/smsstop/json/',
             'delete' => '/smsstop/delete/{csrf}/',
         ],
 
@@ -149,10 +140,8 @@
         ],
 
         'User' => [
-            'list' => [
-                '/user/',
-                '/user/p/{page}/',
-            ],
+            'list' => '/user/',
+            'list_json' => '/user/json/',
             'add' => '/user/add/',
             'create' => '/user/create/{csrf}/',
             'delete' => '/user/delete/{csrf}/',
@@ -160,20 +149,16 @@
         ],
 
         'Phone' => [
-            'list' => [
-                '/phone/',
-                '/phone/p/{page}/',
-            ],
+            'list' => '/phone/',
+            'list_json' => '/phone/json/',
             'add' => '/phone/add/',
             'create' => '/phone/create/{csrf}/',
             'delete' => '/phone/delete/{csrf}/',
         ],
         
         'Webhook' => [
-            'list' => [
-                '/webhook/',
-                '/webhook/p/{page}/',
-            ],
+            'list' => '/webhook/',
+            'list_json' => '/webhook/json/',
             'add' => '/webhook/add/',
             'create' => '/webhook/create/{csrf}/',
             'delete' => '/webhook/delete/{csrf}/',

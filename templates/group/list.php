@@ -35,42 +35,36 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <?php if (!$groups) { ?>
-                                    <p>Aucun groupe n'a été formé pour le moment.</p>
-                                <?php } else { ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover table-striped datatable" id="table-groupes">
-                                            <thead>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-groupes">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom</th>
+                                                <th>Nombre de contacts</th>
+                                                <th class="checkcolumn">&#10003;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($groups as $group) { ?>
                                                 <tr>
-                                                    <th>Nom</th>
-                                                    <th>Nombre de contacts</th>
-                                                    <th class="checkcolumn">&#10003;</th>
+                                                    <td><?php $this->s($group['name']); ?></td>
+                                                    <td><?php $this->s($group['nb_contacts']); ?></td>
+                                                    <td><input type="checkbox" name="ids[]" value="<?php $this->s($group['id']); ?>"></td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($groups as $group) { ?>
-                                                    <tr>
-                                                        <td><?php $this->s($group['name']); ?></td>
-                                                        <td><?php $this->s($group['nb_contacts']); ?></td>
-                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($group['id']); ?>"></td>
-                                                    </tr>
-                                                <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php } ?>
+                                            <?php } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div>
                                     <div class="col-xs-6 no-padding">
                                         <a class="btn btn-success" href="<?php echo \descartes\Router::url('Group', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
                                     </div>
-                                    <?php if ($groups) { ?>
-                                        <div class="text-right col-xs-6 no-padding">
-                                            <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add', ['prefilled' => 'groups']); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                        </div>
-                                    <?php } ?>
+                                    <div class="text-right col-xs-6 no-padding">
+                                        <strong>Action pour la séléction :</strong>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add', ['prefilled' => 'groups']); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                    </div>
                                 </div>
                             </form>
 						</div>
@@ -81,20 +75,37 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('Group', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {data: 'nb_contact', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

@@ -35,41 +35,29 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <?php if (!$scheduleds) { ?>
-                                    <p>Aucun SMS n'est actuellement programmé.</p>
-                                <?php } else { ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover table-striped" id="table-scheduleds">
-                                            <thead>
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Contenu</th>
-                                                    <th class="checkcolumn">&#10003;</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            <?php foreach ($scheduleds as $scheduled) { ?>
-                                                    <tr>
-                                                        <td><?php $this->s($scheduled['at']); ?></td>
-                                                        <td><?php $this->s($scheduled['text']); ?></td>
-                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($scheduled['id']); ?>"></td>
-                                                    </tr>
-                                            <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php } ?>
+                                <div class="table-scheduleds">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-scheduleds">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Contenu</th>
+                                                <th class="checkcolumn">&#10003;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div>
                                     <div class="col-xs-6 no-padding">
                                         <a class="btn btn-success" href="<?php echo \descartes\Router::url('Scheduled', 'add'); ?>"><span class="fa fa-plus"></span> Créer un nouveau SMS</a>
                                     </div>
-                                    <?php if ($scheduleds) { ?>
                                         <div class="text-right col-xs-6 no-padding">
                                             <strong>Action pour la séléction :</strong>
                                             <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
                                             <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
-                                    <?php } ?>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -80,20 +68,37 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('Scheduled', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {data: 'at', render: jQuery.fn.dataTable.render.text()},
+            {data: 'text', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

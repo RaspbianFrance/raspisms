@@ -18,27 +18,89 @@ namespace models;
     {
         const STATUS_UNREAD = 'unread';
         const STATUS_READ = 'read';
-
+        
         /**
-         * Return a list of unread received for a user.
+         * Return a list of received messages for a user.
+         * Add a column contact_name and phone_name when available
          *
-         * @param int $id_user : User id
-         * @param int $limit   : Max results to return
-         * @param int $offset  : Number of results to ignore
+         * @param int $id_user : user id
+         * @param ?int $limit   : Number of entry to return or null
+         * @param ?int $offset  : Number of entry to ignore or null
+         *
+         * @return array
          */
-        public function list_unread_for_user($id_user, $limit, $offset)
+        public function list_for_user(int $id_user, $limit, $offset)
         {
-            $limit = (int) $limit;
-            $offset = (int) $offset;
+            $query = '
+                SELECT received.*, contact.name as contact_name, phone.name as phone_name
+                FROM received
+                LEFT JOIN contact
+                ON contact.number = received.origin
+                AND contact.id_user = received.id_user
+                LEFT JOIN phone
+                ON phone.id = received.id_phone
+                WHERE received.id_user = :id_user
+            ';
 
-            $query = ' 
-                SELECT * FROM received
-                WHERE status = \'unread\'
-                AND id_user = :id_user
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
+            if ($limit !== null)
+            {
+                $limit = (int) $limit;
 
+                $query .= ' LIMIT ' . $limit;
+                if ($offset !== null)
+                {
+                    $offset = (int) $offset;
+                    $query .= ' OFFSET ' . $offset;
+                }
+            }
+            
             $params = [
                 'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
+        
+        
+        /**
+         * Return a list of unread received messages for a user.
+         * Add a column contact_name and phone_name when available
+         *
+         * @param int $id_user : user id
+         * @param ?int $limit   : Number of entry to return or null
+         * @param ?int $offset  : Number of entry to ignore or null
+         *
+         * @return array
+         */
+        public function list_unread_for_user(int $id_user, $limit, $offset)
+        {
+            $query = '
+                SELECT received.*, contact.name as contact_name, phone.name as phone_name
+                FROM received
+                LEFT JOIN contact
+                ON contact.number = received.origin
+                AND contact.id_user = received.id_user
+                LEFT JOIN phone
+                ON phone.id = received.id_phone
+                WHERE received.id_user = :id_user
+                AND status = :status
+            ';
+
+            if ($limit !== null)
+            {
+                $limit = (int) $limit;
+
+                $query .= ' LIMIT ' . $limit;
+                if ($offset !== null)
+                {
+                    $offset = (int) $offset;
+                    $query .= ' OFFSET ' . $offset;
+                }
+            }
+            
+            $params = [
+                'id_user' => $id_user,
+                'status' => self::STATUS_UNREAD,
             ];
 
             return $this->_run_query($query, $params);
@@ -154,7 +216,7 @@ namespace models;
         public function get_discussions_for_user(int $id_user)
         {
             $query = ' 
-                    SELECT at, number
+                    SELECT discussions.at, discussions.number, contact.name as contact_name
                     FROM (
                         SELECT at, destination as number FROM sended
                         WHERE id_user = :id_user
@@ -163,6 +225,8 @@ namespace models;
                             WHERE id_user = :id_user
                         )
                     ) as discussions
+                    LEFT JOIN contact
+                    ON discussions.number = contact.number AND id_user = :id_user
                     GROUP BY number
                     ORDER BY at DESC
             ';

@@ -74,23 +74,10 @@ function playReceptionSound ()
 
 jQuery(document).ready(function()
 {
-    jQuery('.datatable').DataTable({
-        "pageLength": 25,
-        "bLengthChange": false,
-        "language": {
-            "url": HTTP_PWD + "/assets/js/datatables/french.json",
-        },
-        "columnDefs": [{
-            'targets': 'checkcolumn',
-            'orderable': false,
-        }],
-    });
-    
     jQuery('.datatable').on('draw.dt', function (){
         jQuery('body :checkbox').off('shiftcheckbox');
         jQuery('body :checkbox').shiftcheckbox();
     });
-
 	
     var verifReceivedInterval = setInterval(verifReceived, 10000);
     

@@ -41,32 +41,22 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $receiveds = $this->internal_received->list_for_user($_SESSION['user']['id']);
-
-            foreach ($receiveds as $key => $received)
+            $this->render('received/list', ['is_unread' => false]);
+        }
+        
+        /**
+         * Return received as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_received->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
             {
-                if ('read' !== $received['status'])
-                {
-                    $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
-                }
-
-                if (null !== $received['id_phone'])
-                {
-                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
-                    if ($phone)
-                    {
-                        $receiveds[$key]['phone_name'] = $phone['name'];
-                    }
-                }
-
-                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']);
-                if ($contact)
-                {
-                    $receiveds[$key]['contact'] = $contact['name'];
-                }
+                $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
             }
 
-            $this->render('received/list', ['receiveds' => $receiveds, 'nb_results' => \count($receiveds)]);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**
@@ -74,29 +64,56 @@ namespace controllers\publics;
          */
         public function list_unread()
         {
-            $receiveds = $this->internal_received->list_unread_for_user($_SESSION['user']['id']);
-
-            foreach ($receiveds as $key => $received)
+            $this->render('received/list', ['is_unread' => true]);
+        }
+        
+        /**
+         * Return unred received as json
+         */
+        public function list_unread_json()
+        {
+            $entities = $this->internal_received->list_unread_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
             {
-                $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $received['id']);
+                $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
+            }
 
-                if (null !== $received['id_phone'])
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
+        }
+
+        /**
+         * Mark messages as
+         *
+         * @param string $status : New status of the message, read or unread
+         * @param array int $_GET['ids'] : Ids of receiveds to delete
+         * @param mixed     $csrf
+         *
+         * @return boolean;
+         */
+        public function mark_as ($status, $csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('Received', 'list'));
+            }
+            
+            $ids = $_GET['ids'] ?? [];
+            foreach ($ids as $id)
+            {
+                if ($status === \models\Received::STATUS_UNREAD)
                 {
-                    $phone = $this->internal_phone->get_for_user($_SESSION['user']['id'], $received['id_phone']);
-                    if ($phone)
-                    {
-                        $receiveds[$key]['phone_name'] = $phone['name'];
-                    }
+                    $this->internal_received->mark_as_unread_for_user($_SESSION['user']['id'], $id);
                 }
-
-                $contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']);
-                if ($contact)
+                elseif ($status === \models\Received::STATUS_READ)
                 {
-                    $receiveds[$key]['contact'] = $contact['name'];
+                    $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $id);
                 }
             }
 
-            $this->render('received/list_unread', ['receiveds' => $receiveds, 'nb_results' => \count($receiveds)]);
+            return $this->redirect(\descartes\Router::url('Received', 'list'));
         }
 
         /**

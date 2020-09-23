@@ -40,8 +40,22 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $events = $this->internal_event->list_for_user($_SESSION['user']['id']);
-            $this->render('event/list', ['events' => $events, 'nb_results' => \count($events)]);
+            $this->render('event/list');
+        }
+
+        /**
+         * Return events as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_event->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
+            {
+                $entity['icon'] = \controllers\internals\Tool::event_type_to_icon($entity['type']);
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**
@@ -57,6 +71,13 @@ namespace controllers\publics;
             if (!$this->verify_csrf($csrf))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('Event', 'list'));
+            }
+            
+            if (!\controllers\internals\Tool::is_admin())
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour supprimer un event !');
 
                 return $this->redirect(\descartes\Router::url('Event', 'list'));
             }

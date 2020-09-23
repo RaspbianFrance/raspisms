@@ -81,20 +81,37 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('ConditionalGroup', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {data: 'condition', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

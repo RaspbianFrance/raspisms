@@ -42,15 +42,18 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $groups = $this->internal_group->list_for_user($_SESSION['user']['id']);
-
-            foreach ($groups as $key => $group)
-            {
-                $contacts = $this->internal_group->get_contacts($group['id']);
-                $groups[$key]['nb_contacts'] = \count($contacts);
-            }
-
-            $this->render('group/list', ['groups' => $groups]);
+            $this->render('group/list');
+        }
+        
+        
+        /**
+         * Return groups as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_group->list_for_user($_SESSION['user']['id']);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

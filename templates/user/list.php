@@ -41,19 +41,11 @@
                                             <tr>
                                                 <th>Email</th>
                                                 <th>Admin</th>
-                                                <th>Status</th>
+                                                <th>Statut</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        <?php foreach ($users as $user) { ?>
-                                            <tr>
-                                                <td><?php $this->s($user['email']); ?></td>
-                                                <td><?php $this->s($user['admin']); ?></td>
-                                                <td><?php $this->s($user['status']); ?></td>
-                                                <td><input type="checkbox" value="<?php $this->s($user['id']); ?>" name="ids[]"></td>
-                                            </tr>
-                                        <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -78,20 +70,38 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('User', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {data: 'email', render: jQuery.fn.dataTable.render.text()},
+            {data: 'admin', render: jQuery.fn.dataTable.render.text()},
+            {data: 'status', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

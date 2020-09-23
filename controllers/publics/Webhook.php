@@ -36,8 +36,17 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $webhooks = $this->internal_webhook->list_for_user($_SESSION['user']['id']);
-            $this->render('webhook/list', ['webhooks' => $webhooks]);
+            $this->render('webhook/list');
+        }
+        
+        /**
+         * Return commands as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_webhook->list_for_user($_SESSION['user']['id']);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

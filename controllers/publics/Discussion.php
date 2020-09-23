@@ -46,21 +46,24 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $discussions = $this->internal_received->get_discussions_for_user($_SESSION['user']['id']);
+            $this->render('discussion/list');
+        }
+        
+        /**
+         * Return discussions as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_received->get_discussions_for_user($_SESSION['user']['id']);
 
-            foreach ($discussions as $key => $discussion)
+            foreach ($entities as &$entity)
             {
-                if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $discussion['number']))
-                {
-                    continue;
-                }
-
-                $discussions[$key]['contact'] = $contact['name'];
+                $entity['number_formatted'] = \controllers\internals\Tool::phone_link($entity['number']);
+                $entity['link'] = \descartes\Router::url('Discussion', 'show', ['number' => $entity['number']]);
             }
 
-            $this->render('discussion/list', [
-                'discussions' => $discussions,
-            ]);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

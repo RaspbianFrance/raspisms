@@ -73,6 +73,51 @@ class Phone extends \descartes\Controller
     }
 
     /**
+     * Return phones as json with additionnals datas about callbacks
+     */
+    public function list_json()
+    {
+        $id_user = $_SESSION['user']['id'];
+        $api_key = $_SESSION['user']['api_key'];
+        $phones = $this->internal_phone->list_for_user($id_user);
+
+        $adapters = [];
+        $adapters = $this->internal_adapter->list_adapters();
+        foreach ($adapters as $key => $adapter)
+        {
+            unset($adapters[$key]);
+            $adapters[$adapter['meta_classname']] = $adapter;
+        }
+
+        foreach ($phones as &$phone)
+        {
+            $adapter = $adapters[$phone['adapter']] ?? false;
+
+            if (!$adapter)
+            {
+                $phone['adapter'] = 'Inconnu';
+
+                continue;
+            }
+
+            $phone['adapter'] = $adapter['meta_name'];
+
+            if ($adapter['meta_support_reception'])
+            {
+                $phone['callback_reception'] = \descartes\Router::url('Callback', 'reception', ['adapter_uid' => $adapter['meta_uid'], 'id_phone' => $phone['id']], ['api_key' => $api_key]);
+            }
+
+            if ($adapter['meta_support_status_change'])
+            {
+                $phone['callback_status'] = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => $adapter['meta_uid']], ['api_key' => $api_key]);
+            }
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['data' => $phones]);
+    }
+
+    /**
      * Cette fonction va supprimer une liste de phones.
      *
      * @param array int $_GET['ids'] : Les id des phonees à supprimer

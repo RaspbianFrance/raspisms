@@ -35,38 +35,28 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <?php if (!$smsstops) { ?>
-                                    <p>Aucun SMS STOP n'a été reçu pour le moment.</p>
-                                <?php } else { ?>
-                                    <div class="table-events">
-                                        <table class="table table-bordered table-hover table-striped datatable" id="table-smsstop">
-                                            <thead>
-                                                <tr>
-                                                    <th>Numéro</th>
+                                <div class="table-events">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-smsstop">
+                                        <thead>
+                                            <tr>
+                                                <th>Numéro</th>
+                                                <?php if ($_SESSION['user']['admin']) { ?>
                                                     <th class="checkcolumn">&#10003;</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            <?php foreach ($smsstops as $smsstop) { ?>
-                                                <tr>
-                                                    <td><?php echo(\controllers\internals\Tool::phone_link($smsstop['number'])); ?></td>
-                                                    <?php if ($_SESSION['user']['admin']) { ?>
-                                                        <td><input name="ids[]" type="checkbox" value="<?php $this->s($smsstop['id']); ?>"></td>
-                                                    <?php } ?>
-                                                </tr>
-                                            <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div>
-                                        <?php if ($_SESSION['user']['admin']) { ?>
-                                            <div class="text-right col-xs-12 no-padding">
-                                                <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                            </div>
-                                        <?php } ?>
-                                    </div>
-                                <?php } ?>
+                                                <?php } ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <?php if ($_SESSION['user']['admin']) { ?>
+                                        <div class="text-right col-xs-12 no-padding">
+                                            <strong>Action pour la séléction :</strong>
+                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                        </div>
+                                    <?php } ?>
+                                </div>
                             </form>
 						</div>
 					</div>
@@ -76,20 +66,38 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('SmsStop', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {
+                data: 'number_formatted',
+            },
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

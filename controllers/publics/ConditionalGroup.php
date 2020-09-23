@@ -48,8 +48,18 @@ namespace controllers\publics;
         {
             $page = (int) $page;
 
-            $groups = $this->internal_conditional_group->list_for_user($_SESSION['user']['id'], 25, $page);
+            $groups = $this->internal_conditional_group->list_for_user($_SESSION['user']['id']);
             $this->render('conditional_group/list', ['groups' => $groups]);
+        }
+        
+        /**
+         * Return conditionnals groups as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_conditional_group->list_for_user($_SESSION['user']['id']);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

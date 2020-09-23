@@ -40,9 +40,22 @@ namespace controllers\publics;
          */
         public function list()
         {
-            $contacts = $this->internal_contact->list_for_user($_SESSION['user']['id']);
+            return $this->render('contact/list');
+        }
+        
+        /**
+         * Return contacts as json
+         */
+        public function list_json()
+        {
+            $entities = $this->internal_contact->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
+            {
+                $entity['number_formatted'] = \controllers\internals\Tool::phone_link($entity['number']);
+            }
 
-            return $this->render('contact/list', ['contacts' => $contacts]);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $entities]);
         }
 
         /**

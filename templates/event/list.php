@@ -35,42 +35,29 @@
 						</div>
                         <div class="panel-body">
                             <form method="GET">
-                                <?php if (!$events) { ?>
-                                    <p>Aucun évènement n'a été enregistré pour le moment.</p>
-                                <?php } else { ?>
-                                    <div class="table-events">
-                                        <table class="table table-bordered table-hover table-striped datatable" id="table-events">
-                                            <thead>
-                                                <tr>
-                                                    <th>Type</th>
-                                                    <th>Date</th>
-                                                    <th>Texte</th>
+                                <div class="table-events">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-events">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Texte</th>
+                                                <?php if ($_SESSION['user']['admin']) { ?>
                                                     <th class="checkcolumn">&#10003;</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            <?php foreach ($events as $event) { ?>
-                                                    <tr>
-                                                        <td><span class="fa fa-fw <?php echo \controllers\internals\Tool::event_type_to_icon($event['type']); ?>"></span></td>
-                                                        <td><?php $this->s($event['at']); ?></td>
-                                                        <td><?php $this->s($event['text']); ?></td>
-                                                        <?php if ($_SESSION['user']['admin']) { ?>
-                                                            <td><input name="ids[]" type="checkbox" value="<?php $this->s($event['id']); ?>"></td>
-                                                        <?php } ?>
-                                                    </tr>
-                                            <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div>
-                                        <?php if ($_SESSION['user']['admin']) { ?>
-                                            <div class="text-right col-xs-12 no-padding">
-                                                <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Event', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                            </div>
-                                        <?php } ?>
-                                    </div>
-                                <?php } ?>
+                                                <?php } ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <?php if ($_SESSION['user']['admin']) { ?>
+                                        <div class="text-right col-xs-12 no-padding">
+                                            <strong>Action pour la séléction :</strong>
+                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Event', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                        </div>
+                                    <?php } ?>
+                                </div>
                             </form>
 						</div>
 					</div>
@@ -80,20 +67,46 @@
 	</div>
 </div>
 <script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('.action-dropdown a').on('click', function (e)
-		{
-			e.preventDefault();
-			var destination = jQuery(this).parents('.action-dropdown').attr('destination');
-			var url = jQuery(this).attr('href');
-			jQuery(destination).find('input:checked').each(function ()
-			{
-				url += '/' + jQuery(this).val();
-			});
-			window.location = url;
-		});
-	});
+jQuery(document).ready(function ()
+{
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('Event', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {
+                data: 'type',
+                    render: function (data, type, row, meta) {
+                    return '<span class="fa fa-fw ' + row.icon + '"></span>';
+                },
+            },
+            {data: 'at', render: jQuery.fn.dataTable.render.text()},
+            {data: 'text', render: jQuery.fn.dataTable.render.text()},
+            
+            <?php if ($_SESSION['user']['admin']) { ?>
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+            <?php } ?>
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');

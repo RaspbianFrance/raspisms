@@ -42,8 +42,17 @@ class User extends \descartes\Controller
      */
     public function list()
     {
-        $users = $this->internal_user->list();
-        $this->render('user/list', ['users' => $users]);
+        $this->render('user/list');
+    }
+    
+    /**
+     * Return users as json
+     */
+    public function list_json()
+    {
+        $entities = $this->internal_user->list();
+        header('Content-Type: application/json');
+        echo json_encode(['data' => $entities]);
     }
 
     /**

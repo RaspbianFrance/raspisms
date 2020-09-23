@@ -37,42 +37,29 @@
 						</div>
 						<div class="panel-body">
                             <form method="GET">
-                                <?php if (!$contacts) { ?>
-                                    <p>Aucun contact n'est enregistré pour le moment.</p>
-                                <?php } else { ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover table-striped datatable" id="table-contacts">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nom</th>
-                                                    <th>Numéro</th>
-                                                    <th class="checkcolumn">&#10003;</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            <?php foreach ($contacts as $contact) { ?>
-                                                    <tr>
-                                                        <td><?php $this->s($contact['name']); ?></td>
-                                                        <td><?php echo(\controllers\internals\Tool::phone_link($contact['number'])); ?></td>
-                                                        <td><input type="checkbox" name="ids[]" value="<?php $this->s($contact['id']); ?>"></td>
-                                                    </tr>
-                                            <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                <?php } ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-contacts">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom</th>
+                                                <th>Numéro</th>
+                                                <th class="checkcolumn">&#10003;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div>
                                     <div class="col-xs-6 no-padding">
                                         <a class="btn btn-success" href="<?php echo \descartes\Router::url('Contact', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un contact</a>
                                     </div>
-                                    <?php if ($contacts) { ?>
-                                        <div class="text-right col-xs-6 no-padding">
-                                                <strong>Action pour la séléction :</strong>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add', ['prefilled' => 'contacts']); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
-                                                <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                                <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                        </div>
-                                    <?php } ?>
+                                    <div class="text-right col-xs-6 no-padding">
+                                            <strong>Action pour la séléction :</strong>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add', ['prefilled' => 'contacts']); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Contact', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                    </div>
                                 </div>
                             </form>
 						</div>
@@ -124,18 +111,50 @@
     </div>
 </div>
 <script>
-	jQuery(document).ready(function()
+jQuery(document).ready(function()
+{
+    //Import/export contacts
+    jQuery('body').on('click', '#btn-import', function ()
     {
-        jQuery('body').on('click', '#btn-import', function ()
-        {
-            jQuery('#import-modal').modal({'keyboard': true});
-        });
-        
-        jQuery('body').on('click', '#btn-export', function ()
-        {
-            jQuery('#export-modal').modal({'keyboard': true});
-        });
+        jQuery('#import-modal').modal({'keyboard': true});
     });
+    
+    jQuery('body').on('click', '#btn-export', function ()
+    {
+        jQuery('#export-modal').modal({'keyboard': true});
+    });
+    
+    
+    //Datatable
+    jQuery('.datatable').DataTable({
+        "pageLength": 25,
+        "bLengthChange": false,
+        "language": {
+            "url": HTTP_PWD + "/assets/js/datatables/french.json",
+        },
+        "columnDefs": [{
+            'targets': 'checkcolumn',
+            'orderable': false,
+        }],
+
+        "ajax": {
+            'url': '<?php echo \descartes\Router::url('Contact', 'list_json'); ?>',
+            'dataSrc': 'data',
+        },
+        "columns" : [
+            {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {data: 'number_formatted'},
+            {
+                data: 'id',
+                render: function (data, type, row, meta) {
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
+        ],
+        "deferRender": true
+    });
+
+});
 </script>
 <?php
 	$this->render('incs/footer');
