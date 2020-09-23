@@ -45,13 +45,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($groups as $group) { ?>
-                                                <tr>
-                                                    <td><?php $this->s($group['name']); ?></td>
-                                                    <td><?php $this->s($group['nb_contacts']); ?></td>
-                                                    <td><input type="checkbox" name="ids[]" value="<?php $this->s($group['id']); ?>"></td>
-                                                </tr>
-                                            <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
