@@ -44,12 +44,9 @@ namespace controllers\publics;
          *
          * @param mixed $page
          */
-        public function list($page = 0)
+        public function list()
         {
-            $page = (int) $page;
-
-            $groups = $this->internal_conditional_group->list_for_user($_SESSION['user']['id']);
-            $this->render('conditional_group/list', ['groups' => $groups]);
+            $this->render('conditional_group/list');
         }
         
         /**
