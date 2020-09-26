@@ -68,8 +68,14 @@ namespace controllers\publics;
 
             $contact['datas'] = json_decode($contact['datas'], true);
 
+            //Add metas of contact by adding contact without datas
+            $metas = $contact;
+            unset($metas['datas']);
+            unset($metas['id_user']);
+
             $datas = [
                 'contact' => $contact['datas'],
+                'contact_metas' => $metas,
             ];
 
             $result = $this->internal_templating->render($template, $datas);
