@@ -105,6 +105,10 @@ namespace controllers\internals;
                     $logo = 'fa-group';
 
                     break;
+                case 'CONDITIONAL_GROUP_ADD':
+                    $logo = 'fa-bullseye';
+
+                    break;
                 case 'SCHEDULED_ADD':
                     $logo = 'fa-calendar';
 
