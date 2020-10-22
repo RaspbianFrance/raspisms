@@ -67,10 +67,9 @@ namespace models;
         }
 
         /**
-         * Retourne une liste de useres sous forme d'un tableau.
+         * Delete a user
          *
-         * @param array $ids : un ou plusieurs id d'entrées à supprimer
-         * @param mixed $id
+         * @param int $id : Id de l'utilisateur a supprimer
          *
          * @return int : Le nombre de lignes supprimées
          */
