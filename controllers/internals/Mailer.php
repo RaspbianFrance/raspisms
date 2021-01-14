@@ -52,7 +52,7 @@ class Mailer extends \descartes\Controller
      * @param array   $destinations : Destinations address
      * @param string  $subject      : Message subject
      * @param string  $message      : Message
-     * @param ?string $alt_message  : Alt Message if no html support. Null if message is not html.
+     * @param ?string $alt_message  : Alt Message for clients with no html support. Use default (null) if mail to send is textonly and not html.
      * @param array   $attachments  : List of path to attachment files
      *
      * @return bool : false on error, true else
@@ -79,7 +79,7 @@ class Mailer extends \descartes\Controller
 
             if ($alt_message)
             {
-                $mail->isHTML($html);
+                $mail->isHTML(true);
                 $mail->AltBody = $alt_message;
             }
 
