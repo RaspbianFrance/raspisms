@@ -72,7 +72,7 @@ namespace controllers\internals;
          *
          * @param string $email : User email
          *
-         * @return exit code 1 on false, 0 else
+         * @return void : exit code 1 on false, 0 else
          */
         public function user_exists(string $email)
         {

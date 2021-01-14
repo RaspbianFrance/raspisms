@@ -18,6 +18,7 @@ namespace controllers\publics;
     {
         private $internal_sended;
         private $internal_phone;
+        private $internal_contact;
 
         /**
          * Cette fonction est appelée avant toute les autres :
