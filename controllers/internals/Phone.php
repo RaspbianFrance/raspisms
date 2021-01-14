@@ -60,9 +60,9 @@ namespace controllers\internals;
          * @param string      $adapter       : The adapter to use the phone
          * @param string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          *
-         * @return bool : false on error, true on success
+         * @return int|bool : false on error, new id on success
          */
-        public function create(int $id_user, string $name, string $adapter, string $adapter_datas): bool
+        public function create(int $id_user, string $name, string $adapter, string $adapter_datas)
         {
             $phone = [
                 'id_user' => $id_user,
@@ -71,7 +71,7 @@ namespace controllers\internals;
                 'adapter_datas' => $adapter_datas,
             ];
 
-            return (bool) $this->get_model()->insert($phone);
+            return $this->get_model()->insert($phone);
         }
 
         /**

@@ -182,6 +182,12 @@
             'delete_scheduled' => [
                 '/api/scheduled/{id}/',
             ],
+            'post_phone' => [
+                '/api/phone/',
+            ],
+            'delete_phone' => [
+                '/api/phone/{id}/',
+            ],
         ],
     );
 

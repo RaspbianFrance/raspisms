@@ -35,7 +35,7 @@ namespace controllers\publics;
         ];
 
         const ERROR_MESSAGES = [
-            'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API key as GET or POST parameter "api_key".',
+            'INVALID_CREDENTIALS' => 'Invalid API Key. Please provide a valid API key as GET or POST parameter "api_key" or a HTTP "X-Api-Key".',
             'INVALID_PARAMETER' => 'You have specified an invalid parameter : ',
             'MISSING_PARAMETER' => 'One require parameter is missing : ',
             'CANNOT_CREATE' => 'Cannot create a new entry.',
@@ -51,6 +51,7 @@ namespace controllers\publics;
         private $internal_contact;
         private $internal_group;
         private $internal_conditional_group;
+        private $internal_adapter;
         private $user;
 
         /**
@@ -71,6 +72,7 @@ namespace controllers\publics;
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_group = new \controllers\internals\Group($bdd);
             $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
+            $this->internal_adapter = new \controllers\internals\Adapter();
 
             //If no user, quit with error
             $this->user = false;
@@ -288,6 +290,176 @@ namespace controllers\publics;
         {
             $return = self::DEFAULT_RETURN;
             $success = $this->internal_scheduled->delete_for_user($this->user['id'], $id);
+
+            if (!$success)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_DELETE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_DELETE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $return['response'] = true;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
+         * Create a new phone
+         * 
+         * @param string $_POST['name'] : Phone name
+         * @param string $_POST['adapter'] : Phone adapter
+         * @param array $_POST['adapter_datas'] : Phone adapter datas
+         *
+         * @return int : id phone the new phone on success
+         */
+        public function post_phone()
+        {
+            $return = self::DEFAULT_RETURN;
+            
+            $name = $_POST['name'] ?? false;
+            $adapter = $_POST['adapter'] ?? false;
+            $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
+
+            if (!$name)
+            {
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ' You must specify phone name.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+            
+            if (!$adapter)
+            {
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ' You must specify adapter name.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $name_exist = $this->internal_phone->get_by_name($name);
+            if ($name_exist)
+            {
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' This name is already used for another phone.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $adapters = $this->internal_adapter->list_adapters();
+            $find_adapter = false;
+            foreach ($adapters as $metas)
+            {
+                if ($metas['meta_classname'] === $adapter)
+                {
+                    $find_adapter = $metas;
+
+                    break;
+                }
+            }
+
+            if (!$find_adapter)
+            {
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' adapter. Adapter "' . $adapter . '" does not exists.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //If missing required data fields, error
+            foreach ($find_adapter['meta_datas_fields'] as $field)
+            {
+                if (false === $field['required'])
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_datas[$field['name']]))
+                {
+                    continue;
+                }
+
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ' You must speicify param ' . $field['name'] . ' (' . $field['description'] . ') for this phone.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //If field phone number is invalid
+            foreach ($find_adapter['meta_datas_fields'] as $field)
+            {
+                if (false === ($field['number'] ?? false))
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_datas[$field['name']]))
+                {
+                    $adapter_datas[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_datas[$field['name']]);
+
+                    if ($adapter_datas[$field['name']])
+                    {
+                        continue;
+                    }
+                }
+                
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' field ' . $field['name'] . ' is not a valid phone number.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $adapter_datas = json_encode($adapter_datas);
+
+            //Check adapter is working correctly with thoses names and datas
+            $adapter_classname = $find_adapter['meta_classname'];
+            $adapter_instance = new $adapter_classname($adapter_datas);
+            $adapter_working = $adapter_instance->test();
+
+            if (!$adapter_working)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'] . ' : Impossible to validate this phone, verify adapters parameters.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_datas);
+            if ($phone_id === false)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $return['response'] = $phone_id;
+            $this->auto_http_code(true);
+            
+            return $this->json($return);
+        }
+        
+        /**
+         * Delete a phone.
+         *
+         * @param int $id : Id of phond to delete
+         *
+         * @return bool : void
+         */
+        public function delete_phone(int $id)
+        {
+            $return = self::DEFAULT_RETURN;
+            $success = $this->internal_phone->delete_for_user($this->user['id'], $id);
 
             if (!$success)
             {

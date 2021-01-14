@@ -245,10 +245,6 @@ class Phone extends \descartes\Controller
                 }
             }
 
-            var_dump($field);
-            var_dump($adapter_datas[$field['name']]);
-            die();
-
             \FlashMessage\FlashMessage::push('danger', 'Vous avez fourni un numéro de téléphone avec un format invalide.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));

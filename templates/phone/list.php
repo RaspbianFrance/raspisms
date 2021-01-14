@@ -88,7 +88,7 @@ jQuery(document).ready(function ()
         "columns" : [
             {data: 'id', render: jQuery.fn.dataTable.render.text()},
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
-            {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {data: 'adapter', render: jQuery.fn.dataTable.render.text()},
             {
                 data: '_',
                 render: function (data, type, row, meta) {
