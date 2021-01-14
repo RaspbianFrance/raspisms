@@ -27,14 +27,14 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
         {
             return null;
         });
-
+        
         //Exists must be personnalized because it inverse is_null
-        $exists = new ExpressionFunction('exists', function ($var)
+        $exists = new ExpressionFunction('exists', function ($str)
         {
-            return sprintf('!is_null(%1$s)', $str);
+            return sprintf('isset(%1$s)', $str);
         }, function ($arguments, $var)
         {
-            return null !== $var;
+            return isset($var);
         });
 
         return [
