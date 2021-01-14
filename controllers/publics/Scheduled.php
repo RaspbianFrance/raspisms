@@ -96,9 +96,12 @@ namespace controllers\publics;
         /**
          * Cette fonction retourne la page d'ajout d'un scheduled.
          *
+         * @param array? int $contacts_ids : Ids of contacts to prefilled
+         * @param array? int $groups_ids : Ids of groups to prefilled
+         * @param array? int $conditional_groups_ids : Ids of conditional groups to prefilled
          * @param $prefilled : If we have prefilled some fields (possible values : 'contacts', 'groups', 'conditional_groups', false)
          */
-        public function add($prefilled = false)
+        public function add()
         {
             $now = new \DateTime();
             $less_one_minute = new \DateInterval('PT1M');
@@ -109,32 +112,31 @@ namespace controllers\publics;
             $contacts = $this->internal_contact->gets_for_user($id_user);
             $phones = $this->internal_phone->gets_for_user($id_user);
 
+            $contact_ids = (isset($_GET['contact_ids']) && is_array($_GET['contact_ids'])) ? $_GET['contact_ids'] : [];
+            $group_ids = (isset($_GET['group_ids']) && is_array($_GET['group_ids'])) ? $_GET['group_ids'] : [];
+            $conditional_group_ids = (isset($_GET['conditional_group_ids']) && is_array($_GET['conditional_group_ids'])) ? $_GET['conditional_group_ids'] : [];
+
             $prefilled_contacts = [];
             $prefilled_groups = [];
             $prefilled_conditional_groups = [];
 
-            if ($prefilled)
+            if ($contact_ids)
             {
-                $ids = $_GET['ids'] ?? [];
-            }
-
-            if ('contacts' === $prefilled)
-            {
-                foreach ($this->internal_contact->gets_in_for_user($id_user, $ids) as $contact)
+                foreach ($this->internal_contact->gets_in_for_user($id_user, $contact_ids) as $contact)
                 {
                     $prefilled_contacts[] = $contact['id'];
                 }
             }
-            elseif ('groups' === $prefilled)
+            elseif ($group_ids)
             {
-                foreach ($this->internal_group->gets_in_for_user($id_user, $ids) as $group)
+                foreach ($this->internal_group->gets_in_for_user($id_user, $group_ids) as $group)
                 {
                     $prefilled_groups[] = $group['id'];
                 }
             }
-            elseif ('conditional_groups' === $prefilled)
+            elseif ($conditional_group_ids)
             {
-                foreach ($this->internal_conditional_group->gets_in_for_user($id_user, $ids) as $conditional_group)
+                foreach ($this->internal_conditional_group->gets_in_for_user($id_user, $conditional_group_ids) as $conditional_group)
                 {
                     $prefilled_conditional_groups[] = $conditional_group['id'];
                 }

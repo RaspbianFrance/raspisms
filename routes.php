@@ -107,7 +107,6 @@
             'list_json' => '/scheduled/json/',
             'add' => [
                 '/scheduled/add/',
-                '/scheduled/add/{prefilled}/',
             ],
             'create' => '/scheduled/create/{csrf}/',
             'edit' => '/scheduled/edit/',
