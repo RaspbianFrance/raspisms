@@ -49,9 +49,9 @@ namespace controllers\publics;
         {
             $this->render('scheduled/list');
         }
-        
+
         /**
-         * Return scheduleds as json
+         * Return scheduleds as json.
          */
         public function list_json()
         {

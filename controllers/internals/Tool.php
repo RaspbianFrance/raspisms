@@ -97,26 +97,32 @@ namespace controllers\internals;
                     $logo = 'fa-user';
 
                     break;
+
                 case 'CONTACT_ADD':
                     $logo = 'fa-user';
 
                     break;
+
                 case 'GROUP_ADD':
                     $logo = 'fa-group';
 
                     break;
+
                 case 'CONDITIONAL_GROUP_ADD':
                     $logo = 'fa-bullseye';
 
                     break;
+
                 case 'SCHEDULED_ADD':
                     $logo = 'fa-calendar';
 
                     break;
+
                 case 'COMMAND_ADD':
                     $logo = 'fa-terminal';
 
                     break;
+
                 default:
                     $logo = 'fa-question';
             }
@@ -169,7 +175,8 @@ namespace controllers\internals;
             if (!isset($_SESSION['connect']) || !$_SESSION['connect'])
             {
                 header('Location: /');
-                die();
+
+                exit();
             }
         }
 
@@ -217,26 +224,32 @@ namespace controllers\internals;
                         $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
 
                         break;
+
                     case UPLOAD_ERR_FORM_SIZE:
                         $result['content'] = 'Le fichier dépasse la limite de taille.';
 
                         break;
+
                     case UPLOAD_ERR_PARTIAL:
                         $result['content'] = 'L\'envoi du fichier a été interrompu.';
 
                         break;
+
                     case UPLOAD_ERR_NO_FILE:
                         $result['content'] = 'Aucun fichier n\'a été envoyé.';
 
                         break;
+
                     case UPLOAD_ERR_NO_TMP_DIR:
                         $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
 
                         break;
+
                     case UPLOAD_ERR_CANT_WRITE:
                         $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
 
                         break;
+
                     case UPLOAD_ERR_EXTENSION:
                         $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
 
@@ -284,26 +297,32 @@ namespace controllers\internals;
                         $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
 
                         break;
+
                     case UPLOAD_ERR_FORM_SIZE:
                         $result['content'] = 'Le fichier dépasse la limite de taille.';
 
                         break;
+
                     case UPLOAD_ERR_PARTIAL:
                         $result['content'] = 'L\'envoi du fichier a été interrompu.';
 
                         break;
+
                     case UPLOAD_ERR_NO_FILE:
                         $result['content'] = 'Aucun fichier n\'a été envoyé.';
 
                         break;
+
                     case UPLOAD_ERR_NO_TMP_DIR:
                         $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
 
                         break;
+
                     case UPLOAD_ERR_CANT_WRITE:
                         $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
 
                         break;
+
                     case UPLOAD_ERR_EXTENSION:
                         $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
 

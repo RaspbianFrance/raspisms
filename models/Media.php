@@ -26,7 +26,7 @@ namespace models;
          */
         public function get_for_user(int $id_user, int $id)
         {
-            $query = ' 
+            $query = '
                 SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 AND id = :id
@@ -51,7 +51,7 @@ namespace models;
          */
         public function gets_for_user(int $id_user)
         {
-            $query = ' 
+            $query = '
                 SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
             ';
@@ -73,7 +73,7 @@ namespace models;
          */
         public function get_for_scheduled_and_user(int $id_user, int $id_scheduled)
         {
-            $query = ' 
+            $query = '
                 SELECT * FROM `' . $this->get_table_name() . '`
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 AND id_scheduled = :id_scheduled
@@ -105,7 +105,7 @@ namespace models;
             $limit = (int) $limit;
             $offset = (int) $offset;
 
-            $query = ' 
+            $query = '
                 SELECT * FROM media
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 LIMIT ' . $limit . ' OFFSET ' . $offset;
@@ -127,7 +127,7 @@ namespace models;
          */
         public function gets_in_for_user(int $id_user, $ids)
         {
-            $query = ' 
+            $query = '
                 SELECT * FROM media
                 WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
                 AND id ';
@@ -151,7 +151,7 @@ namespace models;
          */
         public function delete_for_user(int $id_user, int $id)
         {
-            $query = ' 
+            $query = '
                 DELETE FROM media
                 WHERE id = :id
                 AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
@@ -172,7 +172,7 @@ namespace models;
          */
         public function delete_for_scheduled_and_user(int $id_user, int $id_scheduled)
         {
-            $query = ' 
+            $query = '
                 DELETE FROM media
                 WHERE id_scheduled = :id_scheduled
                 AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)

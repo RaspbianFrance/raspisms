@@ -38,9 +38,9 @@ namespace controllers\publics;
         {
             $this->render('webhook/list');
         }
-        
+
         /**
-         * Return commands as json
+         * Return commands as json.
          */
         public function list_json()
         {

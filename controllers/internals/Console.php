@@ -68,9 +68,10 @@ namespace controllers\internals;
         }
 
         /**
-         * Check if a user exists based on email
+         * Check if a user exists based on email.
          *
-         * @param string $email  : User email
+         * @param string $email : User email
+         *
          * @return exit code 1 on false, 0 else
          */
         public function user_exists(string $email)
@@ -79,6 +80,7 @@ namespace controllers\internals;
             $internal_user = new \controllers\internals\User($bdd);
 
             $user = $internal_user->get_by_email($email);
+
             exit($user ? 0 : 1);
         }
 
@@ -105,18 +107,20 @@ namespace controllers\internals;
                 $api_key = $api_key ?? $internal_user->generate_random_api_key();
                 $success = $internal_user->update($user['id'], $email, $password, $admin, $api_key, $status, $encrypt_password);
                 echo json_encode(['id' => $user['id']]);
+
                 exit($success ? 0 : 1);
             }
 
             $new_user_id = $internal_user->create($email, $password, $admin, $api_key, $status, $encrypt_password);
             echo json_encode(['id' => $new_user_id]);
+
             exit($new_user_id ? 0 : 1);
         }
 
         /**
          * Update a user status.
          *
-         * @param string $id  : User id
+         * @param string $id     : User id
          * @param string $status : User status, default \models\User::STATUS_ACTIVE
          */
         public function update_user_status(string $id, string $status)
@@ -131,14 +135,14 @@ namespace controllers\internals;
             }
 
             $success = $internal_user->update_status($user['id'], $status);
+
             exit($success ? 0 : 1);
         }
-        
-        
+
         /**
-         * Delete a user
+         * Delete a user.
          *
-         * @param string $id  : User id
+         * @param string $id : User id
          */
         public function delete_user(string $id)
         {
@@ -146,6 +150,7 @@ namespace controllers\internals;
             $internal_user = new \controllers\internals\User($bdd);
 
             $success = $internal_user->delete($id);
+
             exit($success ? 0 : 1);
         }
     }

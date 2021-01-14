@@ -257,10 +257,12 @@ namespace adapters;
                     $return['status'] = \models\Sended::STATUS_DELIVERED;
 
                     break;
+
                 case \models\Sended::STATUS_FAILED:
                     $return['status'] = \models\Sended::STATUS_FAILED;
 
                     break;
+
                 default:
                     $return['status'] = \models\Sended::STATUS_UNKNOWN;
 

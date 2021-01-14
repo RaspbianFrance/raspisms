@@ -46,7 +46,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Return sendeds as json
+         * Return sendeds as json.
          */
         public function list_json()
         {
@@ -59,7 +59,6 @@ namespace controllers\publics;
             header('Content-Type: application/json');
             echo json_encode(['data' => $entities]);
         }
-            
 
         /**
          * Cette fonction va supprimer une liste de sendeds.

@@ -70,8 +70,7 @@ namespace controllers\publics;
 
             //Add metas of contact by adding contact without datas
             $metas = $contact;
-            unset($metas['datas']);
-            unset($metas['id_user']);
+            unset($metas['datas'], $metas['id_user']);
 
             $datas = [
                 'contact' => $contact['datas'],

@@ -355,6 +355,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 $status = \models\Sended::STATUS_DELIVERED;
 
                 break;
+
             case 'NOT_ALLOWED':
             case 'INVALID_DESTINATION_ADDRESS':
             case 'OUT_OF_DATE':
@@ -363,6 +364,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 $status = \models\Sended::STATUS_FAILED;
 
                 break;
+
             default:
                 $status = \models\Sended::STATUS_UNKNOWN;
 

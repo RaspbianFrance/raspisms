@@ -67,7 +67,7 @@ namespace models;
         }
 
         /**
-         * Delete a user
+         * Delete a user.
          *
          * @param int $id : Id de l'utilisateur a supprimer
          *

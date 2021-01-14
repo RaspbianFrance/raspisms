@@ -43,9 +43,9 @@ namespace controllers\publics;
         {
             $this->render('received/list', ['is_unread' => false]);
         }
-        
+
         /**
-         * Return received as json
+         * Return received as json.
          */
         public function list_json()
         {
@@ -66,9 +66,9 @@ namespace controllers\publics;
         {
             $this->render('received/list', ['is_unread' => true]);
         }
-        
+
         /**
-         * Return unred received as json
+         * Return unred received as json.
          */
         public function list_unread_json()
         {
@@ -83,15 +83,15 @@ namespace controllers\publics;
         }
 
         /**
-         * Mark messages as
+         * Mark messages as.
          *
-         * @param string $status : New status of the message, read or unread
+         * @param string    $status      : New status of the message, read or unread
          * @param array int $_GET['ids'] : Ids of receiveds to delete
          * @param mixed     $csrf
          *
          * @return boolean;
          */
-        public function mark_as ($status, $csrf)
+        public function mark_as($status, $csrf)
         {
             if (!$this->verify_csrf($csrf))
             {
@@ -99,15 +99,15 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Received', 'list'));
             }
-            
+
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {
-                if ($status === \models\Received::STATUS_UNREAD)
+                if (\models\Received::STATUS_UNREAD === $status)
                 {
                     $this->internal_received->mark_as_unread_for_user($_SESSION['user']['id'], $id);
                 }
-                elseif ($status === \models\Received::STATUS_READ)
+                elseif (\models\Received::STATUS_READ === $status)
                 {
                     $this->internal_received->mark_as_read_for_user($_SESSION['user']['id'], $id);
                 }

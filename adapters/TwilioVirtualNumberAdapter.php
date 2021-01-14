@@ -325,10 +325,12 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
             $status = \models\Sended::STATUS_DELIVERED;
 
             break;
+
         case 'failed':
             $status = \models\Sended::STATUS_FAILED;
 
             break;
+
         default:
             $status = \models\Sended::STATUS_UNKNOWN;
 

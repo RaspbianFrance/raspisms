@@ -60,7 +60,7 @@ namespace controllers\internals;
          * @param string      $adapter       : The adapter to use the phone
          * @param string json $adapter_datas : A JSON string representing adapter's datas (for example credentials for an api)
          *
-         * @return int|bool : false on error, new id on success
+         * @return bool|int : false on error, new id on success
          */
         public function create(int $id_user, string $name, string $adapter, string $adapter_datas)
         {

@@ -19,12 +19,12 @@ namespace models;
         const STATUS_UNKNOWN = 'unknown';
         const STATUS_DELIVERED = 'delivered';
         const STATUS_FAILED = 'failed';
-        
+
         /**
          * Return a list of sended messages for a user.
-         * Add a column contact_name and phone_name when available
+         * Add a column contact_name and phone_name when available.
          *
-         * @param int $id_user : user id
+         * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
          *
@@ -43,18 +43,18 @@ namespace models;
                 WHERE sended.id_user = :id_user
             ';
 
-            if ($limit !== null)
+            if (null !== $limit)
             {
                 $limit = (int) $limit;
 
                 $query .= ' LIMIT ' . $limit;
-                if ($offset !== null)
+                if (null !== $offset)
                 {
                     $offset = (int) $offset;
                     $query .= ' OFFSET ' . $offset;
                 }
             }
-            
+
             $params = [
                 'id_user' => $id_user,
             ];
@@ -137,7 +137,7 @@ namespace models;
          */
         public function count_by_day_since_for_user($id_user, $date)
         {
-            $query = " 
+            $query = "
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM sended
                 WHERE at > :date
@@ -163,7 +163,7 @@ namespace models;
          */
         public function get_since_by_date_for_user($date, $id_user)
         {
-            $query = " 
+            $query = "
                 SELECT *
                 FROM sended
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')

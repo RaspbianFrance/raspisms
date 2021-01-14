@@ -44,9 +44,9 @@ namespace controllers\publics;
         {
             $this->render('command/list');
         }
-        
+
         /**
-         * Return commands as json
+         * Return commands as json.
          */
         public function list_json()
         {

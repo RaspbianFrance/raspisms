@@ -48,9 +48,9 @@ namespace controllers\publics;
         {
             $this->render('discussion/list');
         }
-        
+
         /**
-         * Return discussions as json
+         * Return discussions as json.
          */
         public function list_json()
         {

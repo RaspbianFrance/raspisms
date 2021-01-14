@@ -52,6 +52,7 @@ use Monolog\Logger;
                 http_response_code(401);
                 echo json_encode(['error' => 'Invalid API key. You must provide a valid GET or POST api_key param.']);
                 $this->logger->error('Callback call failed with invalid api key : ' . $api_key);
+
                 exit(1);
             }
 

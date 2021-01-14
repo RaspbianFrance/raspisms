@@ -125,6 +125,7 @@ abstract class AbstractDaemon
             if (-1 === $sid)
             { //Error
                 $this->logger->critical("Cannot make the child process with pid {$pid} independent.");
+
                 exit(1);
             }
 
@@ -138,6 +139,7 @@ abstract class AbstractDaemon
             if (!$success)
             {
                 $this->logger->critical('Cannot create PID directory : ' . $this->pid_dir);
+
                 exit(2);
             }
         }

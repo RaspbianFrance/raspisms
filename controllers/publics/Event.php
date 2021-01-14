@@ -44,7 +44,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Return events as json
+         * Return events as json.
          */
         public function list_json()
         {
@@ -74,7 +74,7 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Event', 'list'));
             }
-            
+
             if (!\controllers\internals\Tool::is_admin())
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour supprimer un event !');

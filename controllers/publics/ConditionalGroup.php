@@ -48,9 +48,9 @@ namespace controllers\publics;
         {
             $this->render('conditional_group/list');
         }
-        
+
         /**
-         * Return conditionnals groups as json
+         * Return conditionnals groups as json.
          */
         public function list_json()
         {

@@ -93,9 +93,9 @@ namespace models;
                 return [];
             }
 
-            $query = ' 
+            $query = '
                 SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE id_user = :id_user 
+                WHERE id_user = :id_user
                 AND id ';
 
             $params = [];

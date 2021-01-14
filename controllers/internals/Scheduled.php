@@ -244,7 +244,7 @@ namespace controllers\internals;
                 if (!isset($users_phones[$scheduled['id_user']]))
                 {
                     $phones = $internal_phone->gets_for_user($scheduled['id_user']);
-                    $users_phones[$scheduled['id_user']] = $phones ? $phones : [];
+                    $users_phones[$scheduled['id_user']] = $phones ?: [];
                 }
 
                 $phone_to_use = null;
@@ -335,14 +335,12 @@ namespace controllers\internals;
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {
                         $contact['datas'] = json_decode($contact['datas'], true);
-                        
+
                         //Add metas of contact by adding contact without datas
                         $metas = $contact;
-                        unset($metas['datas']);
-                        unset($metas['id_user']);
-                        
-                        $datas = ['contact' => $contact['datas'], 'contact_metas' => $metas];
+                        unset($metas['datas'], $metas['id_user']);
 
+                        $datas = ['contact' => $contact['datas'], 'contact_metas' => $metas];
 
                         $render = $internal_templating->render($scheduled['text'], $datas);
 

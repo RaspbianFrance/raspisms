@@ -347,11 +347,13 @@ namespace adapters;
                     $status = \models\Sended::STATUS_DELIVERED;
 
                     break;
+
                 case 2:
                 case 16:
                     $status = \models\Sended::STATUS_FAILED;
 
                     break;
+
                 default:
                     $status = \models\Sended::STATUS_UNKNOWN;
 

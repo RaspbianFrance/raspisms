@@ -44,9 +44,9 @@ class User extends \descartes\Controller
     {
         $this->render('user/list');
     }
-    
+
     /**
-     * Return users as json
+     * Return users as json.
      */
     public function list_json()
     {

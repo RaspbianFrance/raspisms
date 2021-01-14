@@ -41,9 +41,9 @@ namespace controllers\publics;
         {
             $this->render('smsstop/list');
         }
-        
+
         /**
-         * Return smsstops as json
+         * Return smsstops as json.
          */
         public function list_json()
         {

@@ -114,11 +114,11 @@ namespace controllers\internals;
             {
                 $contact['datas'] = json_decode($contact['datas']);
                 $contact = (object) $contact;
-                
+
                 //Add metas of contact by adding contact without datas
                 $metas = clone $contact;
-                unset($metas->datas);
-                unset($metas->id_user);
+                $metas->datas = null;
+                $metas->id_user = null;
 
                 $datas = ['contact' => $contact->datas, 'contact_metas' => $metas];
                 $is_valid = $ruler->evaluate_condition($condition, $datas);

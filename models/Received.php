@@ -18,12 +18,12 @@ namespace models;
     {
         const STATUS_UNREAD = 'unread';
         const STATUS_READ = 'read';
-        
+
         /**
          * Return a list of received messages for a user.
-         * Add a column contact_name and phone_name when available
+         * Add a column contact_name and phone_name when available.
          *
-         * @param int $id_user : user id
+         * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
          *
@@ -42,31 +42,30 @@ namespace models;
                 WHERE received.id_user = :id_user
             ';
 
-            if ($limit !== null)
+            if (null !== $limit)
             {
                 $limit = (int) $limit;
 
                 $query .= ' LIMIT ' . $limit;
-                if ($offset !== null)
+                if (null !== $offset)
                 {
                     $offset = (int) $offset;
                     $query .= ' OFFSET ' . $offset;
                 }
             }
-            
+
             $params = [
                 'id_user' => $id_user,
             ];
 
             return $this->_run_query($query, $params);
         }
-        
-        
+
         /**
          * Return a list of unread received messages for a user.
-         * Add a column contact_name and phone_name when available
+         * Add a column contact_name and phone_name when available.
          *
-         * @param int $id_user : user id
+         * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
          *
@@ -86,18 +85,18 @@ namespace models;
                 AND status = :status
             ';
 
-            if ($limit !== null)
+            if (null !== $limit)
             {
                 $limit = (int) $limit;
 
                 $query .= ' LIMIT ' . $limit;
-                if ($offset !== null)
+                if (null !== $offset)
                 {
                     $offset = (int) $offset;
                     $query .= ' OFFSET ' . $offset;
                 }
             }
-            
+
             $params = [
                 'id_user' => $id_user,
                 'status' => self::STATUS_UNREAD,
@@ -190,7 +189,7 @@ namespace models;
          */
         public function count_by_day_since_for_user(int $id_user, $date)
         {
-            $query = " 
+            $query = "
                 SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM received
                 WHERE at > :date
@@ -215,7 +214,7 @@ namespace models;
          */
         public function get_discussions_for_user(int $id_user)
         {
-            $query = ' 
+            $query = '
                     SELECT discussions.at, discussions.number, contact.name as contact_name
                     FROM (
                         SELECT at, destination as number FROM sended
@@ -246,7 +245,7 @@ namespace models;
          */
         public function get_since_by_date_for_user(int $id_user, $date)
         {
-            $query = " 
+            $query = "
                 SELECT *
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')
@@ -272,7 +271,7 @@ namespace models;
          */
         public function get_since_by_date_for_origin_and_user(int $id_user, $date, string $origin)
         {
-            $query = " 
+            $query = "
                 SELECT *
                 FROM received
                 WHERE at > STR_TO_DATE(:date, '%Y-%m-%d %h:%i:%s')

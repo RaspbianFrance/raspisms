@@ -42,9 +42,9 @@ namespace controllers\publics;
         {
             return $this->render('contact/list');
         }
-        
+
         /**
-         * Return contacts as json
+         * Return contacts as json.
          */
         public function list_json()
         {
@@ -288,16 +288,19 @@ namespace controllers\publics;
 
             //Try to import file
             $invalid_type = false;
+
             switch ($read_file['mime_type'])
             {
                 case 'text/csv':
                     $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
 
                     break;
+
                 case 'application/json':
                     $result = $this->internal_contact->import_json($id_user, $read_file['content']);
 
                     break;
+
                 default:
                     $invalid_type = true;
             }
@@ -338,16 +341,19 @@ namespace controllers\publics;
 
             //Try to export contacts
             $invalid_type = false;
+
             switch ($format)
             {
                 case 'csv':
                     $result = $this->internal_contact->export_csv($id_user);
 
                     break;
+
                 case 'json':
                     $result = $this->internal_contact->export_json($id_user);
 
                     break;
+
                 default:
                     $invalid_type = true;
             }

@@ -15,9 +15,9 @@ namespace models;
     {
         /**
          * Return a list of groups for a user.
-         * Add a column nb_contacts
+         * Add a column nb_contacts.
          *
-         * @param int $id_user : user id
+         * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
          *
@@ -30,28 +30,29 @@ namespace models;
                 FROM `group` as g
                 LEFT JOIN group_contact as gc
                 ON g.id = gc.id_group
-                WHERE id_user = :id_user 
+                WHERE id_user = :id_user
                 GROUP BY g.id
             ';
 
-            if ($limit !== null)
+            if (null !== $limit)
             {
                 $limit = (int) $limit;
 
                 $query .= ' LIMIT ' . $limit;
-                if ($offset !== null)
+                if (null !== $offset)
                 {
                     $offset = (int) $offset;
                     $query .= ' OFFSET ' . $offset;
                 }
             }
-            
+
             $params = [
                 'id_user' => $id_user,
             ];
 
             return $this->_run_query($query, $params);
         }
+
         /**
          * Return a group by his name for a user.
          *
@@ -102,7 +103,7 @@ namespace models;
         public function get_contacts(int $id_group)
         {
             $query = '
-                SELECT * 
+                SELECT *
                 FROM `contact`
                 WHERE id IN (SELECT id_contact FROM `group_contact` WHERE id_group = :id_group)
             ';

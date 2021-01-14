@@ -44,10 +44,9 @@ namespace controllers\publics;
         {
             $this->render('group/list');
         }
-        
-        
+
         /**
-         * Return groups as json
+         * Return groups as json.
          */
         public function list_json()
         {

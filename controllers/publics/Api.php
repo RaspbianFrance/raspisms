@@ -307,18 +307,18 @@ namespace controllers\publics;
         }
 
         /**
-         * Create a new phone
-         * 
-         * @param string $_POST['name'] : Phone name
-         * @param string $_POST['adapter'] : Phone adapter
-         * @param array $_POST['adapter_datas'] : Phone adapter datas
+         * Create a new phone.
+         *
+         * @param string $_POST['name']          : Phone name
+         * @param string $_POST['adapter']       : Phone adapter
+         * @param array  $_POST['adapter_datas'] : Phone adapter datas
          *
          * @return int : id phone the new phone on success
          */
         public function post_phone()
         {
             $return = self::DEFAULT_RETURN;
-            
+
             $name = $_POST['name'] ?? false;
             $adapter = $_POST['adapter'] ?? false;
             $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
@@ -331,7 +331,7 @@ namespace controllers\publics;
 
                 return $this->json($return);
             }
-            
+
             if (!$adapter)
             {
                 $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
@@ -409,7 +409,7 @@ namespace controllers\publics;
                         continue;
                     }
                 }
-                
+
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' field ' . $field['name'] . ' is not a valid phone number.';
                 $this->auto_http_code(false);
@@ -434,7 +434,7 @@ namespace controllers\publics;
             }
 
             $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_datas);
-            if ($phone_id === false)
+            if (false === $phone_id)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
                 $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
@@ -445,10 +445,10 @@ namespace controllers\publics;
 
             $return['response'] = $phone_id;
             $this->auto_http_code(true);
-            
+
             return $this->json($return);
         }
-        
+
         /**
          * Delete a phone.
          *

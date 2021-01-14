@@ -73,7 +73,7 @@ class Phone extends \descartes\Controller
     }
 
     /**
-     * Return phones as json with additionnals datas about callbacks
+     * Return phones as json with additionnals datas about callbacks.
      */
     public function list_json()
     {
