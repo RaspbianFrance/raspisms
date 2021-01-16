@@ -87,7 +87,7 @@ namespace controllers\publics;
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_CREDENTIALS'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_CREDENTIALS'];
-                $this->auto_http_code(false);
+                $this->set_http_code(401);
                 $this->json($return);
 
                 exit(self::ERROR_CODES['INVALID_CREDENTIALS']);
@@ -98,7 +98,7 @@ namespace controllers\publics;
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['SUSPENDED_USER'];
                 $return['message'] = self::ERROR_MESSAGES['SUSPENDED_USER'];
-                $this->auto_http_code(false);
+                $this->set_http_code(403);
                 $this->json($return);
 
                 exit(self::ERROR_CODES['SUSPENDED_USER']);
