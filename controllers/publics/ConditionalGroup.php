@@ -62,7 +62,7 @@ namespace controllers\publics;
         /**
          * Cette fonction va supprimer une liste de groups.
          *
-         * @param array int $_GET['ids'] : Les id des groups à supprimer
+         * @param array int $_GET['conditional_group_ids'] : Les id des groups à supprimer
          * @param mixed     $csrf
          *
          * @return boolean;
@@ -76,7 +76,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('ConditionalGroup', 'list'));
             }
 
-            $ids = $_GET['ids'] ?? [];
+            $ids = $_GET['conditional_group_ids'] ?? [];
             foreach ($ids as $id)
             {
                 $this->internal_conditional_group->delete_for_user($_SESSION['user']['id'], $id);
@@ -100,7 +100,7 @@ namespace controllers\publics;
          */
         public function edit()
         {
-            $ids = $_GET['ids'] ?? [];
+            $ids = $_GET['conditional_group_ids'] ?? [];
 
             $groups = $this->internal_conditional_group->gets_in_for_user($_SESSION['user']['id'], $ids);
 

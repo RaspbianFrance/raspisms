@@ -61,7 +61,7 @@ namespace controllers\publics;
         /**
          * Cette fonction va supprimer une liste de contacts.
          *
-         * @param array int $_GET['ids'] : Les id des contactes à supprimer
+         * @param array int $_GET['contact_ids'] : Les id des contactes à supprimer
          * @param mixed     $csrf
          *
          * @return boolean;
@@ -75,7 +75,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            $ids = $_GET['ids'] ?? [];
+            $ids = $_GET['contact_ids'] ?? [];
             foreach ($ids as $id)
             {
                 $this->internal_contact->delete_for_user($_SESSION['user']['id'], $id);
@@ -99,7 +99,7 @@ namespace controllers\publics;
          */
         public function edit()
         {
-            $ids = $_GET['ids'] ?? [];
+            $ids = $_GET['contact_ids'] ?? [];
             $id_user = $_SESSION['user']['id'];
 
             $contacts = $this->internal_contact->gets_in_for_user($id_user, $ids);
