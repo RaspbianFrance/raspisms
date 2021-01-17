@@ -96,13 +96,13 @@ namespace models;
          * Update a user using his is.
          *
          * @param int   $id    : User id
-         * @param array $datas : Datas to update
+         * @param array $data : Data to update
          *
          * @return int : number of modified rows
          */
-        public function update($id, $datas)
+        public function update($id, $data)
         {
-            return $this->_update('user', $datas, ['id' => $id]);
+            return $this->_update('user', $data, ['id' => $id]);
         }
 
         /**

@@ -66,12 +66,12 @@ class Webhook extends StandardController
             return false;
         }
 
-        $datas = [
+        $data = [
             'url' => $url,
             'type' => $type,
         ];
 
-        return $this->get_model()->update_for_user($id_user, $id, $datas);
+        return $this->get_model()->update_for_user($id_user, $id, $data);
     }
 
     /**
@@ -117,7 +117,7 @@ class Webhook extends StandardController
         {
             $message = [
                 'url' => $webhook['url'],
-                'datas' => [
+                'data' => [
                     'webhook_type' => $webhook['type'],
                     'id' => $sms['id'],
                     'at' => $sms['at'],

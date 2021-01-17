@@ -33,7 +33,7 @@ namespace controllers\internals;
             ];
 
             $internal_ruler = new Ruler();
-            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['data' => (object) null]]);
             if (!$valid_condition)
             {
                 return false;
@@ -69,7 +69,7 @@ namespace controllers\internals;
             ];
 
             $internal_ruler = new Ruler();
-            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null]]);
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['data' => (object) null]]);
             if (!$valid_condition)
             {
                 return false;
@@ -112,16 +112,16 @@ namespace controllers\internals;
 
             foreach ($contacts as $key => $contact)
             {
-                $contact['datas'] = json_decode($contact['datas']);
+                $contact['data'] = json_decode($contact['data']);
                 $contact = (object) $contact;
 
-                //Add metas of contact by adding contact without datas
+                //Add metas of contact by adding contact without data
                 $metas = clone $contact;
-                $metas->datas = null;
+                $metas->data = null;
                 $metas->id_user = null;
 
-                $datas = ['contact' => $contact->datas, 'contact_metas' => $metas];
-                $is_valid = $ruler->evaluate_condition($condition, $datas);
+                $data = ['contact' => $contact->data, 'contact_metas' => $metas];
+                $is_valid = $ruler->evaluate_condition($condition, $data);
                 if (!$is_valid)
                 {
                     unset($contacts[$key]);

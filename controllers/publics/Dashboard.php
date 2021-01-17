@@ -129,7 +129,7 @@ namespace controllers\publics;
                 'sendeds' => $sendeds,
                 'receiveds' => $receiveds,
                 'events' => $events,
-                'datas_area_chart' => json_encode($array_area_chart),
+                'data_area_chart' => json_encode($array_area_chart),
             ]);
         }
     }

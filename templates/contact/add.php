@@ -53,18 +53,18 @@
                                 </div>
 								<div class="form-group">
                                     <label>Données du contact</label>
-                                    <p class="italic small help" id="description-datas">
+                                    <p class="italic small help" id="description-data">
                                         Les données d'un contact vous permettent de l'enrichir afin de pouvoir accéder à ces données au sein d'un message via <a href="#">l'utilisation de templates.</a><br/>
                                         Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact. Utilisez uniquement des lettres, des chiffres et des underscore pour les noms de données, ni espace ni caractères spéciaux.
                                     </p>
-                                    <div class="contact-datas-container">
-                                        <?php foreach ($_SESSION['previous_http_post']['datas'] ?? [] as $key => $value) { ?>
+                                    <div class="contact-data-container">
+                                        <?php foreach ($_SESSION['previous_http_post']['data'] ?? [] as $key => $value) { ?>
                                             <?php if ($value == null) { continue; } ?>
                                             <div class="form-group">
                                             <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*" value="<?php $this->s($key) ?>">
                                                  : 
                                                 <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée" value="<?php $this->s($value) ?>">
-                                                <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>
+                                                <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>
                                             </div>
                                             
                                         <?php } ?>
@@ -101,14 +101,14 @@
         });
 
 
-        jQuery('.contact-datas-container').on('input', '.contact-data-value, .contact-data-name', function (e) 
+        jQuery('.contact-data-container').on('input', '.contact-data-value, .contact-data-name', function (e) 
         {
             var focus_group = jQuery(this).parent('.form-group');
             var focus_input = this;
             var input_name = focus_group.find('.contact-data-name');
             var input_value = focus_group.find('.contact-data-value');
 
-            jQuery('.contact-datas-container .form-group').each(function (e) 
+            jQuery('.contact-data-container .form-group').each(function (e) 
             {
                 var current_input_name = jQuery(this).find('.contact-data-name');
                 var current_input_value = jQuery(this).find('.contact-data-value');
@@ -136,15 +136,15 @@
                     '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
                     ' : ' +
                     '<input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">' +
-                    ' <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>' +
+                    ' <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>' +
                 '</div>';
-            jQuery('.contact-datas-container').append(template);
+            jQuery('.contact-data-container').append(template);
         });
 
-        jQuery('.contact-datas-container').on('click', '.contact-datas-remove', function (e)
+        jQuery('.contact-data-container').on('click', '.contact-data-remove', function (e)
         {
             e.preventDefault();
-            if (jQuery('.contact-datas-container .form-group').length > 1)
+            if (jQuery('.contact-data-container .form-group').length > 1)
             {
                 jQuery(this).parent('.form-group').remove();
             }
@@ -156,11 +156,11 @@
         {
             e.preventDefault();
 
-            jQuery('.contact-datas-container .form-group').each(function ()
+            jQuery('.contact-data-container .form-group').each(function ()
             {
                 var name = jQuery(this).find('.contact-data-name').val();
                 name = name.replace(/\W/g, '');
-                name = 'datas[' + name + ']';
+                name = 'data[' + name + ']';
                 jQuery(this).find('.contact-data-value').attr('name', name);
             });
 

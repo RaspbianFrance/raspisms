@@ -19,9 +19,9 @@ use Twilio\Rest\Client;
 class TwilioVirtualNumberAdapter implements AdapterInterface
 {
     /**
-     * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
+     * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
      */
-    private $datas;
+    private $data;
 
     /**
      * Twilio Api client.
@@ -42,19 +42,19 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
      * Adapter constructor, called when instanciated by RaspiSMS.
      *
      * @param string      $number : Phone number the adapter is used for
-     * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
+     * @param json string $data  : JSON string of the data to configure interaction with the implemented service
      */
-    public function __construct(string $datas)
+    public function __construct(string $data)
     {
-        $this->datas = json_decode($datas, true);
+        $this->data = json_decode($data, true);
 
         $this->client = new Client(
-            $this->datas['account_sid'],
-            $this->datas['auth_token']
+            $this->data['account_sid'],
+            $this->data['auth_token']
         );
 
-        $this->number = $this->datas['number'];
-        $this->status_change_callback = $this->datas['status_change_callback'];
+        $this->number = $this->data['number'];
+        $this->status_change_callback = $this->data['status_change_callback'];
     }
 
     /**
@@ -98,11 +98,11 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
     }
 
     /**
-     * List of entries we want in datas for the adapter.
+     * List of entries we want in data for the adapter.
      *
      * @return array : Every line is a field as an array with keys : name, title, description, required
      */
-    public static function meta_datas_fields(): array
+    public static function meta_data_fields(): array
     {
         return [
             [

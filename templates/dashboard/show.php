@@ -244,7 +244,7 @@
 			element: 'morris-area-chart',
 			behaveLikeLine: true,
 			fillOpacity: 0.4,
-			data: <?php echo $datas_area_chart;?>,
+			data: <?php echo $data_area_chart;?>,
             xkey: 'period',
             parseTime: false,
 			ykeys: ['sendeds', 'receiveds'],

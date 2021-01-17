@@ -66,18 +66,18 @@ namespace controllers\publics;
                 return false;
             }
 
-            $contact['datas'] = json_decode($contact['datas'], true);
+            $contact['data'] = json_decode($contact['data'], true);
 
-            //Add metas of contact by adding contact without datas
+            //Add metas of contact by adding contact without data
             $metas = $contact;
-            unset($metas['datas'], $metas['id_user']);
+            unset($metas['data'], $metas['id_user']);
 
-            $datas = [
-                'contact' => $contact['datas'],
+            $data = [
+                'contact' => $contact['data'],
                 'contact_metas' => $metas,
             ];
 
-            $result = $this->internal_templating->render($template, $datas);
+            $result = $this->internal_templating->render($template, $data);
             $return = $result;
             if (!trim($result['result']))
             {

@@ -39,12 +39,12 @@ namespace controllers\internals;
                 return false;
             }
 
-            $datas = [
+            $data = [
                 'id_scheduled' => $id_scheduled,
                 'path' => $result_upload_media['content'],
             ];
 
-            return (bool) $this->get_model()->insert($datas);
+            return (bool) $this->get_model()->insert($data);
         }
 
         /**

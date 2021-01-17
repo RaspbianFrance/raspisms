@@ -154,7 +154,7 @@ namespace models;
          *
          * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $datas   : datas to update
+         * @param array $data   : data to update
          *
          * @return int : number of modified rows
          */
@@ -167,7 +167,7 @@ namespace models;
          * Update a entry by his id.
          *
          * @param int   $id    : Entry id
-         * @param array $datas : datas to update
+         * @param array $data : data to update
          *
          * @return int : number of modified rows
          */

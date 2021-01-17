@@ -59,13 +59,13 @@ namespace controllers\internals;
          */
         public function update_for_user(int $id_user, int $id, string $name, string $script, bool $admin)
         {
-            $datas = [
+            $data = [
                 'name' => $name,
                 'script' => $script,
                 'admin' => $admin,
             ];
 
-            return $this->get_model()->update_for_user($id_user, $id, $datas);
+            return $this->get_model()->update_for_user($id_user, $id, $data);
         }
 
         /**

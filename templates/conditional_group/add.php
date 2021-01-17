@@ -90,16 +90,16 @@ jQuery(document).ready(function()
         e.preventDefault();
         var condition = jQuery(this).parents('.form-group').find('input').val();
 
-        var datas = {
+        var data = {
             'condition' : condition,
         };
 
         jQuery.ajax({
             type: "POST",
             url: HTTP_PWD + '/conditional_group/preview/',
-            data: datas,
-            success: function (datas) {
-                jQuery('#preview-text-modal').find('.modal-body pre').text(datas.result);
+            data: data,
+            success: function (data) {
+                jQuery('#preview-text-modal').find('.modal-body pre').text(data.result);
                 jQuery('#preview-text-modal').modal({'keyboard': true});
             },
             dataType: 'json'

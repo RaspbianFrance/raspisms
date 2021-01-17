@@ -100,13 +100,13 @@ class Mailer extends \descartes\Controller
      *
      * @param string $destination : email address to send email to
      * @param array  $settings    : Email settings
-     * @param array  $datas       : Datas to inject into email template
+     * @param array  $data       : Data to inject into email template
      *
      * @return bool : true on success, false on error
      */
-    public function enqueue(string $destination, array $settings, array $datas): bool
+    public function enqueue(string $destination, array $settings, array $data): bool
     {
-        $response = $this->generate_body($settings, $datas);
+        $response = $this->generate_body($settings, $data);
 
         $message = [
             'destinations' => [$destination],
@@ -131,18 +131,18 @@ class Mailer extends \descartes\Controller
      *                        string 'template' => Email template to use
      *                        ?string 'alt_template' => Template to use for alt message, if null ignore
      *                        ]
-     * @param array : Datas to inject into email template
+     * @param array : Data to inject into email template
      *
      * @return array [
      *               string 'body' => email body
      *               ?string 'alt_body' => email alternative body if needed
      *               ]
      */
-    private function generate_body(array $settings, array $datas): array
+    private function generate_body(array $settings, array $data): array
     {
         //Generate body of email
         ob_start();
-        $this->render($settings['template'], $datas);
+        $this->render($settings['template'], $data);
         $body = ob_get_clean();
 
         //Generate alt body if needed
@@ -150,7 +150,7 @@ class Mailer extends \descartes\Controller
         if ($settings['alt_template'] ?? false)
         {
             ob_start();
-            $this->render($settings['alt_template'], $datas);
+            $this->render($settings['alt_template'], $data);
             $alt_body = ob_get_clean();
         }
 

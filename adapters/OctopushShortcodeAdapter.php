@@ -22,9 +22,9 @@ class OctopushShortcodeAdapter implements AdapterInterface
     const SMS_TYPE_INTERNATIONAL = 'WWW';
 
     /**
-     * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
+     * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
      */
-    private $datas;
+    private $data;
 
     /**
      * Octopush login.
@@ -50,15 +50,15 @@ class OctopushShortcodeAdapter implements AdapterInterface
      * Adapter constructor, called when instanciated by RaspiSMS.
      *
      * @param string      $number : Phone number the adapter is used for
-     * @param json string $datas  : JSON string of the datas to configure interaction with the implemented service
+     * @param json string $data  : JSON string of the data to configure interaction with the implemented service
      */
-    public function __construct(string $datas)
+    public function __construct(string $data)
     {
-        $this->datas = json_decode($datas, true);
+        $this->data = json_decode($data, true);
 
-        $this->login = $this->datas['login'];
-        $this->api_key = $this->datas['api_key'];
-        $this->sender = $this->datas['sender'] ?? null;
+        $this->login = $this->data['login'];
+        $this->api_key = $this->data['api_key'];
+        $this->sender = $this->data['sender'] ?? null;
     }
 
     /**
@@ -102,11 +102,11 @@ class OctopushShortcodeAdapter implements AdapterInterface
     }
 
     /**
-     * List of entries we want in datas for the adapter.
+     * List of entries we want in data for the adapter.
      *
      * @return array : Every line is a field as an array with keys : name, title, description, required
      */
-    public static function meta_datas_fields(): array
+    public static function meta_data_fields(): array
     {
         return [
             [
@@ -187,7 +187,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
 
         try
         {
-            $datas = [
+            $data = [
                 'user_login' => $this->login,
                 'api_key' => $this->api_key,
                 'sms_text' => $text,
@@ -198,7 +198,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
 
             if (null !== $this->sender)
             {
-                $datas['sms_sender'] = $this->sender;
+                $data['sms_sender'] = $this->sender;
             }
 
             $endpoint = $this->api_url . '/sms/json';
@@ -208,7 +208,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             $response = curl_exec($curl);
             curl_close($curl);
 
@@ -285,12 +285,12 @@ class OctopushShortcodeAdapter implements AdapterInterface
         {
             $success = true;
 
-            if ($this->datas['sender'] && (mb_strlen($this->datas['sender']) < 3 || mb_strlen($this->datas['sender'] > 11)))
+            if ($this->data['sender'] && (mb_strlen($this->data['sender']) < 3 || mb_strlen($this->data['sender'] > 11)))
             {
                 return false;
             }
 
-            $datas = [
+            $data = [
                 'user_login' => $this->login,
                 'api_key' => $this->api_key,
             ];
@@ -302,7 +302,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             $response = curl_exec($curl);
             curl_close($curl);
 

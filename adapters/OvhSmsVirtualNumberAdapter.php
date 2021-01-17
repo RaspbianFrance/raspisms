@@ -19,9 +19,9 @@ namespace adapters;
     class OvhSmsVirtualNumberAdapter implements AdapterInterface
     {
         /**
-         * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
+         * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
-        private $datas;
+        private $data;
 
         /**
          * OVH Api instance.
@@ -41,20 +41,20 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $data : JSON string of the data to configure interaction with the implemented service
          */
-        public function __construct(string $datas)
+        public function __construct(string $data)
         {
-            $this->datas = json_decode($datas, true);
+            $this->data = json_decode($data, true);
 
             $this->api = new Api(
-                $this->datas['app_key'],
-                $this->datas['app_secret'],
+                $this->data['app_key'],
+                $this->data['app_secret'],
                 'ovh-eu',
-                $this->datas['consumer_key']
+                $this->data['consumer_key']
             );
 
-            $this->number = $this->datas['number'];
+            $this->number = $this->data['number'];
             $this->formatted_number = str_replace('+', '00', $this->number);
         }
 
@@ -99,11 +99,11 @@ namespace adapters;
         }
 
         /**
-         * List of entries we want in datas for the adapter.
+         * List of entries we want in data for the adapter.
          *
          * @return array : Every line is a field as an array with keys : name, title, description, required
          */
-        public static function meta_datas_fields(): array
+        public static function meta_data_fields(): array
         {
             return [
                 [
@@ -197,7 +197,7 @@ namespace adapters;
             {
                 $success = true;
 
-                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/jobs';
+                $endpoint = '/sms/' . $this->data['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/jobs';
                 $params = [
                     'message' => $text,
                     'receivers' => [$destination],
@@ -255,7 +255,7 @@ namespace adapters;
 
             try
             {
-                $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
+                $endpoint = '/sms/' . $this->data['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming';
                 $uids = $this->api->get($endpoint);
 
                 if (!\is_array($uids) || !$uids)
@@ -265,7 +265,7 @@ namespace adapters;
 
                 foreach ($uids as $uid)
                 {
-                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
+                    $endpoint = '/sms/' . $this->data['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
                     $sms_details = $this->api->get($endpoint);
 
                     if (!isset($sms_details['creationDatetime'], $sms_details['message'], $sms_details['sender']))
@@ -280,7 +280,7 @@ namespace adapters;
                     ];
 
                     //Remove the sms to prevent double reading as ovh do not offer a filter for unread messages only
-                    $endpoint = '/sms/' . $this->datas['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
+                    $endpoint = '/sms/' . $this->data['service_name'] . '/virtualNumbers/' . $this->formatted_number . '/incoming/' . $uid;
                     $this->api->delete($endpoint);
                 }
 
@@ -309,7 +309,7 @@ namespace adapters;
                 $success = true;
 
                 //Check service name
-                $endpoint = '/sms/' . $this->datas['service_name'];
+                $endpoint = '/sms/' . $this->data['service_name'];
                 $response = $this->api->get($endpoint);
                 $success = $success && (bool) $response;
 

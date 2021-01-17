@@ -57,11 +57,11 @@ namespace controllers\internals;
          * Render a string as a twig template.
          *
          * @param string $template : Template string
-         * @param array  $datas    : Datas to pass to the template
+         * @param array  $data    : Data to pass to the template
          *
          * @return array : keys, success, error, result
          */
-        public function render(string $template, array $datas = [])
+        public function render(string $template, array $data = [])
         {
             try
             {
@@ -80,7 +80,7 @@ namespace controllers\internals;
                 ]);
 
                 $twig->addExtension($this->sandbox);
-                $result = $twig->render('template', $datas);
+                $result = $twig->render('template', $data);
 
                 return [
                     'success' => true,

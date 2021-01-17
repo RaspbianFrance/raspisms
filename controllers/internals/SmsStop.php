@@ -44,11 +44,11 @@ namespace controllers\internals;
          */
         public function update_for_user(int $id_user, int $id_smsstop, string $number)
         {
-            $datas = [
+            $data = [
                 'number' => $number,
             ];
 
-            return $this->get_model()->update_for_user($id_user, $id_smsstop, $datas);
+            return $this->get_model()->update_for_user($id_user, $id_smsstop, $data);
         }
 
         /**

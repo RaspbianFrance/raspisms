@@ -59,17 +59,17 @@ namespace controllers\internals;
          * @param int    $id_user : User id
          * @param string $number  : Contact number
          * @param string $name    : Contact name
-         * @param string $datas   : Contact datas
+         * @param string $data   : Contact data
          *
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
-        public function create($id_user, $number, $name, $datas)
+        public function create($id_user, $number, $name, $data)
         {
             $contact = [
                 'id_user' => $id_user,
                 'number' => $number,
                 'name' => $name,
-                'datas' => $datas,
+                'data' => $data,
             ];
 
             $result = $this->get_model()->insert($contact);
@@ -91,16 +91,16 @@ namespace controllers\internals;
          * @param int     $id      : Contact id
          * @param string  $number  : Contact number
          * @param string  $name    : Contact name
-         * @param ?string $datas   : Contact datas
+         * @param ?string $data   : Contact data
          *
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, int $id, string $number, string $name, string $datas)
+        public function update_for_user(int $id_user, int $id, string $number, string $name, string $data)
         {
             $contact = [
                 'number' => $number,
                 'name' => $name,
-                'datas' => $datas,
+                'data' => $data,
             ];
 
             return $this->get_model()->update_for_user($id_user, $id, $contact);
@@ -144,7 +144,7 @@ namespace controllers\internals;
                     continue;
                 }
 
-                $datas = [];
+                $data = [];
                 $i = 0;
                 foreach ($line as $key => $value)
                 {
@@ -160,13 +160,13 @@ namespace controllers\internals;
                     }
 
                     $key = mb_ereg_replace('[\W]', '', $key);
-                    $datas[$key] = $value;
+                    $data[$key] = $value;
                 }
-                $datas = json_encode($datas);
+                $data = json_encode($data);
 
                 try
                 {
-                    $success = $this->create($id_user, $line[array_keys($line)[1]], $line[array_keys($line)[0]], $datas);
+                    $success = $this->create($id_user, $line[array_keys($line)[1]], $line[array_keys($line)[0]], $data);
                     if ($success)
                     {
                         ++$nb_insert;
@@ -224,12 +224,12 @@ namespace controllers\internals;
                         continue;
                     }
 
-                    $datas = $contact['datas'] ?? [];
-                    $datas = json_encode($datas);
+                    $data = $contact['data'] ?? [];
+                    $data = json_encode($data);
 
                     try
                     {
-                        $success = $this->create($id_user, $contact['number'], $contact['name'], $datas);
+                        $success = $this->create($id_user, $contact['number'], $contact['name'], $data);
                         if ($success)
                         {
                             ++$nb_insert;
@@ -264,8 +264,8 @@ namespace controllers\internals;
 
             foreach ($contacts as $contact)
             {
-                $datas = json_decode($contact['datas'], true);
-                foreach ($datas as $key => $value)
+                $data = json_decode($contact['data'], true);
+                foreach ($data as $key => $value)
                 {
                     $columns[] = $key;
                 }
@@ -275,14 +275,14 @@ namespace controllers\internals;
             $lines = [];
             foreach ($contacts as $contact)
             {
-                $datas = json_decode($contact['datas'], true);
+                $data = json_decode($contact['data'], true);
 
                 $line = [$contact['name'], $contact['number']];
                 foreach ($columns as $column)
                 {
-                    if (isset($datas[$column]))
+                    if (isset($data[$column]))
                     {
-                        $line[] = $datas[$column];
+                        $line[] = $data[$column];
 
                         continue;
                     }
@@ -327,7 +327,7 @@ namespace controllers\internals;
             {
                 unset($contact['id'], $contact['id_user']);
 
-                $contact['datas'] = json_decode($contact['datas']);
+                $contact['data'] = json_decode($contact['data']);
             }
             $content = json_encode($contacts);
 

@@ -21,9 +21,9 @@ namespace adapters;
     class BenchmarkAdapter implements AdapterInterface
     {
         /**
-         * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
+         * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
-        private $datas;
+        private $data;
 
         /**
          * API URL.
@@ -33,11 +33,11 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $data : JSON string of the data to configure interaction with the implemented service
          */
-        public function __construct(string $datas)
+        public function __construct(string $data)
         {
-            $this->datas = $datas;
+            $this->data = $data;
         }
 
         /**
@@ -76,11 +76,11 @@ namespace adapters;
         }
 
         /**
-         * List of entries we want in datas for the adapter.
+         * List of entries we want in data for the adapter.
          *
          * @return array : Eachline line is a field as an array with keys : name, title, description, required
          */
-        public static function meta_datas_fields(): array
+        public static function meta_data_fields(): array
         {
             return [];
         }
@@ -140,7 +140,7 @@ namespace adapters;
 
             try
             {
-                $datas = [
+                $data = [
                     'sms_text' => $text,
                     'sms_destination' => $destination,
                     'sms_flash' => $flash,
@@ -153,7 +153,7 @@ namespace adapters;
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
                 curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($datas));
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 $curl_response = curl_exec($curl);
                 curl_close($curl);
 

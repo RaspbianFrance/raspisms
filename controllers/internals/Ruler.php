@@ -35,15 +35,15 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
          * Verify if a condition is valid. i.e we can evaluate it without error.
          *
          * @param string $condition : The condition to evaluate
-         * @param array  $datas     : The datas to made available to condition
+         * @param array  $data     : The data to made available to condition
          *
          * @return bool : false if invalid, true else
          */
-        public function validate_condition(string $condition, array $datas = []): bool
+        public function validate_condition(string $condition, array $data = []): bool
         {
             try
             {
-                $this->expression_language->parse($condition, array_keys($datas));
+                $this->expression_language->parse($condition, array_keys($data));
 
                 return true;
             }
@@ -61,15 +61,15 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
          * Evaluate a condition.
          *
          * @param string $condition : The condition to evaluate
-         * @param array  $datas     : The datas to made available to condition
+         * @param array  $data     : The data to made available to condition
          *
          * @return ?bool : false if invalid, true else, null only on error
          */
-        public function evaluate_condition(string $condition, array $datas = []): ?bool
+        public function evaluate_condition(string $condition, array $data = []): ?bool
         {
             try
             {
-                $result = $this->expression_language->evaluate($condition, $datas);
+                $result = $this->expression_language->evaluate($condition, $data);
 
                 return (bool) $result;
             }

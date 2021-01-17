@@ -57,7 +57,7 @@
                                             <option 
                                                 value="<?= $adapter['meta_classname'] ?>"
                                                 data-description="<?php $this->s($adapter['meta_description']); ?>"
-                                                data-datas-fields="<?php $this->s(json_encode($adapter['meta_datas_fields'])); ?>"
+                                                data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
                                                 <?= ($_SESSION['previous_http_post']['adapter'] ?? '') == $adapter['meta_classname'] ? 'selected' : ''  ?>
                                             >
                                                 <?php $this->s($adapter['meta_name']); ?>
@@ -65,15 +65,15 @@
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <div id="adapter-datas-container" class="form-group">
-                                    <div id="adapter-datas-description-container">
+                                <div id="adapter-data-container" class="form-group">
+                                    <div id="adapter-data-description-container">
                                         <h4>Description de l'adaptateur</h4>
-                                        <div id="adapter-datas-description"></div>
+                                        <div id="adapter-data-description"></div>
                                     </div>
                                     
                                     <div id="adapter-data-fields-container">
                                         <h4>Réglages de l'adaptateur</h4>
-                                        <div id="adapter-datas-fields"></div>
+                                        <div id="adapter-data-fields"></div>
                                     </div>
                                 </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
@@ -91,17 +91,17 @@
     function change_adapter ()
     {
         var option = jQuery('#adapter-select').find('option:selected');
-        jQuery('#adapter-datas-description').html(option.attr('data-description'));
-        jQuery('#description-adapter-datas').text(option.attr('data-datas-help'));
+        jQuery('#adapter-data-description').html(option.attr('data-description'));
+        jQuery('#description-adapter-data').text(option.attr('data-data-help'));
     
-        var datas_fields = option.attr('data-datas-fields');
-        datas_fields = JSON.parse(datas_fields);
+        var data_fields = option.attr('data-data-fields');
+        data_fields = JSON.parse(data_fields);
 
 
         var numbers = [];
 
         var html = '';
-        jQuery.each(datas_fields, function (index, field)
+        jQuery.each(data_fields, function (index, field)
         {
             if (!field.number)
             {
@@ -109,7 +109,7 @@
                             '<label>' + field.title + '</label>' +
                             '<p class="italic small help">' + field.description + '</p>' +
                             '<div class="form-group">' + 
-                                '<input name="adapter_datas[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') +  '>' +
+                                '<input name="adapter_data[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') +  '>' +
                             '</div>' +
                         '</div>';
             }
@@ -139,12 +139,12 @@
             html = 'Pas de réglages.';
         }
 
-        jQuery('#adapter-datas-fields').html(html);
+        jQuery('#adapter-data-fields').html(html);
         
         for (i = 0; i < numbers.length; i++)
         {
             var iti_number_input = window.intlTelInput(document.getElementById(numbers[i].id), {
-                hiddenInput: 'adapter_datas[' + numbers[i].name + ']',
+                hiddenInput: 'adapter_data[' + numbers[i].name + ']',
                 defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
                 preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
                 nationalMode: true,

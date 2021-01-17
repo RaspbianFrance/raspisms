@@ -188,16 +188,16 @@ namespace models;
          *
          * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $datas   : datas to update
+         * @param array $data   : data to update
          *
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, int $id, array $datas)
+        public function update_for_user(int $id_user, int $id, array $data)
         {
             $params = [];
             $sets = [];
 
-            foreach ($datas as $label => $value)
+            foreach ($data as $label => $value)
             {
                 $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
                 $params['set_' . $label] = $value;

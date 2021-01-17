@@ -311,7 +311,7 @@ namespace controllers\publics;
          *
          * @param string $_POST['name']          : Phone name
          * @param string $_POST['adapter']       : Phone adapter
-         * @param array  $_POST['adapter_datas'] : Phone adapter datas
+         * @param array  $_POST['adapter_data'] : Phone adapter data
          *
          * @return int : id phone the new phone on success
          */
@@ -321,7 +321,7 @@ namespace controllers\publics;
 
             $name = $_POST['name'] ?? false;
             $adapter = $_POST['adapter'] ?? false;
-            $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
+            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
 
             if (!$name)
             {
@@ -373,14 +373,14 @@ namespace controllers\publics;
             }
 
             //If missing required data fields, error
-            foreach ($find_adapter['meta_datas_fields'] as $field)
+            foreach ($find_adapter['meta_data_fields'] as $field)
             {
                 if (false === $field['required'])
                 {
                     continue;
                 }
 
-                if (!empty($adapter_datas[$field['name']]))
+                if (!empty($adapter_data[$field['name']]))
                 {
                     continue;
                 }
@@ -393,18 +393,18 @@ namespace controllers\publics;
             }
 
             //If field phone number is invalid
-            foreach ($find_adapter['meta_datas_fields'] as $field)
+            foreach ($find_adapter['meta_data_fields'] as $field)
             {
                 if (false === ($field['number'] ?? false))
                 {
                     continue;
                 }
 
-                if (!empty($adapter_datas[$field['name']]))
+                if (!empty($adapter_data[$field['name']]))
                 {
-                    $adapter_datas[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_datas[$field['name']]);
+                    $adapter_data[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_data[$field['name']]);
 
-                    if ($adapter_datas[$field['name']])
+                    if ($adapter_data[$field['name']])
                     {
                         continue;
                     }
@@ -417,11 +417,11 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $adapter_datas = json_encode($adapter_datas);
+            $adapter_data = json_encode($adapter_data);
 
-            //Check adapter is working correctly with thoses names and datas
+            //Check adapter is working correctly with thoses names and data
             $adapter_classname = $find_adapter['meta_classname'];
-            $adapter_instance = new $adapter_classname($adapter_datas);
+            $adapter_instance = new $adapter_classname($adapter_data);
             $adapter_working = $adapter_instance->test();
 
             if (!$adapter_working)
@@ -433,7 +433,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_datas);
+            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_data);
             if (false === $phone_id)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];

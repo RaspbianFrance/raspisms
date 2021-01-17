@@ -73,7 +73,7 @@ class Phone extends \descartes\Controller
     }
 
     /**
-     * Return phones as json with additionnals datas about callbacks.
+     * Return phones as json with additionnals data about callbacks.
      */
     public function list_json()
     {
@@ -159,7 +159,7 @@ class Phone extends \descartes\Controller
      * @param $csrf : CSRF token
      * @param string $_POST['name']          : Phone name
      * @param string $_POST['adapter']       : Phone adapter
-     * @param array  $_POST['adapter_datas'] : Phone adapter datas
+     * @param array  $_POST['adapter_data'] : Phone adapter data
      */
     public function create($csrf)
     {
@@ -173,7 +173,7 @@ class Phone extends \descartes\Controller
         $id_user = $_SESSION['user']['id'];
         $name = $_POST['name'] ?? false;
         $adapter = $_POST['adapter'] ?? false;
-        $adapter_datas = !empty($_POST['adapter_datas']) ? $_POST['adapter_datas'] : [];
+        $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
 
         if (!$name || !$adapter)
         {
@@ -210,14 +210,14 @@ class Phone extends \descartes\Controller
         }
 
         //If missing required data fields, error
-        foreach ($find_adapter['meta_datas_fields'] as $field)
+        foreach ($find_adapter['meta_data_fields'] as $field)
         {
             if (false === $field['required'])
             {
                 continue;
             }
 
-            if (!empty($adapter_datas[$field['name']]))
+            if (!empty($adapter_data[$field['name']]))
             {
                 continue;
             }
@@ -228,18 +228,18 @@ class Phone extends \descartes\Controller
         }
 
         //If field phone number is invalid
-        foreach ($find_adapter['meta_datas_fields'] as $field)
+        foreach ($find_adapter['meta_data_fields'] as $field)
         {
             if (false === ($field['number'] ?? false))
             {
                 continue;
             }
 
-            if (!empty($adapter_datas[$field['name']]))
+            if (!empty($adapter_data[$field['name']]))
             {
-                $adapter_datas[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_datas[$field['name']]);
+                $adapter_data[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_data[$field['name']]);
 
-                if ($adapter_datas[$field['name']])
+                if ($adapter_data[$field['name']])
                 {
                     continue;
                 }
@@ -250,11 +250,11 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $adapter_datas = json_encode($adapter_datas);
+        $adapter_data = json_encode($adapter_data);
 
-        //Check adapter is working correctly with thoses names and datas
+        //Check adapter is working correctly with thoses names and data
         $adapter_classname = $find_adapter['meta_classname'];
-        $adapter_instance = new $adapter_classname($adapter_datas);
+        $adapter_instance = new $adapter_classname($adapter_data);
         $adapter_working = $adapter_instance->test();
 
         if (!$adapter_working)
@@ -264,7 +264,7 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_datas);
+        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_data);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');

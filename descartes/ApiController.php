@@ -91,21 +91,21 @@
 	
 		/**
 		 * Cette fonction permet de faire un retour sous forme de json
-		 * @param array $datas : Les données à retourner sous forme de json
+		 * @param array $data : Les données à retourner sous forme de json
 		 * @param boolean $secure : Défini si l'affichage doit être sécurisé contre les XSS, par défaut true
 		 * @return ApiController : On retourne l'API controlleur lui meme pour pouvoir chainer
 		 */
-		public function json ($datas, $secure = true)
+		public function json ($data, $secure = true)
 		{
 			header('Content-Type: application/json');
 			
 			if ($secure)
 			{
-				echo htmlspecialchars(json_encode($datas), ENT_NOQUOTES);
+				echo htmlspecialchars(json_encode($data), ENT_NOQUOTES);
 			}
 			else
 			{
-				echo json_encode($datas);
+				echo json_encode($data);
 			}
 
 			return $this;

@@ -82,7 +82,7 @@ class Phone extends AbstractDaemon
 
         //Instanciate adapter
         $adapter_class = $this->phone['adapter'];
-        $this->adapter = new $adapter_class($this->phone['adapter_datas']);
+        $this->adapter = new $adapter_class($this->phone['adapter_data']);
 
         $this->logger->info('Starting Phone daemon with pid ' . getmypid());
     }

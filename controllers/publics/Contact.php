@@ -111,9 +111,9 @@ namespace controllers\publics;
 
             foreach ($contacts as &$contact)
             {
-                if ($contact['datas'])
+                if ($contact['data'])
                 {
-                    $contact['datas'] = json_decode($contact['datas']);
+                    $contact['data'] = json_decode($contact['data']);
                 }
             }
 
@@ -141,7 +141,7 @@ namespace controllers\publics;
             $name = $_POST['name'] ?? false;
             $number = $_POST['number'] ?? false;
             $id_user = $_SESSION['user']['id'];
-            $datas = $_POST['datas'] ?? [];
+            $data = $_POST['data'] ?? [];
 
             if (!$name || !$number)
             {
@@ -158,8 +158,8 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'add'));
             }
 
-            $clean_datas = [];
-            foreach ($datas as $key => $value)
+            $clean_data = [];
+            foreach ($data as $key => $value)
             {
                 if ('' === $value)
                 {
@@ -167,12 +167,12 @@ namespace controllers\publics;
                 }
 
                 $key = mb_ereg_replace('[\W]', '', $key);
-                $clean_datas[$key] = (string) $value;
+                $clean_data[$key] = (string) $value;
             }
 
-            $clean_datas = json_encode($clean_datas);
+            $clean_data = json_encode($clean_data);
 
-            if (!$this->internal_contact->create($id_user, $number, $name, $clean_datas))
+            if (!$this->internal_contact->create($id_user, $number, $name, $clean_data))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce contact.');
 
@@ -212,7 +212,7 @@ namespace controllers\publics;
                 $name = $contact['name'] ?? false;
                 $number = $contact['number'] ?? false;
                 $id_user = $_SESSION['user']['id'];
-                $datas = $contact['datas'] ?? [];
+                $data = $contact['data'] ?? [];
 
                 if (!$name || !$number)
                 {
@@ -225,8 +225,8 @@ namespace controllers\publics;
                     continue;
                 }
 
-                $clean_datas = [];
-                foreach ($datas as $key => $value)
+                $clean_data = [];
+                foreach ($data as $key => $value)
                 {
                     if ('' === $value)
                     {
@@ -234,11 +234,11 @@ namespace controllers\publics;
                     }
 
                     $key = mb_ereg_replace('[\W]', '', $key);
-                    $clean_datas[$key] = (string) $value;
+                    $clean_data[$key] = (string) $value;
                 }
-                $clean_datas = json_encode($clean_datas);
+                $clean_data = json_encode($clean_data);
 
-                $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_datas);
+                $nb_contacts_update += (int) $this->internal_contact->update_for_user($id_user, $id_contact, $number, $name, $clean_data);
             }
 
             if ($nb_contacts_update !== \count($_POST['contacts']))

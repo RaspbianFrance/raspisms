@@ -23,9 +23,9 @@ namespace adapters;
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $data : JSON string of the data to configure interaction with the implemented service
          */
-        public function __construct(string $datas);
+        public function __construct(string $data);
 
         /**
          * Classname of the adapter.
@@ -51,11 +51,11 @@ namespace adapters;
         public static function meta_description(): string;
 
         /**
-         * List of entries we want in datas for the adapter.
+         * List of entries we want in data for the adapter.
          *
          * @return array : Eachline line is a field as an array with keys : name, title, description, required
          */
-        public static function meta_datas_fields(): array;
+        public static function meta_data_fields(): array;
 
         /**
          * Does the implemented service support flash smss.

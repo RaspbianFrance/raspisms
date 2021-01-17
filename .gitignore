@@ -8,7 +8,7 @@ composer.lock
 env.*
 phinx.*
 
-datas/test_write_sms.json
-datas/test_read_sms.json
+data/test_write_sms.json
+data/test_read_sms.json
 
 !*.dist

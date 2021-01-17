@@ -333,29 +333,29 @@ footer img
     display: inline-block !important;
 }
 
-.contact-datas-container input
+.contact-data-container input
 {
     display: inline-block;
 }
 
-.contact-datas-container .contact-data-name
+.contact-data-container .contact-data-name
 {
     width: 25%;
 }
 
-.contact-datas-container .contact-data-value
+.contact-data-container .contact-data-value
 {
     width: 50%;
 }
 
-.contact-datas-container .contact-datas-remove
+.contact-data-container .contact-data-remove
 {
     color: #c9302c;
 }
 
 
 /* PHONE */
-#adapter-datas-container
+#adapter-data-container
 {
     margin-top: 35px;
 }
@@ -365,7 +365,7 @@ footer img
     margin-top: 20px;
 }
 
-#adapter-datas-fields
+#adapter-data-fields
 {
     padding-top: 15px;
     padding-left: 15px;

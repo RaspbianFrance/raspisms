@@ -55,31 +55,31 @@
 									</div>
                                     <div class="form-group">
                                         <label>Données du contact</label>
-                                        <p class="italic small help" id="description-datas">
+                                        <p class="italic small help" id="description-data">
                                             Les données d'un contact vous permettent de l'enrichir afin de pouvoir accéder à ces données au sein d'un message via <a href="#">l'utilisation de templates.</a><br/>
                                             Laissez vide si vous ne souhaitez pas renseigner d'informations supplémentaires pour le contact. Utilisez uniquement des lettres, des chiffres et des underscore pour les noms de données, ni espace ni caractères spéciaux.
                                         </p>
-                                        <div class="contact-datas-container" data-id-contact="<?php $this->s($contact['id']); ?>">
-                                            <?php if (!$contact['datas']) { ?>
+                                        <div class="contact-data-container" data-id-contact="<?php $this->s($contact['id']); ?>">
+                                            <?php if (!$contact['data']) { ?>
                                                 <div class="form-group">
                                                     <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
                                                      : 
                                                     <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">
                                                 </div>
                                             <?php } else {?>
-                                                <?php foreach ($contact['datas'] as $name => $data) { ?>
+                                                <?php foreach ($contact['data'] as $name => $data) { ?>
                                                     <div class="form-group">
                                                         <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*" value="<?php $this->s($name); ?>">
                                                          : 
                                                         <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée" value="<?php $this->s($data); ?>">
-                                                        <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>
+                                                        <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>
                                                     </div>
                                                 <?php } ?>
                                                 <div class="form-group">
                                                     <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
                                                      : 
                                                     <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">
-                                                    <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>
+                                                    <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>
                                                 </div>
                                             <?php } ?>
                                         </div>
@@ -116,16 +116,16 @@
         });
         
         
-        jQuery('.contact-datas-container').on('input', '.contact-data-value, .contact-data-name', function (e) 
+        jQuery('.contact-data-container').on('input', '.contact-data-value, .contact-data-name', function (e) 
         {
             var focus_group = jQuery(this).parent('.form-group');
             var focus_input = this;
             var input_name = focus_group.find('.contact-data-name');
             var input_value = focus_group.find('.contact-data-value');
 
-            var datas_container = jQuery(this).parents('.contact-datas-container');
+            var data_container = jQuery(this).parents('.contact-data-container');
 
-            datas_container.find('.form-group').each(function (e) 
+            data_container.find('.form-group').each(function (e) 
             {
                 console.log(this);
                 var current_input_name = jQuery(this).find('.contact-data-name');
@@ -154,15 +154,15 @@
                     '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
                     ' : ' +
                     '<input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">' +
-                    ' <a href="#" class="contact-datas-remove"><span class="fa fa-times"></span></a>' +
+                    ' <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>' +
                 '</div>';
-            datas_container.append(template);
+            data_container.append(template);
         });
 
-        jQuery('.contact-datas-container').on('click', '.contact-datas-remove', function (e)
+        jQuery('.contact-data-container').on('click', '.contact-data-remove', function (e)
         {
             e.preventDefault();
-            if (jQuery('.contact-datas-container .form-group').length > 1)
+            if (jQuery('.contact-data-container .form-group').length > 1)
             {
                 jQuery(this).parent('.form-group').remove();
             }
@@ -174,13 +174,13 @@
         {
             e.preventDefault();
 
-            jQuery('.contact-datas-container .form-group').each(function ()
+            jQuery('.contact-data-container .form-group').each(function ()
             {
-                var contact_id = jQuery(this).parents('.contact-datas-container').attr('data-id-contact');
+                var contact_id = jQuery(this).parents('.contact-data-container').attr('data-id-contact');
                 var name = jQuery(this).find('.contact-data-name').val();
                 name = name.replace(/\W/g, '');
 
-                name = 'contacts[' + contact_id + '][datas][' + name + ']';
+                name = 'contacts[' + contact_id + '][data][' + name + ']';
                 jQuery(this).find('.contact-data-value').attr('name', name);
             });
 

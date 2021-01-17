@@ -21,18 +21,18 @@ namespace adapters;
     class GammuAdapter implements AdapterInterface
     {
         /**
-         * Datas used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
+         * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
          */
-        private $datas;
+        private $data;
 
         /**
          * Adapter constructor, called when instanciated by RaspiSMS.
          *
-         * @param json string $datas : JSON string of the datas to configure interaction with the implemented service
+         * @param json string $data : JSON string of the data to configure interaction with the implemented service
          */
-        public function __construct(string $datas)
+        public function __construct(string $data)
         {
-            $this->datas = json_decode($datas, true);
+            $this->data = json_decode($data, true);
         }
 
         /**
@@ -73,11 +73,11 @@ namespace adapters;
         }
 
         /**
-         * List of entries we want in datas for the adapter.
+         * List of entries we want in data for the adapter.
          *
          * @return array : Every line is a field as an array with keys : name, title, description, required
          */
-        public static function meta_datas_fields(): array
+        public static function meta_data_fields(): array
         {
             return [
                 [
@@ -159,7 +159,7 @@ namespace adapters;
             $command_parts = [
                 'gammu',
                 '--config',
-                escapeshellarg($this->datas['config_file']),
+                escapeshellarg($this->data['config_file']),
                 'sendsms',
                 'TEXT',
                 escapeshellarg($destination),
@@ -248,7 +248,7 @@ namespace adapters;
 
             $command_parts = [
                 PWD . '/bin/gammu_get_unread_sms.py',
-                escapeshellarg($this->datas['config_file']),
+                escapeshellarg($this->data['config_file']),
             ];
 
             $return = $this->exec_command($command_parts);
@@ -326,7 +326,7 @@ namespace adapters;
          */
         private function unlock_sim(): bool
         {
-            if (!$this->datas['pin'])
+            if (!$this->data['pin'])
             {
                 return true;
             }
@@ -334,10 +334,10 @@ namespace adapters;
             $command_parts = [
                 'gammu',
                 '--config',
-                escapeshellarg($this->datas['config_file']),
+                escapeshellarg($this->data['config_file']),
                 'entersecuritycode',
                 'PIN',
-                escapeshellarg($this->datas['pin']),
+                escapeshellarg($this->data['pin']),
             ];
 
             $result = $this->exec_command($command_parts);
@@ -346,7 +346,7 @@ namespace adapters;
             $command_parts = [
                 'gammu',
                 '--config',
-                escapeshellarg($this->datas['config_file']),
+                escapeshellarg($this->data['config_file']),
                 'getsecuritystatus',
             ];
 

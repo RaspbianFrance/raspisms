@@ -344,7 +344,7 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $new_file_path = PWD_DATAS . '/' . $md5_filename;
+            $new_file_path = PWD_DATA . '/' . $md5_filename;
 
             if (file_exists($new_file_path))
             {

@@ -101,7 +101,7 @@ use Monolog\Logger;
             $callback_return = $adapter_classname::status_change_callback();
             if (!$callback_return)
             {
-                $this->logger->error('Callback status with adapter ' . $adapter_uid . ' failed because adapter cannot process datas with success.');
+                $this->logger->error('Callback status with adapter ' . $adapter_uid . ' failed because adapter cannot process data with success.');
 
                 return false;
             }

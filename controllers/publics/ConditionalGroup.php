@@ -210,7 +210,7 @@ namespace controllers\publics;
             }
 
             $internal_ruler = new \controllers\internals\Ruler();
-            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['datas' => (object) null], 'contact_metas' => (object) null]);
+            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['data' => (object) null], 'contact_metas' => (object) null]);
             if (!$valid_condition)
             {
                 $return['result'] = 'Syntaxe de la condition invalide.';

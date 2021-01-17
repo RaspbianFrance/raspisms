@@ -249,7 +249,7 @@
             var id_contact = jQuery(this).parents('.scheduled-preview-container').find('select').val();
             var template = jQuery(this).parents('.form-group').find('textarea').val();
 
-            var datas = {
+            var data = {
                 'id_contact' : id_contact,
                 'template' : template,
             };
@@ -257,9 +257,9 @@
             jQuery.ajax({
                 type: "POST",
                 url: HTTP_PWD + '/template/preview',
-                data: datas,
-                success: function (datas) {
-                    jQuery('#scheduled-preview-text-modal').find('.modal-body pre').text(datas.result);
+                data: data,
+                success: function (data) {
+                    jQuery('#scheduled-preview-text-modal').find('.modal-body pre').text(data.result);
                     jQuery('#scheduled-preview-text-modal').modal({'keyboard': true});
                 },
                 dataType: 'json'
