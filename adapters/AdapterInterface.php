@@ -39,6 +39,12 @@ namespace adapters;
         public static function meta_uid(): string;
 
         /**
+        * Should this adapter be hidden in user interface for phone creation and
+        * available to creation through API only
+         */
+        public static function meta_hidden(): bool;
+
+        /**
          * Name of the adapter.
          * It should probably be the name of the service it adapt (e.g : Gammu SMSD, OVH SMS, SIM800L, etc.).
          */

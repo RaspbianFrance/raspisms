@@ -74,6 +74,15 @@ namespace adapters;
         {
             return 'ovh_sms_virtual_number_adapter';
         }
+        
+        /**
+         * Should this adapter be hidden in user interface for phone creation and
+         * available to creation through API only
+         */
+        public static function meta_hidden(): bool
+        {
+            return false;
+        }
 
         /**
          * Name of the adapter.

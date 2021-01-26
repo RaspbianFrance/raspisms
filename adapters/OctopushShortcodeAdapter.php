@@ -77,6 +77,15 @@ class OctopushShortcodeAdapter implements AdapterInterface
     {
         return 'octopush_shortcode_adapter';
     }
+    
+    /**
+     * Should this adapter be hidden in user interface for phone creation and
+     * available to creation through API only
+     */
+    public static function meta_hidden(): bool
+    {
+        return false;
+    }
 
     /**
      * Name of the adapter.
@@ -393,7 +402,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
         $response = [
             'error' => false,
             'error_message' => null,
-            'uid' => null,
+            'sms' => null,
         ];
 
         header('Connection: close');
