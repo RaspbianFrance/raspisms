@@ -209,6 +209,13 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
+        if ($find_adapter['meta_hidden'])
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Ce type de téléphone ne peux pas être créé via l\'interface graphique.');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
         //If missing required data fields, error
         foreach ($find_adapter['meta_data_fields'] as $field)
         {

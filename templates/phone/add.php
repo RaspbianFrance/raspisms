@@ -54,14 +54,16 @@
                                     </p>
                                     <select name="adapter" class="form-control" id="adapter-select">
                                         <?php foreach ($adapters as $adapter) { ?>
-                                            <option 
-                                                value="<?= $adapter['meta_classname'] ?>"
-                                                data-description="<?php $this->s($adapter['meta_description']); ?>"
-                                                data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
-                                                <?= ($_SESSION['previous_http_post']['adapter'] ?? '') == $adapter['meta_classname'] ? 'selected' : ''  ?>
-                                            >
-                                                <?php $this->s($adapter['meta_name']); ?>
-                                            </option>
+                                            <?php if ($adapter['meta_hidden'] === false) { ?>
+                                                <option 
+                                                    value="<?= $adapter['meta_classname'] ?>"
+                                                    data-description="<?php $this->s($adapter['meta_description']); ?>"
+                                                    data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
+                                                    <?= ($_SESSION['previous_http_post']['adapter'] ?? '') == $adapter['meta_classname'] ? 'selected' : ''  ?>
+                                                >
+                                                    <?php $this->s($adapter['meta_name']); ?>
+                                                </option>
+                                            <?php } ?>
                                         <?php } ?>
                                     </select>
                                 </div>
