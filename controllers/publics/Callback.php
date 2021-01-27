@@ -41,7 +41,7 @@ use Monolog\Logger;
 
             //If invalid api key, quit with error
             $this->user = false;
-            $api_key = $_GET['api_key'] ?? false;
+            $api_key = $_GET['api_key'] ?? $_POST['api_key'] ?? $_SERVER['HTTP_X_API_KEY'] ?? false;
             if ($api_key)
             {
                 $this->user = $this->internal_user->get_by_api_key($api_key);
