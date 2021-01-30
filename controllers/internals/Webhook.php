@@ -13,6 +13,8 @@ namespace controllers\internals;
 
 class Webhook extends StandardController
 {
+    const HMAC_ALGO = 'sha256';
+
     protected $bdd;
     protected $model;
 
@@ -105,6 +107,7 @@ class Webhook extends StandardController
     public function trigger(int $id_user, string $type, array $sms)
     {
         $internal_setting = new Setting($this->bdd);
+        $internal_user = new User($this->bdd);
         $settings = $internal_setting->gets_for_user($id_user);
 
         if (!$settings['webhook'] ?? false)
@@ -112,13 +115,22 @@ class Webhook extends StandardController
             return false;
         }
 
+        $user = $internal_user->get($id_user);
+        if (!$user)
+        {
+            return false;
+        }
+
         $webhooks = $this->gets_for_type_and_user($id_user, $type);
         foreach ($webhooks as $webhook)
         {
+            $timestamp = time();
             $message = [
                 'url' => $webhook['url'],
                 'data' => [
+                    'webhook_timestamp' => $timestamp,
                     'webhook_type' => $webhook['type'],
+                    'webhook_random_id' => $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(8))
                     'id' => $sms['id'],
                     'at' => $sms['at'],
                     'text' => $sms['text'],
@@ -126,6 +138,10 @@ class Webhook extends StandardController
                     'destination' => $sms['destination'],
                 ],
             ];
+
+            //signature is hexa string representing hmac sha256 of user_api_key::webhook_timestamp::webhook_random_id
+            $signature_clear = $user['api_key'] . '.' . $message['data']['webhook_timestamp'] . '.' . $message['data']['webhook_random_id'];
+            $message['data']['webhook_signature'] = hash_hmac(self::HMAC_ALGO, $signature_clear, $user['api_key']);
 
             $error_code = null;
             $queue = msg_get_queue(QUEUE_ID_WEBHOOK);
