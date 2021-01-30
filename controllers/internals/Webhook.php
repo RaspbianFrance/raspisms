@@ -125,12 +125,18 @@ class Webhook extends StandardController
         foreach ($webhooks as $webhook)
         {
             $timestamp = time();
+            $webhook_random_id = $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(16));
+            
+            //signature is hexa string representing hmac sha256 of webhook_random_id
+            $webhook_signature = hash_hmac(self::HMAC_ALGO, $webhook_random_id, $user['api_key']);
+            
             $message = [
                 'url' => $webhook['url'],
                 'data' => [
                     'webhook_timestamp' => $timestamp,
                     'webhook_type' => $webhook['type'],
-                    'webhook_random_id' => $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(8)),
+                    'webhook_random_id' => $webhook_random_id,
+                    'webhook_signature' => $webhook_signature,
                     'id' => $sms['id'],
                     'at' => $sms['at'],
                     'text' => $sms['text'],
@@ -138,10 +144,6 @@ class Webhook extends StandardController
                     'destination' => $sms['destination'],
                 ],
             ];
-
-            //signature is hexa string representing hmac sha256 of user_api_key::webhook_timestamp::webhook_random_id
-            $signature_clear = $user['api_key'] . '.' . $message['data']['webhook_timestamp'] . '.' . $message['data']['webhook_random_id'];
-            $message['data']['webhook_signature'] = hash_hmac(self::HMAC_ALGO, $signature_clear, $user['api_key']);
 
             $error_code = null;
             $queue = msg_get_queue(QUEUE_ID_WEBHOOK);
