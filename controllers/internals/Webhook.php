@@ -130,7 +130,7 @@ class Webhook extends StandardController
                 'data' => [
                     'webhook_timestamp' => $timestamp,
                     'webhook_type' => $webhook['type'],
-                    'webhook_random_id' => $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(8))
+                    'webhook_random_id' => $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(8)),
                     'id' => $sms['id'],
                     'at' => $sms['at'],
                     'text' => $sms['text'],
