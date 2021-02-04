@@ -41,7 +41,7 @@
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Nom</th>
-                                                <th>Adaptateur</th>
+                                                <th>Type de téléphone</th>
                                                 <th>Callbacks</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>

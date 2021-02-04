@@ -204,7 +204,7 @@ class Phone extends \descartes\Controller
 
         if (!$find_adapter)
         {
-            \FlashMessage\FlashMessage::push('danger', 'Cet adaptateur n\'existe pas.');
+            \FlashMessage\FlashMessage::push('danger', 'Ce type de téléphone n\'existe pas.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
@@ -229,7 +229,7 @@ class Phone extends \descartes\Controller
                 continue;
             }
 
-            \FlashMessage\FlashMessage::push('danger', 'Vous n\'avez pas rempli certains champs obligatoires pour l\'adaptateur choisis.');
+            \FlashMessage\FlashMessage::push('danger', 'Vous n\'avez pas rempli certains champs obligatoires pour ce type de téléphone.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
@@ -266,7 +266,7 @@ class Phone extends \descartes\Controller
 
         if (!$adapter_working)
         {
-            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser l\'adaptateur choisis avec les données fournies. Vérifiez les réglages.');
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'utiliser ce type de téléphone avec les données fournies. Vérifiez les réglages.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }

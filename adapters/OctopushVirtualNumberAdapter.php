@@ -112,7 +112,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
 
         return '
                 Envoi de SMS avec un numéro virtuel en utilisant <a target="_blank" href="https://www.octopush.com/">Octopush</a>. Pour trouver vos clés API Octopush <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a><br/>
-                Pour plus d\'information sur l\'utilisation de l\'adaptateur, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/octopush_virtual_number.html" target="_blank">la documentation sur l\'adaptateur Octopush Numéro Virtuel.</a>
+                Pour plus d\'information sur l\'utilisation de ce téléphone, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/octopush_virtual_number.html" target="_blank">la documentation sur les téléphones "Octopush Numéro Virtuel".</a>
             ';
     }
 

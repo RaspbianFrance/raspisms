@@ -48,9 +48,9 @@
 									</div>
 								</div>
                                 <div class="form-group">
-                                    <label>Adaptateur logiciel du téléphone : </label>
+                                    <label>Type de téléphone : </label>
                                     <p class="italic small help" id="description-adapter-general">
-                                        L'adaptateur logiciel utilisé par RaspiSMS pour communiquer avec le téléphone. Pour plus d'information, consultez <a href="https://documentation.raspisms.fr/users/adapters/overview.html" target="_blank">la documentation de RaspiSMS</a> concernant les adaptateurs logiciels.
+                                        Le type de téléphone utilisé par RaspiSMS pour envoyer ou recevoir les SMS. Pour plus d'information, consultez <a href="https://documentation.raspisms.fr/users/adapters/overview.html" target="_blank">la documentation de RaspiSMS</a> concernant les différents types de téléphones.
                                     </p>
                                     <select name="adapter" class="form-control" id="adapter-select">
                                         <?php foreach ($adapters as $adapter) { ?>
@@ -69,12 +69,12 @@
                                 </div>
                                 <div id="adapter-data-container" class="form-group">
                                     <div id="adapter-data-description-container">
-                                        <h4>Description de l'adaptateur</h4>
+                                        <h4>Description du téléphone</h4>
                                         <div id="adapter-data-description"></div>
                                     </div>
                                     
                                     <div id="adapter-data-fields-container">
-                                        <h4>Réglages de l'adaptateur</h4>
+                                        <h4>Réglages du téléphone</h4>
                                         <div id="adapter-data-fields"></div>
                                     </div>
                                 </div>
