@@ -115,7 +115,7 @@
 										<h4 class="panel-title"><i class="fa fa-flag fa-fw"></i> Pays autorisés pour l'envoi</h4>
 									</div>
 									<div class="panel-body">
-										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'preferred_phone_country', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'authorized_phone_country', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Code des pays (norme ISO 3166-1 alpha-2) séparés par des virgules (laissez vide pour tout autoriser) : </label>
 												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['authorized_phone_country']); ?>" />
