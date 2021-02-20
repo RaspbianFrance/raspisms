@@ -1,5 +1,5 @@
 Vous avez reçu un nouveau SMS : 
-Date : <?= $sms['at'] ?>
-Origine : <?= $sms['origin'] ?>
-Destination : <?= $sms['destination'] ?>
-Message : <?= $sms['text'] ?>
+Date : <?= $at ?>
+Origine : <?= $origin ?>
+Destination : <?= $destination ?>
+Message : <?= $text ?>
