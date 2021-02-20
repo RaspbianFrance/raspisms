@@ -133,6 +133,10 @@ namespace controllers\internals;
                     continue;
                 }
 
+                //Padding line with '' entries to make sure its same length as head
+                //this allow to mix users with data with users without data
+                $line = array_pad($line, count($head), '');
+
                 $line = array_combine($head, $line);
                 if (false === $line)
                 {
@@ -278,14 +282,16 @@ namespace controllers\internals;
                 $data = json_decode($contact['data'], true);
 
                 $line = [$contact['name'], $contact['number']];
-                foreach ($columns as $column)
+                foreach (array_slice($columns, 2) as $column) //ignore first two columns as it's alway name & number
                 {
-                    if (isset($data[$column]))
+                    //If their is no data for this column key, we set '' to ignore
+                    if (!isset($data[$column]))
                     {
-                        $line[] = $data[$column];
-
+                        $line[] = '';
                         continue;
                     }
+                    
+                    $line[] = $data[$column];
                 }
                 $lines[] = $line;
             }
