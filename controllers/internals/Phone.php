@@ -55,9 +55,9 @@ namespace controllers\internals;
         /**
          * Create a phone.
          *
-         * @param int         $id_user       : User to insert phone for
-         * @param string      $name          : The name of the phone
-         * @param string      $adapter       : The adapter to use the phone
+         * @param int         $id_user      : User to insert phone for
+         * @param string      $name         : The name of the phone
+         * @param string      $adapter      : The adapter to use the phone
          * @param string json $adapter_data : A JSON string representing adapter's data (for example credentials for an api)
          *
          * @return bool|int : false on error, new id on success
@@ -77,10 +77,10 @@ namespace controllers\internals;
         /**
          * Update a phone.
          *
-         * @param int    $id_user       : User to insert phone for
-         * @param int    $id            : Phone id
-         * @param string $name          : The name of the phone
-         * @param string $adapter       : The adapter to use the phone
+         * @param int    $id_user      : User to insert phone for
+         * @param int    $id           : Phone id
+         * @param string $name         : The name of the phone
+         * @param string $adapter      : The adapter to use the phone
          * @param array  $adapter_data : An array of the data of the adapter (for example credentials for an api)
          *
          * @return bool : false on error, true on success

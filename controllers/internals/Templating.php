@@ -57,7 +57,7 @@ namespace controllers\internals;
          * Render a string as a twig template.
          *
          * @param string $template : Template string
-         * @param array  $data    : Data to pass to the template
+         * @param array  $data     : Data to pass to the template
          *
          * @return array : keys, success, error, result
          */

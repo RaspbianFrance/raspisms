@@ -27,7 +27,7 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
         {
             return null;
         });
-        
+
         //Exists must be personnalized because it inverse is_null
         $exists = new ExpressionFunction('exists', function ($str)
         {

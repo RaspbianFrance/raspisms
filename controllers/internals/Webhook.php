@@ -126,10 +126,10 @@ class Webhook extends StandardController
         {
             $timestamp = time();
             $webhook_random_id = $timestamp . '-' . bin2hex(openssl_random_pseudo_bytes(16));
-            
+
             //signature is hexa string representing hmac sha256 of webhook_random_id
             $webhook_signature = hash_hmac(self::HMAC_ALGO, $webhook_random_id, $user['api_key']);
-            
+
             $message = [
                 'url' => $webhook['url'],
                 'data' => [

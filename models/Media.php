@@ -188,7 +188,7 @@ namespace models;
          *
          * @param int   $id_user : User id
          * @param int   $id      : Entry id
-         * @param array $data   : data to update
+         * @param array $data    : data to update
          *
          * @return int : number of modified rows
          */

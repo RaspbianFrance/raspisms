@@ -95,7 +95,7 @@ namespace models;
         /**
          * Update a user using his is.
          *
-         * @param int   $id    : User id
+         * @param int   $id   : User id
          * @param array $data : Data to update
          *
          * @return int : number of modified rows

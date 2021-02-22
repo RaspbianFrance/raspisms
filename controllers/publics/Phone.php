@@ -157,8 +157,8 @@ class Phone extends \descartes\Controller
      * Create a new phone.
      *
      * @param $csrf : CSRF token
-     * @param string $_POST['name']          : Phone name
-     * @param string $_POST['adapter']       : Phone adapter
+     * @param string $_POST['name']         : Phone name
+     * @param string $_POST['adapter']      : Phone adapter
      * @param array  $_POST['adapter_data'] : Phone adapter data
      */
     public function create($csrf)

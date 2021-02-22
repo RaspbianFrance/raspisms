@@ -100,7 +100,7 @@ class Mailer extends \descartes\Controller
      *
      * @param string $destination : email address to send email to
      * @param array  $settings    : Email settings
-     * @param array  $data       : Data to inject into email template
+     * @param array  $data        : Data to inject into email template
      *
      * @return bool : true on success, false on error
      */

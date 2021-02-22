@@ -56,10 +56,10 @@ namespace adapters;
         {
             return 'benchmark_adapter';
         }
-        
+
         /**
          * Should this adapter be hidden in user interface for phone creation and
-         * available to creation through API only
+         * available to creation through API only.
          */
         public static function meta_hidden(): bool
         {

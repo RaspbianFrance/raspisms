@@ -35,7 +35,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
          * Verify if a condition is valid. i.e we can evaluate it without error.
          *
          * @param string $condition : The condition to evaluate
-         * @param array  $data     : The data to made available to condition
+         * @param array  $data      : The data to made available to condition
          *
          * @return bool : false if invalid, true else
          */
@@ -61,7 +61,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
          * Evaluate a condition.
          *
          * @param string $condition : The condition to evaluate
-         * @param array  $data     : The data to made available to condition
+         * @param array  $data      : The data to made available to condition
          *
          * @return ?bool : false if invalid, true else, null only on error
          */

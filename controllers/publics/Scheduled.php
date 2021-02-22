@@ -96,8 +96,8 @@ namespace controllers\publics;
         /**
          * Cette fonction retourne la page d'ajout d'un scheduled.
          *
-         * @param array? int $contacts_ids : Ids of contacts to prefilled
-         * @param array? int $groups_ids : Ids of groups to prefilled
+         * @param array? int $contacts_ids           : Ids of contacts to prefilled
+         * @param array? int $groups_ids             : Ids of groups to prefilled
          * @param array? int $conditional_groups_ids : Ids of conditional groups to prefilled
          * @param $prefilled : If we have prefilled some fields (possible values : 'contacts', 'groups', 'conditional_groups', false)
          */
@@ -112,9 +112,9 @@ namespace controllers\publics;
             $contacts = $this->internal_contact->gets_for_user($id_user);
             $phones = $this->internal_phone->gets_for_user($id_user);
 
-            $contact_ids = (isset($_GET['contact_ids']) && is_array($_GET['contact_ids'])) ? $_GET['contact_ids'] : [];
-            $group_ids = (isset($_GET['group_ids']) && is_array($_GET['group_ids'])) ? $_GET['group_ids'] : [];
-            $conditional_group_ids = (isset($_GET['conditional_group_ids']) && is_array($_GET['conditional_group_ids'])) ? $_GET['conditional_group_ids'] : [];
+            $contact_ids = (isset($_GET['contact_ids']) && \is_array($_GET['contact_ids'])) ? $_GET['contact_ids'] : [];
+            $group_ids = (isset($_GET['group_ids']) && \is_array($_GET['group_ids'])) ? $_GET['group_ids'] : [];
+            $conditional_group_ids = (isset($_GET['conditional_group_ids']) && \is_array($_GET['conditional_group_ids'])) ? $_GET['conditional_group_ids'] : [];
 
             $prefilled_contacts = [];
             $prefilled_groups = [];

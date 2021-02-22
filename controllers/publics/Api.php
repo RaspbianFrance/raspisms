@@ -309,8 +309,8 @@ namespace controllers\publics;
         /**
          * Create a new phone.
          *
-         * @param string $_POST['name']          : Phone name
-         * @param string $_POST['adapter']       : Phone adapter
+         * @param string $_POST['name']         : Phone name
+         * @param string $_POST['adapter']      : Phone adapter
          * @param array  $_POST['adapter_data'] : Phone adapter data
          *
          * @return int : id phone the new phone on success

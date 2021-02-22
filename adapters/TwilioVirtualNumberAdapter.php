@@ -42,7 +42,7 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
      * Adapter constructor, called when instanciated by RaspiSMS.
      *
      * @param string      $number : Phone number the adapter is used for
-     * @param json string $data  : JSON string of the data to configure interaction with the implemented service
+     * @param json string $data   : JSON string of the data to configure interaction with the implemented service
      */
     public function __construct(string $data)
     {
@@ -73,10 +73,10 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
     {
         return 'twilio_virtual_number_adapter';
     }
-    
+
     /**
      * Should this adapter be hidden in user interface for phone creation and
-     * available to creation through API only
+     * available to creation through API only.
      */
     public static function meta_hidden(): bool
     {

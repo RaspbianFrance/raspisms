@@ -59,7 +59,7 @@ namespace controllers\internals;
          * @param int    $id_user : User id
          * @param string $number  : Contact number
          * @param string $name    : Contact name
-         * @param string $data   : Contact data
+         * @param string $data    : Contact data
          *
          * @return mixed bool|int : False if cannot create contact, id of the new contact else
          */
@@ -91,7 +91,7 @@ namespace controllers\internals;
          * @param int     $id      : Contact id
          * @param string  $number  : Contact number
          * @param string  $name    : Contact name
-         * @param ?string $data   : Contact data
+         * @param ?string $data    : Contact data
          *
          * @return int : number of modified rows
          */
@@ -135,7 +135,7 @@ namespace controllers\internals;
 
                 //Padding line with '' entries to make sure its same length as head
                 //this allow to mix users with data with users without data
-                $line = array_pad($line, count($head), '');
+                $line = array_pad($line, \count($head), '');
 
                 $line = array_combine($head, $line);
                 if (false === $line)
@@ -282,15 +282,16 @@ namespace controllers\internals;
                 $data = json_decode($contact['data'], true);
 
                 $line = [$contact['name'], $contact['number']];
-                foreach (array_slice($columns, 2) as $column) //ignore first two columns as it's alway name & number
-                {
+                foreach (\array_slice($columns, 2) as $column)
+                { //ignore first two columns as it's alway name & number
                     //If their is no data for this column key, we set '' to ignore
                     if (!isset($data[$column]))
                     {
                         $line[] = '';
+
                         continue;
                     }
-                    
+
                     $line[] = $data[$column];
                 }
                 $lines[] = $line;

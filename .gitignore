@@ -4,6 +4,7 @@
 .credentials
 .credentials*
 vendor/
+scripts/
 composer.lock
 env.*
 phinx.*

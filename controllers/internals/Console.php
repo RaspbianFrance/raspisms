@@ -71,8 +71,6 @@ namespace controllers\internals;
          * Check if a user exists based on email.
          *
          * @param string $email : User email
-         *
-         * @return void : exit code 1 on false, 0 else
          */
         public function user_exists(string $email)
         {
