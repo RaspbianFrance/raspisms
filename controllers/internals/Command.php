@@ -99,7 +99,7 @@ namespace controllers\internals;
             //Check for user
             $internal_user = new \controllers\internals\User($this->bdd);
             $user = $internal_user->check_credentials($decode_message['login'], $decode_message['password']);
-            if (!$user || $user['id'] !== $id_user)
+            if (!$user || (int) $user['id'] !== $id_user)
             {
                 return false;
             }
