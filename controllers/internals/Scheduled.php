@@ -258,22 +258,22 @@ namespace controllers\internals;
                     $phone_to_use = $phone;
                 }
 
-                if (null === $phone_to_use)
-                {
-                    $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
-                    $phone_to_use = $users_phones[$scheduled['id_user']][$rnd_key];
-                }
-
                 $messages = [];
 
                 //Add messages for numbers
                 $numbers = $this->get_numbers($scheduled['id']);
                 foreach ($numbers as $number)
                 {
+                    if (null === $phone_to_use)
+                    {
+                        $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
+                        $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                    }
+                    
                     $message = [
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
-                        'id_phone' => $phone_to_use['id'],
+                        'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
                     ];
@@ -323,11 +323,17 @@ namespace controllers\internals;
                     }
 
                     $added_contacts[$contact['id']] = true;
+                    
+                    if (null === $phone_to_use)
+                    {
+                        $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
+                        $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                    }
 
                     $message = [
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
-                        'id_phone' => $phone_to_use['id'],
+                        'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
                         'destination' => $contact['number'],
                         'flash' => $scheduled['flash'],
                     ];
