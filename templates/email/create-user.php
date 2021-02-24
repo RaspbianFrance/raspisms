@@ -4,4 +4,4 @@ Adresse e-mail : <?php echo $email; ?>
 Mot de passe : <?php echo $password; ?>
 
 --------------------------------------------------------------------------------------------
-Pour plus d'informations sur le système RaspiSMS, rendez-vous sur le site https://raspisms.raspberry-pi.fr
+Pour plus d'informations sur le système RaspiSMS, rendez-vous sur le site https://raspisms.fr
