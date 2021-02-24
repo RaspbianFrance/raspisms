@@ -5,7 +5,7 @@
             'connection' => '/connection/',
             'forget_password' => '/forget_password/',
             'send_reset_password' => '/send_reset_password/{csrf}/',
-            'reset_password' => '/reset_password/{user_id}/{token}/',
+            'reset_password' => '/reset_password/{id_user}/{token}/',
             'logout' => '/logout/',
         ],
 

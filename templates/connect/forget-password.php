@@ -11,7 +11,7 @@
 				<label>Adresse e-mail</label>
 				<div class="form-group input-group">
 					<span class="input-group-addon"><span class="fa fa-at"></span></span>
-					<input name="mail" class="form-control" type="email" placeholder="Ex : john.doe@example.tld" autofocus required>
+					<input name="email" class="form-control" type="email" placeholder="Ex : john.doe@example.tld" autofocus required>
 				</div>
 			</div>	
 
