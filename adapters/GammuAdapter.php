@@ -207,7 +207,7 @@ namespace adapters;
             foreach ($result['output'] as $line)
             {
                 $matches = [];
-                preg_match('#reference=([0-9]+)#u', $line, $matches);
+                preg_match('#=([0-9]+)#u', $line, $matches);
 
                 if ($matches[1] ?? false)
                 {
