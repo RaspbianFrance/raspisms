@@ -76,6 +76,8 @@ class Sender extends AbstractDaemon
                 'id_phone' => $sms['id_phone'],
                 'destination' => $sms['destination'],
                 'flash' => $sms['flash'],
+                'mms' => $sms['mms'],
+                'medias' => $sms['medias'] ?? [],
             ];
 
             msg_send($this->queues[$queue_id], QUEUE_TYPE_SEND_MSG, $msg);

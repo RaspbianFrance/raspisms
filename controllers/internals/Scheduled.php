@@ -253,7 +253,7 @@ namespace controllers\internals;
         /**
          * Get all messages to send and the number to use to send theme.
          *
-         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash'], ...]
+         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...]
          */
         public function get_smss_to_send()
         {
