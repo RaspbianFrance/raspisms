@@ -39,10 +39,12 @@ namespace controllers\internals;
          * @param string $origin  : Number of the sender
          * @param string $status  : Status of the received message
          * @param bool   $command : Is the sms a command
+         * @param bool $mms : Is the sms a mms
+         * @param array $media_ids : Ids of the medias to link to received
          *
          * @return mixed : false on error, new received id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $origin, string $status = 'unread', bool $command = false)
+        public function create(int $id_user, int $id_phone, $at, string $text, string $origin, string $status = 'unread', bool $command = false, bool $mms = false, array $media_ids = [])
         {
             $received = [
                 'id_user' => $id_user,
@@ -52,9 +54,39 @@ namespace controllers\internals;
                 'origin' => $origin,
                 'status' => $status,
                 'command' => $command,
+                'mms' => $mms,
             ];
 
-            return $this->get_model()->insert($received);
+            //use a transaction to ensure received and media links are created at the same time
+            $this->bdd->beginTransaction();
+
+            $id_received = $this->get_model()->insert($received);
+            if (!$id_received)
+            {
+                $this->bdd->rollBack();
+                return false;
+            }
+
+            //Link medias
+            $internal_media = new Media($this->bdd);
+            foreach ($media_ids as $media_id)
+            {
+                $id_media_received = $internal_media->link_to($media_id, 'received', $id_received);
+                if (!$id_media_received)
+                {
+                    $this->bdd->rollBack();
+                    return false;
+                }
+            }
+
+            //All ok, commit
+            $success = $this->bdd->commit();
+            if (!$success)
+            {
+                return false;
+            }
+
+            return $id_received;
         }
 
         /**
@@ -211,13 +243,15 @@ namespace controllers\internals;
          * @param string  $origin : Number of the sender
          * @param ?string $at     : Message reception date, if null use current date
          * @param string  $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
+         * @param bool $mms : Is the sms a mms
+         * @param array $media_ids : Ids of the medias to link to received
          *
          * @return array : [
          *               bool 'error' => false if success, true else
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function receive(int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD): array
+        public function receive(int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD, bool $mms = false, array $media_ids = []): array
         {
             $return = [
                 'error' => false,
@@ -236,7 +270,7 @@ namespace controllers\internals;
                 $text = $response;
             }
 
-            $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command);
+            $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command, $mms, $media_ids);
             if (!$received_id)
             {
                 $return['error'] = true;
@@ -251,6 +285,9 @@ namespace controllers\internals;
                 'text' => $text,
                 'destination' => $id_phone,
                 'origin' => $origin,
+                'command' => $is_command,
+                'mms' => $mms,
+                'medias' => $media_ids,
             ];
 
             $internal_webhook = new Webhook($this->bdd);

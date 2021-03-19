@@ -250,6 +250,7 @@ namespace controllers\publics;
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $flash = (bool) ($_POST['flash'] ?? false);
+            $mms = $_FILES['media'] ?? false;
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
@@ -292,7 +293,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -300,7 +301,7 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
-            //If mms is enabled, try to process a media to link to the scheduled
+            //If mms is disabled or no media uploaded, do not process
             if (!($_SESSION['user']['settings']['mms'] ?? false) || !$media)
             {
                 \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');

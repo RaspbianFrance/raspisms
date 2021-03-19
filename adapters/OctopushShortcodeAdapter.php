@@ -172,21 +172,24 @@ class OctopushShortcodeAdapter implements AdapterInterface
     {
         return true;
     }
+    
+    /**
+     * Does the implemented service support mms reception
+     */
+    public static function meta_support_mms_reception(): bool
+    {
+        return false;
+    }
 
     /**
-     * Method called to send a SMS to a number.
-     *
-     * @param string $destination : Phone number to send the sms to
-     * @param string $text        : Text of the SMS to send
-     * @param bool   $flash       : Is the SMS a Flash SMS
-     *
-     * @return array : [
-     *               bool 'error' => false if no error, true else
-     *               ?string 'error_message' => null if no error, else error message
-     *               array 'uid' => Uid of the sms created on success
-     *               ]
+     * Does the implemented service support mms sending
      */
-    public function send(string $destination, string $text, bool $flash = false)
+    public static function meta_support_mms_sending(): bool
+    {
+        return false;
+    }
+
+    public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []) : array
     {
         $response = [
             'error' => false,
@@ -268,26 +271,11 @@ class OctopushShortcodeAdapter implements AdapterInterface
         }
     }
 
-    /**
-     * Method called to read SMSs of the number.
-     *
-     * @return array : [
-     *               bool 'error' => false if no error, true else
-     *               ?string 'error_message' => null if no error, else error message
-     *               array 'sms' => Array of the sms reads
-     *               ]
-     */
     public function read(): array
     {
         return [];
     }
 
-    /**
-     * Method called to verify if the adapter is working correctly
-     * should be use for exemple to verify that credentials and number are both valid.
-     *
-     * @return bool : False on error, true else
-     */
     public function test(): bool
     {
         try
@@ -339,11 +327,6 @@ class OctopushShortcodeAdapter implements AdapterInterface
         }
     }
 
-    /**
-     * Method called on reception of a status update notification for a SMS.
-     *
-     * @return mixed : False on error, else array ['uid' => uid of the sms, 'status' => New status of the sms (\models\Sended::STATUS_UNKNOWN, \models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED)]
-     */
     public static function status_change_callback()
     {
         header('Connection: close');
@@ -383,20 +366,6 @@ class OctopushShortcodeAdapter implements AdapterInterface
         return ['uid' => $uid, 'status' => $status];
     }
 
-    /**
-     * Method called on reception of a sms notification.
-     *
-     * @return array : [
-     *               bool 'error' => false on success, true on error
-     *               ?string 'error_message' => null on success, error message else
-     *               array 'sms' => array [
-     *               string 'at' : Recepetion date format Y-m-d H:i:s,
-     *               string 'text' : SMS body,
-     *               string 'origin' : SMS sender,
-     *               ]
-     *
-     * ]
-     */
     public static function reception_callback(): array
     {
         $response = [

@@ -19,32 +19,105 @@ namespace controllers\internals;
          * Create a media.
          *
          * @param int   $id_user      : Id of the user
-         * @param int   $id_scheduled : Id of the scheduled
-         * @param array $media        : $_FILES media array
+         * @param string $path        : path of the media in data dir
          *
-         * @return bool : false on error, new media id else
+         * @return mixed bool|int : false on error, new media id else
          */
-        public function create(int $id_user, int $id_scheduled, array $media): bool
+        public function create(int $id_user, string $path): bool
         {
-            $internal_scheduled = new Scheduled($this->bdd);
-            $scheduled = $internal_scheduled->get_for_user($id_user, $id_scheduled);
-            if (!$scheduled)
-            {
-                return false;
-            }
-
-            $result_upload_media = \controllers\internals\Tool::upload_file($media);
-            if (false === $result_upload_media['success'])
-            {
-                return false;
-            }
-
             $data = [
-                'id_scheduled' => $id_scheduled,
-                'path' => $result_upload_media['content'],
+                'path' => $path,
+                'id_user' => $id_user,
             ];
 
-            return (bool) $this->get_model()->insert($data);
+            return $this->get_model()->insert($data);
+        }
+
+        /**
+         * Link a media to a scheduled, a received or a sended message
+         * @param int $id_media : Id of the media
+         * @param string $resource_type : Type of resource to link the media to ('scheduled', 'received' or 'sended')
+         * @param int $resource_id : Id of the resource to link the media to
+         *
+         * @return mixed bool|int : false on error, the new link id else
+         */
+        public function link_to(int $id_media, int $resource_type, int $resource_id)
+        {
+            switch ($resource_type)
+            {
+                case 'scheduled':
+                    return $this->get_model()->insert_media_scheduled($id_media, $resource_id);
+                    break;
+                
+                case 'received':
+                    return $this->get_model()->insert_media_received($id_media, $resource_id);
+                    break;
+                
+                case 'sended':
+                    return $this->get_model()->insert_media_sended($id_media, $resource_id);
+                    break;
+
+                default:
+                    return false;
+            }
+        }
+        
+        
+        /**
+         * Unlink a media of a scheduled, a received or a sended message
+         * @param int $id_media : Id of the media
+         * @param string $resource_type : Type of resource to unlink the media of ('scheduled', 'received' or 'sended')
+         * @param int $resource_id : Id of the resource to unlink the media of
+         *
+         * @return mixed bool : false on error, true on success
+         */
+        public function unlink_of(int $id_media, int $resource_type, int $resource_id)
+        {
+            switch ($resource_type)
+            {
+                case 'scheduled':
+                    return $this->get_model()->delete_media_scheduled($id_media, $resource_id);
+                    break;
+                
+                case 'received':
+                    return $this->get_model()->delete_media_received($id_media, $resource_id);
+                    break;
+                
+                case 'sended':
+                    return $this->get_model()->delete_media_sended($id_media, $resource_id);
+                    break;
+
+                default:
+                    return false;
+            }
+        }
+        
+        /**
+         * Unlink all medias of a scheduled, a received or a sended message
+         * @param string $resource_type : Type of resource to unlink the media of ('scheduled', 'received' or 'sended')
+         * @param int $resource_id : Id of the resource to unlink the media of
+         *
+         * @return mixed bool : false on error, true on success
+         */
+        public function unlink_all_of(int $resource_type, int $resource_id)
+        {
+            switch ($resource_type)
+            {
+                case 'scheduled':
+                    return $this->get_model()->delete_all_for_scheduled($resource_id);
+                    break;
+                
+                case 'received':
+                    return $this->get_model()->delete_all_for_received($resource_id);
+                    break;
+                
+                case 'sended':
+                    return $this->get_model()->delete_all_for_sended($resource_id);
+                    break;
+
+                default:
+                    return false;
+            }
         }
 
         /**
@@ -52,24 +125,15 @@ namespace controllers\internals;
          *
          * @param int    $id_user      : user id
          * @param int    $id_media     : Media id
-         * @param int    $id_scheduled : Id of the scheduled
          * @param string $path         : Path of the file
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id_media, int $id_scheduled, string $path): bool
+        public function update_for_user(int $id_user, int $id_media, string $path): bool
         {
             $media = [
-                'id_scheduled' => $id_scheduled,
                 'path' => $path,
             ];
-
-            $internal_scheduled = new Scheduled($this->bdd);
-            $scheduled = $this->get_for_user($id_user, $id_scheduled);
-            if (!$scheduled)
-            {
-                return false;
-            }
 
             return (bool) $this->get_model()->update_for_user($id_user, $id_media, $media);
         }
@@ -96,35 +160,42 @@ namespace controllers\internals;
         }
 
         /**
-         * Delete a media for a scheduled and a user.
-         *
-         * @param int $id_user      : User id
-         * @param int $id_scheduled : Scheduled id to delete medias for
-         *
-         * @return int : Number of removed rows
-         */
-        public function delete_for_scheduled_and_user(int $id_user, int $id_scheduled): bool
-        {
-            $media = $this->get_model()->get_for_scheduled_and_user($id_user, $id_scheduled);
-            if ($media)
-            {
-                unlink($media['path']);
-            }
-
-            return $this->get_model()->delete_for_scheduled_and_user($id_user, $id_scheduled);
-        }
-
-        /**
          * Find medias for a scheduled and a user.
          *
          * @param int $id_user      : User id
-         * @param int $id_scheduled : Scheduled id to delete medias for
+         * @param int $id_scheduled : Scheduled id to fin medias for
          *
          * @return mixed : Medias || false
          */
-        public function get_for_scheduled_and_user(int $id_user, int $id_scheduled)
+        public function gets_for_scheduled_and_user(int $id_user, int $id_scheduled)
         {
-            return $this->get_model()->get_for_scheduled_and_user($id_user, $id_scheduled);
+            return $this->get_model()->gets_for_scheduled_and_user($id_user, $id_scheduled);
+        }
+        
+        /**
+         * Find medias for a sended and a user.
+         *
+         * @param int $id_user      : User id
+         * @param int $id_sended : Scheduled id to fin medias for
+         *
+         * @return mixed : Medias || false
+         */
+        public function gets_for_sended_and_user(int $id_user, int $id_sended)
+        {
+            return $this->get_model()->gets_for_sended_and_user($id_user, $id_sended);
+        }
+        
+        /**
+         * Find medias for a received and a user.
+         *
+         * @param int $id_user      : User id
+         * @param int $id_received : Scheduled id to fin medias for
+         *
+         * @return mixed : Medias || false
+         */
+        public function gets_for_received_and_user(int $id_user, int $id_received)
+        {
+            return $this->get_model()->gets_for_received_and_user($id_user, $id_received);
         }
 
         /**

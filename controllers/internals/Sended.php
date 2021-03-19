@@ -26,11 +26,13 @@ namespace controllers\internals;
          * @param string $uid         : Uid of the sms on the adapter service used
          * @param string $adapter     : Name of the adapter service used to send the message
          * @param bool   $flash       : Is the sms a flash
+         * @param bool   $mms         : Is the sms a MMS. By default false.
+         * @param array  $medias      : Array of medias to link to the MMS.
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, ?string $status = \models\Sended::STATUS_UNKNOWN)
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, array $medias = [], ?string $status = \models\Sended::STATUS_UNKNOWN)
         {
             $sended = [
                 'id_user' => $id_user,
@@ -41,10 +43,33 @@ namespace controllers\internals;
                 'uid' => $uid,
                 'adapter' => $adapter,
                 'flash' => $flash,
+                'mms' => $mms,
                 'status' => $status,
             ];
 
-            return $this->get_model()->insert($sended);
+            //Ensure atomicity
+            $this->bdd->beginTransaction();
+            
+            $id_sended = $this->get_model()->insert($sended);
+            if (!$id_sended)
+            {
+                $this->bdd->rollback();
+                return false;
+            }
+            
+            //Link medias
+            $internal_media = new Media($this->bdd);
+            foreach ($medias as $media)
+            {
+                $internal_media->link_to($media['id'], 'sended', $id_sended); //No rollback on error, keeping track of mms is more important than integrity
+            }
+
+            if (!$this->bdd->commit())
+            {
+                return false;
+            }
+
+            return $id_sended;
         }
 
         /**
@@ -165,6 +190,8 @@ namespace controllers\internals;
          * @param $text : Text of the message
          * @param string $destination : Number of the receiver
          * @param bool   $flash       : Is the sms a flash. By default false.
+         * @param bool   $mms         : Is the sms a MMS. By default false.
+         * @param array  $medias      : Array of medias to link to the MMS.
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return array : [
@@ -172,7 +199,7 @@ namespace controllers\internals;
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, string $status = \models\Sended::STATUS_UNKNOWN): array
+        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, array $medias = [], string $status = \models\Sended::STATUS_UNKNOWN): array
         {
             $return = [
                 'error' => false,
@@ -180,19 +207,28 @@ namespace controllers\internals;
             ];
 
             $at = (new \DateTime())->format('Y-m-d H:i:s');
-            $response = $adapter->send($destination, $text, $flash);
+            $media_uris = [];
+            foreach ($medias as $media)
+            {
+                $media_uris[] = [
+                    'http_url' => HTTP_PWD . '/data/' . $media['path'],
+                    'local_uri' => PWD_DATA . '/data/' . $media['path'],
+                ];
+            }
+
+            $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
 
             if ($response['error'])
             {
                 $return['error'] = true;
                 $return['error_message'] = $response['error_message'];
                 $status = \models\Sended::STATUS_FAILED;
-                $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+                $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
 
                 return $return;
             }
 
-            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
 
             $sended = [
                 'id' => $sended_id,

@@ -266,7 +266,8 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $result['extension'] = pathinfo($file['name'])['extension'];
+            $result['tmp_name'] = $tmp_filename;
+            $result['extension'] = pathinfo($file['name'], PATHINFO_EXTENSION);
             $result['mime_type'] = mime_content_type($tmp_filename);
 
             $file_handler = fopen($tmp_filename, 'r');
@@ -277,13 +278,18 @@ namespace controllers\internals;
         }
 
         /**
-         * Allow to upload file.
+         * Allow to save an uploaded file from the $_FILE['file'] array
          *
          * @param array $file : The array extracted from $_FILES['file']
+         * @param string $dirpath : The directory to save the file in
+         * @param bool $override : If true, override the file if another file with this name exists 
+         * @param ?string $filename : The name to use for the file, if null use a highly random name
+         * @param ?string $extension : The extension to use for the file, if null try to determine it using original file extension, then mime_type
+         * @param bool $use_mimetype : If true, ignore original file extension to determine final file extension and use file real mimetype instead
          *
-         * @return array : ['success' => bool, 'content' => file path | error message, 'error_code' => $file['error']]
+         * @return array : ['success' => bool, 'content' => new file name | error message, 'error_code' => $file['error']]
          */
-        public static function upload_file(array $file)
+        public static function save_uploaded_file(array $file, string $dirpath, bool $override = false, ?string $filename = null, ?string $extension = null, bool $use_mimetype = false)
         {
             $result = [
                 'success' => false,
@@ -291,82 +297,61 @@ namespace controllers\internals;
                 'error_code' => $file['error'] ?? 99,
             ];
 
-            if (UPLOAD_ERR_OK !== $file['error'])
+            $upload_info = self::read_uploaded_file($file);
+            if (!$upload_info['success'])
             {
-                switch ($file['error'])
+                $result['content'] = $upload_info['content'];
+                return $result;
+            }
+            
+            if ($extension === null)
+            {
+                $extension = $upload_info['extension'];
+                if ($extension === '' || $use_mimetype)
                 {
-                    case UPLOAD_ERR_INI_SIZE:
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
-
-                        break;
-
-                    case UPLOAD_ERR_FORM_SIZE:
-                        $result['content'] = 'Le fichier dépasse la limite de taille.';
-
-                        break;
-
-                    case UPLOAD_ERR_PARTIAL:
-                        $result['content'] = 'L\'envoi du fichier a été interrompu.';
-
-                        break;
-
-                    case UPLOAD_ERR_NO_FILE:
-                        $result['content'] = 'Aucun fichier n\'a été envoyé.';
-
-                        break;
-
-                    case UPLOAD_ERR_NO_TMP_DIR:
-                        $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
-
-                        break;
-
-                    case UPLOAD_ERR_CANT_WRITE:
-                        $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
-
-                        break;
-
-                    case UPLOAD_ERR_EXTENSION:
-                        $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
-
-                        break;
+                    $mimey = new \Mimey\MimeTypes;
+                    $extension = $mimey->getExtension($upload_info['mime_type']);
                 }
-
-                return $result;
             }
 
-            $tmp_filename = $file['tmp_name'] ?? false;
-            if (!$tmp_filename || !is_readable($tmp_filename))
+            if ($filename === null)
             {
-                return $result;
+                $filename = self::random_uuid();
             }
 
-            $md5_filename = md5_file($tmp_filename);
-            if (!$md5_filename)
+            $filename = $filename . '.' . $extension;
+            $filepath = $dirpath . '/' . $filename;
+
+            if (file_exists($filepath) && !$override)
             {
-                return $result;
-            }
-
-            $new_file_path = PWD_DATA . '/' . $md5_filename;
-
-            if (file_exists($new_file_path))
-            {
-                $result['success'] = true;
-                $result['content'] = $new_file_path;
+                $result['content'] = 'Le fichier ' . $filepath . ' existe déjà.';
 
                 return $result;
             }
 
-            $success = move_uploaded_file($tmp_filename, $new_file_path);
+            $success = move_uploaded_file($upload_info['tmp_name'], $filepath);
             if (!$success)
             {
-                $result['content'] = 'Impossible d\'écrire le fichier sur le serveur.';
+                $result['content'] = 'Impossible de délplacer le fichier vers ' . $filepath;
 
                 return $result;
             }
 
             $result['success'] = true;
-            $result['content'] = $new_file_path;
+            $result['content'] = $filename;
 
             return $result;
+        }
+        
+        
+        /**
+         * Generate a highly random uuid based on timestamp and strong cryptographic random
+         *
+         * @return string
+         */
+        public static function random_uuid()
+        {
+            $bytes = random_bytes(16);
+            return time() . '-' . bin2hex($bytes);
         }
     }

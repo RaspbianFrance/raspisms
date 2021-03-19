@@ -130,21 +130,24 @@ namespace adapters;
         {
             return false;
         }
+        
+        /**
+         * Does the implemented service support mms reception
+         */
+        public static function meta_support_mms_reception(): bool
+        {
+            return true;
+        }
 
         /**
-         * Method called to send a SMS to a number.
-         *
-         * @param string $destination : Phone number to send the sms to
-         * @param string $text        : Text of the SMS to send
-         * @param bool   $flash       : Is the SMS a Flash SMS
-         *
-         * @return array : [
-         *               bool 'error' => false if no error, true else
-         *               ?string 'error_message' => null if no error, else error message
-         *               array 'uid' => Uid of the sms created on success
-         *               ]
+         * Does the implemented service support mms sending
          */
-        public function send(string $destination, string $text, bool $flash = false)
+        public static function meta_support_mms_sending(): bool
+        {
+            return true;
+        }
+
+        public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []) : array
         {
             $response = [
                 'error' => false,
@@ -154,8 +157,10 @@ namespace adapters;
 
             $uid = uniqid();
 
+            $medias = [];
+
             $at = (new \DateTime())->format('Y-m-d H:i:s');
-            $success = file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash]) . "\n", FILE_APPEND);
+            $success = file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash, 'mms' => $mms, 'medias' => $medias]) . "\n", FILE_APPEND);
             if (false === $success)
             {
                 $response['error'] = true;
@@ -169,15 +174,6 @@ namespace adapters;
             return $response;
         }
 
-        /**
-         * Method called to read SMSs of the number.
-         *
-         * @return array : [
-         *               bool 'error' => false if no error, true else
-         *               ?string 'error_message' => null if no error, else error message
-         *               array 'sms' => Array of the sms reads
-         *               ]
-         */
         public function read(): array
         {
             $response = [
@@ -231,20 +227,11 @@ namespace adapters;
             }
         }
 
-        /**
-         * Method called to verify if the adapter is working correctly
-         * should be use for exemple to verify that credentials and number are both valid.
-         *
-         * @return bool : False on error, true else
-         */
         public function test(): bool
         {
             return true;
         }
 
-        /**
-         * Method called on reception of a status update notification for a SMS.
-         */
         public static function status_change_callback()
         {
             $uid = $_GET['uid'] ?? false;
@@ -281,20 +268,6 @@ namespace adapters;
             return $return;
         }
 
-        /**
-         * Method called on reception of a sms notification.
-         *
-         * @return array : [
-         *               bool 'error' => false on success, true on error
-         *               ?string 'error_message' => null on success, error message else
-         *               array 'sms' => array [
-         *               string 'at' : Recepetion date format Y-m-d H:i:s,
-         *               string 'text' : SMS body,
-         *               string 'origin' : SMS sender,
-         *               ]
-         *
-         * ]
-         */
         public static function reception_callback(): array
         {
             return [];
