@@ -76,7 +76,7 @@
 					<?php if ($_SESSION['user']['settings']['detect_url']) { ?>
 						//On ajoute la detection de lien dans le texte du message
 						message.text = Autolinker.link(message.text, {newWindow:true});
-					<?php } ?>
+                    <?php } ?>
 
 					switch (message.type)
 					{
@@ -85,7 +85,10 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-received">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
-									'<div class="discussion-message-date">' + message.date + '</div>' +
+                                    '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
+                                        return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
+                                     }).join(' - ') + '</div>' +
+                                    '<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
 
@@ -101,6 +104,9 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
+                                    '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
+                                        return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
+                                     }).join(' - ') + '</div>' +
 									'<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="fa fa-times-circle fa-fw text-danger"></span>' : '<span class="fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
 								'</div>' +
 							'</div>';
@@ -111,6 +117,9 @@
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
 										'<div class="discussion-message-text">' + message.text + '</div>' +
+                                        '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
+                                            return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
+                                         }).join(' - ') + '</div>' +
 										'<div class="discussion-message-date">' + message.date + '</div>' +
 									'</div>' +
 								'</div>';

@@ -45,8 +45,8 @@
                                         <table class="table table-bordered table-hover table-striped datatable" id="table-receiveds">
                                             <thead>
                                                 <tr>
-                                                    <th>De</th>
-                                                    <th>À</th>
+                                                    <th>Expéditeur</th>
+                                                    <th>Destinataire</th>
                                                     <th>Message</th>
                                                     <th>Date</th>
                                                     <th>Status</th>
@@ -104,7 +104,21 @@ jQuery(document).ready(function ()
                 },
             },
             {data: 'phone_name', render: jQuery.fn.dataTable.render.text()},
-            {data: 'text', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'text',
+                render: function (data, type, row, meta) {
+                    if (row.mms == 1) {
+                        var medias = [];
+                        for (i = 0; i < row.medias.length; i++) {
+                            medias.push('<a href="' + HTTP_PWD + '/data/' + jQuery.fn.dataTable.render.text().display(row.medias[i].path) + '" target="_blank">Fichier ' + (i + 1) + '</a>');
+                        }
+                        html = data + '<br/>' + medias.join(' - ');
+                        return html;
+                    }
+
+                    return data;
+                },
+            },
             {data: 'at', render: jQuery.fn.dataTable.render.text()},
             {
                 data: 'status',

@@ -21,6 +21,7 @@ namespace controllers\publics;
         private $internal_received;
         private $internal_contact;
         private $internal_phone;
+        private $internal_media;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -37,6 +38,7 @@ namespace controllers\publics;
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_media = new \controllers\internals\Media($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -112,12 +114,26 @@ namespace controllers\publics;
 
             foreach ($sendeds as $sended)
             {
-                $messages[] = [
+                $medias = [];
+                if ($sended['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_sended($sended['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                    }
+                }
+
+                $message = [
                     'date' => htmlspecialchars($sended['at']),
                     'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
+                    'medias' => $medias,
                     'status' => $sended['status'],
                 ];
+
+
+                $messages[] = $message;
             }
 
             foreach ($receiveds as $received)
@@ -126,21 +142,43 @@ namespace controllers\publics;
                 {
                     $this->internal_received->mark_as_read_for_user($id_user, $received['id']);
                 }
+                
+                $medias = [];
+                if ($sended['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_received($received['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                    }
+                }
 
                 $messages[] = [
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
                     'md5' => md5($received['at'] . $received['text']),
+                    'medias' => $medias,
                 ];
             }
 
             foreach ($scheduleds as $scheduled)
             {
+                $medias = [];
+                if ($sended['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_scheduled($scheduled['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                    }
+                }
+
                 $messages[] = [
                     'date' => htmlspecialchars($scheduled['at']),
                     'text' => htmlspecialchars($scheduled['text']),
                     'type' => 'inprogress',
+                    'medias' => $medias,
                 ];
             }
 

@@ -19,6 +19,7 @@ namespace controllers\publics;
         private $internal_received;
         private $internal_contact;
         private $internal_phone;
+        private $internal_media;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -32,6 +33,7 @@ namespace controllers\publics;
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_media = new \controllers\internals\Media($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -53,6 +55,10 @@ namespace controllers\publics;
             foreach ($entities as &$entity)
             {
                 $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
+                if ($entity['mms'])
+                {
+                    $entity['medias'] = $this->internal_media->gets_for_received($entity['id']);
+                }
             }
 
             header('Content-Type: application/json');
@@ -76,6 +82,10 @@ namespace controllers\publics;
             foreach ($entities as &$entity)
             {
                 $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
+                if ($entity['mms'])
+                {
+                    $entity['medias'] = $this->internal_media->gets_for_received($entity['id']);
+                }
             }
 
             header('Content-Type: application/json');

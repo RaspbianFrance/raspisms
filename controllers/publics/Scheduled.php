@@ -56,6 +56,13 @@ namespace controllers\publics;
         public function list_json()
         {
             $entities = $this->internal_scheduled->list_for_user($_SESSION['user']['id']);
+            foreach ($entities as &$entity)
+            {
+                if ($entity['mms'])
+                {
+                    $entity['medias'] = $this->internal_media->gets_for_scheduled($entity['id']);
+                }
+            }
 
             header('Content-Type: application/json');
             echo json_encode(['data' => $entities]);
