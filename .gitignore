@@ -11,5 +11,6 @@ phinx.*
 
 data/test_write_sms.json
 data/test_read_sms.json
+data/medias/
 
 !*.dist

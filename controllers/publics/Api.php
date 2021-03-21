@@ -151,6 +151,21 @@ namespace controllers\publics;
                     $entries[$key]['contacts'] = $this->internal_scheduled->get_contacts($entry['id']);
                     $entries[$key]['groups'] = $this->internal_scheduled->get_groups($entry['id']);
                     $entries[$key]['conditional_groups'] = $this->internal_scheduled->get_conditional_groups($entry['id']);
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_scheduled($entry['id']);
+                }
+            }
+            elseif ('received' === $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_received($entry['id']);
+                }
+            }
+            elseif ('sended' === $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_sended($entry['id']);
                 }
             }
             //Special case for group we must add contact because its a join
@@ -206,12 +221,39 @@ namespace controllers\publics;
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
-            $files = $_FILES ?? [];
+            $files = $_FILES['medias'] ?? false;
 
             $numbers = \is_array($numbers) ? $numbers : [$numbers];
             $contacts = \is_array($contacts) ? $contacts : [$contacts];
             $groups = \is_array($groups) ? $groups : [$groups];
             $conditional_groups = \is_array($conditional_groups) ? $conditional_groups : [$conditional_groups];
+
+            //Iterate over files to re-create individual $_FILES array
+            $files_arrays = [];
+
+            if ($files === false)
+            {
+                $files_arrays = [];
+            }
+            elseif (!is_array($files['name'])) //Only one file uploaded
+            {
+                $files_arrays[] = $files;
+            }
+            else //multiple files
+            {
+                foreach ($files as $property_name => $files_values)
+                {
+                    foreach ($files_values as $file_key => $property_value)
+                    {
+                        if (!isset($files_arrays[$file_key]))
+                        {
+                            $files_arrays[$file_key] = [];
+                        }
+
+                        $files_arrays[$file_key][$property_name] = $property_value;
+                    }
+                }
+            }
 
             $media_ids = [];
 
@@ -316,45 +358,50 @@ namespace controllers\publics;
                 }
             }
 
-            foreach ($files as $file)
+            if ($mms)
             {
-                $user_media_path = PWD_DATA . '/medias/' . $this->user['id'];
-                
-                //Create user medias dir if not exists 
-                if (!file_exists($user_media_path))
+                foreach ($files_arrays as $file)
                 {
-                    if (!mkdir($user_media_path, fileperms(PWD_DATA), true))
+                    $user_media_path = PWD_DATA . '/medias/' . $this->user['id'];
+                    
+                    //Create user medias dir if not exists 
+                    if (!file_exists($user_media_path))
+                    {
+                        if (!mkdir($user_media_path, fileperms(PWD_DATA), true))
+                        {
+                            $return = self::DEFAULT_RETURN;
+                            $return['error'] = self::ERROR_CODES['CANNOT_UPLOAD_FILE'];
+                            $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . ' : Because cannot create medias dir on server for the user.';
+                            $this->auto_http_code(false);
+
+                            return $this->json($return);
+                        }
+                    }
+
+                    $result = \controllers\internals\Tool::save_uploaded_file($file, $user_media_path);
+                    if ($result['success'] !== true)
                     {
                         $return = self::DEFAULT_RETURN;
                         $return['error'] = self::ERROR_CODES['CANNOT_UPLOAD_FILE'];
-                        $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . ' : Because cannot create medias dir on server for the user.';
+                        $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . $file['name'] . ' with error : ' . $result['content'];
                         $this->auto_http_code(false);
 
                         return $this->json($return);
                     }
-                }
 
-                $result = \controllers\internals\Tool::save_uploaded_file($file, $user_media_path);
-                if ($result['success'] !== true)
-                {
-                    $return = self::DEFAULT_RETURN;
-                    $return['error'] = self::ERROR_CODES['CANNOT_UPLOAD_FILE'];
-                    $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . $file['name'] . ' with error : ' . $result['content'];
-                    $this->auto_http_code(false);
+                    $new_filepath = 'medias/' . $this->user['id'] . '/' . $result['content'];
+                    $new_media_id = $this->internal_media->create($this->user['id'], $new_filepath);
+                    if (!$new_media_id)
+                    {
+                        $return = self::DEFAULT_RETURN;
+                        $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
+                        $this->auto_http_code(false);
 
-                    return $this->json($return);
-                }
+                        return $this->json($return);
+                    }
 
-                $new_filepath = 'medias/' . $this->user['id'] . '/' . $result['content'];
-                $new_media_id = $this->internal_media->create($this->user['id'], $new_filepath);
-                if (!$new_media_id)
-                {
-                    $return = self::DEFAULT_RETURN;
-                    $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
-                    $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
-                    $this->auto_http_code(false);
-
-                    return $this->json($return);
+                    $media_ids[] = $new_media_id;
                 }
             }
 

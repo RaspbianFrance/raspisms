@@ -17,26 +17,23 @@ namespace models;
     class Media extends StandardModel
     {
         /**
-         * Return a media for a user and a scheduled.
+         * Return all medias for a scheduled.
          *
-         * @param int $id_user      : user id
          * @param int $id_scheduled : scheduled id
          *
          * @return array
          */
-        public function gets_for_scheduled_and_user(int $id_user, int $id_scheduled)
+        public function gets_for_scheduled(int $id_scheduled)
         {
             $query = '
-                SELECT m.id as id, m.user_id as user_id, m.path as path
+                SELECT m.id as id, m.id_user as id_user, m.path as path
                 FROM `' . $this->get_table_name() . '` as m
                 INNER JOIN media_scheduled as ms
                 ON m.id = ms.id_media
-                WHERE m.id_user = :id_user
-                AND ms.id_scheduled = :id_scheduled
+                WHERE ms.id_scheduled = :id_scheduled
             ';
 
             $params = [
-                'id_user' => $id_user,
                 'id_scheduled' => $id_scheduled,
             ];
 
@@ -44,26 +41,23 @@ namespace models;
         }
         
         /**
-         * Return a media for a user and a sended.
+         * Return all medias for a sended.
          *
-         * @param int $id_user      : user id
          * @param int $id_sended : sended id
          *
          * @return array
          */
-        public function gets_for_sended_and_user(int $id_user, int $id_sended)
+        public function gets_for_sended(int $id_sended)
         {
             $query = '
-                SELECT m.id as id, m.user_id as user_id, m.path as path
+                SELECT m.id as id, m.id_user as id_user, m.path as path
                 FROM `' . $this->get_table_name() . '` as m
                 INNER JOIN media_sended as ms
                 ON m.id = ms.id_media
-                WHERE m.id_user = :id_user
-                AND ms.id_sended = :id_sended
+                WHERE ms.id_sended = :id_sended
             ';
 
             $params = [
-                'id_user' => $id_user,
                 'id_sended' => $id_sended,
             ];
 
@@ -71,26 +65,23 @@ namespace models;
         }
         
         /**
-         * Return a media for a user and a received.
+         * Return all medias for a received.
          *
-         * @param int $id_user      : user id
          * @param int $id_received : received id
          *
          * @return array
          */
-        public function gets_for_received_and_user(int $id_user, int $id_received)
+        public function gets_for_received(int $id_received)
         {
             $query = '
-                SELECT m.id as id, m.user_id as user_id, m.path as path
+                SELECT m.id as id, m.id_user as id_user, m.path as path
                 FROM `' . $this->get_table_name() . '` as m
                 INNER JOIN media_received as mr
                 ON m.id = mr.id_media
-                WHERE m.id_user = :id_user
-                AND mr.id_received = :id_received
+                WHERE mr.id_received = :id_received
             ';
 
             $params = [
-                'id_user' => $id_user,
                 'id_received' => $id_received,
             ];
 

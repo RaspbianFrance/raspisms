@@ -23,7 +23,7 @@ namespace controllers\internals;
          *
          * @return mixed bool|int : false on error, new media id else
          */
-        public function create(int $id_user, string $path): bool
+        public function create(int $id_user, string $path)
         {
             $data = [
                 'path' => $path,
@@ -41,7 +41,7 @@ namespace controllers\internals;
          *
          * @return mixed bool|int : false on error, the new link id else
          */
-        public function link_to(int $id_media, int $resource_type, int $resource_id)
+        public function link_to(int $id_media, string $resource_type, int $resource_id)
         {
             switch ($resource_type)
             {
@@ -160,42 +160,39 @@ namespace controllers\internals;
         }
 
         /**
-         * Find medias for a scheduled and a user.
+         * Find medias for a scheduled.
          *
-         * @param int $id_user      : User id
          * @param int $id_scheduled : Scheduled id to fin medias for
          *
          * @return mixed : Medias || false
          */
-        public function gets_for_scheduled_and_user(int $id_user, int $id_scheduled)
+        public function gets_for_scheduled(int $id_scheduled)
         {
-            return $this->get_model()->gets_for_scheduled_and_user($id_user, $id_scheduled);
+            return $this->get_model()->gets_for_scheduled($id_scheduled);
         }
         
         /**
          * Find medias for a sended and a user.
          *
-         * @param int $id_user      : User id
          * @param int $id_sended : Scheduled id to fin medias for
          *
          * @return mixed : Medias || false
          */
-        public function gets_for_sended_and_user(int $id_user, int $id_sended)
+        public function gets_for_sended(int $id_sended)
         {
-            return $this->get_model()->gets_for_sended_and_user($id_user, $id_sended);
+            return $this->get_model()->gets_for_sended($id_sended);
         }
         
         /**
          * Find medias for a received and a user.
          *
-         * @param int $id_user      : User id
          * @param int $id_received : Scheduled id to fin medias for
          *
          * @return mixed : Medias || false
          */
-        public function gets_for_received_and_user(int $id_user, int $id_received)
+        public function gets_for_received(int $id_received)
         {
-            return $this->get_model()->gets_for_received_and_user($id_user, $id_received);
+            return $this->get_model()->gets_for_received($id_received);
         }
 
         /**

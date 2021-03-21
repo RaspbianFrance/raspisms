@@ -297,7 +297,7 @@ namespace controllers\internals;
                 if ($scheduled['mms'])
                 {
                     $internal_media = new Media($this->bdd);
-                    $scheduled['medias'] = $internal_media->gets_for_scheduled_and_user($scheduled['id_user'], $scheduled['id']);
+                    $scheduled['medias'] = $internal_media->gets_for_scheduled($scheduled['id']);
                 }
 
                 $phone_to_use = null;
