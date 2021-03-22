@@ -222,14 +222,15 @@ footer img
 
 .discussion-message-media
 {
+    display: inline-block;
     line-height: 160px;
     width: 160px;
     height: 160px;
     padding: 5px;
-    margin-bottom: 15px;
     background-color: rgba(255, 255, 255, 0.3);
     vertical-align: middle;
     text-align: center;
+    margin: 5px;
 }
 
 .message-container
