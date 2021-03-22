@@ -79,16 +79,27 @@
 						message.text = Autolinker.link(message.text, {newWindow:true});
                     <?php } ?>
 
+                    var medias = message.medias.map((mediaUrl, index) => {
+                        var extension = mediaUrl.split('.').pop();
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension))
+                        {
+                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank"><img src="' + mediaUrl + '"/></a></div>';
+                        }
+                        else
+                        {
+                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a></div>';
+                        }
+                    });
+                    var medias_html = '<div class="discussion-message-medias">' + medias.join('') + '</div>';
+
 					switch (message.type)
-					{
+                    {
 						case 'received' :
 							var texte = '' +
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-received">' +
-									'<div class="discussion-message-text">' + message.text + '</div>' +
-                                    '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
-                                        return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
-                                     }).join(' - ') + '</div>' +
+                                    '<div class="discussion-message-text">' + message.text + '</div>' +
+                                    medias.html + 
                                     '<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';
@@ -105,10 +116,8 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
-                                    '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
-                                        return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
-                                     }).join(' - ') + '</div>' +
-									'<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="fa fa-times-circle fa-fw text-danger"></span>' : '<span class="fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
+                                    medias_html +
+                                    '<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="fa fa-times-circle fa-fw text-danger"></span>' : '<span class="fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
 								'</div>' +
 							'</div>';
 							break;
@@ -117,10 +126,8 @@
 								'<div class="clearfix message-container">' +
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
-										'<div class="discussion-message-text">' + message.text + '</div>' +
-                                        '<div class="discussion-message-medias">' + message.medias.map((mediaUrl, index) => { 
-                                            return '<a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a>';
-                                         }).join(' - ') + '</div>' +
+                                        '<div class="discussion-message-text">' + message.text + '</div>' +
+                                        medias_html + 
 										'<div class="discussion-message-date">' + message.date + '</div>' +
 									'</div>' +
 								'</div>';

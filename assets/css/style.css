@@ -205,6 +205,33 @@ footer img
 	font-size: 0.9em;
 }
 
+.discussion-message-medias img
+{
+    transition-duration: 0.1s;
+    max-width: 150px;
+    max-height: 150px;
+    line-height: 150px;
+    width: auto;
+    height: auto;
+}
+
+.discussion-message-medias img:hover
+{
+    opacity: 0.6;
+}
+
+.discussion-message-media
+{
+    line-height: 160px;
+    width: 160px;
+    height: 160px;
+    padding: 5px;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+    vertical-align: middle;
+    text-align: center;
+}
+
 .message-container
 {
 	margin-bottom: 10px;
