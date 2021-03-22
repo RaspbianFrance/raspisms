@@ -34,6 +34,36 @@ namespace controllers\internals;
         }
 
         /**
+         * Upload and create a media
+         * 
+         * @param int   $id_user      : Id of the user
+         * @param array $file : array representing uploaded file, extracted from $_FILES['yourfile']
+         * @return mixed bool | int : False on error, or new media id on success
+         */
+        public function upload_and_create_for_user(int $id_user, array $file)
+        {
+            $user_media_path = PWD_DATA . '/medias/' . $id_user;
+
+            //Create user medias dir if not exists 
+            if (!file_exists($user_media_path))
+            {
+                if (!mkdir($user_media_path, fileperms(PWD_DATA), true))
+                {
+                    return false;
+                }
+            }
+
+            $upload_result = \controllers\internals\Tool::save_uploaded_file($file, $user_media_path);
+            if ($upload_result['success'] !== true)
+            {
+                return false;
+            }
+
+            $new_filepath = 'medias/' . $id_user . '/' . $upload_result['content'];
+            return $this->create($id_user, $new_filepath);
+        }
+
+        /**
          * Link a media to a scheduled, a received or a sended message
          * @param int $id_media : Id of the media
          * @param string $resource_type : Type of resource to link the media to ('scheduled', 'received' or 'sended')
@@ -99,7 +129,7 @@ namespace controllers\internals;
          *
          * @return mixed bool : false on error, true on success
          */
-        public function unlink_all_of(int $resource_type, int $resource_id)
+        public function unlink_all_of(string $resource_type, int $resource_id)
         {
             switch ($resource_type)
             {

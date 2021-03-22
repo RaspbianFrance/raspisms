@@ -212,8 +212,8 @@ namespace controllers\publics;
                     $scheduleds[$key]['groups'][] = (int) $group['id'];
                 }
 
-                $media = $this->internal_media->get_for_scheduled_and_user($id_user, $scheduled['id']);
-                $scheduleds[$key]['media'] = $media;
+                $medias = $this->internal_media->gets_for_scheduled($scheduled['id']);
+                $scheduleds[$key]['medias'] = $medias;
 
                 $conditional_groups = $this->internal_scheduled->get_conditional_groups($scheduled['id']);
                 foreach ($conditional_groups as $conditional_group)
@@ -242,7 +242,7 @@ namespace controllers\publics;
          * @param ?array $_POST['contacts']           : Numbers to send the message to
          * @param ?array $_POST['groups']             : Numbers to send the message to
          * @param ?array $_POST['conditional_groups'] : Numbers to send the message to
-         * @param ?array $_FILES['media']             : The media to link to a scheduled
+         * @param ?array $_FILES['medias']             : The media to link to a scheduled
          */
         public function create($csrf)
         {
@@ -257,13 +257,39 @@ namespace controllers\publics;
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $flash = (bool) ($_POST['flash'] ?? false);
-            $mms = $_FILES['media'] ?? false;
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
-            $media = $_FILES['media'] ?? false;
+            $files = $_FILES['medias'] ?? false;
+
+            //Iterate over files to re-create individual $_FILES array
+            $files_arrays = []; 
+            if ($files && is_array($files['name']))
+            {
+                foreach ($files as $property_name => $files_values)
+                {
+                    foreach ($files_values as $file_key => $property_value)
+                    {
+                        if (!isset($files_arrays[$file_key]))
+                        {
+                            $files_arrays[$file_key] = [];
+                        }
+
+                        $files_arrays[$file_key][$property_name] = $property_value;
+                    }
+                }
+            }
+            
+            //Remove empty files input
+            foreach ($files_arrays as $key => $file)
+            {
+                if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                {
+                    unset($files_arrays[$key]);
+                }
+            }
 
             if (empty($text))
             {
@@ -299,29 +325,32 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
+            
+            //If mms is enable and we have medias uploaded
+            $media_ids = [];
+            if ($_SESSION['user']['settings']['mms'] && $files_arrays)
+            {
+                foreach ($files_arrays as $file)
+                {
+                    $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
+                    if (!$new_media_id)
+                    {
+                        \FlashMessage\FlashMessage::push('danger', 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name']);
+                        return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                    }
 
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups);
+                    $media_ids[] = $new_media_id; 
+                }
+            }
+
+            $mms = (bool) count($media_ids);
+            
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
 
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
-            }
-
-            //If mms is disabled or no media uploaded, do not process
-            if (!($_SESSION['user']['settings']['mms'] ?? false) || !$media)
-            {
-                \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
-
-                return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
-            }
-
-            $success = $this->internal_media->create($id_user, $scheduled_id, $media);
-            if (!$success)
-            {
-                \FlashMessage\FlashMessage::push('success', 'Le SMS a bien été créé mais le média n\'as pas pu être enregistré.');
-
-                return $this->redirect(\descartes\Router::url('Scheduled', 'list'));
             }
 
             \FlashMessage\FlashMessage::push('success', 'Le Sms a bien été créé pour le ' . $at . '.');
@@ -360,11 +389,41 @@ namespace controllers\publics;
                 $contacts = $scheduled['contacts'] ?? [];
                 $groups = $scheduled['groups'] ?? [];
                 $conditional_groups = $scheduled['conditional_groups'] ?? [];
+                $files = $_FILES['scheduleds_' . $id_scheduled . '_medias'] ?? false;
+                $media_ids = $scheduled['media_ids'] ?? [];
 
+                //Check scheduled exists and belong to user
                 $scheduled = $this->internal_scheduled->get($id_scheduled);
                 if (!$scheduled || $scheduled['id_user'] !== $id_user)
                 {
                     continue;
+                }
+
+                //Iterate over files to re-create individual $_FILES array
+                $files_arrays = []; 
+                if ($files && is_array($files['name']))
+                {
+                    foreach ($files as $property_name => $files_values)
+                    {
+                        foreach ($files_values as $file_key => $property_value)
+                        {
+                            if (!isset($files_arrays[$file_key]))
+                            {
+                                $files_arrays[$file_key] = [];
+                            }
+
+                            $files_arrays[$file_key][$property_name] = $property_value;
+                        }
+                    }
+                }
+
+                //Remove empty files input
+                foreach ($files_arrays as $key => $file)
+                {
+                    if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                    {
+                        unset($files_arrays[$key]);
+                    }
                 }
 
                 if (empty($text))
@@ -394,32 +453,36 @@ namespace controllers\publics;
                 {
                     continue;
                 }
-
-                $success = $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
-
-                //Check for media
-                /*
-                $current_media = $scheduled['current_media'] ?? false;
-                if (!$current_media)
+                
+                //If mms is enable and we have medias uploaded
+                if ($_SESSION['user']['settings']['mms'] && $files_arrays)
                 {
-                    $this->internal_media->delete_for_scheduled_and_user($id_user, $id_scheduled);
+                    foreach ($files_arrays as $file)
+                    {
+                        $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
+                        if (!$new_media_id)
+                        {
+                            continue 2;
+                        }
+
+                        $media_ids[] = $new_media_id; 
+                    }
                 }
 
-                $media = $_FILES['media_' . $id_scheduled] ?? false;
-                if (!$media)
+                //Ensure media_ids point to medias belongings to the current user
+                foreach ($media_ids as $key => $media_id)
                 {
-                    $nb_update += (int) $success;
-                    continue;
+                    $media = $this->internal_media->get($media_id);
+                    if (!$media || $media['id_user'] !== $_SESSION['user']['id'])
+                    {
+                        unset($media_ids[$key]);
+                    }
                 }
 
-                $success = $this->internal_media->create($id_user, $id_scheduled, $media);
-                if (!$success)
-                {
-                    continue;
-                }
-                 */
+                $mms = (bool) count($media_ids);
 
-                ++$nb_update;
+                $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
+                $nb_update++;
             }
 
             if ($nb_update !== \count($scheduleds))

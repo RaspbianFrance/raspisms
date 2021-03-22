@@ -362,40 +362,12 @@ namespace controllers\publics;
             {
                 foreach ($files_arrays as $file)
                 {
-                    $user_media_path = PWD_DATA . '/medias/' . $this->user['id'];
-                    
-                    //Create user medias dir if not exists 
-                    if (!file_exists($user_media_path))
-                    {
-                        if (!mkdir($user_media_path, fileperms(PWD_DATA), true))
-                        {
-                            $return = self::DEFAULT_RETURN;
-                            $return['error'] = self::ERROR_CODES['CANNOT_UPLOAD_FILE'];
-                            $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . ' : Because cannot create medias dir on server for the user.';
-                            $this->auto_http_code(false);
-
-                            return $this->json($return);
-                        }
-                    }
-
-                    $result = \controllers\internals\Tool::save_uploaded_file($file, $user_media_path);
-                    if ($result['success'] !== true)
-                    {
-                        $return = self::DEFAULT_RETURN;
-                        $return['error'] = self::ERROR_CODES['CANNOT_UPLOAD_FILE'];
-                        $return['message'] = self::ERROR_MESSAGES['CANNOT_UPLOAD_FILE'] . $file['name'] . ' with error : ' . $result['content'];
-                        $this->auto_http_code(false);
-
-                        return $this->json($return);
-                    }
-
-                    $new_filepath = 'medias/' . $this->user['id'] . '/' . $result['content'];
-                    $new_media_id = $this->internal_media->create($this->user['id'], $new_filepath);
+                    $new_media_id = $this->internal_media->upload_and_create_for_user($this->user['id'], $file);
                     if (!$new_media_id)
                     {
                         $return = self::DEFAULT_RETURN;
                         $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
-                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
+                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'] . ' : Cannot upload and create media file ' . $file['name'];
                         $this->auto_http_code(false);
 
                         return $this->json($return);
