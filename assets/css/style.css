@@ -254,6 +254,12 @@ footer img
 	margin-top: 8px;
 }
 
+.message-input input[type="file"]
+{
+    margin-top: 8px;
+    display: inline-block;
+}
+
 .message-in-progress-hover
 {
 	position: absolute;

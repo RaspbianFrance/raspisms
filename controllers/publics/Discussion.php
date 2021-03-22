@@ -203,6 +203,7 @@ namespace controllers\publics;
          * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
          * @param string $_POST['id_phone']    : If of phone to send sms with
+         * @param array $_FILES['medias']      : Medias to upload and link to sms
          *
          * @return string : json string Le statut de l'envoi
          */
@@ -228,6 +229,43 @@ namespace controllers\publics;
             $text = $_POST['text'] ?? '';
             $destination = $_POST['destination'] ?? false;
             $id_phone = $_POST['id_phone'] ?? false;
+            $files = $_FILES['medias'] ?? false;
+            
+            //Iterate over files to re-create individual $_FILES array
+            $files_arrays = []; 
+            if ($files && is_array($files['name']))
+            {
+                foreach ($files as $property_name => $files_values)
+                {
+                    foreach ($files_values as $file_key => $property_value)
+                    {
+                        if (!isset($files_arrays[$file_key]))
+                        {
+                            $files_arrays[$file_key] = []; 
+                        }
+
+                        $files_arrays[$file_key][$property_name] = $property_value;
+                    }
+                }
+            }
+
+            //Remove empty files input
+            foreach ($files_arrays as $key => $file)
+            {
+                if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                {
+                    unset($files_arrays[$key]);
+                }
+            }
+
+            if (!$text)
+            {
+                $return['success'] = false;
+                $return['message'] = 'Vous devez renseigner le texte de votre sms.';
+                echo json_encode($return);
+
+                return false;
+            }
 
             if (!$destination)
             {
@@ -243,10 +281,33 @@ namespace controllers\publics;
                 $id_phone = null;
             }
 
+
+            //If mms is enable and we have medias uploaded
+            $media_ids = [];
+            if ($_SESSION['user']['settings']['mms'] && $files_arrays)
+            {
+                foreach ($files_arrays as $file)
+                {
+                    $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
+                    if (!$new_media_id)
+                    {
+                        $return['success'] = false;
+                        $return['message'] = 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name'];
+                        echo json_encode($return);
+
+                        return false;
+                    }
+
+                    $media_ids[] = $new_media_id;
+                }
+            }
+
+            $mms = (bool) count($media_ids);
+
             //Destinations must be an array of number
             $destinations = [$destination];
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $destinations))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $mms, $destinations, [], [], [], $media_ids))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

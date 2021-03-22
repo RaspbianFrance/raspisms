@@ -43,6 +43,11 @@ namespace controllers\internals;
                 'mms' => $mms,
             ];
 
+            if ($text === '')
+            {
+                return false;
+            }
+
             if (null !== $id_phone)
             {
                 $internal_phone = new Phone($this->bdd);
@@ -441,7 +446,7 @@ namespace controllers\internals;
                 foreach ($messages as $message)
                 {
                     //Remove empty messages
-                    if ('' === trim($message['text']))
+                    if ('' === trim($message['text']) && !$message['medias'])
                     {
                         continue;
                     }

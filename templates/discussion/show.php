@@ -42,6 +42,7 @@
                             <?php if ($response_phone ) { ?>
                                 <input type="hidden" name="id_phone" value="<?php $this->s($response_phone['id']); ?>" />
                             <?php } ?>
+                            <input name="medias[]" type="file" multiple />
 							<button class="btn" ><span class="fa fa-fw fa-send-o"></span> Envoyer</button>
 						</form>
 					</div>
