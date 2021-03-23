@@ -16,7 +16,7 @@ namespace controllers\internals;
         protected $model;
 
         /**
-         * Create a media.
+         * Create a call.
          *
          * @param int $id_user         : Id of the user
          * @param int $id_phone        : Id of the phone that emitted (outbound) or received (inbound) the call
@@ -50,11 +50,11 @@ namespace controllers\internals;
             switch ($direction)
             {
                 case \models\Call::DIRECTION_OUTBOUND :
-                    null === $destination ?: return false;
+                    if (null === $destination) { return false; }
                     break;
                 
                 case \models\Call::DIRECTION_INBOUND :
-                    null === $origin ?: return false;
+                    if (null === $origin) { return false; }
                     break;
 
                 default :
@@ -77,5 +77,51 @@ namespace controllers\internals;
             }
 
             return $this->get_model()->insert($call);
+        }
+
+
+        /**
+         * End a call
+         *
+         * @param int $id_user : Id of the user to end call for
+         * @param int $id_phone : If of the phone to end call for
+         * @param string $uid : Uid of the call to end
+         * @param string $end : End date of the call, format Y-m-d H:i:s
+         *
+         * @return bool : False if cannot end phone call, true else
+         */
+        public function end(int $id_user, int $id_phone, string $uid, string $end)
+        {
+            if (!\controllers\internals\Tool::validate_date($end, 'Y-m-d H:i:s'))
+            {
+                return false;
+            }
+
+            $call = $this->get_model()->get_by_uid_and_phone_for_user($id_user, $id_phone, $uid);
+            if (!$call)
+            {
+                return false;
+            }
+
+            if (new \DateTime($end) < new \DateTime($call['start']))
+            {
+                return false;
+            }
+
+            $datas = [
+                'end' => $end,
+            ];
+
+            return (bool) $this->get_model()->update_for_user($id_user, $call['id'], $datas);
+        }
+        
+        /**
+         * Get the model for the Controller.
+         */
+        protected function get_model(): \descartes\Model
+        {
+            $this->model = $this->model ?? new \models\Call($this->bdd);
+
+            return $this->model;
         }
     }

@@ -27,6 +27,7 @@ use Monolog\Logger;
         private $internal_adapter;
         private $internal_media;
         private $internal_phone;
+        private $internal_call;
 
         public function __construct()
         {
@@ -37,7 +38,8 @@ use Monolog\Logger;
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_media = new \controllers\internals\Media($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
-            $this->internal_phone = new \controllers\internals\Phone();
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_call = new \controllers\internals\Call($bdd);
 
             //Logger
             $this->logger = new Logger('Callback ' . uniqid());
@@ -283,73 +285,81 @@ use Monolog\Logger;
             $response = $phone['adapter']::inbound_call_callback();
             if ($response['error'])
             {
-                $this->logger->error('Callback reception with adapter ' . $adapter_uid . ' failed : ' . $response['error_message']);
+                $this->logger->error('Callback inbound_call failed : ' . $response['error_message']);
 
                 return false;
             }
 
-            $sms = $response['sms'];
-            $mms = !empty($sms['mms']);
-            $medias = empty($sms['medias']) ? [] : $sms['medias'];
-            $media_ids = [];
+            $call = $response['call'];
+            $result = $this->internal_call->create($this->user['id'], $id_phone, $call['uid'], \models\Call::DIRECTION_INBOUND, $call['start'], $call['end'] ?? null, $call['origin']);
 
-            //We create medias to link to the sms
-            if ($mms)
+            if (!$result)
             {
-                foreach ($medias as $media)
-                {
-                    try
-                    {
-                        $media['mimetype'] = empty($media['mimetype']) ? mime_content_type($media['filepath']) : $media['mimetype'];
+                $this->logger->error('Callback inbound_call failed because cannot create call ' . json_encode($call));
 
-                        $mimey = new \Mimey\MimeTypes;
-                        $extension = empty($media['extension']) ? $mimey->getExtension($media['mimetype']) : $media['extension'];
-
-                        $new_filename = \controllers\internals\Tool::random_uuid() . '.' . $extension;
-                        $new_filedir = PWD_DATA . '/medias/' . $this->user['id'];
-                        $new_filerelpath = 'medias/' . $this->user['id'] . '/' . $new_filename;
-                        $new_filepath = $new_filedir . '/' . $new_filename;
-
-                        //Create user dir if not exists 
-                        if (!file_exists($new_filedir))
-                        {
-                            if (!mkdir($new_filedir, fileperms(PWD_DATA), true))
-                            {
-                                throw new \Exception('Cannot create dir ' . $new_filedir . ' to copy media : ' . json_encode($media));
-                            }
-                        }
-
-                        if (!rename($media['filepath'], $new_filepath))
-                        {
-                            throw new \Exception('Cannot copy media : ' . json_encode($media) . ' to ' . $new_filepath);
-                        }
-
-                        $new_media_id = $this->internal_media->create($this->user['id'], $new_filerelpath);
-                        if (!$new_media_id)
-                        {
-                            throw new \Exception('Cannot save into db media : ' . json_encode($media));
-                        }
-
-                        $media_ids[] = $new_media_id;
-                    }
-                    catch (\Throwable $t)
-                    {
-                        $this->logger->error($t->getMessage());
-                        continue;
-                    }
-                }
+                return false;
             }
 
-            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $media_ids);
+            $this->logger->info('Callback inbound_call successfully received inbound call : ' . json_encode($call));
+            
+            return true;
+        }
+        
+        
+        /**
+         * Function call on end call notification
+         * We return nothing, and we let the adapter do his things.
+         *
+         * @param int    $id_phone    : Phone id
+         *
+         * @return bool : true on success, false on error
+         */
+        public function end_call(int $id_phone)
+        {
+            $this->logger->info('Callback end call with phone : ' . $id_phone);
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+
+            if (!$phone)
+            {
+                $this->logger->error('Callback end call use non existing phone : ' . $id_phone);
+
+                return false;
+            }
+
+            if (!class_exists($phone['adapter']))
+            {
+                $this->logger->error('Callback end call use non existing adapter : ' . $phone['adapter']);
+
+                return false;
+            }
+
+            if (!$phone['adapter']::meta_support_end_call_callback())
+            {
+                $this->logger->error('Callback end call use adapter ' . $phone['adapter'] . ' which does not support end call callback.');
+
+                return false;
+            }
+
+            $response = $phone['adapter']::end_call_callback();
             if ($response['error'])
             {
-                $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+                $this->logger->error('Callback end call failed : ' . $response['error_message']);
 
                 return false;
             }
 
-            $this->logger->info('Callback reception successfully received message : ' . json_encode($sms));
+            $call = $response['call'];
+            $result = $this->internal_call->end($this->user['id'], $id_phone, $call['uid'], $call['end']);
 
+            if (!$result)
+            {
+                $this->logger->error('Callback end call failed because cannot update call ' . json_encode($call));
+
+                return false;
+            }
+
+            $this->logger->info('Callback end call successfully update call : ' . json_encode($call));
+            
             return true;
         }
     }

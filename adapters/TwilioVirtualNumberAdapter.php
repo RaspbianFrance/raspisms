@@ -190,6 +190,16 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
     {
         return false;
     }
+    
+    public static function meta_support_inbound_call_callback(): bool
+    {
+        return false;
+    }
+    
+    public static function meta_support_end_call_callback(): bool
+    {
+        return false;
+    }
 
     public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []) : array
     {
@@ -333,6 +343,16 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
     }
 
     public static function reception_callback(): array
+    {
+        return [];
+    }
+    
+    public function inbound_call_callback(): array
+    {
+        return [];
+    }
+    
+    public function end_call_callback(): array
     {
         return [];
     }
