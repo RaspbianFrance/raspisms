@@ -1,7 +1,7 @@
 <?php
 	//Template dashboard
 	
-	$this->render('incs/head', ['title' => 'ConditionalGroupes Conditionnels - Show All'])
+	$this->render('incs/head', ['title' => 'Groupes Conditionnels - Show All'])
 ?>
 <div id="wrapper">
 <?php

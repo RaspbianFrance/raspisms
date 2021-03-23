@@ -33,43 +33,7 @@ class Phone extends \descartes\Controller
      */
     public function list()
     {
-        $id_user = $_SESSION['user']['id'];
-        $api_key = $_SESSION['user']['api_key'];
-        $phones = $this->internal_phone->list_for_user($id_user);
-
-        $adapters = [];
-        $adapters = $this->internal_adapter->list_adapters();
-        foreach ($adapters as $key => $adapter)
-        {
-            unset($adapters[$key]);
-            $adapters[$adapter['meta_classname']] = $adapter;
-        }
-
-        foreach ($phones as &$phone)
-        {
-            $adapter = $adapters[$phone['adapter']] ?? false;
-
-            if (!$adapter)
-            {
-                $phone['adapter'] = 'Inconnu';
-
-                continue;
-            }
-
-            $phone['adapter'] = $adapter['meta_name'];
-
-            if ($adapter['meta_support_reception'])
-            {
-                $phone['callback_reception'] = \descartes\Router::url('Callback', 'reception', ['adapter_uid' => $adapter['meta_uid'], 'id_phone' => $phone['id']], ['api_key' => $api_key]);
-            }
-
-            if ($adapter['meta_support_status_change'])
-            {
-                $phone['callback_status'] = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => $adapter['meta_uid']], ['api_key' => $api_key]);
-            }
-        }
-
-        $this->render('phone/list', ['phones' => $phones]);
+        $this->render('phone/list');
     }
 
     /**
@@ -110,6 +74,16 @@ class Phone extends \descartes\Controller
             if ($adapter['meta_support_status_change'])
             {
                 $phone['callback_status'] = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => $adapter['meta_uid']], ['api_key' => $api_key]);
+            }
+            
+            if ($adapter['meta_support_inbound_call_callback'])
+            {
+                $phone['callback_inbound_call'] = \descartes\Router::url('Callback', 'inbound_call', ['id_phone' => $phone['id']], ['api_key' => $api_key]);
+            }
+            
+            if ($adapter['meta_support_end_call_callback'])
+            {
+                $phone['callback_end_call'] = \descartes\Router::url('Callback', 'end_call', ['id_phone' => $phone['id']], ['api_key' => $api_key]);
             }
         }
 

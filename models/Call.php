@@ -18,6 +18,48 @@ namespace models;
     {
         const DIRECTION_INBOUND = 'inbound';
         const DIRECTION_OUTBOUND = 'outbound';
+        
+        /**
+         * Return a list of call for a user.
+         * Add a column contact_name and phone_name when available.
+         *
+         * @param int  $id_user : user id
+         * @param ?int $limit   : Number of entry to return or null
+         * @param ?int $offset  : Number of entry to ignore or null
+         *
+         * @return array
+         */
+        public function list_for_user(int $id_user, $limit, $offset)
+        {
+            $query = '
+                SELECT `call`.*, contact.name as contact_name, phone.name as phone_name
+                FROM `call`
+                LEFT JOIN contact
+                ON contact.number = `call`.destination
+                OR contact.number = `call`.origin
+                LEFT JOIN phone
+                ON phone.id = `call`.id_phone
+                WHERE `call`.id_user = :id_user
+            ';
+
+            if (null !== $limit)
+            {
+                $limit = (int) $limit;
+
+                $query .= ' LIMIT ' . $limit;
+                if (null !== $offset)
+                {
+                    $offset = (int) $offset;
+                    $query .= ' OFFSET ' . $offset;
+                }
+            }
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
 
         /**
          * Get a call for a user by his phone and uid

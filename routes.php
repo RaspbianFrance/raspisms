@@ -58,10 +58,7 @@
         ],
 
         'Event' => [
-            'list' => [
-                '/event/',
-                '/event/p/{page}/',
-            ],
+            'list' => '/event/',
             'list_json' => '/event/json/',
             'delete' => '/event/delete/{csrf}/',
         ],
@@ -155,6 +152,12 @@
             'delete' => '/phone/delete/{csrf}/',
         ],
         
+        'Call' => [
+            'list' => '/call/',
+            'list_json' => '/call/json/',
+            'delete' => '/call/delete/{csrf}/',
+        ],
+        
         'Webhook' => [
             'list' => '/webhook/',
             'list_json' => '/webhook/json/',
@@ -169,6 +172,7 @@
             'update_sended_status' => '/callback/status/{adapter_uid}/',
             'reception' => '/callback/reception/{adapter_uid}/{id_phone}/',
             'inbound_call' => '/callback/inbound_call/{id_phone}/',
+            'end_call' => '/callback/end_call/{id_phone}/',
         ],
         
         'Api' => [
