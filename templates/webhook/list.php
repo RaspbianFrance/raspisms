@@ -92,6 +92,8 @@ jQuery(document).ready(function ()
                             return 'Envoi de SMS';
                         case 'receive_sms':
                             return 'Réception de SMS';
+                        case 'inbound_call':
+                            return 'Réception d\'un appel téléphonique';
                         default:
                             return 'Inconnu';
                     }

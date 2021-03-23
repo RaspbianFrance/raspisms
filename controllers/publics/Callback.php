@@ -26,6 +26,7 @@ use Monolog\Logger;
         private $internal_received;
         private $internal_adapter;
         private $internal_media;
+        private $internal_phone;
 
         public function __construct()
         {
@@ -36,6 +37,7 @@ use Monolog\Logger;
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_media = new \controllers\internals\Media($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
+            $this->internal_phone = new \controllers\internals\Phone();
 
             //Logger
             $this->logger = new Logger('Callback ' . uniqid());
@@ -171,6 +173,114 @@ use Monolog\Logger;
             }
 
             $response = $adapter_classname::reception_callback();
+            if ($response['error'])
+            {
+                $this->logger->error('Callback reception with adapter ' . $adapter_uid . ' failed : ' . $response['error_message']);
+
+                return false;
+            }
+
+            $sms = $response['sms'];
+            $mms = !empty($sms['mms']);
+            $medias = empty($sms['medias']) ? [] : $sms['medias'];
+            $media_ids = [];
+
+            //We create medias to link to the sms
+            if ($mms)
+            {
+                foreach ($medias as $media)
+                {
+                    try
+                    {
+                        $media['mimetype'] = empty($media['mimetype']) ? mime_content_type($media['filepath']) : $media['mimetype'];
+
+                        $mimey = new \Mimey\MimeTypes;
+                        $extension = empty($media['extension']) ? $mimey->getExtension($media['mimetype']) : $media['extension'];
+
+                        $new_filename = \controllers\internals\Tool::random_uuid() . '.' . $extension;
+                        $new_filedir = PWD_DATA . '/medias/' . $this->user['id'];
+                        $new_filerelpath = 'medias/' . $this->user['id'] . '/' . $new_filename;
+                        $new_filepath = $new_filedir . '/' . $new_filename;
+
+                        //Create user dir if not exists 
+                        if (!file_exists($new_filedir))
+                        {
+                            if (!mkdir($new_filedir, fileperms(PWD_DATA), true))
+                            {
+                                throw new \Exception('Cannot create dir ' . $new_filedir . ' to copy media : ' . json_encode($media));
+                            }
+                        }
+
+                        if (!rename($media['filepath'], $new_filepath))
+                        {
+                            throw new \Exception('Cannot copy media : ' . json_encode($media) . ' to ' . $new_filepath);
+                        }
+
+                        $new_media_id = $this->internal_media->create($this->user['id'], $new_filerelpath);
+                        if (!$new_media_id)
+                        {
+                            throw new \Exception('Cannot save into db media : ' . json_encode($media));
+                        }
+
+                        $media_ids[] = $new_media_id;
+                    }
+                    catch (\Throwable $t)
+                    {
+                        $this->logger->error($t->getMessage());
+                        continue;
+                    }
+                }
+            }
+
+            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $media_ids);
+            if ($response['error'])
+            {
+                $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
+
+                return false;
+            }
+
+            $this->logger->info('Callback reception successfully received message : ' . json_encode($sms));
+
+            return true;
+        }
+        
+        
+        /**
+         * Function call on call reception notification
+         * We return nothing, and we let the adapter do his things.
+         *
+         * @param int    $id_phone    : Phone id
+         *
+         * @return bool : true on success, false on error
+         */
+        public function inbound_call(int $id_phone)
+        {
+            $this->logger->info('Callback reception call with phone : ' . $id_phone);
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+
+            if (!$phone)
+            {
+                $this->logger->error('Callback inbound_call use non existing phone : ' . $id_phone);
+
+                return false;
+            }
+
+            if (!class_exists($phone['adapter']))
+            {
+                $this->logger->error('Callback inbound_call use non existing adapter : ' . $phone['adapter']);
+
+                return false;
+            }
+
+            if (!$phone['adapter']::meta_support_inbound_call_callback())
+            {
+                $this->logger->error('Callback inbound_call use adapter ' . $phone['adapter'] . ' which does not support inbound_call callback.');
+
+                return false;
+            }
+
+            $response = $phone['adapter']::inbound_call_callback();
             if ($response['error'])
             {
                 $this->logger->error('Callback reception with adapter ' . $adapter_uid . ' failed : ' . $response['error_message']);

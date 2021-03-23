@@ -236,10 +236,12 @@ namespace controllers\internals;
                 'text' => $text,
                 'destination' => $destination,
                 'origin' => $id_phone,
+                'mms' => $mms,
+                'medias' => $medias,
             ];
 
             $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND, $sended);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $sended);
 
             return $return;
         }

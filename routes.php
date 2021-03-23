@@ -168,6 +168,7 @@
         'Callback' => [
             'update_sended_status' => '/callback/status/{adapter_uid}/',
             'reception' => '/callback/reception/{adapter_uid}/{id_phone}/',
+            'inbound_call' => '/callback/inbound_call/{id_phone}/',
         ],
         
         'Api' => [
