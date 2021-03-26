@@ -75,8 +75,17 @@ namespace controllers\internals;
             {
                 return false;
             }
+            
+            $new_call_id = $this->get_model()->insert($call);
+            if (!$new_call_id)
+            {
+                return false;
+            }
+            
+            $internal_webhook = new Webhook($this->bdd);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_INBOUND_CALL, $call);
 
-            return $this->get_model()->insert($call);
+            return $new_call_id;
         }
 
 
