@@ -258,7 +258,7 @@ use Monolog\Logger;
          */
         public function inbound_call(int $id_phone)
         {
-            $this->logger->info('Callback reception call with phone : ' . $id_phone);
+            $this->logger->info('Callback inbound_call call with phone : ' . $id_phone);
             $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
 
             if (!$phone)
@@ -291,6 +291,14 @@ use Monolog\Logger;
             }
 
             $call = $response['call'];
+
+            if (empty($call)  || empty($call['uid']) || empty($call['start']) || empty($call['origin']))
+            {
+                $this->logger->error('Callback inbound_call failed : missing required param in call return');
+
+                return false;
+            }
+
             $result = $this->internal_call->create($this->user['id'], $id_phone, $call['uid'], \models\Call::DIRECTION_INBOUND, $call['start'], $call['end'] ?? null, $call['origin']);
 
             if (!$result)
@@ -349,6 +357,13 @@ use Monolog\Logger;
             }
 
             $call = $response['call'];
+            if (empty($call)  || empty($call['uid']) || empty($call['end']))
+            {
+                $this->logger->error('Callback end call failed : missing required param in call return');
+
+                return false;
+            }
+
             $result = $this->internal_call->end($this->user['id'], $id_phone, $call['uid'], $call['end']);
 
             if (!$result)
