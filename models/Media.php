@@ -246,6 +246,29 @@ namespace models;
         }
 
         /**
+         * Find all unused medias
+         * @return array
+         */
+        public function gets_unused ()
+        {
+            $query = '
+                SELECT `media`.*
+                FROM   `media`
+                       LEFT JOIN `media_sended`
+                               ON `media`.id = `media_sended`.id_media
+                       LEFT JOIN `media_received`
+                               ON `media`.id = `media_received`.id_media
+                       LEFT JOIN `media_scheduled`
+                               ON `media`.id = `media_scheduled`.id_media
+                WHERE  `media_sended`.id IS NULL
+                        AND `media_received`.id IS NULL
+                        AND `media_scheduled`.id IS NULL 
+            ';
+            
+            return $this->_run_query($query);
+        }
+
+        /**
          * Return table name.
          */
         protected function get_table_name(): string

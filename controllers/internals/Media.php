@@ -174,7 +174,7 @@ namespace controllers\internals;
          * @param int $id_user : User id
          * @param int $id      : Entry id
          *
-         * @return int : Number of removed rows
+         * @return mixed bool|int : False on error, else number of removed rows
          */
         public function delete_for_user(int $id_user, int $id_media): bool
         {
@@ -184,7 +184,19 @@ namespace controllers\internals;
                 return false;
             }
 
-            unlink($media['path']);
+            //Delete file
+            try
+            {
+                $filepath = PWD_DATA . '/' . $media['path'];
+                if (file_exists($filepath))
+                {
+                    unlink($filepath);
+                }
+            }
+            catch (\Throwable $t)
+            {
+                return false;
+            }
 
             return $this->get_model()->delete_for_user($id_user, $id_media);
         }
@@ -223,6 +235,15 @@ namespace controllers\internals;
         public function gets_for_received(int $id_received)
         {
             return $this->get_model()->gets_for_received($id_received);
+        }
+
+        /**
+         * Find medias that are not used
+         * @return array
+         */
+        public function gets_unused()
+        {
+            return $this->get_model()->gets_unused();
         }
 
         /**
