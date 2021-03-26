@@ -8,6 +8,7 @@ scripts/
 composer.lock
 env.*
 phinx.*
+descartes/env.php
 
 data/test_write_sms.json
 data/test_read_sms.json
