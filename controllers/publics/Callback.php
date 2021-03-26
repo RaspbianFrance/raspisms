@@ -183,58 +183,10 @@ use Monolog\Logger;
             }
 
             $sms = $response['sms'];
-            $mms = !empty($sms['mms']);
+            $mms = (bool) $sms['mms'] ?? false;
             $medias = empty($sms['medias']) ? [] : $sms['medias'];
-            $media_ids = [];
 
-            //We create medias to link to the sms
-            if ($mms)
-            {
-                foreach ($medias as $media)
-                {
-                    try
-                    {
-                        $media['mimetype'] = empty($media['mimetype']) ? mime_content_type($media['filepath']) : $media['mimetype'];
-
-                        $mimey = new \Mimey\MimeTypes;
-                        $extension = empty($media['extension']) ? $mimey->getExtension($media['mimetype']) : $media['extension'];
-
-                        $new_filename = \controllers\internals\Tool::random_uuid() . '.' . $extension;
-                        $new_filedir = PWD_DATA . '/medias/' . $this->user['id'];
-                        $new_filerelpath = 'medias/' . $this->user['id'] . '/' . $new_filename;
-                        $new_filepath = $new_filedir . '/' . $new_filename;
-
-                        //Create user dir if not exists 
-                        if (!file_exists($new_filedir))
-                        {
-                            if (!mkdir($new_filedir, fileperms(PWD_DATA), true))
-                            {
-                                throw new \Exception('Cannot create dir ' . $new_filedir . ' to copy media : ' . json_encode($media));
-                            }
-                        }
-
-                        if (!rename($media['filepath'], $new_filepath))
-                        {
-                            throw new \Exception('Cannot copy media : ' . json_encode($media) . ' to ' . $new_filepath);
-                        }
-
-                        $new_media_id = $this->internal_media->create($this->user['id'], $new_filerelpath);
-                        if (!$new_media_id)
-                        {
-                            throw new \Exception('Cannot save into db media : ' . json_encode($media));
-                        }
-
-                        $media_ids[] = $new_media_id;
-                    }
-                    catch (\Throwable $t)
-                    {
-                        $this->logger->error($t->getMessage());
-                        continue;
-                    }
-                }
-            }
-
-            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $media_ids);
+            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $medias);
             if ($response['error'])
             {
                 $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);

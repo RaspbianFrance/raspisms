@@ -362,12 +362,15 @@ namespace controllers\publics;
             {
                 foreach ($files_arrays as $file)
                 {
-                    $new_media_id = $this->internal_media->upload_and_create_for_user($this->user['id'], $file);
-                    if (!$new_media_id)
+                    try
+                    {
+                        $new_media_id = $this->internal_media->upload_and_create_for_user($this->user['id'], $file);
+                    }
+                    catch (\Exception $e)
                     {
                         $return = self::DEFAULT_RETURN;
                         $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
-                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'] . ' : Cannot upload and create media file ' . $file['name'];
+                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'] . ' : Cannot upload and create media file ' . $file['name'] . ' : ' . $e->getMessage();
                         $this->auto_http_code(false);
 
                         return $this->json($return);

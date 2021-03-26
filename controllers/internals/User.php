@@ -264,6 +264,7 @@ namespace controllers\internals;
          *                        string 'text' => sms content,
          *                        string 'destination' => id of phone the sms was sent to
          *                        string 'origin' => phone number that sent the sms
+         *                        bool 'mms' => is the sms a mms
          *                        ]
          *
          * @return bool : False if no transfer, true else

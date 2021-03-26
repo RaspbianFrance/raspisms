@@ -184,6 +184,20 @@ namespace adapters;
             return $response;
         }
 
+        /**
+         * Read from a files to simulate sms reception.
+         * In the file we expect a json string representing an array of sms of format :
+         * {
+         *    "at" : "2021-03-26 11:21:48",
+         *    "medias" : [
+         *       "https://unsplash.com/photos/q4DJVtxES0w/download?force=true&w=640",
+         *       "/tmp/somelocalfile.jpg"
+         *    ],
+         *    "mms" : true,
+         *    "origin" : "+33612345678",
+         *    "text" : "SMS Text"
+         * }
+         */ 
         public function read(): array
         {
             $response = [
@@ -223,7 +237,36 @@ namespace adapters;
                         continue;
                     }
 
-                    $response['smss'][] = $decode_sms;
+                    $clean_sms = [
+                        'at' => $decode_sms['at'],
+                        'text' => $decode_sms['text'],
+                        'origin' => $decode_sms['origin'],
+                        'mms' => $decode_sms['mms'],
+                        'medias' => [],
+                    ];
+
+                    //In medias we want a media URI or URL
+                    foreach ($decode_sms['medias'] ?? [] as $media)
+                    {
+                        $tempfile = tempnam('/tmp', 'raspisms-media-');
+                        if (!$tempfile)
+                        {
+                            continue;
+                        }
+
+                        $copy = copy($media, $tempfile);
+                        if (!$copy)
+                        {
+                            continue;
+                        }
+
+                        $clean_sms['medias'][] = [
+                            'filepath' => $tempfile,
+                            'extension' => pathinfo($media, PATHINFO_EXTENSION) ?: null,
+                        ];
+                    }
+
+                    $response['smss'][] = $clean_sms;
                 }
 
                 return $response;

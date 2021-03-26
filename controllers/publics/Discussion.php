@@ -120,7 +120,7 @@ namespace controllers\publics;
                     $medias = $this->internal_media->gets_for_sended($sended['id']);
                     foreach ($medias as &$media)
                     {
-                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
                     }
                 }
 
@@ -149,7 +149,7 @@ namespace controllers\publics;
                     $medias = $this->internal_media->gets_for_received($received['id']);
                     foreach ($medias as &$media)
                     {
-                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
                     }
                 }
 
@@ -170,7 +170,7 @@ namespace controllers\publics;
                     $medias = $this->internal_media->gets_for_scheduled($scheduled['id']);
                     foreach ($medias as &$media)
                     {
-                        $media = HTTP_PWD_DATA . '/' . $media['path'];
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
                     }
                 }
 
@@ -288,11 +288,14 @@ namespace controllers\publics;
             {
                 foreach ($files_arrays as $file)
                 {
-                    $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
-                    if (!$new_media_id)
+                    try
+                    {
+                        $new_media_id = $this->internal_media->create_from_uploaded_file_for_user($_SESSION['user']['id'], $file);
+                    }
+                    catch (\Exception $e)
                     {
                         $return['success'] = false;
-                        $return['message'] = 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name'];
+                        $return['message'] = $e->getMessage();
                         echo json_encode($return);
 
                         return false;

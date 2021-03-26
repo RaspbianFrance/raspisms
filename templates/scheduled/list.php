@@ -93,7 +93,7 @@ jQuery(document).ready(function ()
                     if (row.mms == 1) {
                         var medias = [];
                         for (i = 0; i < row.medias.length; i++) {
-                            medias.push('<a href="' + HTTP_PWD + '/data/' + jQuery.fn.dataTable.render.text().display(row.medias[i].path) + '" target="_blank">Fichier ' + (i + 1) + '</a>');
+                            medias.push('<a href="' + HTTP_PWD + '/data/public/' + jQuery.fn.dataTable.render.text().display(row.medias[i].path) + '" target="_blank">Fichier ' + (i + 1) + '</a>');
                         }
                         html = data + '<br/>' + medias.join(' - ');
                         return html;

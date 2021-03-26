@@ -181,7 +181,7 @@ class Phone extends AbstractDaemon
         foreach ($response['smss'] as $sms)
         {
             $this->logger->info('Receive message : ' . json_encode($sms));
-            $response = $internal_received->receive($this->phone['id_user'], $this->phone['id'], $sms['text'], $sms['origin']);
+            $response = $internal_received->receive($this->phone['id_user'], $this->phone['id'], $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $sms['mms'] ?? false, $sms['medias'] ?? []);
 
             if ($response['error'])
             {

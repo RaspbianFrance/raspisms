@@ -87,7 +87,7 @@
                         }
                         else
                         {
-                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (index + 1) + '</a></div>';
+                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + ((int)index + 1) + '</a></div>';
                         }
                     });
                     var medias_html = '<div class="discussion-message-medias">' + medias.join('') + '</div>';

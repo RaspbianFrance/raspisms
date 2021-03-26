@@ -75,7 +75,7 @@
                                                     <?php foreach ($scheduled['medias'] as $key => $media) { ?>
                                                         <p class="current-media">
                                                             <input type="hidden" name="scheduleds[<?php $this->s($scheduled['id']); ?>][media_ids][]" value="<?php $this->s($media['id']); ?>">
-                                                            <label>Fichier <?= $key + 1 ?> :</label><br/> <a href="<?php $this->s(HTTP_PWD_DATA . '/' . $media['path']); ?>" class="btn btn-info btn-sm" target="_blank">Voir le média</a> <a href="#" class="btn btn-warning btn-delete-media btn-sm">Supprimer le média</a>
+                                                            <label>Fichier <?= $key + 1 ?> :</label><br/> <a href="<?php $this->s(HTTP_PWD_DATA_PUBLIC . '/' . $media['path']); ?>" class="btn btn-info btn-sm" target="_blank">Voir le média</a> <a href="#" class="btn btn-warning btn-delete-media btn-sm">Supprimer le média</a>
                                                         </p>
                                                     <?php } ?>
                                                 </div>

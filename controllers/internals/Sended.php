@@ -211,8 +211,8 @@ namespace controllers\internals;
             foreach ($medias as $media)
             {
                 $media_uris[] = [
-                    'http_url' => HTTP_PWD_DATA . '/' . $media['path'],
-                    'local_uri' => PWD_DATA . '/' . $media['path'],
+                    'http_url' => HTTP_PWD_DATA_PUBLIC . '/' . $media['path'],
+                    'local_uri' => PWD_DATA_PUBLIC . '/' . $media['path'],
                 ];
             }
 

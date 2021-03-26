@@ -12,6 +12,6 @@ descartes/env.php
 
 data/test_write_sms.json
 data/test_read_sms.json
-data/medias/
+data/public/
 
 !*.dist

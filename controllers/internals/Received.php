@@ -244,14 +244,17 @@ namespace controllers\internals;
          * @param ?string $at     : Message reception date, if null use current date
          * @param string  $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
          * @param bool $mms : Is the sms a mms
-         * @param array $media_ids : Ids of the medias to link to received
+         * @param array $medias : Empty array if no medias, or medias to create and link to the received message. Format : [[
+         *      string 'filepath' => local path to a readable copy of the media,
+         *      ?string 'extension' => extension to use for the file or null
+         * ], ...]
          *
          * @return array : [
          *               bool 'error' => false if success, true else
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function receive(int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD, bool $mms = false, array $media_ids = []): array
+        public function receive(int $id_user, int $id_phone, string $text, string $origin, ?string $at = null, string $status = \models\Received::STATUS_UNREAD, bool $mms = false, array $medias = []): array
         {
             $return = [
                 'error' => false,
@@ -268,6 +271,26 @@ namespace controllers\internals;
             { //Received sms is a command an we must use anonymized text
                 $is_command = true;
                 $text = $response;
+            }
+            
+            //We create medias to link to the sms
+            $internal_media = new Media($this->bdd);
+            $media_ids = [];
+            if ($mms)
+            {
+                foreach ($medias as $media)
+                {
+                    try
+                    {
+                        $new_media_id = $internal_media->create($id_user, $media['filepath'], $media['extension']);
+                        $media_ids[] = $new_media_id;
+                    }
+                    catch (\Throwable $t)
+                    {
+                        $return['error_message'] = $t->getMessage();
+                        continue; //Better loose the media than the message
+                    }
+                }
             }
 
             $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command, $mms, $media_ids);
@@ -287,7 +310,7 @@ namespace controllers\internals;
                 'origin' => $origin,
                 'command' => $is_command,
                 'mms' => $mms,
-                'medias' => $this->get_model()->gets_in_for_user($id_user, $media_ids),
+                'medias' => $internal_media->gets_in_for_user($id_user, $media_ids),
             ];
 
             $internal_webhook = new Webhook($this->bdd);

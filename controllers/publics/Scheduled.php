@@ -332,10 +332,13 @@ namespace controllers\publics;
             {
                 foreach ($files_arrays as $file)
                 {
-                    $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
-                    if (!$new_media_id)
+                    try
                     {
-                        \FlashMessage\FlashMessage::push('danger', 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name']);
+                        $new_media_id = $this->internal_media->create_from_uploaded_file_for_user($_SESSION['user']['id'], $file);
+                    }
+                    catch (\Exception $e)
+                    {
+                        \FlashMessage\FlashMessage::push('danger', 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name'] . ':' . $e->getMessage());
                         return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                     }
 
@@ -459,8 +462,11 @@ namespace controllers\publics;
                 {
                     foreach ($files_arrays as $file)
                     {
-                        $new_media_id = $this->internal_media->upload_and_create_for_user($_SESSION['user']['id'], $file);
-                        if (!$new_media_id)
+                        try
+                        {
+                            $new_media_id = $this->internal_media->create_from_uploaded_file_for_user($_SESSION['user']['id'], $file);
+                        }
+                        catch (\Exception $e)
                         {
                             continue 2;
                         }

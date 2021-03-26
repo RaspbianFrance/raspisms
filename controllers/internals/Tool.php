@@ -205,7 +205,7 @@ namespace controllers\internals;
          *
          * @param array $file : The array extracted from $_FILES['file']
          *
-         * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error']]
+         * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error'], 'mime_type' => server side calculated mimetype, 'extension' => original extension, 'tmp_name' => name of the tmp_file]
          */
         public static function read_uploaded_file(array $file)
         {
@@ -213,8 +213,9 @@ namespace controllers\internals;
                 'success' => false,
                 'content' => 'Une erreur inconnue est survenue.',
                 'error_code' => $file['error'] ?? 99,
-                'mime_type' => false,
-                'extension' => false,
+                'mime_type' => null,
+                'extension' => null,
+                'tmp_name' => null,
             ];
 
             if (UPLOAD_ERR_OK !== $file['error'])
@@ -278,73 +279,6 @@ namespace controllers\internals;
         }
 
         /**
-         * Allow to save an uploaded file from the $_FILE['file'] array
-         *
-         * @param array $file : The array extracted from $_FILES['file']
-         * @param string $dirpath : The directory to save the file in
-         * @param bool $override : If true, override the file if another file with this name exists 
-         * @param ?string $filename : The name to use for the file, if null use a highly random name
-         * @param ?string $extension : The extension to use for the file, if null try to determine it using original file extension, then mime_type
-         * @param bool $use_mimetype : If true, ignore original file extension to determine final file extension and use file real mimetype instead
-         *
-         * @return array : ['success' => bool, 'content' => new file name | error message, 'error_code' => $file['error']]
-         */
-        public static function save_uploaded_file(array $file, string $dirpath, bool $override = false, ?string $filename = null, ?string $extension = null, bool $use_mimetype = false)
-        {
-            $result = [
-                'success' => false,
-                'content' => 'Une erreur inconnue est survenue.',
-                'error_code' => $file['error'] ?? 99,
-            ];
-
-            $upload_info = self::read_uploaded_file($file);
-            if (!$upload_info['success'])
-            {
-                $result['content'] = $upload_info['content'];
-                return $result;
-            }
-            
-            if ($extension === null)
-            {
-                $extension = $upload_info['extension'];
-                if ($extension === '' || $use_mimetype)
-                {
-                    $mimey = new \Mimey\MimeTypes;
-                    $extension = $mimey->getExtension($upload_info['mime_type']);
-                }
-            }
-
-            if ($filename === null)
-            {
-                $filename = self::random_uuid();
-            }
-
-            $filename = $filename . '.' . $extension;
-            $filepath = $dirpath . '/' . $filename;
-
-            if (file_exists($filepath) && !$override)
-            {
-                $result['content'] = 'Le fichier ' . $filepath . ' existe déjà.';
-
-                return $result;
-            }
-
-            $success = move_uploaded_file($upload_info['tmp_name'], $filepath);
-            if (!$success)
-            {
-                $result['content'] = 'Impossible de délplacer le fichier vers ' . $filepath;
-
-                return $result;
-            }
-
-            $result['success'] = true;
-            $result['content'] = $filename;
-
-            return $result;
-        }
-        
-        
-        /**
          * Generate a highly random uuid based on timestamp and strong cryptographic random
          *
          * @return string
@@ -353,5 +287,40 @@ namespace controllers\internals;
         {
             $bytes = random_bytes(16);
             return time() . '-' . bin2hex($bytes);
+        }
+
+
+        /**
+         * Create a user data public path
+         * @param int $id_user : The user id
+         *
+         * @return string : The created path
+         
+         * @exception Raise exception on error
+         */
+        public static function create_user_public_path (int $id_user)
+        {
+            $new_dir = PWD_DATA_PUBLIC . '/' . $id_user;
+            if (file_exists($new_dir))
+            {
+                return $new_dir;
+            }
+
+            if (!mkdir($new_dir, fileperms(PWD_DATA_PUBLIC)))
+            {
+                throw new \Exception('Cannot create dir ' . $new_dir);
+            }
+
+            if (!chown($new_dir, fileowner(PWD_DATA_PUBLIC)))
+            {
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA));
+            }
+
+            if (!chgrp($new_dir, filegroup(PWD_DATA_PUBLIC)))
+            {
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA));
+            }
+
+            return $new_dir;
         }
     }
