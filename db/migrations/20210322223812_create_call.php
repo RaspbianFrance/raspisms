@@ -41,7 +41,7 @@ class CreateCall extends AbstractMigration
               ->addColumn('origin', 'string', ['limit' => 20, 'null' => true])
               ->addColumn('destination', 'string', ['limit' => 20, 'null' => true])
               ->addForeignKey('id_user', 'user', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-              ->addForeignKey('id_phone', 'user', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+              ->addForeignKey('id_phone', 'phone', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
               ->create();
     }
 }
