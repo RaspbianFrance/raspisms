@@ -81,6 +81,8 @@ namespace controllers\internals;
             {
                 return false;
             }
+
+            $call['id'] = $new_call_id;
             
             $internal_webhook = new Webhook($this->bdd);
             $internal_webhook->trigger($id_user, \models\Webhook::TYPE_INBOUND_CALL, $call);
