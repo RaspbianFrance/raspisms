@@ -292,7 +292,7 @@ use Monolog\Logger;
 
             $call = $response['call'];
 
-            if (empty($call)  || empty($call['uid']) || empty($call['start']) || empty($call['origin']))
+            if (empty($call) || empty($call['uid']) || empty($call['start']) || empty($call['origin']))
             {
                 $this->logger->error('Callback inbound_call failed : missing required param in call return');
 
@@ -357,7 +357,7 @@ use Monolog\Logger;
             }
 
             $call = $response['call'];
-            if (empty($call)  || empty($call['uid']) || empty($call['end']))
+            if (empty($call) || empty($call['uid']) || empty($call['end']))
             {
                 $this->logger->error('Callback end call failed : missing required param in call return');
 
