@@ -29,7 +29,12 @@ class Media extends StandardController
     public function create(int $id_user, string $tmpfile_path, ?string $extension = null)
     {
         $user_path = \controllers\internals\Tool::create_user_public_path($id_user);
-        if (!file_exists($tmpfile_path) || !is_readable($tmpfile_path))
+        if (!file_exists($tmpfile_path))
+        {
+            throw new \Exception('File ' . $tmpfile_path . ' does not exists.');
+        }
+        
+        if (!is_readable($tmpfile_path))
         {
             throw new \Exception('File ' . $tmpfile_path . ' is not readable.');
         }
@@ -40,6 +45,11 @@ class Media extends StandardController
         $new_file_name = \controllers\internals\Tool::random_uuid() . '.' . $extension;
         $new_file_path = $user_path . '/' . $new_file_name;
         $new_file_relpath = $id_user . '/' . $new_file_name;
+
+        if (!file_put_contents($new_file_path, 'a'))
+        {
+            throw new \Exception('pute de merde');
+        }
 
         if (!rename($tmpfile_path, $new_file_path))
         {
@@ -90,10 +100,18 @@ class Media extends StandardController
             throw new \Exception($upload_result['content']);
         }
 
-        return $this->create($id_user, $upload_result['tmp_name'], $upload_result['extension']);
+        //Move uploaded file to a tmp file
+        if (!$tmp_file = tempnam('/tmp', 'raspisms-media-'))
+        {
+            throw new \Exception('Cannot create tmp file in /tmp to store the uploaded file.');
+        }
 
-        $new_filepath = 'medias/' . $id_user . '/' . $upload_result['content'];
-        return $this->create($id_user, $new_filepath);
+        if (!move_uploaded_file($upload_result['tmp_name'], $tmp_file))
+        {
+            throw new \Exception('Cannot move uploaded file to : ' . $tmp_file);
+        }
+        
+        return $this->create($id_user, $tmp_file, $upload_result['extension']);
     }
 
     /**

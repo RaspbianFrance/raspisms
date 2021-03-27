@@ -87,7 +87,7 @@
                         }
                         else
                         {
-                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + ((int)index + 1) + '</a></div>';
+                            return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank">Voir le fichier ' + (Number(index) + 1) + '</a></div>';
                         }
                     });
                     var medias_html = '<div class="discussion-message-medias">' + medias.join('') + '</div>';
@@ -99,7 +99,7 @@
 							'<div class="clearfix message-container">' +
 								'<div class="discussion-message message-received">' +
                                     '<div class="discussion-message-text">' + message.text + '</div>' +
-                                    medias.html + 
+                                    medias_html + 
                                     '<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
 							'</div>';

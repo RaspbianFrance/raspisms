@@ -144,7 +144,7 @@ namespace controllers\publics;
                 }
                 
                 $medias = [];
-                if ($sended['mms'])
+                if ($received['mms'])
                 {
                     $medias = $this->internal_media->gets_for_received($received['id']);
                     foreach ($medias as &$media)

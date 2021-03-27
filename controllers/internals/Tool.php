@@ -306,19 +306,26 @@ namespace controllers\internals;
                 return $new_dir;
             }
 
-            if (!mkdir($new_dir, fileperms(PWD_DATA_PUBLIC)))
+            clearstatcache();
+            if (!mkdir($new_dir))
             {
                 throw new \Exception('Cannot create dir ' . $new_dir);
             }
 
-            if (!chown($new_dir, fileowner(PWD_DATA_PUBLIC)))
+            //We do chmod in two times because else umask fuck mkdir permissions
+            if (!chmod($new_dir, fileperms(PWD_DATA_PUBLIC) & 0777)) //Fileperms return garbage in addition to perms. Perms are only in weak bytes. We must use an octet notation with 0
             {
-                throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA));
+                throw new \Exception('Cannot give dir ' . $new_dir . ' rights : ' . decoct(fileperms(PWD_DATA_PUBLIC) & 0777)); //Show error in dec
+            }
+
+            if (posix_getuid() === 0 && !chown($new_dir, fileowner(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper user
+            {
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA_PUBLIC));
             }
 
             if (!chgrp($new_dir, filegroup(PWD_DATA_PUBLIC)))
             {
-                throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA));
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA_PUBLIC));
             }
 
             return $new_dir;

@@ -186,7 +186,7 @@ namespace adapters;
 
         /**
          * Read from a files to simulate sms reception.
-         * In the file we expect a json string representing an array of sms of format :
+         * In the file we expect a series of lines, each line beeing a SMS as a json string of format :
          * {
          *    "at" : "2021-03-26 11:21:48",
          *    "medias" : [
