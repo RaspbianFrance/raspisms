@@ -238,7 +238,7 @@ class Media extends StandardController
         //Delete file
         try
         {
-            $filepath = PWD_DATA . '/' . $media['path'];
+            $filepath = PWD_DATA_PUBLIC . '/' . $media['path'];
             if (file_exists($filepath))
             {
                 unlink($filepath);
