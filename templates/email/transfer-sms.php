@@ -1,4 +1,4 @@
-Vous avez reçu un nouveau SMS : 
+Vous avez reçu un nouveau <?= $mms ? 'MMS' : 'SMS'; ?> : 
 Date : <?= $at ?>
 
 Origine : <?= $origin ?>

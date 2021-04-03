@@ -101,10 +101,11 @@ class Mailer extends \descartes\Controller
      * @param string $destination : email address to send email to
      * @param array  $settings    : Email settings
      * @param array  $data        : Data to inject into email template
+     * @param array  $attachments : List of paths of files to attach to the mail
      *
      * @return bool : true on success, false on error
      */
-    public function enqueue(string $destination, array $settings, array $data): bool
+    public function enqueue(string $destination, array $settings, array $data, array $attachments = []): bool
     {
         $response = $this->generate_body($settings, $data);
 
@@ -113,6 +114,7 @@ class Mailer extends \descartes\Controller
             'subject' => $settings['subject'],
             'body' => $response['body'],
             'alt_body' => $response['alt_body'],
+            'attachments' => $attachments,
         ];
 
         $error_code = null;

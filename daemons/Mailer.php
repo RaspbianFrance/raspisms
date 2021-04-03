@@ -74,7 +74,7 @@ class Mailer extends AbstractDaemon
             $this->logger->info('Try sending email : ' . json_encode($message));
 
             $mailer = new \controllers\internals\Mailer();
-            $success = $mailer->send($message['destinations'], $message['subject'], $message['body'], $message['alt_body']);
+            $success = $mailer->send($message['destinations'], $message['subject'], $message['body'], $message['alt_body'], $message['attachments']);
             if (!$success)
             {
                 $this->logger->error('Failed sending email');

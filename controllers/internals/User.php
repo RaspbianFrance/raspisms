@@ -291,12 +291,20 @@ namespace controllers\internals;
             }
 
             $mailer = new Mailer();
+            
+            $attachments = [];
+           
+            foreach ($received['medias'] ?? [] as $media)
+            {
+                $attachments[] = PWD_DATA_PUBLIC . '/' . $media['path'];
+            }
 
             return $mailer->enqueue($user['email'], EMAIL_TRANSFER_SMS, [
                 'at' => $received['at'],
                 'origin' => $received['origin'],
                 'destination' => $phone['name'],
                 'text' => $received['text'],
-            ]);
+                'mms' => $received['mms'] ?? false,
+            ], $attachments);
         }
     }
