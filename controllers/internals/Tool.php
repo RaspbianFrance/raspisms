@@ -323,7 +323,7 @@ namespace controllers\internals;
                 throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA_PUBLIC));
             }
 
-            if (!chgrp($new_dir, filegroup(PWD_DATA_PUBLIC)))
+            if (posix_getuid() === 0 && !chgrp($new_dir, filegroup(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper group
             {
                 throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA_PUBLIC));
             }
