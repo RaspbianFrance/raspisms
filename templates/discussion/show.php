@@ -42,7 +42,9 @@
                             <?php if ($response_phone ) { ?>
                                 <input type="hidden" name="id_phone" value="<?php $this->s($response_phone['id']); ?>" />
                             <?php } ?>
-                            <input name="medias[]" type="file" multiple />
+                            <?php if ($_SESSION['user']['settings']['mms'] ?? false) { ?>
+                                <input name="medias[]" type="file" multiple />
+                            <?php } ?>
 							<button class="btn" ><span class="fa fa-fw fa-send-o"></span> Envoyer</button>
 						</form>
 					</div>
