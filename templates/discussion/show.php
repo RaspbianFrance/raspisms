@@ -100,9 +100,13 @@
                         {
                             return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank"><img src="' + mediaUrl + '"/></a></div>';
                         }
-                        else if (['webm', 'ogg', 'ogv', 'mp4'].includes(extension))
+                        else if (['webm', 'ogv', 'mp4'].includes(extension))
                         {
                             return '<video controls class="discussion-message-media"><source src="' + mediaUrl + '"/></video>';
+                        }
+                        else if (['wav', 'ogg', 'mp3'].includes(extension))
+                        {
+                            return '<audio controls class="discussion-message-media"><source src="' + mediaUrl + '"/></audio>';
                         }
                         else
                         {
