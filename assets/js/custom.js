@@ -45,8 +45,9 @@ function verifReceived()
 
 /**
  * Cette fonction permet de scroller au dernier message
+ * @param force: bool : should we force the scroll
  */
-function scrollDownDiscussion()
+function scrollDownDiscussion(force)
 {
 	var discussion_height = jQuery('.discussion-container').innerHeight();
 	var discussion_scroll_height = jQuery('.discussion-container')[0].scrollHeight;
@@ -54,7 +55,7 @@ function scrollDownDiscussion()
 	var scroll_before_end = discussion_scroll_height - (discussion_scroll_top + discussion_height);
 
 	//On scroll uniquement si on a pas remonté plus haut que la moitié de la fenetre de discussion
-	if (scroll_before_end <= discussion_height / 2)
+	if (force || scroll_before_end <= discussion_height / 2)
 	{
 		jQuery('.discussion-container').animate({scrollTop: 1000000});
 	}
@@ -115,8 +116,8 @@ jQuery(document).ready(function()
 		var form = jQuery(this);
 		var message = form.find('textarea').val();
 		var formData = new FormData(form[0]);
-		jQuery('.discussion-container').find('#send-message-spiner').remove();
-		jQuery('.discussion-container').append('<div class="text-center" id="send-message-spiner"><i class="fa fa-spinner fa-spin"></i></div>');
+		jQuery('.discussion-container').find('#send-message-spinner').remove();
+		jQuery('.discussion-container').append('<div class="text-center" id="send-message-spinner"><i class="fa fa-spinner fa-spin"></i></div>');
 		scrollDownDiscussion();
 		jQuery.ajax({
 			url: form.attr('action'),
@@ -130,7 +131,7 @@ jQuery(document).ready(function()
 				if (!data.success)
 				{
 					showMessage(data.message.replace(/</g, "&lt;").replace(/>/g, "&gt;"), 0);
-					jQuery('.discussion-container').find('#send-message-spiner').remove();
+					jQuery('.discussion-container').find('#send-message-spinner').remove();
 				}
 			}
 		}).done(function()

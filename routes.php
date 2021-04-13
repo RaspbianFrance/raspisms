@@ -54,7 +54,10 @@
             'list_json' => '/discussion/json/',
             'show' => '/discussion/show/{number}/',
             'send' => '/discussion/send/{csrf}/',
-            'get_messages' => '/discussion/getmessage/{number}/{transaction_id}/',
+            'get_messages' => [
+                '/discussion/getmessage/{number}/{transaction_id}/',
+                '/discussion/getmessage/{number}/{transaction_id}/{since}/',
+            ],
         ],
 
         'Event' => [

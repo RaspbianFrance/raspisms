@@ -132,6 +132,19 @@ namespace controllers\internals;
         {
             return $this->get_model()->gets_by_destination_and_user($id_user, $origin);
         }
+        
+        /**
+         * Return sendeds for a destination and a user since a date.
+         *
+         * @param int    $id_user : User id
+         * @param string $since   : Date we want messages since format Y-m-d H:i:s
+         * @param string $origin  : Number who sent the message
+         * @return array
+         */
+        public function gets_since_date_by_destination_and_user(int $id_user, string $since, string $origin)
+        {
+            return $this->get_model()->gets_since_date_by_destination_and_user($id_user, $since, $origin);
+        }
 
         /**
          * Return sended for an uid and an adapter.

@@ -112,6 +112,35 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
+        
+        
+        /**
+         * Return sendeds for an destination and a user since a date.
+         *
+         * @param int    $id_user     : User id
+         * @param string $since   : Date we want messages since
+         * @param string $destination : Number who sent the message
+         *
+         * @return array
+         */
+        public function gets_since_date_by_destination_and_user(int $id_user, string $since, string $destination)
+        {
+            $query = '
+                SELECT *
+                FROM sended
+                WHERE id_user = :id_user
+                AND destination = :destination
+                AND at > :since
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+                'destination' => $destination,
+                'since' => $since,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
 
         /**
          * Return sended for an uid and an adapter.

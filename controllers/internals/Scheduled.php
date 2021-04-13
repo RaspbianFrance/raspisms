@@ -254,6 +254,20 @@ namespace controllers\internals;
         {
             return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
+        
+        /**
+         * Get messages scheduled after a date for a number and a user.
+         *
+         * @param int $id_user : User id
+         * @param $date : Date after which we want messages
+         * @param string $number : Number for which we want messages
+         *
+         * @return array
+         */
+        public function gets_after_date_for_number_and_user(int $id_user, $date, string $number)
+        {
+            return $this->get_model()->gets_after_date_for_number_and_user($id_user, $date, $number);
+        }
 
         /**
          * Get all messages to send and the number to use to send theme.

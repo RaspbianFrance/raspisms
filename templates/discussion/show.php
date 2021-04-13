@@ -32,7 +32,7 @@
 
 			<div class="row">
 				<div class="col-lg-12 discussion-container">
-					<div class="text-center"><i class="fa fa-spinner fa-spin"></i></div>
+					<div class="text-center" id="load-message-spinner"><i class="fa fa-spinner fa-spin"></i></div>
 				</div>
 				<div class="col-lg-12 message-input-container">
 					<div class="discussion-message message-input">
@@ -57,22 +57,35 @@
 	jQuery(document).ready(function () {
 
 		var alreadyReceivedMessages = [];
+        var limit_date = false;
 
 		/**
 		 * Cette fonction vérifie régulièrement les sms pour mettre à jour l'affichage
 		 */
 		function getmessages ()
 		{
-			ajaxTransactionId = Date.now();
-			jQuery.getJSON(HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId , function( data ) {
+            ajaxTransactionId = Date.now();
+            if (limit_date == false) 
+            {
+                var first_load = true;
+                url = HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId;
+                limit_date = Date.now(); //After first load, we will only search for new messages
+            }
+            else
+            {
+                var first_load = false;
+                url = HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId + "/" + limit_date + "/";
+            }
+
+			jQuery.getJSON(url, function( data ) {
 
                 if (data.transaction_id != ajaxTransactionId)
 				{
 					return false;
-				}
+                }
 
-				jQuery('.discussion-container').html('');
-
+                jQuery('.discussion-container #load-message-spinner').remove();
+                jQuery('.discussion-container #send-message-spinner').remove();
 
 				$.each(data.messages, function(key, message) {
 
@@ -86,6 +99,10 @@
                         if (['jpg', 'jpeg', 'png', 'gif'].includes(extension))
                         {
                             return '<div class="discussion-message-media"><a href="' + mediaUrl + '" target="_blank"><img src="' + mediaUrl + '"/></a></div>';
+                        }
+                        else if (['webm', 'ogg', 'ogv', 'mp4'].includes(extension))
+                        {
+                            return '<video controls class="discussion-message-media"><source src="' + mediaUrl + '"/></video>';
                         }
                         else
                         {
@@ -106,10 +123,10 @@
 								'</div>' +
 							'</div>';
 
-							if (alreadyReceivedMessages.indexOf(message.md5) == -1)
+							if (alreadyReceivedMessages.indexOf(message.uid) == -1 && !first_load) //If new message received and not first time loading
 							{
 								playReceptionSound();
-								alreadyReceivedMessages.push(message.md5);
+								alreadyReceivedMessages.push(message.uid);
 							}
 
 							break;
@@ -140,8 +157,17 @@
 					}
 
 					jQuery('.discussion-container').append(texte);
-				});
-				scrollDownDiscussion();
+                });
+
+                //Update limit_date if set
+                if (data.new_limit_date !== undefined)
+                {
+                    limit_date = data.new_limit_date;
+                }
+
+                if (data.messages.length) {
+                    scrollDownDiscussion(first_load);
+                }
 			});
 		}
 
@@ -154,9 +180,6 @@
 			var windowHeight = jQuery(window).height();
 			var messageInputContainer = jQuery('.message-input-container').outerHeight();
 			var footerHeight = jQuery('footer').outerHeight();
-
-            console.log(windowHeight);
-            console.log(containerPosition.top);
 
 			var containerHeight = Math.floor(windowHeight - (containerPosition.top + messageInputContainer) - 20); //-20 px for aesthetic
 

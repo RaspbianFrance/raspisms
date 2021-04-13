@@ -98,17 +98,34 @@ namespace controllers\publics;
          *
          * @param string $number         : Le numéro cible
          * @param string $transaction_id : Le numéro unique de la transaction ajax (sert à vérifier si la requete doit être prise en compte)
+         * @param ?int $since            : La date à partir de laquelle on veut les messages, sous forme de timestamp
          */
-        public function get_messages($number, $transaction_id)
+        public function get_messages($number, $transaction_id, ?int $since = null)
         {
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
 
             $id_user = $_SESSION['user']['id'];
 
-            $sendeds = $this->internal_sended->gets_by_destination_and_user($id_user, $number);
-            $receiveds = $this->internal_received->gets_by_origin_and_user($id_user, $number);
-            $scheduleds = $this->internal_scheduled->gets_before_date_for_number_and_user($id_user, $now, $number);
+            if ($since && !($since = date('Y-m-d H:i:s', $since)))
+            {
+                echo json_encode(['transaction_id' => $transaction_id, 'messages' => [], 'error' => true, 'error_message' => 'Not a valid date.']);
+
+                return false;
+            }
+
+            if ($since)
+            {
+                $sendeds = $this->internal_sended->gets_since_date_by_destination_and_user($id_user, $since, $number);
+                $receiveds = $this->internal_received->gets_since_date_by_origin_and_user($id_user, $since, $number);
+                $scheduleds = $this->internal_scheduled->gets_after_date_for_number_and_user($id_user, $since, $number);
+            }
+            else
+            {
+                $sendeds = $this->internal_sended->gets_by_destination_and_user($id_user, $number);
+                $receiveds = $this->internal_received->gets_by_origin_and_user($id_user, $number);
+                $scheduleds = $this->internal_scheduled->gets_before_date_for_number_and_user($id_user, $now, $number);
+            }
 
             $messages = [];
 
@@ -125,6 +142,7 @@ namespace controllers\publics;
                 }
 
                 $message = [
+                    'uid'  => 'sended-' . $sended['id'],
                     'date' => htmlspecialchars($sended['at']),
                     'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
@@ -154,10 +172,10 @@ namespace controllers\publics;
                 }
 
                 $messages[] = [
+                    'uid'  => 'received-' . $received['id'],
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
-                    'md5' => md5($received['at'] . $received['text']),
                     'medias' => $medias,
                 ];
             }
@@ -165,7 +183,7 @@ namespace controllers\publics;
             foreach ($scheduleds as $scheduled)
             {
                 $medias = [];
-                if ($sended['mms'])
+                if ($scheduled['mms'])
                 {
                     $medias = $this->internal_media->gets_for_scheduled($scheduled['id']);
                     foreach ($medias as &$media)
@@ -175,6 +193,7 @@ namespace controllers\publics;
                 }
 
                 $messages[] = [
+                    'uid'  => 'scheduled-' . $scheduled['id'],
                     'date' => htmlspecialchars($scheduled['at']),
                     'text' => htmlspecialchars($scheduled['text']),
                     'type' => 'inprogress',
@@ -188,10 +207,24 @@ namespace controllers\publics;
                 return strtotime($a['date']) - strtotime($b['date']);
             });
 
-            //On récupère uniquement les 25 derniers messages sur l'ensemble
-            $messages = \array_slice($messages, -25);
+            //Sans limite de temps, on récupère uniquement les 25 derniers messages sur l'ensemble pour limiter la charge
+            if (!$since) 
+            {
+                $messages = \array_slice($messages, -25);
+            }
 
-            echo json_encode(['transaction_id' => $transaction_id, 'messages' => $messages]);
+            $response = [
+                'transaction_id' => $transaction_id,
+                'messages' => $messages,
+            ];
+
+            if ($messages)
+            {
+                $new_limit_date = (new \DateTime($messages[count($messages) - 1]['date']))->getTimestamp(); //Use latest message as the new limit date to search
+                $response['new_limit_date'] = $new_limit_date;
+            }
+
+            echo json_encode($response);
 
             return true;
         }

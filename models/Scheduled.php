@@ -233,6 +233,63 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
+        
+        
+        /**
+         * Get messages scheduled after a date for a number and a user.
+         *
+         * @param int $id_user : User id
+         * @param $date : Date after which we want messages
+         * @param string $number : Number for which we want messages
+         *
+         * @return array
+         */
+        public function gets_after_date_for_number_and_user(int $id_user, $date, string $number)
+        {
+            $query = '
+                SELECT *
+                FROM scheduled
+                WHERE at > :date
+                AND id_user = :id_user
+                AND (
+                    id IN (
+                        SELECT id_scheduled
+                        FROM scheduled_number
+                        WHERE number = :number
+                    )
+                    OR id IN (
+                        SELECT id_scheduled
+                        FROM scheduled_contact
+                        WHERE id_contact IN (
+                            SELECT id
+                            FROM contact
+                            WHERE number = :number
+                        )
+                    )
+                    OR id IN (
+                        SELECT id_scheduled
+                        FROM scheduled_group
+                        WHERE id_group IN (
+                            SELECT id_group
+                            FROM `group_contact`
+                            WHERE id_contact IN (
+                                SELECT id
+                                FROM contact
+                                WHERE number = :number
+                            )
+                        )
+                    )
+                )
+            ';
+
+            $params = [
+                'id_user' => $id_user,
+                'date' => $date,
+                'number' => $number,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
 
         /**
          * Get scheduleds before a date.

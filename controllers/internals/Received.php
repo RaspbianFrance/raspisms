@@ -162,6 +162,19 @@ namespace controllers\internals;
         }
 
         /**
+         * Return receiveds for an origin and a user since a date.
+         *
+         * @param int    $id_user : User id
+         * @param string $since   : Date we want messages since format Y-m-d H:i:s
+         * @param string $origin  : Number who sent the message
+         * @return array
+         */
+        public function gets_since_date_by_origin_and_user(int $id_user, string $since, string $origin)
+        {
+            return $this->get_model()->gets_since_date_by_origin_and_user($id_user, $since, $origin);
+        }
+
+        /**
          * Get number of sended SMS for every date since a date for a specific user.
          *
          * @param int       $id_user : user id
