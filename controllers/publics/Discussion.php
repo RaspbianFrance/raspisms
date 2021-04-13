@@ -220,8 +220,18 @@ namespace controllers\publics;
 
             if ($messages)
             {
-                $new_limit_date = (new \DateTime($messages[count($messages) - 1]['date']))->getTimestamp(); //Use latest message as the new limit date to search
-                $response['new_limit_date'] = $new_limit_date;
+                for ($i = count($messages); $i > 0; $i--)
+                {
+                    $message = $messages[$i - 1];
+                    if ($message['type'] == 'inprogress')
+                    {
+                        continue;
+                    }
+
+                    $new_limit_date = (new \DateTime($message['date']))->getTimestamp(); //Use latest not inprogress message as the new limit date to search
+                    $response['new_limit_date'] = $new_limit_date;
+                    break;
+                }
             }
 
             echo json_encode($response);

@@ -87,6 +87,9 @@
                 jQuery('.discussion-container #load-message-spinner').remove();
                 jQuery('.discussion-container #send-message-spinner').remove();
 
+                //We also remove all in-progress messages because they are added again in the new response if not sended yet, and if sended they should not appear in double
+                jQuery('.discussion-container .message-in-progress-container').remove();
+
 				$.each(data.messages, function(key, message) {
 
 					<?php if ($_SESSION['user']['settings']['detect_url']) { ?>
@@ -146,7 +149,7 @@
 							break;
 						case 'inprogress' :
 							var texte = '' +
-								'<div class="clearfix message-container">' +
+								'<div class="clearfix message-container message-in-progress-container">' +
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
                                         '<div class="discussion-message-text">' + message.text + '</div>' +
