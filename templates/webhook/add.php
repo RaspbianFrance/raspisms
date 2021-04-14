@@ -47,6 +47,7 @@
 									<select name="type" class="form-control" required>
                                         <option value="receive_sms" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'receive_sms' ? 'selected' : ''  ?>>Réception d'un SMS</option>
                                         <option value="send_sms" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'send_sms' ? 'selected' : ''  ?>>Envoi d'un SMS</option>
+										<option value="send_sms_error" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'send_sms_error' ? 'selected' : ''  ?>>Erreur à l'envoi d'un SMS</option>
 									</select>
 								</div>	
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Annuler</a>

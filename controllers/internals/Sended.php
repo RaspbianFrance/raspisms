@@ -187,7 +187,18 @@ namespace controllers\internals;
                 $return['error'] = true;
                 $return['error_message'] = $response['error_message'];
                 $status = \models\Sended::STATUS_FAILED;
-                $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $status);
+                $errored_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid()$
+
+                $errored = [
+                        'id' => $errored_id,
+                        'at' => $at,
+                        'text' => $text,
+                        'destination' => $destination,
+                        'origin' => $id_phone,
+                ];
+
+                $internal_webhook = new Webhook($this->bdd);
+                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_ERROR, $errored);
 
                 return $return;
             }

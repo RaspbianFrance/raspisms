@@ -14,6 +14,7 @@ namespace models;
     class Webhook extends StandardModel
     {
         const TYPE_SEND = 'send_sms';
+        const TYPE_SEND_ERROR = 'send_sms_error';
         const TYPE_RECEIVE = 'receive_sms';
 
         /**
