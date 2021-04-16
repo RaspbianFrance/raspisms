@@ -167,8 +167,6 @@ namespace adapters;
 
             $uid = uniqid();
 
-            $medias = [];
-
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $success = file_put_contents($this->test_file_write, json_encode(['uid' => $uid, 'at' => $at, 'destination' => $destination, 'text' => $text, 'flash' => $flash, 'mms' => $mms, 'medias' => $medias]) . "\n", FILE_APPEND);
             if (false === $success)

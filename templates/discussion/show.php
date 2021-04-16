@@ -134,7 +134,7 @@
 							var texte = '' +
 							'<div class="clearfix message-container" id="' + message.uid + '">' +
 								'<div class="discussion-message message-received">' +
-                                    '<div class="discussion-message-text">' + message.text + '</div>' +
+                                    '<div class="discussion-message-text">' + message.text.replace(/\n/g,"<br>") + '</div>' +
                                     medias_html + 
                                     '<div class="discussion-message-date">' + message.date + '</div>' +
 								'</div>' +
@@ -150,7 +150,7 @@
 							var texte = '' +
 							'<div class="clearfix message-container" id="' + message.uid + '">' +
 								'<div class="discussion-message message-sended">' +
-									'<div class="discussion-message-text">' + message.text + '</div>' +
+									'<div class="discussion-message-text">' + message.text.replace(/\n/g,"<br>") + '</div>' +
                                     medias_html +
                                     '<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="message-status fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="message-status fa fa-times-circle fa-fw text-danger"></span>' : '<span class="message-status fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
 								'</div>' +
@@ -161,7 +161,7 @@
 								'<div class="clearfix message-container message-in-progress-container" id="' + message.uid + '">' +
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
-                                        '<div class="discussion-message-text">' + message.text + '</div>' +
+                                        '<div class="discussion-message-text">' + message.text.replace(/\n/g,"<br>") + '</div>' +
                                         medias_html + 
 										'<div class="discussion-message-date">' + message.date + '</div>' +
 									'</div>' +

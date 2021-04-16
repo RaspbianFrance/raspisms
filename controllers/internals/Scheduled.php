@@ -338,7 +338,7 @@ namespace controllers\internals;
                 {
                     if (null === $phone_to_use)
                     {
-                        if ($scheduled['mms'])
+                        if ($scheduled['mms'] && count($users_mms_phones))
                         {
                             $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
                             $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];
@@ -408,7 +408,7 @@ namespace controllers\internals;
                     
                     if (null === $phone_to_use)
                     {
-                        if ($scheduled['mms'])
+                        if ($scheduled['mms'] && count($users_mms_phones))
                         {
                             $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
                             $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];

@@ -229,6 +229,18 @@ namespace controllers\internals;
                 ];
             }
 
+            //If adapter does not support mms and the message is a mms, add medias as link
+            if (!$adapter::meta_support_mms_sending() && $mms)
+            {
+                $media_urls = [];
+                foreach ($media_uris as $media_uri)
+                {
+                    $media_urls[] = STATIC_HTTP_URL . '/data/public/' . $media_uri['path'];
+                }
+
+                $text .= "\n" . join(' - ', $media_urls);
+            }
+
             $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
 
             if ($response['error'])

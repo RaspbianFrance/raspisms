@@ -333,31 +333,6 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            if ($id_phone && $mms && !$this->internal_phone->support_mms($id_phone, $this->internal_phone::MMS_SENDING))
-            {
-                $return = self::DEFAULT_RETURN;
-                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'mms : You try to send a mms with a phone that does not support mms.';
-                $this->auto_http_code(false);
-
-                return $this->json($return);
-            }
-
-            //if try to send mms and no available phone support mms, return error
-            if (!$id_phone && $mms)
-            {
-                $phones_supporting_mms = $this->internal_phone->gets_phone_supporting_mms_for_user($this->user['id'], $this->internal_phone::MMS_SENDING);
-                if (!count($phones_supporting_mms))
-                {
-                    $return = self::DEFAULT_RETURN;
-                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
-                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'mms : You try to send a mms but you dont have any phone supporting mms. Please add at least one phone supporting mms before trying to send one.';
-                    $this->auto_http_code(false);
-
-                    return $this->json($return);
-                }
-            }
-
             if ($mms)
             {
                 foreach ($files_arrays as $file)

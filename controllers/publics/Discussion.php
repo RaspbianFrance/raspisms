@@ -106,13 +106,6 @@ namespace controllers\publics;
 
             $id_user = $_SESSION['user']['id'];
 
-            if ($since && !($since = date('Y-m-d H:i:s', $since)))
-            {
-                echo json_encode(['transaction_id' => $transaction_id, 'messages' => [], 'error' => true, 'error_message' => 'Not a valid date.']);
-
-                return false;
-            }
-
             $sendeds = $this->internal_sended->gets_by_destination_and_user($id_user, $number);
             $receiveds = $this->internal_received->gets_by_origin_and_user($id_user, $number);
             $scheduleds = $this->internal_scheduled->gets_before_date_for_number_and_user($id_user, $now, $number);
