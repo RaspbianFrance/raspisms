@@ -282,7 +282,6 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            //TODO : Check if phone adapter support mms and if mms are enabled
             if (($this->user['settings']['mms'] ?? false) && $mms)
             {
                 $return = self::DEFAULT_RETURN;
