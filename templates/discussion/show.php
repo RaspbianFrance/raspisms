@@ -56,26 +56,18 @@
 <script>
 	jQuery(document).ready(function () {
 
-		var alreadyReceivedMessages = [];
-        var limit_date = false;
-
-		/**
+        //List of messages already loaded
+        var cachedMessages = {};
+        
+        /**
 		 * Cette fonction vérifie régulièrement les sms pour mettre à jour l'affichage
 		 */
 		function getmessages ()
 		{
             ajaxTransactionId = Date.now();
-            if (limit_date == false) 
-            {
-                var first_load = true;
-                url = HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId;
-                limit_date = Date.now(); //After first load, we will only search for new messages
-            }
-            else
-            {
-                var first_load = false;
-                url = HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId + "/" + limit_date + "/";
-            }
+            var first_load = true;
+            url = HTTP_PWD + "/discussion/getmessage/<?php echo htmlspecialchars(urlencode($number)); ?>/" + ajaxTransactionId;
+            var newMessages = false;
 
 			jQuery.getJSON(url, function( data ) {
 
@@ -91,6 +83,24 @@
                 jQuery('.discussion-container .message-in-progress-container').remove();
 
 				$.each(data.messages, function(key, message) {
+                    //If message already loaded, continue
+                    if (message.uid in cachedMessages)
+                    {
+                        if (cachedMessages[message.uid]['type'] == 'sended') 
+                        {
+                            if (message.status != cachedMessages[message.uid]['status']) 
+                            {
+                                cachedMessages[message.uid] = message;
+                                var htmlStatus = (message.status == 'delivered' ? '<span class="message-status fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="message-status fa fa-times-circle fa-fw text-danger"></span>' : '<span class="message-status fa fa-clock-o fa-fw text-info"></span>' ));
+                                jQuery('.discussion-container #' + message.uid + " .message-status").replaceWith(htmlStatus);
+                            }
+                        }
+                        return;
+                    }
+
+                    //Add the message to the list of already receiveds once
+                    cachedMessages[message.uid] = message;
+                    newMessages = true;
 
 					<?php if ($_SESSION['user']['settings']['detect_url']) { ?>
 						//On ajoute la detection de lien dans le texte du message
@@ -122,7 +132,7 @@
                     {
 						case 'received' :
 							var texte = '' +
-							'<div class="clearfix message-container">' +
+							'<div class="clearfix message-container" id="' + message.uid + '">' +
 								'<div class="discussion-message message-received">' +
                                     '<div class="discussion-message-text">' + message.text + '</div>' +
                                     medias_html + 
@@ -130,26 +140,25 @@
 								'</div>' +
 							'</div>';
 
-							if (alreadyReceivedMessages.indexOf(message.uid) == -1 && !first_load) //If new message received and not first time loading
+							if (!first_load) //If new message received and not first time loading
 							{
 								playReceptionSound();
-								alreadyReceivedMessages.push(message.uid);
 							}
 
 							break;
                         case 'sended' :
 							var texte = '' +
-							'<div class="clearfix message-container">' +
+							'<div class="clearfix message-container" id="' + message.uid + '">' +
 								'<div class="discussion-message message-sended">' +
 									'<div class="discussion-message-text">' + message.text + '</div>' +
                                     medias_html +
-                                    '<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="fa fa-times-circle fa-fw text-danger"></span>' : '<span class="fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
+                                    '<div class="discussion-message-date">' + message.date + ' ' + (message.status == 'delivered' ? '<span class="message-status fa fa-check-circle fa-fw text-success"></span>' : (message.status == 'failed' ? '<span class="message-status fa fa-times-circle fa-fw text-danger"></span>' : '<span class="message-status fa fa-clock-o fa-fw text-info"></span>' )) + '</div>' +
 								'</div>' +
 							'</div>';
 							break;
 						case 'inprogress' :
 							var texte = '' +
-								'<div class="clearfix message-container message-in-progress-container">' +
+								'<div class="clearfix message-container message-in-progress-container" id="' + message.uid + '">' +
 									'<div class="discussion-message message-sended">' +
 										'<div class="message-in-progress-hover"><i class="fa fa-spinner fa-spin"></i></div>' +
                                         '<div class="discussion-message-text">' + message.text + '</div>' +
@@ -166,13 +175,7 @@
 					jQuery('.discussion-container').append(texte);
                 });
 
-                //Update limit_date if set
-                if (data.new_limit_date !== undefined)
-                {
-                    limit_date = data.new_limit_date;
-                }
-
-                if (data.messages.length) {
+                if (newMessages) {
                     scrollDownDiscussion(first_load);
                 }
 			});
