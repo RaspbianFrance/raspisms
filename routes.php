@@ -43,6 +43,7 @@
             'update' => '/contact/update/{csrf}/',
             'import' => '/contact/import/{csrf}/',
             'export' => '/contact/export/{format}/',
+            'conditional_delete' => '/contact/conditional_delete/{csrf}/',
             'json_list' => '/contacts.json/',
         ],
 

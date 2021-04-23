@@ -442,3 +442,21 @@ footer img
 {
     margin-bottom: 30px;
 }
+
+
+/**
+ * Contacts conditional deletion
+ */
+.conditional-deletion-preview-container
+{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.conditional-deletion-preview-container label,
+.conditional-deletion-preview-container select
+{
+    display: inline-block;
+    width: auto;
+}

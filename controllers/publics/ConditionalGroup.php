@@ -234,7 +234,17 @@ namespace controllers\publics;
                 $contacts_name[] = $contact['name'];
             }
 
-            $return['result'] = 'Contacts du groupe : ' . implode(', ', $contacts_name);
+            $visible_names = array_slice($contacts_name, 0, 5);
+            $how_many_more = count($contacts_name) - count($visible_names);
+
+            $result_text = 'Contacts du groupe : ' . implode(', ', $visible_names);
+
+            if ($how_many_more > 0)
+            {
+                $result_text .= ", et $how_many_more autres.";
+            }
+
+            $return['result'] = $result_text;
             $return['success'] = true;
             echo json_encode($return);
 

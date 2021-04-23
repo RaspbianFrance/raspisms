@@ -18,6 +18,7 @@ namespace controllers\publics;
     {
         private $internal_contact;
         private $internal_event;
+        private $internal_conditional_group;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -31,6 +32,7 @@ namespace controllers\publics;
 
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
+            $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -79,6 +81,40 @@ namespace controllers\publics;
             foreach ($ids as $id)
             {
                 $this->internal_contact->delete_for_user($_SESSION['user']['id'], $id);
+            }
+
+            return $this->redirect(\descartes\Router::url('Contact', 'list'));
+        }
+        
+        /**
+         * This function will delete a list of contacts depending on a condition
+         *
+         * @param string $_POST['condition'] : Condition to use to delete contacts
+         * @param mixed     $csrf
+         *
+         * @return boolean;
+         */
+        public function conditional_delete($csrf)
+        {
+            if (!$this->verify_csrf($csrf))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $condition = $_POST['condition'] ?? false;
+            if (!$condition)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir une condition !');
+
+                return $this->redirect(\descartes\Router::url('Contact', 'list'));
+            }
+
+            $contacts_to_delete = $this->internal_conditional_group->get_contacts_for_condition_and_user($_SESSION['user']['id'], $condition);
+            foreach ($contacts_to_delete as $contact)
+            {
+                $this->internal_contact->delete_for_user($_SESSION['user']['id'], $contact['id']);
             }
 
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
