@@ -14,7 +14,7 @@
 				<div class="col-lg-12">
 					<h1 class="page-header">
 						Dashboard <small>Contacts</small>
-                        <a class="btn btn-info float-right" id="btn-conditional-deletion" href="#"><span class="fa fa-trash-o"></span> Supprimer une liste dynamique de contacts</a>
+                        <a class="btn btn-warning float-right" id="btn-conditional-deletion" href="#"><span class="fa fa-trash-o"></span> Supprimer une liste dynamique de contacts</a>
                         <a class="btn btn-info float-right" id="btn-export" href="#" style="margin-right: 10px;"><span class="fa fa-upload"></span> Exporter la liste des contacts</a>
                         <a class="btn btn-info float-right" id="btn-import" href="#" style="margin-right: 10px;"><span class="fa fa-download"></span> Importer une liste de contacts</a>
 					</h1>
