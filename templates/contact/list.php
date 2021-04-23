@@ -43,6 +43,8 @@
                                             <tr>
                                                 <th>Nom</th>
                                                 <th>Numéro</th>
+                                                <th>Date de création</th>
+                                                <th>Dernière modification</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
@@ -128,7 +130,7 @@ jQuery(document).ready(function()
     //Datatable
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "bLengthChange": false,
+        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -144,6 +146,8 @@ jQuery(document).ready(function()
         "columns" : [
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
             {data: 'number_formatted'},
+            {data: 'created_at'},
+            {data: 'updated_at'},
             {
                 data: 'id',
                 render: function (data, type, row, meta) {
