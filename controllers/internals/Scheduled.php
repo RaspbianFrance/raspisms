@@ -23,14 +23,16 @@ namespace controllers\internals;
          * @param string $text                  : Text of the message
          * @param ?int   $id_phone              : Id of the phone to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
+         * @param bool   $mms                   : Is the sms a mms, by default false
          * @param array  $numbers               : Numbers to send message to
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
          * @param array  $conditional_group_ids : Conditional Groups ids to send message to
+         * @param array  $media_ids             : Ids of the medias to link to scheduled message
          *
          * @return bool : false on error, new id on success
          */
-        public function create(int $id_user, $at, string $text, ?int $id_phone = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function create(int $id_user, $at, string $text, ?int $id_phone = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
@@ -38,7 +40,13 @@ namespace controllers\internals;
                 'text' => $text,
                 'id_phone' => $id_phone,
                 'flash' => $flash,
+                'mms' => $mms,
             ];
+
+            if ($text === '')
+            {
+                return false;
+            }
 
             if (null !== $id_phone)
             {
@@ -51,11 +59,27 @@ namespace controllers\internals;
                 }
             }
 
+            //Use transaction to garanty atomicity
+            $this->bdd->beginTransaction();
+
             $id_scheduled = $this->get_model()->insert($scheduled);
             if (!$id_scheduled)
             {
+                $this->bdd->rollBack();
                 return false;
             }
+
+            $internal_media = new Media($this->bdd);
+            foreach ($media_ids as $media_id)
+            {
+                $id_media_scheduled = $internal_media->link_to($media_id, 'scheduled', $id_scheduled);
+                if (!$id_media_scheduled)
+                {
+                    $this->bdd->rollBack();
+                    return false;
+                }
+            }
+
 
             foreach ($numbers as $number)
             {
@@ -96,6 +120,12 @@ namespace controllers\internals;
                 }
 
                 $this->get_model()->insert_scheduled_conditional_group_relation($id_scheduled, $conditional_group_id);
+            }
+
+            $success = $this->bdd->commit();
+            if (!$success)
+            {
+                return false;
             }
 
             $date = date('Y-m-d H:i:s');
@@ -114,20 +144,23 @@ namespace controllers\internals;
          * @param string $text                  : Text of the message
          * @param ?int   $id_phone              : Id of the phone to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
+         * @param bool   $mms                   : Is the sms a mms, by default false
          * @param array  $numbers               : Numbers to send message to
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
          * @param array  $conditional_group_ids : Conditional Groups ids to send message to
+         * @param array  $media_ids             : Ids of the medias to link to scheduled message
          *
-         * @return bool : false on error, new id on success
+         * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $id_phone = null, bool $flash = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [])
+        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $id_phone = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'id_phone' => $id_phone,
+                'mms' => $mms,
                 'flash' => $flash,
             ];
 
@@ -142,12 +175,27 @@ namespace controllers\internals;
                 }
             }
 
+            //Ensure atomicity
+            $this->bdd->beginTransaction();
+
             $success = (bool) $this->get_model()->update_for_user($id_user, $id_scheduled, $scheduled);
 
             $this->get_model()->delete_scheduled_numbers($id_scheduled);
             $this->get_model()->delete_scheduled_contact_relations($id_scheduled);
             $this->get_model()->delete_scheduled_group_relations($id_scheduled);
             $this->get_model()->delete_scheduled_conditional_group_relations($id_scheduled);
+            $internal_media = new Media($this->bdd);
+            $internal_media->unlink_all_of('scheduled', $id_scheduled);
+
+            foreach ($media_ids as $media_id)
+            {
+                $id_media_scheduled = $internal_media->link_to($media_id, 'scheduled', $id_scheduled);
+                if (!$id_media_scheduled)
+                {
+                    $this->bdd->rollBack();
+                    return false;
+                }
+            }
 
             foreach ($numbers as $number)
             {
@@ -190,7 +238,7 @@ namespace controllers\internals;
                 $this->get_model()->insert_scheduled_conditional_group_relation($id_scheduled, $conditional_group_id);
             }
 
-            return true;
+            return $this->bdd->commit();
         }
 
         /**
@@ -206,11 +254,25 @@ namespace controllers\internals;
         {
             return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
+        
+        /**
+         * Get messages scheduled after a date for a number and a user.
+         *
+         * @param int $id_user : User id
+         * @param $date : Date after which we want messages
+         * @param string $number : Number for which we want messages
+         *
+         * @return array
+         */
+        public function gets_after_date_for_number_and_user(int $id_user, $date, string $number)
+        {
+            return $this->get_model()->gets_after_date_for_number_and_user($id_user, $date, $number);
+        }
 
         /**
          * Get all messages to send and the number to use to send theme.
          *
-         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash'], ...]
+         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...]
          */
         public function get_smss_to_send()
         {
@@ -224,6 +286,7 @@ namespace controllers\internals;
 
             $users_settings = [];
             $users_phones = [];
+            $users_mms_phones = [];
 
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
@@ -244,7 +307,16 @@ namespace controllers\internals;
                 if (!isset($users_phones[$scheduled['id_user']]))
                 {
                     $phones = $internal_phone->gets_for_user($scheduled['id_user']);
+                    $mms_phones = $internal_phone->gets_phone_supporting_mms_for_user($scheduled['id_user'], $internal_phone::MMS_SENDING);
                     $users_phones[$scheduled['id_user']] = $phones ?: [];
+                    $users_mms_phones[$scheduled['id_user']] = $mms_phones ?: [];
+                }
+
+                //Add medias to mms
+                if ($scheduled['mms'])
+                {
+                    $internal_media = new Media($this->bdd);
+                    $scheduled['medias'] = $internal_media->gets_for_scheduled($scheduled['id']);
                 }
 
                 $phone_to_use = null;
@@ -266,8 +338,16 @@ namespace controllers\internals;
                 {
                     if (null === $phone_to_use)
                     {
-                        $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
-                        $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                        if ($scheduled['mms'] && count($users_mms_phones))
+                        {
+                            $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
+                            $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];
+                        }
+                        else
+                        {
+                            $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
+                            $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                        }
                     }
                     
                     $message = [
@@ -276,6 +356,8 @@ namespace controllers\internals;
                         'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
                         'destination' => $number['number'],
                         'flash' => $scheduled['flash'],
+                        'mms' => $scheduled['mms'],
+                        'medias' => $scheduled['medias'],
                     ];
 
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
@@ -326,8 +408,16 @@ namespace controllers\internals;
                     
                     if (null === $phone_to_use)
                     {
-                        $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
-                        $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                        if ($scheduled['mms'] && count($users_mms_phones))
+                        {
+                            $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
+                            $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];
+                        }
+                        else
+                        {
+                            $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
+                            $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
+                        }
                     }
 
                     $message = [
@@ -336,6 +426,8 @@ namespace controllers\internals;
                         'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
                         'destination' => $contact['number'],
                         'flash' => $scheduled['flash'],
+                        'mms' => $scheduled['mms'],
+                        'medias' => $scheduled['medias'],
                     ];
 
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
@@ -368,7 +460,7 @@ namespace controllers\internals;
                 foreach ($messages as $message)
                 {
                     //Remove empty messages
-                    if ('' === trim($message['text']))
+                    if ('' === trim($message['text']) && !$message['medias'])
                     {
                         continue;
                     }

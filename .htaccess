@@ -1,4 +1,5 @@
 RewriteEngine on
 RewriteRule ^assets - [L]
 RewriteRule ^.well-known - [L]
+RewriteRule ^data/public/ - [L]
 RewriteRule . index.php

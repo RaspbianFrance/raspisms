@@ -205,7 +205,7 @@ namespace controllers\internals;
          *
          * @param array $file : The array extracted from $_FILES['file']
          *
-         * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error']]
+         * @return array : ['success' => bool, 'content' => file handler | error message, 'error_code' => $file['error'], 'mime_type' => server side calculated mimetype, 'extension' => original extension, 'tmp_name' => name of the tmp_file]
          */
         public static function read_uploaded_file(array $file)
         {
@@ -213,8 +213,9 @@ namespace controllers\internals;
                 'success' => false,
                 'content' => 'Une erreur inconnue est survenue.',
                 'error_code' => $file['error'] ?? 99,
-                'mime_type' => false,
-                'extension' => false,
+                'mime_type' => null,
+                'extension' => null,
+                'tmp_name' => null,
             ];
 
             if (UPLOAD_ERR_OK !== $file['error'])
@@ -266,7 +267,8 @@ namespace controllers\internals;
                 return $result;
             }
 
-            $result['extension'] = pathinfo($file['name'])['extension'];
+            $result['tmp_name'] = $tmp_filename;
+            $result['extension'] = pathinfo($file['name'], PATHINFO_EXTENSION);
             $result['mime_type'] = mime_content_type($tmp_filename);
 
             $file_handler = fopen($tmp_filename, 'r');
@@ -277,96 +279,55 @@ namespace controllers\internals;
         }
 
         /**
-         * Allow to upload file.
+         * Generate a highly random uuid based on timestamp and strong cryptographic random
          *
-         * @param array $file : The array extracted from $_FILES['file']
-         *
-         * @return array : ['success' => bool, 'content' => file path | error message, 'error_code' => $file['error']]
+         * @return string
          */
-        public static function upload_file(array $file)
+        public static function random_uuid()
         {
-            $result = [
-                'success' => false,
-                'content' => 'Une erreur inconnue est survenue.',
-                'error_code' => $file['error'] ?? 99,
-            ];
+            $bytes = random_bytes(16);
+            return time() . '-' . bin2hex($bytes);
+        }
 
-            if (UPLOAD_ERR_OK !== $file['error'])
+
+        /**
+         * Create a user data public path
+         * @param int $id_user : The user id
+         *
+         * @return string : The created path
+         
+         * @exception Raise exception on error
+         */
+        public static function create_user_public_path (int $id_user)
+        {
+            $new_dir = PWD_DATA_PUBLIC . '/' . $id_user;
+            if (file_exists($new_dir))
             {
-                switch ($file['error'])
-                {
-                    case UPLOAD_ERR_INI_SIZE:
-                        $result['content'] = 'Impossible de télécharger le fichier car il dépasse les ' . ini_get('upload_max_filesize') / (1000 * 1000) . ' Mégaoctets.';
-
-                        break;
-
-                    case UPLOAD_ERR_FORM_SIZE:
-                        $result['content'] = 'Le fichier dépasse la limite de taille.';
-
-                        break;
-
-                    case UPLOAD_ERR_PARTIAL:
-                        $result['content'] = 'L\'envoi du fichier a été interrompu.';
-
-                        break;
-
-                    case UPLOAD_ERR_NO_FILE:
-                        $result['content'] = 'Aucun fichier n\'a été envoyé.';
-
-                        break;
-
-                    case UPLOAD_ERR_NO_TMP_DIR:
-                        $result['content'] = 'Le serveur ne dispose pas de fichier temporaire permettant l\'envoi de fichiers.';
-
-                        break;
-
-                    case UPLOAD_ERR_CANT_WRITE:
-                        $result['content'] = 'Impossible d\'envoyer le fichier car il n\'y a plus de place sur le serveur.';
-
-                        break;
-
-                    case UPLOAD_ERR_EXTENSION:
-                        $result['content'] = 'Le serveur a interrompu l\'envoi du fichier.';
-
-                        break;
-                }
-
-                return $result;
+                return $new_dir;
             }
 
-            $tmp_filename = $file['tmp_name'] ?? false;
-            if (!$tmp_filename || !is_readable($tmp_filename))
+            clearstatcache();
+            if (!mkdir($new_dir))
             {
-                return $result;
+                throw new \Exception('Cannot create dir ' . $new_dir);
             }
 
-            $md5_filename = md5_file($tmp_filename);
-            if (!$md5_filename)
+            //We do chmod in two times because else umask fuck mkdir permissions
+            if (!chmod($new_dir, fileperms(PWD_DATA_PUBLIC) & 0777)) //Fileperms return garbage in addition to perms. Perms are only in weak bytes. We must use an octet notation with 0
             {
-                return $result;
+                throw new \Exception('Cannot give dir ' . $new_dir . ' rights : ' . decoct(fileperms(PWD_DATA_PUBLIC) & 0777)); //Show error in dec
             }
 
-            $new_file_path = PWD_DATA . '/' . $md5_filename;
-
-            if (file_exists($new_file_path))
+            if (posix_getuid() === 0 && !chown($new_dir, fileowner(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper user
             {
-                $result['success'] = true;
-                $result['content'] = $new_file_path;
-
-                return $result;
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA_PUBLIC));
             }
 
-            $success = move_uploaded_file($tmp_filename, $new_file_path);
-            if (!$success)
+            if (posix_getuid() === 0 && !chgrp($new_dir, filegroup(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper group
             {
-                $result['content'] = 'Impossible d\'écrire le fichier sur le serveur.';
-
-                return $result;
+                throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA_PUBLIC));
             }
 
-            $result['success'] = true;
-            $result['content'] = $new_file_path;
-
-            return $result;
+            return $new_dir;
         }
     }

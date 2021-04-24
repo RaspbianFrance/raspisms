@@ -205,6 +205,34 @@ footer img
 	font-size: 0.9em;
 }
 
+.discussion-message-medias img
+{
+    transition-duration: 0.1s;
+    max-width: 150px;
+    max-height: 150px;
+    line-height: 150px;
+    width: auto;
+    height: auto;
+}
+
+.discussion-message-medias img:hover
+{
+    opacity: 0.6;
+}
+
+.discussion-message-media
+{
+    display: inline-block;
+    line-height: 160px;
+    width: 160px;
+    height: 160px;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    vertical-align: middle;
+    text-align: center;
+    margin: 5px;
+}
+
 .message-container
 {
 	margin-bottom: 10px;
@@ -252,6 +280,12 @@ footer img
 {
 	float: right;
 	margin-top: 8px;
+}
+
+.message-input input[type="file"]
+{
+    margin-top: 8px;
+    display: inline-block;
 }
 
 .message-in-progress-hover
@@ -407,4 +441,22 @@ footer img
 .form-group
 {
     margin-bottom: 30px;
+}
+
+
+/**
+ * Contacts conditional deletion
+ */
+.conditional-deletion-preview-container
+{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.conditional-deletion-preview-container label,
+.conditional-deletion-preview-container select
+{
+    display: inline-block;
+    width: auto;
 }

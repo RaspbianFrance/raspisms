@@ -158,9 +158,9 @@ namespace models;
          *
          * @return int : number of modified rows
          */
-        public function update_for_user(int $id_user, int $id, array $entry)
+        public function update_for_user(int $id_user, int $id, array $data)
         {
-            return $this->_update($this->get_table_name(), $entry, ['id_user' => $id_user, 'id' => $id]);
+            return $this->_update($this->get_table_name(), $data, ['id_user' => $id_user, 'id' => $id]);
         }
 
         /**

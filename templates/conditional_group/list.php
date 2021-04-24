@@ -1,7 +1,7 @@
 <?php
 	//Template dashboard
 	
-	$this->render('incs/head', ['title' => 'ConditionalGroupes Conditionnels - Show All'])
+	$this->render('incs/head', ['title' => 'Groupes Conditionnels - Show All'])
 ?>
 <div id="wrapper">
 <?php
@@ -41,6 +41,8 @@
                                             <tr>
                                                 <th>Nom</th>
                                                 <th>Condition</th>
+                                                <th>Date de création</th>
+                                                <th>Dernière modification</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
@@ -72,7 +74,7 @@ jQuery(document).ready(function ()
 {
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "bLengthChange": false,
+        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -87,7 +89,14 @@ jQuery(document).ready(function ()
         },
         "columns" : [
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
-            {data: 'condition', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'condition', 
+                render: function (data, type, row, meta) { 
+                    return '<code>' + jQuery.fn.dataTable.render.text().display(data) + '</code>';
+                },
+            },
+            {data: 'created_at'},
+            {data: 'updated_at'},
             {
                 data: 'id',
                 render: function (data, type, row, meta) {

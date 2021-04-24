@@ -64,17 +64,21 @@
                                         <div class="form-group">
                                             <label>Ajouter un média</label>
                                             <p class="italic small help description-scheduled-media">
-                                                Le média sera utilisé uniquement si le téléphone utilisé supporte l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>
+                                                L'ajout d'un média nécessite un téléphone supportant l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>.
                                             </p>
-                                            <?php if ($scheduled['media']) { ?>
-                                                <div class="current-media-container">
-                                                    <input type="hidden" name="scheduleds[<?php $this->s($scheduled['id']); ?>][current_media]" value="1">
-                                                    <p class="inline-block">Un média est déjà lié à ce message.</p>
-                                                    <a href="#" class="btn btn-warning btn-delete-media">Supprimer le média</a>
+                                            <div class="form-group">
+                                                <input class="" name="scheduleds_<?php $this->s($scheduled['id']); ?>_medias[]" value="" type="file" multiple />
+                                            </div>
+                                            <?php if ($scheduled['medias']) { ?>
+                                                <div class="current-medias-container">
+                                                    <label>Médias déjà attachés au SMS</label>
+                                                    <?php foreach ($scheduled['medias'] as $key => $media) { ?>
+                                                        <p class="current-media">
+                                                            <input type="hidden" name="scheduleds[<?php $this->s($scheduled['id']); ?>][media_ids][]" value="<?php $this->s($media['id']); ?>">
+                                                            <label>Fichier <?= $key + 1 ?> :</label><br/> <a href="<?php $this->s(HTTP_PWD_DATA_PUBLIC . '/' . $media['path']); ?>" class="btn btn-info btn-sm" target="_blank">Voir le média</a> <a href="#" class="btn btn-warning btn-delete-media btn-sm">Supprimer le média</a>
+                                                        </p>
+                                                    <?php } ?>
                                                 </div>
-                                                <input class="hidden" name="media_<?php $this->s($scheduled['id']); ?>" type="file" />
-                                            <?php } else { ?>
-                                                <input name="media_<?php $this->s($scheduled['id']); ?>" type="file" />
                                             <?php } ?>
                                         </div>
                                     <?php } ?>
@@ -246,8 +250,7 @@
         jQuery('body').on('click', '.btn-delete-media', function (e)
         {
             e.preventDefault();
-            jQuery(this).parents('.form-group').find('input').removeClass('hidden');
-            jQuery(this).parents('.form-group').find('.current-media-container').remove();
+            jQuery(this).parents('.current-media').remove();
         });
 
         jQuery('body').on('click', '.preview-button', function (e)

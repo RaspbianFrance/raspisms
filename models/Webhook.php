@@ -13,8 +13,9 @@ namespace models;
 
     class Webhook extends StandardModel
     {
-        const TYPE_SEND = 'send_sms';
-        const TYPE_RECEIVE = 'receive_sms';
+        const TYPE_SEND_SMS = 'send_sms';
+        const TYPE_RECEIVE_SMS = 'receive_sms';
+        const TYPE_INBOUND_CALL = 'inbound_call';
 
         /**
          * Find all webhooks for a user and for a type of webhook.

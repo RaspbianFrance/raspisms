@@ -94,17 +94,11 @@ class Webhook extends StandardController
      *
      * @param int    $id_user : User to trigger the webhook for
      * @param string $type    : Type of webhook to trigger
-     * @param array  $sms     : The sms [
-     *                        int 'id' => SMS id,
-     *                        string 'at' => SMS date,
-     *                        string 'text' => sms body,
-     *                        string 'origin' => sms origin (number or phone id)
-     *                        string 'destination' => sms destination (number or phone id)
-     *                        ]
+     * @param array  $body    : The body, an array depending on webhook type
      *
      * @return bool : False if no trigger, true else
      */
-    public function trigger(int $id_user, string $type, array $sms)
+    public function trigger(int $id_user, string $type, array $body)
     {
         $internal_setting = new Setting($this->bdd);
         $internal_user = new User($this->bdd);
@@ -137,11 +131,7 @@ class Webhook extends StandardController
                     'webhook_type' => $webhook['type'],
                     'webhook_random_id' => $webhook_random_id,
                     'webhook_signature' => $webhook_signature,
-                    'id' => $sms['id'],
-                    'at' => $sms['at'],
-                    'text' => $sms['text'],
-                    'origin' => $sms['origin'],
-                    'destination' => $sms['destination'],
+                    'body' => json_encode($body),
                 ],
             ];
 

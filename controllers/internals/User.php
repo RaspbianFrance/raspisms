@@ -264,6 +264,7 @@ namespace controllers\internals;
          *                        string 'text' => sms content,
          *                        string 'destination' => id of phone the sms was sent to
          *                        string 'origin' => phone number that sent the sms
+         *                        bool 'mms' => is the sms a mms
          *                        ]
          *
          * @return bool : False if no transfer, true else
@@ -290,12 +291,20 @@ namespace controllers\internals;
             }
 
             $mailer = new Mailer();
+            
+            $attachments = [];
+           
+            foreach ($received['medias'] ?? [] as $media)
+            {
+                $attachments[] = PWD_DATA_PUBLIC . '/' . $media['path'];
+            }
 
             return $mailer->enqueue($user['email'], EMAIL_TRANSFER_SMS, [
                 'at' => $received['at'],
                 'origin' => $received['origin'],
                 'destination' => $phone['name'],
                 'text' => $received['text'],
-            ]);
+                'mms' => $received['mms'] ?? false,
+            ], $attachments);
         }
     }

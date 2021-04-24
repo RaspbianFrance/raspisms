@@ -32,6 +32,7 @@ namespace controllers\publics;
             'CANNOT_CREATE' => 8,
             'SUSPENDED_USER' => 16,
             'CANNOT_DELETE' => 32,
+            'CANNOT_UPLOAD_FILE' => 64,
         ];
 
         const ERROR_MESSAGES = [
@@ -41,6 +42,7 @@ namespace controllers\publics;
             'CANNOT_CREATE' => 'Cannot create a new entry.',
             'SUSPENDED_USER' => 'This user account is currently suspended.',
             'CANNOT_DELETE' => 'Cannot delete this entry.',
+            'CANNOT_UPLOAD_FILE' => 'Failed to upload or save an uploaded file : ',
         ];
 
         private $internal_user;
@@ -52,6 +54,8 @@ namespace controllers\publics;
         private $internal_group;
         private $internal_conditional_group;
         private $internal_adapter;
+        private $internal_media;
+        private $internal_setting;
         private $user;
 
         /**
@@ -73,6 +77,8 @@ namespace controllers\publics;
             $this->internal_group = new \controllers\internals\Group($bdd);
             $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
+            $this->internal_media = new \controllers\internals\Media($bdd);
+            $this->internal_setting = new \controllers\internals\Setting($bdd);
 
             //If no user, quit with error
             $this->user = false;
@@ -93,6 +99,8 @@ namespace controllers\publics;
                 exit(self::ERROR_CODES['INVALID_CREDENTIALS']);
             }
 
+            $this->user['settings'] = $this->internal_setting->gets_for_user($this->user['id']);
+
             if (\models\User::STATUS_ACTIVE !== $this->user['status'])
             {
                 $return = self::DEFAULT_RETURN;
@@ -108,14 +116,14 @@ namespace controllers\publics;
         /**
          * List all entries of a certain type for the current user, sorted by id.
          *
-         * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone']
+         * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'media']
          * @param int    $page       : Pagination number, Default = 0. Group of 25 results.
          *
          * @return : List of entries
          */
         public function get_entries(string $entry_type, int $page = 0)
         {
-            $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone'];
+            $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'media'];
 
             if (!\in_array($entry_type, $entry_types, true))
             {
@@ -143,6 +151,21 @@ namespace controllers\publics;
                     $entries[$key]['contacts'] = $this->internal_scheduled->get_contacts($entry['id']);
                     $entries[$key]['groups'] = $this->internal_scheduled->get_groups($entry['id']);
                     $entries[$key]['conditional_groups'] = $this->internal_scheduled->get_conditional_groups($entry['id']);
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_scheduled($entry['id']);
+                }
+            }
+            elseif ('received' === $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_received($entry['id']);
+                }
+            }
+            elseif ('sended' === $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    $entries[$key]['medias'] = $this->internal_media->gets_for_sended($entry['id']);
                 }
             }
             //Special case for group we must add contact because its a join
@@ -179,6 +202,7 @@ namespace controllers\publics;
          * @param string $_POST['text']               : Text of the message to send
          * @param string $_POST['id_phone']           : Default null. Id of phone to send the message from. If null use a random phone
          * @param string $_POST['flash']              : Default false. Is the sms a flash sms.
+         * @param string $_POST['mms']                : Default false. Is the sms a mms.
          * @param string $_POST['numbers']            : Array of numbers to send message to
          * @param string $_POST['contacts']           : Array of ids of contacts to send message to
          * @param string $_POST['groups']             : Array of ids of groups to send message to
@@ -192,15 +216,46 @@ namespace controllers\publics;
             $text = $_POST['text'] ?? false;
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $flash = (bool) ($_POST['flash'] ?? false);
+            $mms = (bool) ($_POST['mms'] ?? false);
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
+            $files = $_FILES['medias'] ?? false;
 
             $numbers = \is_array($numbers) ? $numbers : [$numbers];
             $contacts = \is_array($contacts) ? $contacts : [$contacts];
             $groups = \is_array($groups) ? $groups : [$groups];
             $conditional_groups = \is_array($conditional_groups) ? $conditional_groups : [$conditional_groups];
+
+            //Iterate over files to re-create individual $_FILES array
+            $files_arrays = [];
+
+            if ($files === false)
+            {
+                $files_arrays = [];
+            }
+            elseif (!is_array($files['name'])) //Only one file uploaded
+            {
+                $files_arrays[] = $files;
+            }
+            else //multiple files
+            {
+                foreach ($files as $property_name => $files_values)
+                {
+                    foreach ($files_values as $file_key => $property_value)
+                    {
+                        if (!isset($files_arrays[$file_key]))
+                        {
+                            $files_arrays[$file_key] = [];
+                        }
+
+                        $files_arrays[$file_key][$property_name] = $property_value;
+                    }
+                }
+            }
+
+            $media_ids = [];
 
             if (!$at)
             {
@@ -222,6 +277,16 @@ namespace controllers\publics;
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'at must be a date of format "Y-m-d H:i:s".';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            if (($this->user['settings']['mms'] ?? false) && $mms)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'mms is set to true, but mms are disabled in settings.';
                 $this->auto_http_code(false);
 
                 return $this->json($return);
@@ -251,7 +316,13 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            if ($id_phone && !$this->internal_phone->get_for_user($this->user['id'], $id_phone))
+            $phone = null;
+            if ($id_phone)
+            {
+                $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+            } 
+            
+            if ($id_phone && !$phone)
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
@@ -261,7 +332,29 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $flash, $numbers, $contacts, $groups, $conditional_groups);
+            if ($mms)
+            {
+                foreach ($files_arrays as $file)
+                {
+                    try
+                    {
+                        $new_media_id = $this->internal_media->upload_and_create_for_user($this->user['id'], $file);
+                    }
+                    catch (\Exception $e)
+                    {
+                        $return = self::DEFAULT_RETURN;
+                        $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                        $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'] . ' : Cannot upload and create media file ' . $file['name'] . ' : ' . $e->getMessage();
+                        $this->auto_http_code(false);
+
+                        return $this->json($return);
+                    }
+
+                    $media_ids[] = $new_media_id;
+                }
+            }
+
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
                 $return = self::DEFAULT_RETURN;

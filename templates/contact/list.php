@@ -14,7 +14,8 @@
 				<div class="col-lg-12">
 					<h1 class="page-header">
 						Dashboard <small>Contacts</small>
-                        <a class="btn btn-info float-right" id="btn-export" href="#"><span class="fa fa-upload"></span> Exporter la liste des contacts</a>
+                        <a class="btn btn-warning float-right" id="btn-conditional-deletion" href="#"><span class="fa fa-trash-o"></span> Supprimer une liste dynamique de contacts</a>
+                        <a class="btn btn-info float-right" id="btn-export" href="#" style="margin-right: 10px;"><span class="fa fa-upload"></span> Exporter la liste des contacts</a>
                         <a class="btn btn-info float-right" id="btn-import" href="#" style="margin-right: 10px;"><span class="fa fa-download"></span> Importer une liste de contacts</a>
 					</h1>
 					<ol class="breadcrumb">
@@ -43,6 +44,8 @@
                                             <tr>
                                                 <th>Nom</th>
                                                 <th>Numéro</th>
+                                                <th>Date de création</th>
+                                                <th>Dernière modification</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
@@ -110,6 +113,32 @@
         </div>
     </div>
 </div>
+<div class="modal fade" tabindex="-1" id="conditional-deletion-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="<?php $this->s(\descartes\Router::url('Contact', 'conditional_delete', ['csrf' => $_SESSION['csrf']])); ?>" method="POST" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Supprimer des contacts de façon conditionnelle</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="form-group">
+                        <p>Vous pouvez supprimer une liste dynamique de contacts, construite selon des règles basées sur les données de ces contacts. Pour plus d'informations consultez la documentation relative à <a href="https://documentation.raspisms.fr/users/groups_and_contacts/conditionnals_groups.html" target="_blank">l'utilisation des groupes conditionnels.</a><br/></p>
+                        <input class="form-control" name="condition" placeholder="Ex : contact.gender == 'male'" required/>
+                        <div class="conditional-deletion-preview-container">
+                            <div class="conditional-deletion-preview-text"></div>
+                            <a class="btn btn-info conditional-deletion-preview-button" href="#">Prévisualiser les contacts qui seront supprimés</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-danger" data-dismiss="modal">Annuler</a>
+                    <button class="btn btn-default btn-confirm" type="submit"><span class="fa fa-trash-o"></span> Supprimer les contacts</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
 jQuery(document).ready(function()
 {
@@ -124,11 +153,36 @@ jQuery(document).ready(function()
         jQuery('#export-modal').modal({'keyboard': true});
     });
     
+    jQuery('body').on('click', '#btn-conditional-deletion', function ()
+    {
+        jQuery('#conditional-deletion-modal').modal({'keyboard': true});
+    });
+
+    jQuery('body').on('click', '.conditional-deletion-preview-button', function (e)
+    {
+        e.preventDefault();
+        var condition = jQuery(this).parents('.form-group').find('input').val();
+
+        var data = {
+            'condition' : condition,
+        };
+
+        jQuery.ajax({
+            type: "POST",
+            url: HTTP_PWD + '/conditional_group/preview/',
+            data: data,
+            success: function (data) {
+                jQuery('.conditional-deletion-preview-text').text(data.result);
+            },
+            dataType: 'json'
+        });
+    });
+    
     
     //Datatable
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "bLengthChange": false,
+        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -144,6 +198,8 @@ jQuery(document).ready(function()
         "columns" : [
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
             {data: 'number_formatted'},
+            {data: 'created_at'},
+            {data: 'updated_at'},
             {
                 data: 'id',
                 render: function (data, type, row, meta) {

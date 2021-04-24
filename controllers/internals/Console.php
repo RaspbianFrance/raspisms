@@ -151,4 +151,23 @@ namespace controllers\internals;
 
             exit($success ? 0 : 1);
         }
+
+
+        /**
+         * Delete medias that are no longer usefull
+         */
+        public function clean_unused_medias()
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_media = new \controllers\internals\Media($bdd);
+
+            $medias = $internal_media->gets_unused();
+
+            foreach ($medias as $media)
+            {
+                $success = $internal_media->delete_for_user($media['id_user'], $media['id']);
+
+                echo ($success === false ? '[KO]' : '[OK]') . ' - ' . $media['path'] . "\n";
+            }
+        }
     }

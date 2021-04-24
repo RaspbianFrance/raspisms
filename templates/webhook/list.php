@@ -69,7 +69,7 @@ jQuery(document).ready(function ()
 {
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "bLengthChange": false,
+        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -92,6 +92,8 @@ jQuery(document).ready(function ()
                             return 'Envoi de SMS';
                         case 'receive_sms':
                             return 'Réception de SMS';
+                        case 'inbound_call':
+                            return 'Réception d\'un appel téléphonique';
                         default:
                             return 'Inconnu';
                     }

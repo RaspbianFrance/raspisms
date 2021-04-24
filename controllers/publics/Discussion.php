@@ -21,6 +21,7 @@ namespace controllers\publics;
         private $internal_received;
         private $internal_contact;
         private $internal_phone;
+        private $internal_media;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -37,6 +38,7 @@ namespace controllers\publics;
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_media = new \controllers\internals\Media($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -112,12 +114,27 @@ namespace controllers\publics;
 
             foreach ($sendeds as $sended)
             {
-                $messages[] = [
+                $medias = [];
+                if ($sended['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_sended($sended['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
+                    }
+                }
+
+                $message = [
+                    'uid'  => 'sended-' . $sended['id'],
                     'date' => htmlspecialchars($sended['at']),
                     'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
+                    'medias' => $medias,
                     'status' => $sended['status'],
                 ];
+
+
+                $messages[] = $message;
             }
 
             foreach ($receiveds as $received)
@@ -126,21 +143,44 @@ namespace controllers\publics;
                 {
                     $this->internal_received->mark_as_read_for_user($id_user, $received['id']);
                 }
+                
+                $medias = [];
+                if ($received['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_received($received['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
+                    }
+                }
 
                 $messages[] = [
+                    'uid'  => 'received-' . $received['id'],
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
-                    'md5' => md5($received['at'] . $received['text']),
+                    'medias' => $medias,
                 ];
             }
 
             foreach ($scheduleds as $scheduled)
             {
+                $medias = [];
+                if ($scheduled['mms'])
+                {
+                    $medias = $this->internal_media->gets_for_scheduled($scheduled['id']);
+                    foreach ($medias as &$media)
+                    {
+                        $media = HTTP_PWD_DATA_PUBLIC . '/' . $media['path'];
+                    }
+                }
+
                 $messages[] = [
+                    'uid'  => 'scheduled-' . $scheduled['id'],
                     'date' => htmlspecialchars($scheduled['at']),
                     'text' => htmlspecialchars($scheduled['text']),
                     'type' => 'inprogress',
+                    'medias' => $medias,
                 ];
             }
 
@@ -150,10 +190,15 @@ namespace controllers\publics;
                 return strtotime($a['date']) - strtotime($b['date']);
             });
 
-            //On récupère uniquement les 25 derniers messages sur l'ensemble
+            //Récupère uniquement les 25 derniers messages sur l'ensemble pour limiter la charge
             $messages = \array_slice($messages, -25);
 
-            echo json_encode(['transaction_id' => $transaction_id, 'messages' => $messages]);
+            $response = [
+                'transaction_id' => $transaction_id,
+                'messages' => $messages,
+            ];
+
+            echo json_encode($response);
 
             return true;
         }
@@ -165,6 +210,7 @@ namespace controllers\publics;
          * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
          * @param string $_POST['id_phone']    : If of phone to send sms with
+         * @param array $_FILES['medias']      : Medias to upload and link to sms
          *
          * @return string : json string Le statut de l'envoi
          */
@@ -190,6 +236,43 @@ namespace controllers\publics;
             $text = $_POST['text'] ?? '';
             $destination = $_POST['destination'] ?? false;
             $id_phone = $_POST['id_phone'] ?? false;
+            $files = $_FILES['medias'] ?? false;
+            
+            //Iterate over files to re-create individual $_FILES array
+            $files_arrays = []; 
+            if ($files && is_array($files['name']))
+            {
+                foreach ($files as $property_name => $files_values)
+                {
+                    foreach ($files_values as $file_key => $property_value)
+                    {
+                        if (!isset($files_arrays[$file_key]))
+                        {
+                            $files_arrays[$file_key] = []; 
+                        }
+
+                        $files_arrays[$file_key][$property_name] = $property_value;
+                    }
+                }
+            }
+
+            //Remove empty files input
+            foreach ($files_arrays as $key => $file)
+            {
+                if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                {
+                    unset($files_arrays[$key]);
+                }
+            }
+
+            if (!$text)
+            {
+                $return['success'] = false;
+                $return['message'] = 'Vous devez renseigner le texte de votre sms.';
+                echo json_encode($return);
+
+                return false;
+            }
 
             if (!$destination)
             {
@@ -205,10 +288,36 @@ namespace controllers\publics;
                 $id_phone = null;
             }
 
+
+            //If mms is enable and we have medias uploaded
+            $media_ids = [];
+            if ($_SESSION['user']['settings']['mms'] && $files_arrays)
+            {
+                foreach ($files_arrays as $file)
+                {
+                    try
+                    {
+                        $new_media_id = $this->internal_media->create_from_uploaded_file_for_user($_SESSION['user']['id'], $file);
+                    }
+                    catch (\Exception $e)
+                    {
+                        $return['success'] = false;
+                        $return['message'] = $e->getMessage();
+                        echo json_encode($return);
+
+                        return false;
+                    }
+
+                    $media_ids[] = $new_media_id;
+                }
+            }
+
+            $mms = (bool) count($media_ids);
+
             //Destinations must be an array of number
             $destinations = [$destination];
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $destinations))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $mms, $destinations, [], [], [], $media_ids))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

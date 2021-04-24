@@ -71,10 +71,13 @@
 					</li>
 					<li>
 						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop')) ? 'in' : ''; ?>">
+						<ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop', 'calls')) ? 'in' : ''; ?>">
 							<li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('SmsStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
 							</li>
+                            <li <?php echo $page == 'calls' ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo \descartes\Router::url('Call', 'list'); ?>"><i class="fa fa-fw fa-file-audio-o"></i> Appels</a>
+                            </li>
 							<li <?php echo $page == 'events' ? 'class="active"' : ''; ?>>
 								<a href="<?php echo \descartes\Router::url('Event', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>
 							</li>

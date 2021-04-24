@@ -72,7 +72,7 @@ jQuery(document).ready(function ()
 {
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "bLengthChange": false,
+        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -108,7 +108,24 @@ jQuery(document).ready(function ()
                     } else {
                         html += '<div>Non disponible.</div>';
                     }
+                    
+                    html += '<br/>';
+                    html += '<div class="bold">Notification d\'appel entrant : </div>';
 
+                    if (row.callback_inbound_call) {
+                        html += '<div><code>' + row.callback_inbound_call + '</code></div>';
+                    } else {
+                        html += '<div>Non disponible.</div>';
+                    }
+                    
+                    html += '<br/>';
+                    html += '<div class="bold">Notification de fin d\'appel : </div>';
+                    console.log(row);
+                    if (row.callback_end_call) {
+                        html += '<div><code>' + row.callback_end_call + '</code></div>';
+                    } else {
+                        html += '<div>Non disponible.</div>';
+                    }
 
                     return html;
                 },

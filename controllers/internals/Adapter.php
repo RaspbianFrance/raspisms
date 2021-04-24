@@ -20,9 +20,9 @@ namespace controllers\internals;
         private const ADAPTERS_META_START = 'meta_';
 
         /**
-         * List adapters using internal metas.
+         * List adapters with filepath and internal metas.
          *
-         * @return array
+         * @return array : ['adapter_filepath' => ['meta...' => value, ...], ...]
          */
         public function list_adapters()
         {
@@ -42,7 +42,7 @@ namespace controllers\internals;
                     continue;
                 }
 
-                $adapters[] = $metas;
+                $adapters[$file] = $metas;
             }
 
             return $adapters;
@@ -115,5 +115,30 @@ namespace controllers\internals;
             }
 
             return $metas;
+        }
+
+        /**
+         * List all adapters for a meta value
+         * 
+         * @param $search_name : Name of the meta
+         * @param $search_value : Value of the meta
+         *
+         * @return array : Array with ['adapter filepath' => ['search_name' => value, ...], ...]
+         */
+        public function list_adapters_with_meta_equal($search_name, $search_value)
+        {
+            $adapters = $this->list_adapters();
+            return array_filter($adapters, function($metas) use ($search_name, $search_value) {
+                $match = false;
+                foreach ($metas as $name => $value)
+                {
+                    if ($name === $search_name && $value === $search_value)
+                    {
+                        $match = true;
+                    }
+                }
+
+                return $match;
+            });
         }
     }

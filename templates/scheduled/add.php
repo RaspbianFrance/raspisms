@@ -64,12 +64,14 @@
                             </div>
                             
                             <?php if ($_SESSION['user']['settings']['mms'] ?? false) { ?>
-                                <div class="form-group">
-                                    <label>Ajouter un média</label>
+                                <div class="form-group scheduled-media-group">
+                                    <label>Ajouter un média au SMS</label>
                                     <p class="italic small help description-scheduled-media">
-                                        Le média sera utilisé uniquement si le téléphone utilisé supporte l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>
+                                        L'ajout d'un média nécessite un téléphone supportant l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>.
                                     </p>
-                                    <input class="" name="media" value="" type="file" />
+                                    <div class="form-group">
+                                        <input class="" name="medias[]" value="" type="file" multiple />
+                                    </div>
                                 </div>
                             <?php } ?>
                             <div class="form-group">

@@ -48,7 +48,7 @@
 								<div class="form-group">
 									<label>Condition</label>
                                     <p class="italic small help">
-                                        Les conditions vous permettent de définir dynamiquement les contacts qui appartiennent au groupe en utilisant leurs données additionnelles. Pour plus d'informations consultez la documentation relative à <a href="#">l'utilisation des groupes conditionnels.</a><br/>
+                                        Les conditions vous permettent de définir dynamiquement les contacts qui appartiennent au groupe en utilisant leurs données additionnelles. Pour plus d'informations consultez la documentation relative à <a href="https://documentation.raspisms.fr/users/groups_and_contacts/conditionnals_groups.html" target="_blank">l'utilisation des groupes conditionnels.</a><br/>
                                         Vous pouvez prévisualiser les contacts qui feront parti du groupe en cliquant sur le bouton <b>"Prévisualiser les contacts"</b>.
                                     </p>
 									<input class="form-control" name="condition" placeholder="Ex : contact.gender == 'male'" value="<?php $this->s($_SESSION['previous_http_post']['condition'] ?? '') ?>"/>

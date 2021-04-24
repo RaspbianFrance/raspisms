@@ -25,6 +25,9 @@ use Monolog\Logger;
         private $internal_sended;
         private $internal_received;
         private $internal_adapter;
+        private $internal_media;
+        private $internal_phone;
+        private $internal_call;
 
         public function __construct()
         {
@@ -33,7 +36,10 @@ use Monolog\Logger;
             $this->internal_user = new \controllers\internals\User($bdd);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_received = new \controllers\internals\Received($bdd);
+            $this->internal_media = new \controllers\internals\Media($bdd);
             $this->internal_adapter = new \controllers\internals\Adapter();
+            $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_call = new \controllers\internals\Call($bdd);
 
             //Logger
             $this->logger = new Logger('Callback ' . uniqid());
@@ -177,8 +183,10 @@ use Monolog\Logger;
             }
 
             $sms = $response['sms'];
+            $mms = (bool) $sms['mms'] ?? false;
+            $medias = empty($sms['medias']) ? [] : $sms['medias'];
 
-            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at']);
+            $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $medias);
             if ($response['error'])
             {
                 $this->logger->error('Failed receive message : ' . json_encode($sms) . ' with error : ' . $response['error_message']);
@@ -188,6 +196,137 @@ use Monolog\Logger;
 
             $this->logger->info('Callback reception successfully received message : ' . json_encode($sms));
 
+            return true;
+        }
+        
+        
+        /**
+         * Function call on call reception notification
+         * We return nothing, and we let the adapter do his things.
+         *
+         * @param int    $id_phone    : Phone id
+         *
+         * @return bool : true on success, false on error
+         */
+        public function inbound_call(int $id_phone)
+        {
+            $this->logger->info('Callback inbound_call call with phone : ' . $id_phone);
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+
+            if (!$phone)
+            {
+                $this->logger->error('Callback inbound_call use non existing phone : ' . $id_phone);
+
+                return false;
+            }
+
+            if (!class_exists($phone['adapter']))
+            {
+                $this->logger->error('Callback inbound_call use non existing adapter : ' . $phone['adapter']);
+
+                return false;
+            }
+
+            if (!$phone['adapter']::meta_support_inbound_call_callback())
+            {
+                $this->logger->error('Callback inbound_call use adapter ' . $phone['adapter'] . ' which does not support inbound_call callback.');
+
+                return false;
+            }
+
+            $response = $phone['adapter']::inbound_call_callback();
+            if ($response['error'])
+            {
+                $this->logger->error('Callback inbound_call failed : ' . $response['error_message']);
+
+                return false;
+            }
+
+            $call = $response['call'];
+
+            if (empty($call) || empty($call['uid']) || empty($call['start']) || empty($call['origin']))
+            {
+                $this->logger->error('Callback inbound_call failed : missing required param in call return');
+
+                return false;
+            }
+
+            $result = $this->internal_call->create($this->user['id'], $id_phone, $call['uid'], \models\Call::DIRECTION_INBOUND, $call['start'], $call['end'] ?? null, $call['origin']);
+
+            if (!$result)
+            {
+                $this->logger->error('Callback inbound_call failed because cannot create call ' . json_encode($call));
+
+                return false;
+            }
+
+            $this->logger->info('Callback inbound_call successfully received inbound call : ' . json_encode($call));
+            
+            return true;
+        }
+        
+        
+        /**
+         * Function call on end call notification
+         * We return nothing, and we let the adapter do his things.
+         *
+         * @param int    $id_phone    : Phone id
+         *
+         * @return bool : true on success, false on error
+         */
+        public function end_call(int $id_phone)
+        {
+            $this->logger->info('Callback end call with phone : ' . $id_phone);
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+
+            if (!$phone)
+            {
+                $this->logger->error('Callback end call use non existing phone : ' . $id_phone);
+
+                return false;
+            }
+
+            if (!class_exists($phone['adapter']))
+            {
+                $this->logger->error('Callback end call use non existing adapter : ' . $phone['adapter']);
+
+                return false;
+            }
+
+            if (!$phone['adapter']::meta_support_end_call_callback())
+            {
+                $this->logger->error('Callback end call use adapter ' . $phone['adapter'] . ' which does not support end call callback.');
+
+                return false;
+            }
+
+            $response = $phone['adapter']::end_call_callback();
+            if ($response['error'])
+            {
+                $this->logger->error('Callback end call failed : ' . $response['error_message']);
+
+                return false;
+            }
+
+            $call = $response['call'];
+            if (empty($call) || empty($call['uid']) || empty($call['end']))
+            {
+                $this->logger->error('Callback end call failed : missing required param in call return');
+
+                return false;
+            }
+
+            $result = $this->internal_call->end($this->user['id'], $id_phone, $call['uid'], $call['end']);
+
+            if (!$result)
+            {
+                $this->logger->error('Callback end call failed because cannot update call ' . json_encode($call));
+
+                return false;
+            }
+
+            $this->logger->info('Callback end call successfully update call : ' . json_encode($call));
+            
             return true;
         }
     }

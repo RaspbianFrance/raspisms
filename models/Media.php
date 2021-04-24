@@ -17,226 +17,255 @@ namespace models;
     class Media extends StandardModel
     {
         /**
-         * Return an entry by his id for a user.
+         * Return all medias for a scheduled.
          *
-         * @param int $id_user : user id
-         * @param int $id      : entry id
-         *
-         * @return array
-         */
-        public function get_for_user(int $id_user, int $id)
-        {
-            $query = '
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-                AND id = :id
-            ';
-
-            $params = [
-                'id' => $id,
-                'id_user' => $id_user,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-
-            return $receiveds[0] ?? [];
-        }
-
-        /**
-         * Return all entries for a user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return array
-         */
-        public function gets_for_user(int $id_user)
-        {
-            $query = '
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-            ';
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            $receiveds = $this->_run_query($query, $params);
-        }
-
-        /**
-         * Return a media for a user and a scheduled.
-         *
-         * @param int $id_user      : user id
          * @param int $id_scheduled : scheduled id
          *
          * @return array
          */
-        public function get_for_scheduled_and_user(int $id_user, int $id_scheduled)
+        public function gets_for_scheduled(int $id_scheduled)
         {
             $query = '
-                SELECT * FROM `' . $this->get_table_name() . '`
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-                AND id_scheduled = :id_scheduled
+                SELECT m.id as id, m.id_user as id_user, m.path as path
+                FROM `' . $this->get_table_name() . '` as m
+                INNER JOIN media_scheduled as ms
+                ON m.id = ms.id_media
+                WHERE ms.id_scheduled = :id_scheduled
             ';
 
             $params = [
-                'id_user' => $id_user,
                 'id_scheduled' => $id_scheduled,
             ];
 
-            $receiveds = $this->_run_query($query, $params);
-            if (!$receiveds)
-            {
-                return false;
-            }
-
-            return $receiveds[0];
-        }
-
-        /**
-         * Return a list of media for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $limit   : Max results to return
-         * @param int $offset  : Number of results to ignore
-         */
-        public function list_for_user($id_user, $limit, $offset)
-        {
-            $limit = (int) $limit;
-            $offset = (int) $offset;
-
-            $query = '
-                SELECT * FROM media
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-                LIMIT ' . $limit . ' OFFSET ' . $offset;
-
-            $params = [
-                'id_user' => $id_user,
-            ];
-
             return $this->_run_query($query, $params);
         }
-
+        
         /**
-         * Return a list of medias in a group of ids and for a user.
+         * Return all medias for a sended.
          *
-         * @param int   $id_user : user id
-         * @param array $ids     : ids of medias to find
+         * @param int $id_sended : sended id
          *
          * @return array
          */
-        public function gets_in_for_user(int $id_user, $ids)
+        public function gets_for_sended(int $id_sended)
         {
             $query = '
-                SELECT * FROM media
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-                AND id ';
-
-            //On génère la clause IN et les paramètres adaptés depuis le tableau des id
-            $generated_in = $this->_generate_in_from_array($ids);
-            $query .= $generated_in['QUERY'];
-            $params = $generated_in['PARAMS'];
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params);
-        }
-
-        /**
-         * Delete a entry by his id for a user.
-         *
-         * @param int $id_user : User id
-         * @param int $id      : Entry id
-         *
-         * @return int : Number of removed rows
-         */
-        public function delete_for_user(int $id_user, int $id)
-        {
-            $query = '
-                DELETE FROM media
-                WHERE id = :id
-                AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-            ';
-
-            $params = ['id_user' => $id_user, 'id' => $id];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Delete a entry by his id for a user.
-         *
-         * @param int $id_user      : User id
-         * @param int $id_scheduled : Scheduled id
-         *
-         * @return int : Number of removed rows
-         */
-        public function delete_for_scheduled_and_user(int $id_user, int $id_scheduled)
-        {
-            $query = '
-                DELETE FROM media
-                WHERE id_scheduled = :id_scheduled
-                AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-            ';
-
-            $params = ['id_user' => $id_user, 'id_scheduled' => $id_scheduled];
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Update a media sms for a user.
-         *
-         * @param int   $id_user : User id
-         * @param int   $id      : Entry id
-         * @param array $data    : data to update
-         *
-         * @return int : number of modified rows
-         */
-        public function update_for_user(int $id_user, int $id, array $data)
-        {
-            $params = [];
-            $sets = [];
-
-            foreach ($data as $label => $value)
-            {
-                $label = preg_replace('#[^a-zA-Z0-9_]#', '', $label);
-                $params['set_' . $label] = $value;
-                $sets[] = '`' . $label . '` = :set_' . $label . ' ';
-            }
-
-            $query = '
-                UPDATE `media`
-                SET ' . implode(', ', $sets) . '
-                WHERE id = :id
-                AND id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
-            ';
-
-            $params['id'] = $id;
-            $params['id_user'] = $id_user;
-
-            return $this->_run_query($query, $params, self::ROWCOUNT);
-        }
-
-        /**
-         * Count number of media sms for user.
-         *
-         * @param int $id_user : user id
-         *
-         * @return int : Number of media SMS for user
-         */
-        public function count_for_user($id_user)
-        {
-            $query = '
-                SELECT COUNT(id) as nb
-                FROM media
-                WHERE id_scheduled IN (SELECT id FROM scheduled WHERE id_user = :id_user)
+                SELECT m.id as id, m.id_user as id_user, m.path as path
+                FROM `' . $this->get_table_name() . '` as m
+                INNER JOIN media_sended as ms
+                ON m.id = ms.id_media
+                WHERE ms.id_sended = :id_sended
             ';
 
             $params = [
-                'id_user' => $id_user,
+                'id_sended' => $id_sended,
             ];
 
-            return $this->_run_query($query, $params)[0]['nb'] ?? 0;
+            return $this->_run_query($query, $params);
+        }
+        
+        /**
+         * Return all medias for a received.
+         *
+         * @param int $id_received : received id
+         *
+         * @return array
+         */
+        public function gets_for_received(int $id_received)
+        {
+            $query = '
+                SELECT m.id as id, m.id_user as id_user, m.path as path
+                FROM `' . $this->get_table_name() . '` as m
+                INNER JOIN media_received as mr
+                ON m.id = mr.id_media
+                WHERE mr.id_received = :id_received
+            ';
+
+            $params = [
+                'id_received' => $id_received,
+            ];
+
+            return $this->_run_query($query, $params);
+        }
+        
+        /**
+         * Link a media to a scheduled
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_scheduled : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function insert_media_scheduled (int $id_media, int $id_scheduled)
+        {
+            $entry = [
+                'id_media' => $id_media,
+                'id_scheduled' => $id_scheduled,
+            ];
+
+            return $this->_insert('media_scheduled', $entry) ? $this->_last_id() : false;
+        }
+        
+        /**
+         * Link a media to a received
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_received : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function insert_media_received (int $id_media, int $id_received)
+        {
+            $entry = [
+                'id_media' => $id_media,
+                'id_received' => $id_received,
+            ];
+
+            return $this->_insert('media_received', $entry) ? $this->_last_id() : false;
+        }
+        
+        /**
+         * Link a media to a sended
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_sended : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function insert_media_sended (int $id_media, int $id_sended)
+        {
+            $entry = [
+                'id_media' => $id_media,
+                'id_sended' => $id_sended,
+            ];
+
+            return $this->_insert('media_sended', $entry) ? $this->_last_id() : false;
+        }
+        
+        /**
+         * Unlink a media of a scheduled
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_scheduled : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_media_scheduled (int $id_media, int $id_scheduled)
+        {
+            $where = [
+                'id_media' => $id_media,
+                'id_scheduled' => $id_scheduled,
+            ];
+
+            return $this->_delete('media_scheduled', $where);
+        }
+
+        /**
+         * Unlink a media of a received
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_received : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_media_received (int $id_media, int $id_received)
+        {
+            $where = [
+                'id_media' => $id_media,
+                'id_received' => $id_received,
+            ];
+
+            return $this->_delete('media_received', $where);
+        }
+        
+        /**
+         * Unlink a media of a sended
+         * 
+         * @param int $id_media : Media id
+         * @param int $id_sended : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_media_sended (int $id_media, int $id_sended)
+        {
+            $where = [
+                'id_media' => $id_media,
+                'id_sended' => $id_sended,
+            ];
+
+            return $this->_delete('media_sended', $where);
+        }
+        
+        
+        /**
+         * Unlink all medias of a scheduled
+         * 
+         * @param int $id_scheduled : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_all_for_scheduled (int $id_scheduled)
+        {
+            $where = [
+                'id_scheduled' => $id_scheduled,
+            ];
+
+            return $this->_delete('media_scheduled', $where);
+        }
+        
+        /**
+         * Unlink all medias of a received
+         * 
+         * @param int $id_received : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_all_for_received (int $id_received)
+        {
+            $where = [
+                'id_received' => $id_received,
+            ];
+
+            return $this->_delete('media_received', $where);
+        }
+
+        /**
+         * Unlink all medias of a sended
+         * 
+         * @param int $id_sended : Scheduled id
+         *
+         * @return bool | int
+         */
+        public function delete_all_for_sended (int $id_sended)
+        {
+            $where = [
+                'id_sended' => $id_sended,
+            ];
+
+            return $this->_delete('media_sended', $where);
+        }
+
+        /**
+         * Find all unused medias
+         * @return array
+         */
+        public function gets_unused ()
+        {
+            $query = '
+                SELECT `media`.*
+                FROM   `media`
+                       LEFT JOIN `media_sended`
+                               ON `media`.id = `media_sended`.id_media
+                       LEFT JOIN `media_received`
+                               ON `media`.id = `media_received`.id_media
+                       LEFT JOIN `media_scheduled`
+                               ON `media`.id = `media_scheduled`.id_media
+                WHERE  `media_sended`.id IS NULL
+                        AND `media_received`.id IS NULL
+                        AND `media_scheduled`.id IS NULL 
+            ';
+            
+            return $this->_run_query($query);
         }
 
         /**
