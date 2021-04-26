@@ -33,7 +33,7 @@
          * @param string $password : Le mot de passe à employer
          * @return mixed : Un objet \PDO ou false en cas d'erreur
          */
-        public static function _connect ($host, $dbname, $user, $password, ?string $charset = 'UTF8', ?array $options = null)
+        public static function _connect ($host, $dbname, $user, $password, ?string $charset = 'utf8mb4', ?array $options = null)
         {
             $options = $options ?? [
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
