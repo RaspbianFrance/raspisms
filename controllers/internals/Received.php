@@ -306,31 +306,36 @@ namespace controllers\internals;
                 }
             }
 
-            $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command, $mms, $media_ids);
-            if (!$received_id)
+            //Cut received messages by 1000 chars max
+            $text_parts = mb_str_split($text, 1000);
+            foreach ($text_parts as $text)
             {
-                $return['error'] = true;
-                $return['error_message'] = 'Impossible to insert the sms in database.';
+                $received_id = $this->create($id_user, $id_phone, $at, $text, $origin, $status, $is_command, $mms, $media_ids);
+                if (!$received_id)
+                {
+                    $return['error'] = true;
+                    $return['error_message'] = 'Impossible to insert the sms in database.';
 
-                return $return;
+                    return $return;
+                }
+
+                $received = [
+                    'id' => $received_id,
+                    'at' => $at,
+                    'text' => $text,
+                    'destination' => $id_phone,
+                    'origin' => $origin,
+                    'command' => $is_command,
+                    'mms' => $mms,
+                    'medias' => $internal_media->gets_in_for_user($id_user, $media_ids),
+                ];
+
+                $internal_webhook = new Webhook($this->bdd);
+                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_RECEIVE_SMS, $received);
+
+                $internal_user = new User($this->bdd);
+                $internal_user->transfer_received($id_user, $received);
             }
-
-            $received = [
-                'id' => $received_id,
-                'at' => $at,
-                'text' => $text,
-                'destination' => $id_phone,
-                'origin' => $origin,
-                'command' => $is_command,
-                'mms' => $mms,
-                'medias' => $internal_media->gets_in_for_user($id_user, $media_ids),
-            ];
-
-            $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_RECEIVE_SMS, $received);
-
-            $internal_user = new User($this->bdd);
-            $internal_user->transfer_received($id_user, $received);
 
             return $return;
         }
