@@ -120,10 +120,18 @@ use Monolog\Logger;
                 return false;
             }
 
-            //Do not update if current status is delivered or failed
-            if (\models\Sended::STATUS_DELIVERED === $sended['status'] || \models\Sended::STATUS_FAILED === $sended['status'])
+            //Do not update if current status is delivered
+            if (\models\Sended::STATUS_DELIVERED === $sended['status'])
             {
                 $this->logger->info('Callback status update message ignore because status is already ' . $sended['status'] . '.');
+
+                return false;
+            }
+
+            //Do not update if current status is failed and new status is unknown
+            if (\models\Sended::STATUS_FAILED === $sended['status'] && \models\Sended::STATUS_UNKNOWN == $callback_return['status'])
+            {
+                $this->logger->info('Callback status update message ignore because status is already ' . $sended['status'] . ' and new status is ' . $callback_return['status'] . '.');
 
                 return false;
             }
