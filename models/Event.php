@@ -36,7 +36,7 @@ namespace models;
          *
          * @return array
          */
-        public get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
+        public function get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
         {
             $where = [
                 'id_user' => $id_user,
@@ -46,7 +46,7 @@ namespace models;
 
             if ($until !== null)
             {
-                $where['<=at' => $until->format('Y-m-d H:i:s')];
+                $where['<=at'] = $until->format('Y-m-d H:i:s');
             }
 
             return $this->_select('event', $where, 'at');

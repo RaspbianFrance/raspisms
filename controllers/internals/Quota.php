@@ -158,7 +158,7 @@ class Quota extends StandardController
         $len = mb_strlen($text);
         for ($i = 0; $i < $len; $i++)
         {
-            if (!in_array(mb_substr($utf8_string, $i, 1), $gsm0338))
+            if (!in_array(mb_substr($text, $i, 1), $gsm0338))
             {
                 $is_gsm0338 = false;
                 break;
@@ -166,6 +166,67 @@ class Quota extends StandardController
         }
 
         return ($is_gsm0338 ? ceil($len / 160) : ceil($len / 70));
+    }
+
+
+    /**
+     * Do email alerting for quotas limit close and quotas limit reached
+     */
+    public function alerting_for_limit_close_and_reached()
+    {
+        $internal_user = new User($this->bdd);
+        $internal_event = new Event($this->bdd);
+        
+        $quotas_limit_close = $this->get_model()->get_quotas_for_limit_close();
+        $quotas_limit_reached = $this->get_model()->get_quotas_for_limit_reached();
+
+        foreach ($quotas_limit_close as $quota)
+        {
+            $user = $internal_user->get($quota['id_user']);
+
+            if (!$user)
+            {
+                continue;
+            }
+
+            $quota_percentage = $quota['consumed'] / ($quota['credit'] + $quota['additional']);
+
+            $mailer = new \controllers\internals\Mailer();
+            $success = $mailer->enqueue($user['email'], EMAIL_QUOTA_LIMIT_CLOSE, ['percent' => $quota_percentage]);
+
+            if (!$success)
+            {
+                echo "Cannot enqueue alert for quota limit close for quota : " . $quota['id'] . "\n";
+                continue;
+            }
+            
+            echo "Enqueue alert for quota limit close for quota : " . $quota['id'] . "\n";
+            $internal_event->create($quota['id_user'], 'QUOTA_LIMIT_CLOSE', round($quota_percentage * 100, 2) . '% of SMS quota limit reached.');
+        }
+        
+        foreach ($quotas_limit_reached as $quota)
+        {
+            $user = $internal_user->get($quota['id_user']);
+
+            if (!$user)
+            {
+                continue;
+            }
+
+            $quota_percentage = $quota['consumed'] / ($quota['credit'] + $quota['additional']);
+
+            $mailer = new \controllers\internals\Mailer();
+            $success = $mailer->enqueue($user['email'], EMAIL_QUOTA_LIMIT_REACHED, ['expiration_date' => $quota['expiration_date']]);
+
+            if (!$success)
+            {
+                echo "Cannot enqueue alert for quota limit reached for quota : " . $quota['id'] . "\n";
+                continue;
+            }
+            
+            echo "Enqueue alert for quota limit reached for quota : " . $quota['id'] . "\n";
+            $internal_event->create($quota['id_user'], 'QUOTA_LIMIT_REACHED', 'Reached SMS quota limit.');
+        }
     }
 
     /**

@@ -66,9 +66,9 @@ namespace controllers\internals;
          *
          * @return array
          */
-        public get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
+        public function get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
         {
-            $this->get_model->get_events_by_type_and_date_for_user ($id_user, $type, $since, $until);
+            $this->get_model()->get_events_by_type_and_date_for_user ($id_user, $type, $since, $until);
         }
 
         /**

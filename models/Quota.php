@@ -86,6 +86,77 @@ namespace models;
             return (bool) $this->_run_query($query, $params, \descartes\Model::ROWCOUNT);
         }
 
+
+        /**
+         * Get all quotas we need to send an alert for close limit to users they belongs to
+         * @return array
+         */
+        public function get_quotas_for_limit_close() : array
+        {
+            $query = '
+                SELECT quota.*
+                FROM quota
+                INNER JOIN setting
+                    ON (
+                        quota.id_user = setting.id_user
+                        AND setting.NAME = :setting_name
+                        AND setting.value != 0
+                    )
+                WHERE
+                    quota.consumed / ( quota.credit + quota.additional ) >= setting.value
+                    AND (
+                        SELECT COUNT(id)
+                        FROM event
+                        WHERE
+                            id_user = quota.id_user
+                            AND type = :event_type
+                            AND at >= quota.start_date
+                    ) = 0;
+';
+
+            $params = [
+                'setting_name' => 'alert_quota_limit_close',
+                'event_type' => 'QUOTA_LIMIT_CLOSE',
+            ];
+            
+            return $this->_run_query($query, $params);
+        }
+        
+        /**
+         * Get all quotas we need to send an alert for limit reached to users they belongs to
+         * @return array
+         */
+        public function get_quotas_for_limit_reached() : array
+        {
+            $query = '
+                SELECT quota.*
+                FROM quota
+                INNER JOIN setting
+                    ON (
+                        quota.id_user = setting.id_user
+                        AND setting.NAME = :setting_name
+                        AND setting.value = 1
+                    )
+                WHERE
+                    quota.consumed >= (quota.credit + quota.additional)
+                    AND (
+                        SELECT COUNT(id)
+                        FROM event
+                        WHERE
+                            id_user = quota.id_user
+                            AND type = :event_type
+                            AND at >= quota.start_date
+                    ) = 0;
+            ';
+            
+            $params = [
+                'setting_name' => 'alert_quota_limit_reached',
+                'event_type' => 'QUOTA_LIMIT_REACHED',
+            ];
+            
+            return $this->_run_query($query, $params);
+        }
+
         /**
          * Return table name.
          */
