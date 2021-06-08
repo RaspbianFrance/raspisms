@@ -16,6 +16,9 @@ namespace models;
         const TYPE_SEND_SMS = 'send_sms';
         const TYPE_RECEIVE_SMS = 'receive_sms';
         const TYPE_INBOUND_CALL = 'inbound_call';
+        const TYPE_QUOTA_LEVEL_ALERT = 'quota_level';
+        const TYPE_QUOTA_REACHED = 'quota_reached';
+
 
         /**
          * Find all webhooks for a user and for a type of webhook.

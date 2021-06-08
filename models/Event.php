@@ -27,6 +27,32 @@ namespace models;
         }
 
         /**
+         * Gets events for a type, since a date and eventually until a date (both included)
+         *
+         * @param int $id_user  : User id
+         * @param string $type : Event type we want
+         * @param \DateTime $since : Date to get events since
+         * @param ?\DateTime $until (optional) : Date until wich we want events, if not specified no limit
+         *
+         * @return array
+         */
+        public get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
+        {
+            $where = [
+                'id_user' => $id_user,
+                'type' => $type,
+                '>=at' => $since->format('Y-m-d H:i:s'),
+            ];
+
+            if ($until !== null)
+            {
+                $where['<=at' => $until->format('Y-m-d H:i:s')];
+            }
+
+            return $this->_select('event', $where, 'at');
+        }
+
+        /**
          * Return table name.
          */
         protected function get_table_name(): string

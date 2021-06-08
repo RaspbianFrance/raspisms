@@ -219,6 +219,18 @@ namespace controllers\internals;
                 'error_message' => null,
             ];
 
+            //If we reached our max quota, do not send the message
+            $internal_quota = new Quota($this->bdd);
+            $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
+            if ($internal_quota->has_enough_credit($id_user, $nb_credits))
+            {
+                $return['error'] = false;
+                $return['error_message'] = 'Not enough credit to send message.';
+
+                return $return;
+            }
+
+
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $media_uris = [];
             foreach ($medias as $media)
@@ -252,6 +264,8 @@ namespace controllers\internals;
 
                 return $return;
             }
+
+            $internal_quota->consume_credit($id_user, $nb_credits);
 
             $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
 
