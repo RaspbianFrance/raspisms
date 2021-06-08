@@ -145,6 +145,25 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Alerte limite de SMS atteinte</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'alert_quota_limit_reached', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Recevoir un e-mail quand la limite de SMS est atteinte :</label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['alert_quota_limit_reached'] == 1 ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+                                </div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-question-circle fa-fw"></i> Affichage de l'aide</h4>
 									</div>
 									<div class="panel-body">
@@ -267,6 +286,30 @@
 												<select name="setting_value" class="form-control">
 													<option value="0">Non</option>
 													<option value="1" <?php echo $_SESSION['user']['settings']['templating'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Alerte limite de SMS proche</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'alert_quota_limit_close', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Recevoir un e-mail quand le nombre de SMS envoyés dépasse un pourcentage de la limite : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Désactivé</option>
+													<option value="0.7" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.7 ? 'selected' : ''; ?>>70%</option>
+													<option value="0.75" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.75 ? 'selected' : ''; ?>>75%</option>
+													<option value="0.8" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.8 ? 'selected' : ''; ?>>80%</option>
+													<option value="0.85" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.85 ? 'selected' : ''; ?>>85%</option>
+													<option value="0.9" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.9 ? 'selected' : ''; ?>>90%</option>
+													<option value="0.95" <?php echo $_SESSION['user']['settings']['alert_quota_limit_close'] == 0.95 ? 'selected' : ''; ?>>95%</option>
 												</select>
 											</div>	
 											<div class="text-center">
