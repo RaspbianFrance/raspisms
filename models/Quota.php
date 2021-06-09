@@ -89,6 +89,7 @@ namespace models;
 
         /**
          * Get all quotas we need to send an alert for close limit to users they belongs to
+         * do not return quotas when user already had an event QUOTA_LIMIT_CLOSE since quota start_date
          * @return array
          */
         public function get_quotas_for_limit_close() : array
@@ -124,6 +125,7 @@ namespace models;
         
         /**
          * Get all quotas we need to send an alert for limit reached to users they belongs to
+         * do not return quotas when user already had an event QUOTA_LIMIT_REACHED since quota start_date
          * @return array
          */
         public function get_quotas_for_limit_reached() : array
@@ -155,6 +157,23 @@ namespace models;
             ];
             
             return $this->_run_query($query, $params);
+        }
+
+        /**
+         * Get list of quotas to be renewed as to a date
+         * @param \DateTime $at : Date to get quotas to be renewed before
+         * @return array
+         */
+        public function get_quotas_to_be_renewed (\DateTime $at): array
+        {
+            $at = $at->format('Y-m-d H:i:s');
+            $where = [
+                '!=expiration_date' => null,
+                '<=expiration_date' => $at,
+                'auto_renew' => true,
+            ];
+
+            return $this->_select('quota', $where);
         }
 
         /**

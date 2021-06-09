@@ -180,4 +180,14 @@ namespace controllers\internals;
             $internal_quota = new \controllers\internals\Quota($bdd);
             $internal_quota->alerting_for_limit_close_and_reached();
         }
+        
+        /**
+         * Do quota renewal
+         */ 
+        public function renew_quotas()
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_quota = new \controllers\internals\Quota($bdd);
+            $internal_quota->renew_quotas();
+        }
     }

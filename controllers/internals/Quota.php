@@ -59,21 +59,21 @@ class Quota extends StandardController
      * @param \DateTime $start_date : Starting date for the quota
      * @param ?\DateTime $expiration_date (optional) : Ending date for the quota
      * @param bool $auto_renew (optional) : Should the quota be automatically renewed after expiration_date
-     * @param ?\DateInterval $renew_interval (optional) : Period to use for setting expiration_date on renewal
+     * @param ?string $renew_interval (optional) : Period to use for setting expiration_date on renewal
      * @param int $additional (optional) : Additionals credits
      * @param int $consumed (optional) : Number of consumed credits
      *
      * @return mixed bool|int : False if cannot create smsstop, id of the new smsstop else
      */
-    public function update_for_user(int $id_user, int $id_quota, int $credit, bool $report_unused, bool $report_unused_additional, \DateTime $start_date, ?\DateTime $expiration_date = null, bool $auto_renew= false, ?\DateInterval $renew_interval = null, int $additional = 0, int $consumed = 0)
+    public function update_for_user(int $id_user, int $id_quota, int $credit, bool $report_unused, bool $report_unused_additional, \DateTime $start_date, ?\DateTime $expiration_date = null, bool $auto_renew= false, ?string $renew_interval = null, int $additional = 0, int $consumed = 0)
     {
+        $expiration_date = $expiration_date === null ? $expiration_date : $expiration_date->format('Y-m-d H:i:s');
+
         $quota = [
-            'id_user' => $id_user,
-            'id_quota' => $id_quota,
             'credit' => $credit,
             'report_unused' => $report_unused,
             'report_unused_additional' => $report_unused_additional,
-            'start_date' => $start_date,
+            'start_date' => $start_date->format('Y-m-d H:i:s'),
             'expiration_date' => $expiration_date,
             'auto_renew' => $auto_renew,
             'renew_interval' => $renew_interval,
@@ -81,7 +81,7 @@ class Quota extends StandardController
             'consumed' => $consumed,
         ];
 
-        return $this->get_model()->insert($quota);
+        return $this->get_model()->update_for_user($id_user, $id_quota, $quota);
     }
 
     /**
@@ -226,6 +226,56 @@ class Quota extends StandardController
             
             echo "Enqueue alert for quota limit reached for quota : " . $quota['id'] . "\n";
             $internal_event->create($quota['id_user'], 'QUOTA_LIMIT_REACHED', 'Reached SMS quota limit.');
+        }
+    }
+
+    /**
+     * Do quota renewing
+     */
+    public function renew_quotas ()
+    {
+        $internal_user = new User($this->bdd);
+        $internal_event = new Event($this->bdd);
+        $quotas = $this->get_model()->get_quotas_to_be_renewed(new \DateTime());
+    
+        foreach ($quotas as $quota)
+        {
+            $user = $internal_user->get($quota['id_user']);
+
+            if (!$user)
+            {
+                continue;
+            }
+
+            $unused_credit = $quota['credit'] - $quota['consumed'];
+            $unused_additional = $unused_credit > 0 ? $quota['additional'] : $quota['additional'] + $unused_credit;
+
+            $renew_interval = $quota['renew_interval'] ?? 'P0D';
+            $new_start_date = new \DateTime($quota['expiration_date']); 
+            $new_expiration_date = clone $new_start_date;
+            $new_expiration_date->add(new \DateInterval($quota['renew_interval']));
+            
+            $report = 0;
+            if ($quota['report_unused'] && $unused_credit > 0)
+            {
+                $report += $unused_credit;
+            }
+
+            if ($quota['report_unused_additional'] && $unused_additional > 0)
+            {
+                $report += $unused_additional;
+            }
+
+            $success = $this->update_for_user($user['id'], $quota['id'], $quota['credit'], $quota['report_unused'], $quota['report_unused_additional'], $new_start_date, $new_expiration_date, $quota['auto_renew'], $quota['renew_interval'], $report, 0);
+
+            if (!$success)
+            {
+                echo "Cannot update quota : " . $quota['id'] . "\n";
+                continue;
+            }
+            
+            echo "Update quota : " . $quota['id'] . "\n";
+            $internal_event->create($quota['id_user'], 'QUOTA_RENEWAL', 'Renew quota ' . $quota['id'] . ' report ' . $report . ' credits.');
         }
     }
 
