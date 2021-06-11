@@ -129,7 +129,14 @@ class User extends \descartes\Controller
      */
     public function add()
     {
-        return $this->render('user/add');
+        $now = new \DateTime();
+        $now_plus_one_month = clone $now;
+        $now_plus_one_month->add(new \DateInterval('P1M'));
+
+        $now = $now->format('Y-m-d H:i:00');
+        $now_plus_one_month = $now_plus_one_month->format('Y-m-d H:i:00');
+
+        return $this->render('user/add', ['now' => $now, 'now_plus_one_month' => $now_plus_one_month]);
     }
 
     /**
