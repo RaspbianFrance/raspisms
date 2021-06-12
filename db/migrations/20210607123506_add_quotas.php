@@ -39,12 +39,13 @@ class AddQuotas extends AbstractMigration
               ->addColumn('report_unused', 'boolean', ['null' => false])
               ->addColumn('report_unused_additional', 'boolean', ['null' => false])
               ->addColumn('auto_renew', 'boolean', ['null' => false, 'default' => false])
-              ->addColumn('renew_interval', 'string', ['null' => true, 'default' => NULL])
+              ->addColumn('renew_interval', 'string', ['null' => false, 'default' => NULL])
               ->addColumn('start_date', 'datetime', ['null' => false])
-              ->addColumn('expiration_date', 'datetime', ['null' => true])
+              ->addColumn('expiration_date', 'datetime', ['null' => false])
               ->addColumn('created_at', 'timestamp', ['null' => false, 'default' => 'CURRENT_TIMESTAMP'])
               ->addColumn('updated_at', 'timestamp', ['null' => true, 'update' => 'CURRENT_TIMESTAMP'])
               ->addForeignKey('id_user', 'user', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+              ->addIndex(['id_user'], ['unique' => true])
               ->create();
 
     }

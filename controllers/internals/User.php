@@ -16,6 +16,7 @@ namespace controllers\internals;
      */
     class User extends \descartes\InternalController
     {
+        private $bdd;
         private $model_user;
         private $internal_event;
         private $internal_setting;
@@ -23,10 +24,23 @@ namespace controllers\internals;
 
         public function __construct(\PDO $bdd)
         {
+            $this->bdd = $bdd;
             $this->model_user = new \models\User($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
             $this->internal_setting = new \controllers\internals\Setting($bdd);
             $this->internal_phone = new Phone($bdd);
+        }
+
+        /**
+         * Return a list of users by their ids
+         *
+         * @param array $ids     : ids of entries to find
+         *
+         * @return array
+         */
+        public function gets_in_by_id(array $ids)
+        {
+            return $this->model_user->gets_in_by_id($ids);
         }
 
         /**
@@ -180,27 +194,56 @@ namespace controllers\internals;
         /**
          * Update a user by his id.
          *
-         * @param mixed  $id
-         * @param mixed  $email
-         * @param mixed  $password
-         * @param mixed  $admin
-         * @param mixed  $api_key
-         * @param string $status           : User status
-         * @param bool   $encrypt_password : Should the password be encrypted, by default true
+         * @param mixed  $id : User id
+         * @param array $user : Array of fields to update for user
+         * @param mixed (?array|bool) $quota : Quota to update for the user, by default null -> no update, if false, remove quota
          *
-         * @return int : Number of modified user
+         * @return bool : True on success, false on error
          */
-        public function update($id, $email, $password, $admin, $api_key, $status, bool $encrypt_password = true)
+        public function update($id, array $user, $quota = null)
         {
-            $user = [
-                'email' => $email,
-                'password' => $encrypt_password ? password_hash($password, PASSWORD_DEFAULT) : $password,
-                'admin' => $admin,
-                'api_key' => $api_key,
-                'status' => $status,
-            ];
+            $internal_quota = new Quota($this->bdd);
+            $current_quota = $internal_quota->get_user_quota($id);
 
-            return $this->model_user->update($id, $user);
+            $this->bdd->beginTransaction();
+            
+            $this->model_user->update($id, $user);
+
+            if ($current_quota && $quota === false)
+            {
+                $success = $internal_quota->delete_for_user($id, $current_quota['id']);
+                if (!$success)
+                {
+                    $this->bdd->rollback();
+                    return false;
+                }
+            }
+
+            if ($quota)
+            {
+                if ($current_quota)
+                {
+                    $internal_quota->update_for_user($id, $current_quota['id'], $quota);
+                }
+                else
+                {
+                    $success = $internal_quota->create($id, $quota['credit'], $quota['additional'], $quota['report_unused'], $quota['report_unused_additional'], $quota['auto_renew'], $quota['renew_interval'], new \DateTime($quota['start_date']), new \DateTime($quota['expiration_date']));
+                    if (!$success)
+                    {
+                        $this->bdd->rollback();
+
+                        return false;
+                    }
+                }
+            }
+
+
+            if (!$this->bdd->commit())
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /**
@@ -212,10 +255,11 @@ namespace controllers\internals;
          * @param ?string $api_key          : The api key of the user, if null generate randomly
          * @param string  $status           : User status, default \models\User::STATUS_ACTIVE
          * @param bool    $encrypt_password : Should the password be encrypted, by default true
+         * @param ?array  $quota            : Quota to create for the user, by default null -> no quota
          *
          * @return mixed bool|int : false on error, id of the new user else
          */
-        public function create($email, $password, $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE, bool $encrypt_password = true)
+        public function create($email, $password, $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE, bool $encrypt_password = true, ?array $quota = null)
         {
             $user = [
                 'email' => $email,
@@ -225,19 +269,39 @@ namespace controllers\internals;
                 'status' => $status,
             ];
 
-            $new_id_user = $this->model_user->insert($user);
+            $this->bdd->beginTransaction();
 
+            $new_id_user = $this->model_user->insert($user);
             if (!$new_id_user)
             {
                 return false;
             }
 
-            $success = $this->internal_setting->create_defaults_for_user($new_id_user);
 
+            $success = $this->internal_setting->create_defaults_for_user($new_id_user);
             if (!$success)
             {
-                $this->delete($new_id_user);
+                $this->bdd->rollback();
 
+                return false;
+            }
+
+
+            if ($quota !== null)
+            {
+                $internal_quota = new Quota($this->bdd);
+                $success = $internal_quota->create($new_id_user, $quota['credit'], $quota['additional'], $quota['report_unused'], $quota['report_unused_additional'], $quota['auto_renew'], $quota['renew_interval'], $quota['start_date'], $quota['expiration_date']);
+                if (!$success)
+                {
+                    $this->bdd->rollback();
+
+                    return false;
+                }
+            }
+
+
+            if (!$this->bdd->commit())
+            {
                 return false;
             }
 

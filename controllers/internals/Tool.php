@@ -144,6 +144,27 @@ namespace controllers\internals;
 
             return $objectDate && $objectDate->format($format) === $date;
         }
+        
+        /**
+         * Check if a sting represent a valid PHP period for creating an interval.
+         *
+         * @param string $period   : Period string to check
+         *
+         * @return bool : True if valid period, false else
+         */
+        public static function validate_period($period)
+        {
+            try
+            {
+                $interval = new \DateInterval($period);
+            }
+            catch (\Throwable $e)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /**
          * Cette fonction retourne un mot de passe généré aléatoirement.

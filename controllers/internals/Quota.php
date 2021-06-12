@@ -20,25 +20,25 @@ class Quota extends StandardController
      *
      * @param int $id_user : User id
      * @param int $credit  : Credit for this quota
+     * @param int $additional : Additionals credits
      * @param bool $report_unused : Should unused credits be re-credited
      * @param bool $report_unused_additional : Should unused additional credits be re-credited
+     * @param bool $auto_renew : Should the quota be automatically renewed after expiration_date
+     * @param string $renew_interval : Period to use for setting new expiration_date on renewal (format ISO_8601#Durations)
      * @param \DateTime $start_date : Starting date for the quota
-     * @param ?\DateTime $expiration_date (optional) : Ending date for the quota
-     * @param bool $auto_renew (optional) : Should the quota be automatically renewed after expiration_date
-     * @param ?\DateInterval $renew_interval (optional) : Period to use for setting expiration_date on renewal
-     * @param int $additional (optional) : Additionals credits
+     * @param \DateTime $expiration_date : Ending date for the quota
      *
-     * @return mixed bool|int : False if cannot create smsstop, id of the new smsstop else
+     * @return mixed bool|int : False if cannot create quota, id of the new quota else
      */
-    public function create(int $id_user, int $credit, bool $report_unused, bool $report_unused_additional, \DateTime $start_date, ?\DateTime $expiration_date = null, bool $auto_renew= false, ?\DateInterval $renew_interval = null, int $additional = 0)
+    public function create(int $id_user, int $credit, int $additional, bool $report_unused, bool $report_unused_additional, bool $auto_renew, string $renew_interval, \DateTime $start_date, \DateTime $expiration_date)
     {
         $quota = [
             'id_user' => $id_user,
             'credit' => $credit,
             'report_unused' => $report_unused,
             'report_unused_additional' => $report_unused_additional,
-            'start_date' => $start_date,
-            'expiration_date' => $expiration_date,
+            'start_date' => $start_date->format('Y-m-d H:i:s'),
+            'expiration_date' => $expiration_date->format('Y-m-d H:i:s'),
             'auto_renew' => $auto_renew,
             'renew_interval' => $renew_interval,
             'additional' => $additional,
@@ -52,35 +52,13 @@ class Quota extends StandardController
      *
      *
      * @param int $id_user : User id
-     * @param int $id_quota : Id of the quota to update
-     * @param int $credit  : Credit for this quota
-     * @param bool $report_unused : Should unused credits be re-credited
-     * @param bool $report_unused_additional : Should unused additional credits be re-credited
-     * @param \DateTime $start_date : Starting date for the quota
-     * @param ?\DateTime $expiration_date (optional) : Ending date for the quota
-     * @param bool $auto_renew (optional) : Should the quota be automatically renewed after expiration_date
-     * @param ?string $renew_interval (optional) : Period to use for setting expiration_date on renewal
-     * @param int $additional (optional) : Additionals credits
-     * @param int $consumed (optional) : Number of consumed credits
+     * @param int $id_quota : Quota to update id
+     * @param array $quota : Fields to update whith new values
      *
-     * @return mixed bool|int : False if cannot create smsstop, id of the new smsstop else
+     * @return int : number of updated lines
      */
-    public function update_for_user(int $id_user, int $id_quota, int $credit, bool $report_unused, bool $report_unused_additional, \DateTime $start_date, ?\DateTime $expiration_date = null, bool $auto_renew= false, ?string $renew_interval = null, int $additional = 0, int $consumed = 0)
+    public function update_for_user(int $id_user, $id_quota, array $quota)
     {
-        $expiration_date = $expiration_date === null ? $expiration_date : $expiration_date->format('Y-m-d H:i:s');
-
-        $quota = [
-            'credit' => $credit,
-            'report_unused' => $report_unused,
-            'report_unused_additional' => $report_unused_additional,
-            'start_date' => $start_date->format('Y-m-d H:i:s'),
-            'expiration_date' => $expiration_date,
-            'auto_renew' => $auto_renew,
-            'renew_interval' => $renew_interval,
-            'additional' => $additional,
-            'consumed' => $consumed,
-        ];
-
         return $this->get_model()->update_for_user($id_user, $id_quota, $quota);
     }
 
@@ -266,7 +244,14 @@ class Quota extends StandardController
                 $report += $unused_additional;
             }
 
-            $success = $this->update_for_user($user['id'], $quota['id'], $quota['credit'], $quota['report_unused'], $quota['report_unused_additional'], $new_start_date, $new_expiration_date, $quota['auto_renew'], $quota['renew_interval'], $report, 0);
+            $updated_fields = [
+                'start_date' => $new_start_date->format('Y-m-d H:i:s'),
+                'expiration_date' => $new_expiration_date->format('Y-m-d H:i:s'),
+                'additional' => $report,
+                'consumed' => 0,
+            ];
+
+            $success = $this->update_for_user($user['id'], $quota['id'], $updated_fields);
 
             if (!$success)
             {
@@ -277,6 +262,18 @@ class Quota extends StandardController
             echo "Update quota : " . $quota['id'] . "\n";
             $internal_event->create($quota['id_user'], 'QUOTA_RENEWAL', 'Renew quota ' . $quota['id'] . ' report ' . $report . ' credits.');
         }
+    }
+    
+    /**
+     * Return the quota for a user if it exists.
+     *
+     * @param int $id_user : user id
+     *
+     * @return array 
+     */
+    public function get_user_quota(int $id_user)
+    {
+        return $this->get_model()->get_user_quota($id_user);
     }
 
     /**

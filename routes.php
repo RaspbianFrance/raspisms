@@ -145,6 +145,8 @@
             'add' => '/user/add/',
             'create' => '/user/create/{csrf}/',
             'delete' => '/user/delete/{csrf}/',
+            'edit' => '/user/edit/',
+            'update' => '/user/update/{csrf}/',
             'update_status' => '/user/delete/{status}/{csrf}/',
         ],
 

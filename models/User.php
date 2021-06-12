@@ -32,6 +32,32 @@ namespace models;
         }
 
         /**
+         * Find user by ids
+         * @param array $ids : users ids
+         *
+         * @return array
+         */
+        public function gets_in_by_id($ids)
+        {
+            if (!$ids)
+            {
+                return [];
+            }
+
+            $query = '
+                SELECT * FROM `user`
+                WHERE id ';
+
+            $params = [];
+
+            $generated_in = $this->_generate_in_from_array($ids);
+            $query .= $generated_in['QUERY'];
+            $params = $generated_in['PARAMS'];
+
+            return $this->_run_query($query, $params);
+        }
+
+        /**
          * Find a user using his email.
          *
          * @param string $email : User email

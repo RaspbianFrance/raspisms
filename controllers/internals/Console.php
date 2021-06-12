@@ -103,7 +103,16 @@ namespace controllers\internals;
             if ($user)
             {
                 $api_key = $api_key ?? $internal_user->generate_random_api_key();
-                $success = $internal_user->update($user['id'], $email, $password, $admin, $api_key, $status, $encrypt_password);
+                $user = [
+                    'email' => $email,
+                    'password' => $encrypt_password ? password_hash($password, PASSWORD_DEFAULT) : $password,
+                    'admin' => $admin,
+                    'api_key' => $api_key,
+                    'status' => $status,
+
+                ];
+
+                $success = $internal_user->update($user['id'], $user);
                 echo json_encode(['id' => $user['id']]);
 
                 exit($success ? 0 : 1);

@@ -14,6 +14,18 @@ namespace models;
     class Quota extends StandardModel
     {
         /**
+         * Return the quota for a user if it exists.
+         *
+         * @param int $id_user : user id
+         *
+         * @return array : quota if found, else empty array
+         */
+        public function get_user_quota(int $id_user)
+        {
+            return $this->_select_one($this->get_table_name(), ['id_user' => $id_user]);
+        }
+
+        /**
          * Get remaining credit for a date
          * if no quota for this user return max int
          * @param int $id_user : User id
@@ -168,7 +180,6 @@ namespace models;
         {
             $at = $at->format('Y-m-d H:i:s');
             $where = [
-                '!=expiration_date' => null,
                 '<=expiration_date' => $at,
                 'auto_renew' => true,
             ];

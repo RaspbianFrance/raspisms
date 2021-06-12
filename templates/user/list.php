@@ -57,7 +57,8 @@
                                             <strong>Action pour la séléction :</strong>
                                             <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 0]); ?>"><span class="fa fa-pause"></span> Suspendre</button>
                                             <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 1]); ?>"><span class="fa fa-play"></span> Activer</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('User', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                         </div>
                                     </div>
                                 </div>
@@ -94,7 +95,7 @@ jQuery(document).ready(function ()
             {
                 data: 'id',
                 render: function (data, type, row, meta) {
-                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
+                    return '<input name="user_ids[]" type="checkbox" value="' + data + '">';
                 },
             },
         ],
