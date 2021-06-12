@@ -58,14 +58,14 @@ namespace models;
          * @param \DateTime $at : date to get usage percent at
          * @return float : percent of used credits
          */
-        public function get_usage_percentage (int $id_user, \DateTime $at): int
+        public function get_usage_percentage (int $id_user, \DateTime $at): float
         {
             $query = '
                 SELECT (consumed / (credit + additional)) AS usage_percentage
                 FROM quota
                 WHERE id_user = :id_user
                 AND start_date <= :at
-                AND end_date > :at';
+                AND expiration_date > :at';
 
             $params = [
                 'id_user' => $id_user,
@@ -74,7 +74,7 @@ namespace models;
 
             $result = $this->_run_query($query, $params);
 
-            return ($result[0]['usage_percentage'] ?? 0);
+            return (float) ($result[0]['usage_percentage'] ?? 0);
         }
         
         /**

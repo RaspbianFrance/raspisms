@@ -36,12 +36,13 @@
                         <div class="panel-body">
                             <form method="GET">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped datatable" id="table-users">
+                                    <table class="table table-bordered table-hover table-striped datatable" id="table-users" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>Email</th>
                                                 <th>Admin</th>
                                                 <th>Statut</th>
+                                                <th>Crédit utilisé</th>
                                                 <th class="checkcolumn">&#10003;</th>
                                             </tr>
                                         </thead>
@@ -49,17 +50,16 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                    <div>
-                                        <div class="col-xs-6 no-padding">
-                                            <a class="btn btn-success" href="<?php echo \descartes\Router::url('User', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un utilisateur</a>
-                                        </div>
-                                        <div class="text-right col-xs-6 no-padding">
-                                            <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 0]); ?>"><span class="fa fa-pause"></span> Suspendre</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 1]); ?>"><span class="fa fa-play"></span> Activer</button>
-                                            <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('User', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                        </div>
+                                <div>
+                                    <div class="col-xs-6 no-padding">
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('User', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un utilisateur</a>
+                                    </div>
+                                    <div class="text-right col-xs-6 no-padding">
+                                        <strong>Action pour la séléction :</strong>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 0]); ?>"><span class="fa fa-pause"></span> Suspendre</button>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'update_status', ['csrf' => $_SESSION['csrf'], 'status' => 1]); ?>"><span class="fa fa-play"></span> Activer</button>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('User', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('User', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                     </div>
                                 </div>
                             </form>
@@ -92,6 +92,13 @@ jQuery(document).ready(function ()
             {data: 'email', render: jQuery.fn.dataTable.render.text()},
             {data: 'admin', render: jQuery.fn.dataTable.render.text()},
             {data: 'status', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'quota_percentage',
+                render: function (data, type, row, meta) {
+                    return jQuery.fn.dataTable.render.text().display(data) + "%";
+                    return '<input name="user_ids[]" type="checkbox" value="' + data + '">';
+                },
+            },
             {
                 data: 'id',
                 render: function (data, type, row, meta) {

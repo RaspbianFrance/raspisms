@@ -53,6 +53,13 @@ class User extends \descartes\Controller
     public function list_json()
     {
         $entities = $this->internal_user->list();
+
+        foreach ($entities as &$entity)
+        {
+            $quota_percentage = $this->internal_quota->get_usage_percentage($entity['id']);
+            $entity['quota_percentage'] = $quota_percentage * 100;
+        }
+
         header('Content-Type: application/json');
         echo json_encode(['data' => $entities]);
     }
