@@ -81,7 +81,22 @@
                                     </div>
                                 <?php } ?>
 							</div>
-							<div class="col-xs-12 col-md-6">
+                            <div class="col-xs-12 col-md-6">
+                                <?php if ($quota) { ?>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Quota de SMS</h4>
+                                        </div>
+                                        <div class="panel-body">
+                                            <strong>Crédit de base :</strong> <?php $this->s($quota['credit']); ?><br/>
+                                            <strong>Crédit additionel :</strong> <?php $this->s($quota['additional']); ?><br/>
+                                            <strong>Crédit consommés :</strong> <?php $this->s($quota['consumed']); ?> (<?= $quota_percent * 100; ?>%)<br/>
+                                            <strong>Renouvellement automatique :</strong> <?php $this->s(($quota['auto_renew'] ? 'Oui, renouvellement le ' : 'Non, fin le ') . $quota['expiration_date']); ?><br/>
+                                            <strong>Report des crédits non utilisés :</strong> <?= $quota['report_unused'] ? 'Oui' : 'Non'; ?><br/>
+                                            <strong>Report des crédits additionels non utilisés :</strong> <?= $quota['report_unused_additional'] ? 'Oui' : 'Non'; ?><br/>
+                                        </div>
+                                    </div>
+                                <?php } ?>
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-at fa-fw"></i> Modifier e-mail</h4>

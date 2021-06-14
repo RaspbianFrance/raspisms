@@ -84,10 +84,9 @@ class Quota extends StandardController
     {
         $result = $this->get_model()->consume_credit($id_user, $quantity);
 
-        //Enqueue verifications for quotas alerting
-        $queue = msg_get_queue(QUEUE_ID_QUOTA);
-        $message = ['id_user' => $id_user];
-        msg_send($queue, QUEUE_TYPE_QUOTA, $message, true, true);
+        //Write event
+        $internal_event = new Event($this->bdd);
+        $internal_event->create($id_user, 'QUOTA_CONSUME', 'Consume ' . $quantity . ' credits of SMS quota.');
 
         return $result;
     }
@@ -260,7 +259,7 @@ class Quota extends StandardController
             }
             
             echo "Update quota : " . $quota['id'] . "\n";
-            $internal_event->create($quota['id_user'], 'QUOTA_RENEWAL', 'Renew quota ' . $quota['id'] . ' report ' . $report . ' credits.');
+            $internal_event->create($quota['id_user'], 'QUOTA_RENEWAL', 'Renew quota and report ' . $report . ' credits.');
         }
     }
     

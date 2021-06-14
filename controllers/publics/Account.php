@@ -14,11 +14,13 @@ namespace controllers\publics;
     class Account extends \descartes\Controller
     {
         public $internal_user;
+        public $internal_quota;
 
         public function __construct()
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_user = new \controllers\internals\User($bdd);
+            $this->internal_quota = new \controllers\internals\Quota($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -28,7 +30,9 @@ namespace controllers\publics;
          */
         public function show()
         {
-            $this->render('account/show');
+            $quota = $this->internal_quota->get_user_quota($_SESSION['user']['id']);
+            $quota_percent = $this->internal_quota->get_usage_percentage($_SESSION['user']['id']);
+            $this->render('account/show', ['quota' => $quota, 'quota_percent' => $quota_percent]);
         }
 
         /**

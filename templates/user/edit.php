@@ -62,6 +62,9 @@
                                     </div>
                                     <fieldset>
                                         <legend>Quota de SMS</legend>
+                                        <?php if (($user['quota']['expiration_date'] ?? false) && (new \DateTime() > new \DateTime($user['quota']['expiration_date']))) { ?>
+                                            <div class="alert alert-danger text-left">Le quota de cet utilisateur est expiré depuis le <b><?php $this->s($user['quota']['expiration_date']); ?></b> est n'as pas été renouvelé, il n'est donc plus appliqué !</div>
+                                        <?php } ?>
                                         
                                         <div class="form-group">
                                             <label>Définir un quota pour cet utilisateur : </label>

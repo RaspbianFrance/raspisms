@@ -58,6 +58,17 @@ class User extends \descartes\Controller
         {
             $quota_percentage = $this->internal_quota->get_usage_percentage($entity['id']);
             $entity['quota_percentage'] = $quota_percentage * 100;
+            
+            $quota = $this->internal_quota->get_user_quota($entity['id']);
+            if (!$quota)
+            {
+                continue;
+            }
+
+            if (new \DateTime() > new \DateTime($quota['expiration_date']))
+            {
+                $entity['quota_expired_at'] = $quota['expiration_date'];
+            }
         }
 
         header('Content-Type: application/json');
@@ -300,6 +311,7 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
         
+        $nb_update = 0;
         $users = $_POST['users'] ?? [];
         foreach ($users as $id_user => $user)
         {
@@ -330,6 +342,7 @@ class User extends \descartes\Controller
 
                 return $this->redirect(\descartes\Router::url('User', 'add'));
             }
+
 
             //Forge quota for user if needed
             $quota = false;
@@ -384,13 +397,22 @@ class User extends \descartes\Controller
             if (!$success)
             {
                 \FlashMessage\FlashMessage::push('danger', 'L\'utilisateur #' . (int) $id_user . ' n\'as pas pu être mis à jour.');
-
+                
                 continue;
             }
 
-            return $this->redirect(\descartes\Router::url('User', 'list'));
+            $nb_update++;
         }
 
-
+        if ($nb_update != count($users))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Certains utilisateurs n\'ont pas pu être mis à jour.');
+            
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+        
+        \FlashMessage\FlashMessage::push('success', 'Tous les utilisateurs ont bien été mis à jour.');
+        
+        return $this->redirect(\descartes\Router::url('User', 'list'));
     }
 }

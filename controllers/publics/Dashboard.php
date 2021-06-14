@@ -22,6 +22,7 @@ namespace controllers\publics;
         private $internal_group;
         private $internal_scheduled;
         private $internal_event;
+        private $internal_quota;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -39,6 +40,7 @@ namespace controllers\publics;
             $this->internal_group = new \controllers\internals\Group($bdd);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_event = new \controllers\internals\Event($bdd);
+            $this->internal_quota = new \controllers\internals\Quota($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -60,40 +62,50 @@ namespace controllers\publics;
             $nb_sendeds = $this->internal_sended->count_for_user($id_user);
             $nb_receiveds = $this->internal_received->count_for_user($id_user);
 
-            //Création de la date d'il y a une semaine
-            $now = new \DateTime();
-            $one_week = new \DateInterval('P7D');
-            $date = $now->sub($one_week);
-            $formated_date = $date->format('Y-m-d');
 
             //Récupération des 10 derniers Sms envoyés, Sms reçus et evenements enregistrés. Par date.
             $sendeds = $this->internal_sended->get_lasts_by_date_for_user($id_user, 10);
             $receiveds = $this->internal_received->get_lasts_by_date_for_user($id_user, 10);
             $events = $this->internal_event->get_lasts_by_date_for_user($id_user, 10);
 
-            //Récupération du nombre de Sms envoyés et reçus depuis les 7 derniers jours
-            $nb_sendeds_by_day = $this->internal_sended->count_by_day_since_for_user($id_user, $formated_date);
-            $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $formated_date);
+            //Récupération du nombre de Sms envoyés et reçus depuis 1 mois jours ou depuis le début du quota si il existe
+            
+            //Création de la date d'il y a 30 jours
+            $now = new \DateTime();
+            $one_month = new \DateInterval('P1M');
+            $stats_start_date = clone $now;
+            $stats_start_date->sub($one_month);
+            $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+
+            //If user have a quota and the quota start before today, use quota start date instead
+            $quota = $this->internal_quota->get_user_quota($id_user);
+            if ($quota && (new \DateTime($quota['start_date']) <= $now) && (new \DateTime($quota['expiration_date']) > $now))
+            {
+                $stats_start_date = new \DateTime($quota['start_date']);
+                $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+            }
+
+            $nb_sendeds_by_day = $this->internal_sended->count_by_day_since_for_user($id_user, $stats_start_date_formated);
+            $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $stats_start_date_formated);
 
             //On va traduire ces données pour les afficher en graphique
             $array_area_chart = [];
 
-            $today_less_7_day = new \DateTime();
-            $today_less_7_day->sub(new \DateInterval('P7D'));
-            $increment_day = new \DateInterval('P1D');
+            $date = clone $stats_start_date;
+            $one_day = new \DateInterval('P1D');
             $i = 0;
 
             //On va construire un tableau avec la date en clef, et les données pour chaque date
-            while ($i < 7)
+            while ($date <= $now)
             {
-                $today_less_7_day->add($increment_day);
-                ++$i;
-                $date_f = $today_less_7_day->format('Y-m-d');
+                $date_f = $date->format('Y-m-d');
                 $array_area_chart[$date_f] = [
                     'period' => $date_f,
                     'sendeds' => 0,
                     'receiveds' => 0,
                 ];
+                
+                $date->add($one_day);
             }
 
             $total_sendeds = 0;
@@ -112,8 +124,9 @@ namespace controllers\publics;
                 $total_receiveds += $nb_received;
             }
 
-            $avg_sendeds = round($total_sendeds / 7, 2);
-            $avg_receiveds = round($total_receiveds / 7, 2);
+            $nb_days = $stats_start_date->diff($now)->days;
+            $avg_sendeds = round($total_sendeds / $nb_days, 2);
+            $avg_receiveds = round($total_receiveds / $nb_days, 2);
 
             $array_area_chart = array_values($array_area_chart);
 

@@ -95,8 +95,11 @@ jQuery(document).ready(function ()
             {
                 data: 'quota_percentage',
                 render: function (data, type, row, meta) {
-                    return jQuery.fn.dataTable.render.text().display(data) + "%";
-                    return '<input name="user_ids[]" type="checkbox" value="' + data + '">';
+                    var html = jQuery.fn.dataTable.render.text().display(data) + "%";
+                    if (row['quota_expired_at'] !== undefined) {
+                        html += ' - <span class="danger">Quota expiré le ' + jQuery.fn.dataTable.render.text().display(row['quota_expired_at']) + '</span>';
+                    }
+                    return html;
                 },
             },
             {

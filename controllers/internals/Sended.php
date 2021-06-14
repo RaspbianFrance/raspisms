@@ -222,7 +222,7 @@ namespace controllers\internals;
             //If we reached our max quota, do not send the message
             $internal_quota = new Quota($this->bdd);
             $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
-            if ($internal_quota->has_enough_credit($id_user, $nb_credits))
+            if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
             {
                 $return['error'] = false;
                 $return['error_message'] = 'Not enough credit to send message.';

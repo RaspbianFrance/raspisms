@@ -39,7 +39,7 @@ namespace models;
                 FROM quota
                 WHERE id_user = :id_user
                 AND start_date <= :at
-                AND end_date > :at';
+                AND expiration_date > :at';
 
             $params = [
                 'id_user' => $id_user,
