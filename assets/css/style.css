@@ -367,6 +367,12 @@ footer img
     font-weight: bold;
 }
 
+.credit-estimation-container
+{
+    margin-top: 10px;
+    text-align: right;
+}
+
 /* AUDIO RECEPTION MESSAGE */
 #reception-sound
 {

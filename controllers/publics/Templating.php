@@ -15,6 +15,7 @@ namespace controllers\publics;
     {
         private $internal_contact;
         private $internal_templating;
+        private $internal_quota;
 
         /**
          * Cette fonction est appelée avant toute les autres :
@@ -27,6 +28,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_templating = new \controllers\internals\Templating();
+            $this->internal_quota = new \controllers\internals\Quota($bdd);
 
             \controllers\internals\Tool::verifyconnect();
         }
@@ -44,6 +46,7 @@ namespace controllers\publics;
             $return = [
                 'success' => false,
                 'result' => 'Une erreur inconnue est survenue.',
+                'estimation_credit' => 0,
             ];
 
             $template = $_POST['template'] ?? false;
@@ -79,10 +82,15 @@ namespace controllers\publics;
 
             $result = $this->internal_templating->render($template, $data);
             $return = $result;
+
             if (!trim($result['result']))
             {
                 $return['result'] = 'Message vide, il ne sera pas envoyé.';
             }
+
+
+            //Add credit estimation
+            $return['estimation_credit'] = $this->internal_quota->compute_credits_for_message($return['result']);
 
             echo json_encode($return);
 

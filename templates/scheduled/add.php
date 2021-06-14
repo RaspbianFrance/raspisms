@@ -45,8 +45,8 @@
                                 <label>Texte du SMS</label>
                                 <?php if ($_SESSION['user']['settings']['templating']) { ?>
                                     <p class="italic small help description-scheduled-text">
-                                        Vous pouvez utilisez des fonctionnalités de templating pour indiquer des valeures génériques qui seront remplacées par les données du contact au moment de l'envoie. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des templates.</a><br/>
-                                        Vous pouvez obtenir une prévisualisation du résultat pour un contact en cliquant sur le boutton <b>"Prévisualiser"</b>.
+                                        Vous pouvez utilisez des fonctionnalités de templating pour indiquer des valeures génériques qui seront remplacées par les données du contact au moment de l'envoie. Pour plus d'information, consultez la documentation sur <a href="https://documentation.raspisms.fr/users/templating/overview.html" target="_blank">l'utilisation des templates.</a><br/>
+                                        Vous pouvez obtenir une prévisualisation du résultat pour un contact, ainsi qu'une estimation du nombre de crédits qui seront utilisés par SMS, en cliquant sur le boutton <b>"Prévisualiser"</b>.
                                     </p>
                                 <?php } ?>
                                 <textarea name="text" class="form-control" required><?php $this->s($_SESSION['previous_http_post']['text'] ?? '') ?></textarea>
@@ -67,7 +67,7 @@
                                 <div class="form-group scheduled-media-group">
                                     <label>Ajouter un média au SMS</label>
                                     <p class="italic small help description-scheduled-media">
-                                        L'ajout d'un média nécessite un téléphone supportant l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="#">l'utilisation des MMS.</a>.
+                                        L'ajout d'un média nécessite un téléphone supportant l'envoi de MMS. Pour plus d'information, consultez la documentation sur <a href="https://documentation.raspisms.fr/users/mms/overview.html" target="_blank">l'utilisation des MMS.</a>
                                     </p>
                                     <div class="form-group">
                                         <input class="" name="medias[]" value="" type="file" multiple />
@@ -141,6 +141,9 @@
             </div>
             <div class="modal-body">
                 <pre></pre>
+                <p class="credit-estimation-container bold">
+                    Ce message devrait coûter <span class="credit-estimation-value"></span> crédits par destinataire.
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -262,6 +265,13 @@
                 data: data,
                 success: function (data) {
                     jQuery('#scheduled-preview-text-modal').find('.modal-body pre').text(data.result);
+                    
+                    if (data.estimation_credit !== 'undefined') {
+                        jQuery('#scheduled-preview-text-modal').find('.modal-body .credit-estimation-value').text(data.estimation_credit);
+                    } else {
+                        jQuery('#scheduled-preview-text-modal').find('.modal-body .credit-estimation-value').text('0');
+                    }
+                    
                     jQuery('#scheduled-preview-text-modal').modal({'keyboard': true});
                 },
                 dataType: 'json'

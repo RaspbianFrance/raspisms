@@ -151,6 +151,9 @@
             </div>
             <div class="modal-body">
                 <pre></pre>
+                <p class="credit-estimation-container bold">
+                    Ce message devrait coûter <span class="credit-estimation-value"></span> crédits par destinataire.
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -270,6 +273,13 @@
                 data: data,
                 success: function (data) {
                     jQuery('#scheduled-preview-text-modal').find('.modal-body pre').text(data.result);
+                    
+                    if (data.estimation_credit !== 'undefined') {
+                        jQuery('#scheduled-preview-text-modal').find('.modal-body .credit-estimation-value').text(data.estimation_credit);
+                    } else {
+                        jQuery('#scheduled-preview-text-modal').find('.modal-body .credit-estimation-value').text('0');
+                    }
+
                     jQuery('#scheduled-preview-text-modal').modal({'keyboard': true});
                 },
                 dataType: 'json'
