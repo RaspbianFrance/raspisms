@@ -50,7 +50,7 @@
                                         <label>Mot de passe (laissez vide pour conserver le mot de passe actuel)</label>
                                         <div class="form-group input-group">
                                             <span class="input-group-addon"><span class="fa fa-lock"></span></span>
-                                            <input name="users[<?php $this->s($user['id']); ?>][password]" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur" value="">
+                                            <input name="users[<?php $this->s($user['id']); ?>][password]" class="form-control" type="password" autocomplete="new-password" placeholder="Mot de passe de l'utilisateur" value="">
                                         </div>
                                     </div>
                                     <div class="form-group">

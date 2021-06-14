@@ -390,7 +390,7 @@ class User extends \descartes\Controller
 
             if ($password)
             {
-                $updated_user['password'] = $password;
+                $updated_user['password'] = password_hash($password, PASSWORD_DEFAULT);
             }
 
             $success = $this->internal_user->update($id_user, $updated_user, $quota);

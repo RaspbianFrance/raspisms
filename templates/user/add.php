@@ -49,7 +49,7 @@
 									<label>Mot de passe (laissez vide pour générer le mot de passe automatiquement)</label>
 									<div class="form-group input-group">
 										<span class="input-group-addon"><span class="fa fa-lock"></span></span>
-                                        <input name="password" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur" value="<?php $this->s($_SESSION['previous_http_post']['password'] ?? ''); ?>">
+                                        <input name="password" class="form-control" type="password" placeholder="Mot de passe de l'utilisateur" autocomplete="new-password" value="<?php $this->s($_SESSION['previous_http_post']['password'] ?? ''); ?>">
 									</div>
 								</div>
                                 <div class="form-group">

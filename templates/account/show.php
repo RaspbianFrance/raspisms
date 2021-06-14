@@ -53,7 +53,7 @@
 										<form action="<?php echo \descartes\Router::url('Account', 'update_password', ['csrf' => $_SESSION['csrf']]); ?>" method="POST">
 											<div class="form-group">
 												<label>Mot de passe :</label>
-												<input name="password" type="password" class="form-control" placeholder="Nouveau mot de passe" />
+												<input name="password" type="password" class="form-control" placeholder="Nouveau mot de passe" autocomplete="new-password" />
 											</div>	
 											<div class="text-center">
 												<button class="btn btn-success">Mettre à jour les données</button>	
