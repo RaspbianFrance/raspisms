@@ -123,6 +123,26 @@ namespace controllers\internals;
 
                     break;
 
+                case 'QUOTA_LIMIT_CLOSE':
+                    $logo = 'fa-exclamation';
+
+                    break;
+
+                case 'QUOTA_LIMIT_REACHED':
+                    $logo = 'fa-exclamation-triangle';
+
+                    break;
+
+                case 'QUOTA_RENEWAL':
+                    $logo = 'fa-retweet';
+
+                    break;
+
+                case 'QUOTA_CONSUME':
+                    $logo = 'fa-euro';
+
+                    break;
+
                 default:
                     $logo = 'fa-question';
             }

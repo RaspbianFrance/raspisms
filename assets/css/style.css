@@ -89,6 +89,13 @@ footer img
     opacity: 0.7;
 }
 
+/** DASHBOARD **/
+.dashboard-panel-chart .panel-title
+{
+    margin-bottom: 10px;
+}
+
+
 /** GROUPES **/
 .list-contacts
 {

@@ -145,7 +145,7 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Alerte limite de SMS atteinte</h4>
+										<h4 class="panel-title"><i class="fa fa-exclamation-triangle fa-fw"></i> Alerte limite de SMS atteinte</h4>
 									</div>
 									<div class="panel-body">
 										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'alert_quota_limit_reached', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
@@ -296,7 +296,7 @@
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Alerte limite de SMS proche</h4>
+										<h4 class="panel-title"><i class="fa fa-exclamation fa-fw"></i> Alerte limite de SMS proche</h4>
 									</div>
 									<div class="panel-body">
 										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'alert_quota_limit_close', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">

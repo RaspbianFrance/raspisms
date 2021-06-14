@@ -85,7 +85,7 @@
                                 <?php if ($quota) { ?>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h4 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Quota de SMS</h4>
+                                            <h4 class="panel-title"><i class="fa fa-euro fa-fw"></i> Quota de SMS</h4>
                                         </div>
                                         <div class="panel-body">
                                             <strong>Crédit de base :</strong> <?php $this->s($quota['credit']); ?><br/>

@@ -118,11 +118,15 @@
 
 			<div class="row">
 				<div class="col-lg-12">
-					<div class="panel panel-default">
+					<div class="panel panel-default dashboard-panel-chart">
 						<div class="panel-heading">
 							<h3 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> Activité de la semaine : </h3>
 							<span style="color: #5CB85C;">SMS envoyés (moyenne = <?php echo $avg_sendeds; ?> par jour).</span><br/>
 							<span style="color: #EDAB4D">SMS reçus (moyenne = <?php echo $avg_receiveds; ?> par jour).</span>
+                            <?php if ($quota_limit) { ?>
+                                <br/>
+                                <span style="color: #d9534f">Limite max de SMS sur la période (<?= $quota_limit; ?>).</span>
+                            <?php } ?>
 						</div>
 						<div class="panel-body">
 							<div id="morris-area-chart"></div>
@@ -250,8 +254,8 @@
 			ykeys: ['sendeds', 'receiveds'],
 			labels: ['SMS envoyés', 'SMS reçus'],
 			lineColors: ['#5CB85C', '#EDAB4D'],
-			goals: [<?php echo $avg_sendeds; ?>, <?php echo $avg_receiveds; ?>],
-			goalLineColors: ['#5CB85C', '#EDAB4D'],
+            goals: [<?php echo $avg_sendeds; ?>, <?php echo $avg_receiveds; ?><?= $quota_limit ? ',' . $quota_limit : ''; ?>],
+			goalLineColors: ['#5CB85C', '#EDAB4D', '#d9534f'],
 			goalStrokeWidth: 2,
 			pointSize: 4,
 			hideHover: 'auto',
