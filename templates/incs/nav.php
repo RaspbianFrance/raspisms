@@ -68,37 +68,51 @@
                                 </li>
                             <?php } ?>
 						</ul>
-					</li>
-					<li>
-						<a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
-						<ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop', 'calls')) ? 'in' : ''; ?>">
-							<li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \descartes\Router::url('SmsStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
-							</li>
-                            <li <?php echo $page == 'calls' ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo \descartes\Router::url('Call', 'list'); ?>"><i class="fa fa-fw fa-file-audio-o"></i> Appels</a>
-                            </li>
-							<li <?php echo $page == 'events' ? 'class="active"' : ''; ?>>
-								<a href="<?php echo \descartes\Router::url('Event', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>
-							</li>
-						</ul>
                     </li>
-                    <?php if (ENABLE_COMMAND) { ?>
-                        <li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
-                            <a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
+                    <?php if (!in_array('log', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop', 'calls')) ? 'in' : ''; ?>">
+                                <?php if (!in_array('smsstop', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                                    <li <?php echo $page == 'smsstop' ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo \descartes\Router::url('SmsStop', 'list'); ?>"><i class="fa fa-fw fa-ban"></i> SMS STOP</a>
+                                    </li>
+                                <?php } ?>
+                                <?php if (!in_array('calls', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                                    <li <?php echo $page == 'calls' ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo \descartes\Router::url('Call', 'list'); ?>"><i class="fa fa-fw fa-file-audio-o"></i> Appels</a>
+                                    </li>
+                                <?php } ?>
+                                <?php if (!in_array('events', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                                    <li <?php echo $page == 'events' ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo \descartes\Router::url('Event', 'list'); ?>"><i class="fa fa-fw fa-clock-o"></i> Évènements</a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
                         </li>
+                    <?php } ?>
+                    <?php if (ENABLE_COMMAND) { ?>
+                        <?php if (!in_array('commands', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                            <li <?php echo $page == 'commands' ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo \descartes\Router::url('Command', 'list'); ?>"><i class="fa fa-fw fa-terminal"></i> Commandes</a>
+                            </li>
+                        <?php } ?>
 					<?php } ?>
                     <?php if ($_SESSION['user']['settings']['webhook'] ?? false) { ?>
                         <li <?php echo $page == 'webhooks' ? 'class="active"' : ''; ?>>
                             <a href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>"><i class="fa fa-fw fa-plug"></i> Webhooks</a>
                         </li>
 					<?php } ?>
-					<li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
-						<a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
-					</li>
-                    <li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
-                        <a href="<?php echo \descartes\Router::url('Setting', 'show'); ?>"><i class="fa fa-fw fa-cogs"></i> Réglages</a>
-                    </li>
+                    <?php if (!in_array('phones', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                        <li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
+                        </li>
+					<?php } ?>
+                    <?php if (!in_array('settings', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                        <li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
+                            <a href="<?php echo \descartes\Router::url('Setting', 'show'); ?>"><i class="fa fa-fw fa-cogs"></i> Réglages</a>
+                        </li>
+					<?php } ?>
                     <?php if (\controllers\internals\Tool::is_admin()) { ?>
                         <li <?php echo $page == 'users' ? 'class="active"' : ''; ?>>
                             <a href="<?php echo \descartes\Router::url('User', 'list'); ?>"><i class="fa fa-fw fa-user"></i> Utilisateurs</a>

@@ -318,6 +318,23 @@
 										</form>
 									</div>
 								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-eye-slash fa-fw"></i> Cacher des menus</h4>
+									</div>
+									<div class="panel-body">
+                                        <form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'hide_menus', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+                                            <input type="hidden" name="allow_no_value" value="1" />
+											<div class="form-group">
+                                                <label>Cacher certains menus à  l'utilisateur (ces menus restent accessibles par l'URL) : </label>
+                                                <input name="setting_value[]" class="add-hide-menus form-control" type="text" placeholder="Menus à cacher" autofocus value="<?php $this->s($_SESSION['user']['settings']['hide_menus']); ?>">
+                                            </div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -339,7 +356,27 @@
 				url += '/' + jQuery(this).val();
 			});
 			window.location = url;
-		});
+        });
+
+        jQuery('.add-hide-menus').each(function()
+        {
+            jQuery(this).magicSuggest({
+                data: [
+                    {'id': 'logs', 'name': 'Logs'},
+                    {"id": "smsstop", "name": "SMS Stop"},
+                    {"id": "calls", "name": "Appels"},
+                    {"id": "events", "name": "Évènements"},
+                    {"id": "commands", "name": "Commandes"},
+                    {"id": "phones", "name": "Téléphones"},
+                    {"id": "settings", "name": "Réglages"}, 
+                ],
+                valueField: 'id',
+                displayField: 'name',
+                name: 'hide_menus[]',
+                maxSelection: null,
+            });
+        });
+
 	});
 </script>
 <?php

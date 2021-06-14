@@ -40,6 +40,7 @@ namespace controllers\publics;
          * @param string $setting_name : Name of the setting to modify
          * @param $csrf : CSRF token
          * @param string $_POST['setting_value'] : Setting's new value
+         * @param bool $_POST['allow_no_value'] : Default false, if true then allow $_POST['setting_value'] to dont exists, and treat it as empty string
          *
          * @return boolean;
          */
@@ -53,12 +54,25 @@ namespace controllers\publics;
             }
 
             $setting_value = $_POST['setting_value'] ?? false;
+            $allow_no_value = $_POST['allow_no_value'] ?? false;
+
+            //if no value allowed and no value fund, default to ''
+            if ($allow_no_value && ($setting_value === false))
+            {
+                $setting_value = '';
+            }
 
             if (false === $setting_value)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez renseigner une valeure pour le réglage.');
 
                 return $this->redirect(\descartes\Router::url('Setting', 'show'));
+            }
+
+            //If setting is an array, join with comas
+            if (is_array($setting_value))
+            {
+                $setting_value = json_encode($setting_value);
             }
 
             $update_setting_result = $this->internal_setting->update_for_user($_SESSION['user']['id'], $setting_name, $setting_value);
