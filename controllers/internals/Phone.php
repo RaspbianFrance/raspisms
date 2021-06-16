@@ -44,13 +44,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Check if a phone support mms
+         * Check if a phone support mms.
          *
          * @param int $id : id of the phone to check
-         * @param $type : type of sms support, a const from Phone, MMS_SENDING, MMS_RECEPTION or MMS_BOTH 
+         * @param $type : type of sms support, a const from Phone, MMS_SENDING, MMS_RECEPTION or MMS_BOTH
+         *
          * @return bool : true if support, false else
          */
-        public function support_mms (int $id, string $type)
+        public function support_mms(int $id, string $type)
         {
             $phone = $this->get_model()->get($id);
             if (!$phone)
@@ -60,16 +61,19 @@ namespace controllers\internals;
 
             switch ($type)
             {
-                case self::MMS_SENDING :
+                case self::MMS_SENDING:
                     return $phone['adapter']::meta_support_mms_sending();
+
                     break;
 
-                case self::MMS_RECEPTION :
+                case self::MMS_RECEPTION:
                     return $phone['adapter']::meta_support_mms_reception();
+
                     break;
 
-                case self::MMS_BOTH :
+                case self::MMS_BOTH:
                     return $phone['adapter']::meta_support_mms_sending() && $phone['adapter']::meta_support_mms_reception();
+
                     break;
 
                 default:
@@ -78,13 +82,14 @@ namespace controllers\internals;
         }
 
         /**
-         * Get all phones supporting mms for a user
+         * Get all phones supporting mms for a user.
          *
          * @param int $id_user : id of the user
-         * @param $type : type of sms support, a const from Phone, MMS_SENDING, MMS_RECEPTION or MMS_BOTH 
+         * @param $type : type of sms support, a const from Phone, MMS_SENDING, MMS_RECEPTION or MMS_BOTH
+         *
          * @return array : array of phones supporting mms
          */
-        public function gets_phone_supporting_mms_for_user (int $id_user, string $type)
+        public function gets_phone_supporting_mms_for_user(int $id_user, string $type)
         {
             $phones = $this->get_model()->gets_for_user($id_user);
 

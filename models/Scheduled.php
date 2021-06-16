@@ -233,8 +233,7 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
-        
+
         /**
          * Get messages scheduled after a date for a number and a user.
          *

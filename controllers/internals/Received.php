@@ -36,11 +36,11 @@ namespace controllers\internals;
          * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $origin  : Number of the sender
-         * @param string $status  : Status of the received message
-         * @param bool   $command : Is the sms a command
-         * @param bool $mms : Is the sms a mms
-         * @param array $media_ids : Ids of the medias to link to received
+         * @param string $origin    : Number of the sender
+         * @param string $status    : Status of the received message
+         * @param bool   $command   : Is the sms a command
+         * @param bool   $mms       : Is the sms a mms
+         * @param array  $media_ids : Ids of the medias to link to received
          *
          * @return mixed : false on error, new received id else
          */
@@ -64,6 +64,7 @@ namespace controllers\internals;
             if (!$id_received)
             {
                 $this->bdd->rollBack();
+
                 return false;
             }
 
@@ -75,6 +76,7 @@ namespace controllers\internals;
                 if (!$id_media_received)
                 {
                     $this->bdd->rollBack();
+
                     return false;
                 }
             }
@@ -167,6 +169,7 @@ namespace controllers\internals;
          * @param int    $id_user : User id
          * @param string $since   : Date we want messages since format Y-m-d H:i:s
          * @param string $origin  : Number who sent the message
+         *
          * @return array
          */
         public function gets_since_date_by_origin_and_user(int $id_user, string $since, string $origin)
@@ -256,11 +259,11 @@ namespace controllers\internals;
          * @param string  $origin : Number of the sender
          * @param ?string $at     : Message reception date, if null use current date
          * @param string  $status : Status of a the sms. By default \models\Received::STATUS_UNREAD
-         * @param bool $mms : Is the sms a mms
-         * @param array $medias : Empty array if no medias, or medias to create and link to the received message. Format : [[
-         *      string 'filepath' => local path to a readable copy of the media,
-         *      ?string 'extension' => extension to use for the file or null
-         * ], ...]
+         * @param bool    $mms    : Is the sms a mms
+         * @param array   $medias : Empty array if no medias, or medias to create and link to the received message. Format : [[
+         *                        string 'filepath' => local path to a readable copy of the media,
+         *                        ?string 'extension' => extension to use for the file or null
+         *                        ], ...]
          *
          * @return array : [
          *               bool 'error' => false if success, true else
@@ -285,7 +288,7 @@ namespace controllers\internals;
                 $is_command = true;
                 $text = $response;
             }
-            
+
             //We create medias to link to the sms
             $internal_media = new Media($this->bdd);
             $media_ids = [];
@@ -301,6 +304,7 @@ namespace controllers\internals;
                     catch (\Throwable $t)
                     {
                         $return['error_message'] = $t->getMessage();
+
                         continue; //Better loose the media than the message
                     }
                 }

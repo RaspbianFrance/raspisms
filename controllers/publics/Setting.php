@@ -39,8 +39,8 @@ namespace controllers\publics;
          *
          * @param string $setting_name : Name of the setting to modify
          * @param $csrf : CSRF token
-         * @param string $_POST['setting_value'] : Setting's new value
-         * @param bool $_POST['allow_no_value'] : Default false, if true then allow $_POST['setting_value'] to dont exists, and treat it as empty string
+         * @param string $_POST['setting_value']  : Setting's new value
+         * @param bool   $_POST['allow_no_value'] : Default false, if true then allow $_POST['setting_value'] to dont exists, and treat it as empty string
          *
          * @return boolean;
          */
@@ -57,7 +57,7 @@ namespace controllers\publics;
             $allow_no_value = $_POST['allow_no_value'] ?? false;
 
             //if no value allowed and no value fund, default to ''
-            if ($allow_no_value && ($setting_value === false))
+            if ($allow_no_value && (false === $setting_value))
             {
                 $setting_value = '';
             }

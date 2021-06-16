@@ -125,14 +125,13 @@ namespace controllers\publics;
                 }
 
                 $message = [
-                    'uid'  => 'sended-' . $sended['id'],
+                    'uid' => 'sended-' . $sended['id'],
                     'date' => htmlspecialchars($sended['at']),
                     'text' => htmlspecialchars($sended['text']),
                     'type' => 'sended',
                     'medias' => $medias,
                     'status' => $sended['status'],
                 ];
-
 
                 $messages[] = $message;
             }
@@ -143,7 +142,7 @@ namespace controllers\publics;
                 {
                     $this->internal_received->mark_as_read_for_user($id_user, $received['id']);
                 }
-                
+
                 $medias = [];
                 if ($received['mms'])
                 {
@@ -155,7 +154,7 @@ namespace controllers\publics;
                 }
 
                 $messages[] = [
-                    'uid'  => 'received-' . $received['id'],
+                    'uid' => 'received-' . $received['id'],
                     'date' => htmlspecialchars($received['at']),
                     'text' => htmlspecialchars($received['text']),
                     'type' => 'received',
@@ -176,7 +175,7 @@ namespace controllers\publics;
                 }
 
                 $messages[] = [
-                    'uid'  => 'scheduled-' . $scheduled['id'],
+                    'uid' => 'scheduled-' . $scheduled['id'],
                     'date' => htmlspecialchars($scheduled['at']),
                     'text' => htmlspecialchars($scheduled['text']),
                     'type' => 'inprogress',
@@ -210,7 +209,7 @@ namespace controllers\publics;
          * @param string $_POST['text']        : Le contenu du Sms
          * @param string $_POST['destination'] : Number to send sms to
          * @param string $_POST['id_phone']    : If of phone to send sms with
-         * @param array $_FILES['medias']      : Medias to upload and link to sms
+         * @param array  $_FILES['medias']     : Medias to upload and link to sms
          *
          * @return string : json string Le statut de l'envoi
          */
@@ -237,9 +236,9 @@ namespace controllers\publics;
             $destination = $_POST['destination'] ?? false;
             $id_phone = $_POST['id_phone'] ?? false;
             $files = $_FILES['medias'] ?? false;
-            
+
             //Iterate over files to re-create individual $_FILES array
-            $files_arrays = []; 
+            $files_arrays = [];
             if ($files && is_array($files['name']))
             {
                 foreach ($files as $property_name => $files_values)
@@ -248,7 +247,7 @@ namespace controllers\publics;
                     {
                         if (!isset($files_arrays[$file_key]))
                         {
-                            $files_arrays[$file_key] = []; 
+                            $files_arrays[$file_key] = [];
                         }
 
                         $files_arrays[$file_key][$property_name] = $property_value;
@@ -259,7 +258,7 @@ namespace controllers\publics;
             //Remove empty files input
             foreach ($files_arrays as $key => $file)
             {
-                if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                if (UPLOAD_ERR_NO_FILE === $file['error'])
                 {
                     unset($files_arrays[$key]);
                 }
@@ -287,7 +286,6 @@ namespace controllers\publics;
             {
                 $id_phone = null;
             }
-
 
             //If mms is enable and we have medias uploaded
             $media_ids = [];

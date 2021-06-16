@@ -32,7 +32,8 @@ namespace models;
         }
 
         /**
-         * Find user by ids
+         * Find user by ids.
+         *
          * @param array $ids : users ids
          *
          * @return array

@@ -241,7 +241,7 @@ namespace controllers\publics;
 
             if ($how_many_more > 0)
             {
-                $result_text .= ", et $how_many_more autres.";
+                $result_text .= ", et {$how_many_more} autres.";
             }
 
             $return['result'] = $result_text;

@@ -177,9 +177,9 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
     {
         return true;
     }
-    
+
     /**
-     * Does the implemented service support mms reception
+     * Does the implemented service support mms reception.
      */
     public static function meta_support_mms_reception(): bool
     {
@@ -187,24 +187,24 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
     }
 
     /**
-     * Does the implemented service support mms sending
+     * Does the implemented service support mms sending.
      */
     public static function meta_support_mms_sending(): bool
     {
         return false;
     }
-    
+
     public static function meta_support_inbound_call_callback(): bool
     {
         return false;
     }
-    
+
     public static function meta_support_end_call_callback(): bool
     {
         return false;
     }
 
-    public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []) : array
+    public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []): array
     {
         $response = [
             'error' => false,
@@ -417,12 +417,12 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
 
         return $response;
     }
-    
+
     public function inbound_call_callback(): array
     {
         return [];
     }
-    
+
     public function end_call_callback(): array
     {
         return [];

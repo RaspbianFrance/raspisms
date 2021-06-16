@@ -231,16 +231,16 @@ namespace controllers\publics;
             //Iterate over files to re-create individual $_FILES array
             $files_arrays = [];
 
-            if ($files === false)
+            if (false === $files)
             {
                 $files_arrays = [];
             }
-            elseif (!is_array($files['name'])) //Only one file uploaded
-            {
+            elseif (!is_array($files['name']))
+            { //Only one file uploaded
                 $files_arrays[] = $files;
             }
-            else //multiple files
-            {
+            else
+            { //multiple files
                 foreach ($files as $property_name => $files_values)
                 {
                     foreach ($files_values as $file_key => $property_value)
@@ -320,8 +320,8 @@ namespace controllers\publics;
             if ($id_phone)
             {
                 $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
-            } 
-            
+            }
+
             if ($id_phone && !$phone)
             {
                 $return = self::DEFAULT_RETURN;

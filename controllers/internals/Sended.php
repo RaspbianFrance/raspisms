@@ -27,7 +27,7 @@ namespace controllers\internals;
          * @param string $adapter     : Name of the adapter service used to send the message
          * @param bool   $flash       : Is the sms a flash
          * @param bool   $mms         : Is the sms a MMS. By default false.
-         * @param array  $medias      : Array of medias to link to the MMS.
+         * @param array  $medias      : Array of medias to link to the MMS
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
@@ -49,14 +49,15 @@ namespace controllers\internals;
 
             //Ensure atomicity
             $this->bdd->beginTransaction();
-            
+
             $id_sended = $this->get_model()->insert($sended);
             if (!$id_sended)
             {
                 $this->bdd->rollback();
+
                 return false;
             }
-            
+
             //Link medias
             $internal_media = new Media($this->bdd);
             foreach ($medias as $media)
@@ -132,13 +133,14 @@ namespace controllers\internals;
         {
             return $this->get_model()->gets_by_destination_and_user($id_user, $origin);
         }
-        
+
         /**
          * Return sendeds for a destination and a user since a date.
          *
          * @param int    $id_user : User id
          * @param string $since   : Date we want messages since format Y-m-d H:i:s
          * @param string $origin  : Number who sent the message
+         *
          * @return array
          */
         public function gets_since_date_by_destination_and_user(int $id_user, string $since, string $origin)
@@ -204,7 +206,7 @@ namespace controllers\internals;
          * @param string $destination : Number of the receiver
          * @param bool   $flash       : Is the sms a flash. By default false.
          * @param bool   $mms         : Is the sms a MMS. By default false.
-         * @param array  $medias      : Array of medias to link to the MMS.
+         * @param array  $medias      : Array of medias to link to the MMS
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return array : [
@@ -229,7 +231,6 @@ namespace controllers\internals;
 
                 return $return;
             }
-
 
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $media_uris = [];

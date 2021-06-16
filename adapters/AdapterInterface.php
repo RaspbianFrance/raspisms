@@ -84,22 +84,22 @@ interface AdapterInterface
     public static function meta_support_status_change(): bool;
 
     /**
-     * Does the implemented service support mms reception
+     * Does the implemented service support mms reception.
      */
     public static function meta_support_mms_reception(): bool;
 
     /**
-     * Does the implemented service support mms sending
+     * Does the implemented service support mms sending.
      */
     public static function meta_support_mms_sending(): bool;
-    
+
     /**
-     * Does the implemented service support inbound call callback
+     * Does the implemented service support inbound call callback.
      */
     public static function meta_support_inbound_call_callback(): bool;
-    
+
     /**
-     * Does the implemented service support end call callback
+     * Does the implemented service support end call callback.
      */
     public static function meta_support_end_call_callback(): bool;
 
@@ -118,23 +118,23 @@ interface AdapterInterface
      *               array 'uid' => Uid of the sms created on success
      *               ]
      */
-    public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []) : array;
+    public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []): array;
 
     /**
      * Method called to read SMSs of the number.
      *
      * @return array : [
-     *     bool 'error' => false if no error, true else
-     *     ?string 'error_message' => null if no error, else error message
-     *     array 'smss' => Array of the sms reads [[
-     *          (optional) bool 'mms' => default to false, true if mms
-     *          (optional) array 'medias' => default to [], list of array representing medias to link to sms, with [
-     *              'filepath' => local file copy of the media,
-     *              'extension' (optional) => extension of the media,
-     *              'mimetype' (optional) => mimetype of the media
-     *          ]
-     *     ], ...]
-     * ]
+     *               bool 'error' => false if no error, true else
+     *               ?string 'error_message' => null if no error, else error message
+     *               array 'smss' => Array of the sms reads [[
+     *               (optional) bool 'mms' => default to false, true if mms
+     *               (optional) array 'medias' => default to [], list of array representing medias to link to sms, with [
+     *               'filepath' => local file copy of the media,
+     *               'extension' (optional) => extension of the media,
+     *               'mimetype' (optional) => mimetype of the media
+     *               ]
+     *               ], ...]
+     *               ]
      */
     public function read(): array;
 
@@ -157,50 +157,49 @@ interface AdapterInterface
      * Method called on reception of a sms notification.
      *
      * @return array : [
-     *     bool 'error' => false on success, true on error
-     *     ?string 'error_message' => null on success, error message else
-     *     array 'sms' => array [
-     *        string 'at' : Recepetion date format Y-m-d H:i:s,
-     *        string 'text' : SMS body,
-     *        string 'origin' : SMS sender,
-     *        (optional) array 'medias' => default to [], list of array representing medias to link to sms, with [
-     *           'filepath' => local file copy of the media,
-     *           'extension' (optional) => extension of the media,
-     *           'mimetype' (optional) => mimetype of the media
-     *        ]
-     *     ]
-     * ]
+     *               bool 'error' => false on success, true on error
+     *               ?string 'error_message' => null on success, error message else
+     *               array 'sms' => array [
+     *               string 'at' : Recepetion date format Y-m-d H:i:s,
+     *               string 'text' : SMS body,
+     *               string 'origin' : SMS sender,
+     *               (optional) array 'medias' => default to [], list of array representing medias to link to sms, with [
+     *               'filepath' => local file copy of the media,
+     *               'extension' (optional) => extension of the media,
+     *               'mimetype' (optional) => mimetype of the media
+     *               ]
+     *               ]
+     *               ]
      */
     public static function reception_callback(): array;
 
     /**
-     * Method called on reception of an inbound_call notification
+     * Method called on reception of an inbound_call notification.
      *
      * @return array : [
-     *     bool 'error' => false on success, true on error
-     *     ?string 'error_message' => null on success, error message else
-     *     array 'call' => array [
-     *        string 'uid' : Uid of the call on the adapter plateform
-     *        string 'start' : Start of the call date format Y-m-d H:i:s,
-     *        ?string 'end' : End of the call date format Y-m-d H:i:s. If no known end, NULL
-     *        string 'origin' : Emitter phone call number. International format.
-     *     ]
-     * ]
+     *               bool 'error' => false on success, true on error
+     *               ?string 'error_message' => null on success, error message else
+     *               array 'call' => array [
+     *               string 'uid' : Uid of the call on the adapter plateform
+     *               string 'start' : Start of the call date format Y-m-d H:i:s,
+     *               ?string 'end' : End of the call date format Y-m-d H:i:s. If no known end, NULL
+     *               string 'origin' : Emitter phone call number. International format.
+     *               ]
+     *               ]
      */
     public function inbound_call_callback(): array;
-    
-    
+
     /**
-     * Method called on reception of a end call notification
+     * Method called on reception of a end call notification.
      *
      * @return array : [
-     *     bool 'error' => false on success, true on error
-     *     ?string 'error_message' => null on success, error message else
-     *     array 'call' => array [
-     *        string 'uid' : Uid of the call on the adapter plateform. Used to find the raspisms local call to update.
-     *        string 'end' : End of the call date format Y-m-d H:i:s.
-     *     ]
-     * ]
+     *               bool 'error' => false on success, true on error
+     *               ?string 'error_message' => null on success, error message else
+     *               array 'call' => array [
+     *               string 'uid' : Uid of the call on the adapter plateform. Used to find the raspisms local call to update.
+     *               string 'end' : End of the call date format Y-m-d H:i:s.
+     *               ]
+     *               ]
      */
     public function end_call_callback(): array;
 }

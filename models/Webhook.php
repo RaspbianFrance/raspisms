@@ -19,7 +19,6 @@ namespace models;
         const TYPE_QUOTA_LEVEL_ALERT = 'quota_level';
         const TYPE_QUOTA_REACHED = 'quota_reached';
 
-
         /**
          * Find all webhooks for a user and for a type of webhook.
          *

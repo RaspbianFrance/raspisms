@@ -178,13 +178,13 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
          * Return sendeds for an origin and a user since a date.
          *
-         * @param int    $id_user     : User id
+         * @param int    $id_user : User id
          * @param string $since   : Date we want messages since
-         * @param string $origin : Number who sent the message
+         * @param string $origin  : Number who sent the message
          *
          * @return array
          */

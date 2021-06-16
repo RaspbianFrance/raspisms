@@ -118,8 +118,8 @@ namespace controllers\internals;
         }
 
         /**
-         * List all adapters for a meta value
-         * 
+         * List all adapters for a meta value.
+         *
          * @param $search_name : Name of the meta
          * @param $search_value : Value of the meta
          *
@@ -128,7 +128,9 @@ namespace controllers\internals;
         public function list_adapters_with_meta_equal($search_name, $search_value)
         {
             $adapters = $this->list_adapters();
-            return array_filter($adapters, function($metas) use ($search_name, $search_value) {
+
+            return array_filter($adapters, function ($metas) use ($search_name, $search_value)
+            {
                 $match = false;
                 foreach ($metas as $name => $value)
                 {

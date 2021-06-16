@@ -112,13 +112,12 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
-        
+
         /**
          * Return sendeds for an destination and a user since a date.
          *
          * @param int    $id_user     : User id
-         * @param string $since   : Date we want messages since
+         * @param string $since       : Date we want messages since
          * @param string $destination : Number who sent the message
          *
          * @return array

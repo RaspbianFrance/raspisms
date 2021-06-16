@@ -32,9 +32,9 @@ namespace controllers\internals;
         }
 
         /**
-         * Return a list of users by their ids
+         * Return a list of users by their ids.
          *
-         * @param array $ids     : ids of entries to find
+         * @param array $ids : ids of entries to find
          *
          * @return array
          */
@@ -194,8 +194,8 @@ namespace controllers\internals;
         /**
          * Update a user by his id.
          *
-         * @param mixed  $id : User id
-         * @param array $user : Array of fields to update for user
+         * @param mixed               $id    : User id
+         * @param array               $user  : Array of fields to update for user
          * @param mixed (?array|bool) $quota : Quota to update for the user, by default null -> no update, if false, remove quota
          *
          * @return bool : True on success, false on error
@@ -206,15 +206,16 @@ namespace controllers\internals;
             $current_quota = $internal_quota->get_user_quota($id);
 
             $this->bdd->beginTransaction();
-            
+
             $this->model_user->update($id, $user);
 
-            if ($current_quota && $quota === false)
+            if ($current_quota && false === $quota)
             {
                 $success = $internal_quota->delete_for_user($id, $current_quota['id']);
                 if (!$success)
                 {
                     $this->bdd->rollback();
+
                     return false;
                 }
             }
@@ -236,7 +237,6 @@ namespace controllers\internals;
                     }
                 }
             }
-
 
             if (!$this->bdd->commit())
             {
@@ -277,7 +277,6 @@ namespace controllers\internals;
                 return false;
             }
 
-
             $success = $this->internal_setting->create_defaults_for_user($new_id_user);
             if (!$success)
             {
@@ -286,8 +285,7 @@ namespace controllers\internals;
                 return false;
             }
 
-
-            if ($quota !== null)
+            if (null !== $quota)
             {
                 $internal_quota = new Quota($this->bdd);
                 $success = $internal_quota->create($new_id_user, $quota['credit'], $quota['additional'], $quota['report_unused'], $quota['report_unused_additional'], $quota['auto_renew'], $quota['renew_interval'], $quota['start_date'], $quota['expiration_date']);
@@ -298,7 +296,6 @@ namespace controllers\internals;
                     return false;
                 }
             }
-
 
             if (!$this->bdd->commit())
             {
@@ -355,9 +352,9 @@ namespace controllers\internals;
             }
 
             $mailer = new Mailer();
-            
+
             $attachments = [];
-           
+
             foreach ($received['medias'] ?? [] as $media)
             {
                 $attachments[] = PWD_DATA_PUBLIC . '/' . $media['path'];

@@ -27,16 +27,16 @@ namespace models;
         }
 
         /**
-         * Gets events for a type, since a date and eventually until a date (both included)
+         * Gets events for a type, since a date and eventually until a date (both included).
          *
-         * @param int $id_user  : User id
-         * @param string $type : Event type we want
-         * @param \DateTime $since : Date to get events since
-         * @param ?\DateTime $until (optional) : Date until wich we want events, if not specified no limit
+         * @param int        $id_user : User id
+         * @param string     $type    : Event type we want
+         * @param \DateTime  $since   : Date to get events since
+         * @param ?\DateTime $until   (optional) : Date until wich we want events, if not specified no limit
          *
          * @return array
          */
-        public function get_events_by_type_and_date_for_user (int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
+        public function get_events_by_type_and_date_for_user(int $id_user, string $type, \DateTime $since, ?\DateTime $until = null)
         {
             $where = [
                 'id_user' => $id_user,
@@ -44,7 +44,7 @@ namespace models;
                 '>=at' => $since->format('Y-m-d H:i:s'),
             ];
 
-            if ($until !== null)
+            if (null !== $until)
             {
                 $where['<=at'] = $until->format('Y-m-d H:i:s');
             }

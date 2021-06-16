@@ -27,12 +27,14 @@ namespace models;
 
         /**
          * Get remaining credit for a date
-         * if no quota for this user return max int
-         * @param int $id_user : User id
-         * @param \DateTime $at : date to get credit at
+         * if no quota for this user return max int.
+         *
+         * @param int       $id_user : User id
+         * @param \DateTime $at      : date to get credit at
+         *
          * @return int : number of remaining credits
          */
-        public function get_remaining_credit (int $id_user, \DateTime $at): int
+        public function get_remaining_credit(int $id_user, \DateTime $at): int
         {
             $query = '
                 SELECT (credit + additional - consumed) AS remaining_credit
@@ -48,17 +50,19 @@ namespace models;
 
             $result = $this->_run_query($query, $params);
 
-            return ($result[0]['remaining_credit'] ?? PHP_INT_MAX);
+            return $result[0]['remaining_credit'] ?? PHP_INT_MAX;
         }
-        
+
         /**
          * Get credit usage percent for a date
-         * if no quota for this user return 0
-         * @param int $id_user : User id
-         * @param \DateTime $at : date to get usage percent at
+         * if no quota for this user return 0.
+         *
+         * @param int       $id_user : User id
+         * @param \DateTime $at      : date to get usage percent at
+         *
          * @return float : percent of used credits
          */
-        public function get_usage_percentage (int $id_user, \DateTime $at): float
+        public function get_usage_percentage(int $id_user, \DateTime $at): float
         {
             $query = '
                 SELECT (consumed / (credit + additional)) AS usage_percentage
@@ -76,14 +80,16 @@ namespace models;
 
             return (float) ($result[0]['usage_percentage'] ?? 0);
         }
-        
+
         /**
-         * Consume some credit for a user
-         * @param int $id_user : User id
+         * Consume some credit for a user.
+         *
+         * @param int $id_user  : User id
          * @param int $quantity : Number of credits to consume
+         *
          * @return bool
          */
-        public function consume_credit (int $id_user, int $quantity): int
+        public function consume_credit(int $id_user, int $quantity): int
         {
             $query = '
                 UPDATE quota
@@ -98,13 +104,11 @@ namespace models;
             return (bool) $this->_run_query($query, $params, \descartes\Model::ROWCOUNT);
         }
 
-
         /**
          * Get all quotas we need to send an alert for close limit to users they belongs to
-         * do not return quotas when user already had an event QUOTA_LIMIT_CLOSE since quota start_date
-         * @return array
+         * do not return quotas when user already had an event QUOTA_LIMIT_CLOSE since quota start_date.
          */
-        public function get_quotas_for_limit_close() : array
+        public function get_quotas_for_limit_close(): array
         {
             $query = '
                 SELECT quota.*
@@ -131,16 +135,15 @@ namespace models;
                 'setting_name' => 'alert_quota_limit_close',
                 'event_type' => 'QUOTA_LIMIT_CLOSE',
             ];
-            
+
             return $this->_run_query($query, $params);
         }
-        
+
         /**
          * Get all quotas we need to send an alert for limit reached to users they belongs to
-         * do not return quotas when user already had an event QUOTA_LIMIT_REACHED since quota start_date
-         * @return array
+         * do not return quotas when user already had an event QUOTA_LIMIT_REACHED since quota start_date.
          */
-        public function get_quotas_for_limit_reached() : array
+        public function get_quotas_for_limit_reached(): array
         {
             $query = '
                 SELECT quota.*
@@ -162,21 +165,21 @@ namespace models;
                             AND at >= quota.start_date
                     ) = 0;
             ';
-            
+
             $params = [
                 'setting_name' => 'alert_quota_limit_reached',
                 'event_type' => 'QUOTA_LIMIT_REACHED',
             ];
-            
+
             return $this->_run_query($query, $params);
         }
 
         /**
-         * Get list of quotas to be renewed as to a date
+         * Get list of quotas to be renewed as to a date.
+         *
          * @param \DateTime $at : Date to get quotas to be renewed before
-         * @return array
          */
-        public function get_quotas_to_be_renewed (\DateTime $at): array
+        public function get_quotas_to_be_renewed(\DateTime $at): array
         {
             $at = $at->format('Y-m-d H:i:s');
             $where = [

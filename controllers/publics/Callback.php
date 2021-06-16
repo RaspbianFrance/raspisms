@@ -206,13 +206,12 @@ use Monolog\Logger;
 
             return true;
         }
-        
-        
+
         /**
          * Function call on call reception notification
          * We return nothing, and we let the adapter do his things.
          *
-         * @param int    $id_phone    : Phone id
+         * @param int $id_phone : Phone id
          *
          * @return bool : true on success, false on error
          */
@@ -269,16 +268,15 @@ use Monolog\Logger;
             }
 
             $this->logger->info('Callback inbound_call successfully received inbound call : ' . json_encode($call));
-            
+
             return true;
         }
-        
-        
+
         /**
          * Function call on end call notification
          * We return nothing, and we let the adapter do his things.
          *
-         * @param int    $id_phone    : Phone id
+         * @param int $id_phone : Phone id
          *
          * @return bool : true on success, false on error
          */
@@ -334,7 +332,7 @@ use Monolog\Logger;
             }
 
             $this->logger->info('Callback end call successfully update call : ' . json_encode($call));
-            
+
             return true;
         }
     }

@@ -75,12 +75,12 @@ class Phone extends \descartes\Controller
             {
                 $phone['callback_status'] = \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => $adapter['meta_uid']], ['api_key' => $api_key]);
             }
-            
+
             if ($adapter['meta_support_inbound_call_callback'])
             {
                 $phone['callback_inbound_call'] = \descartes\Router::url('Callback', 'inbound_call', ['id_phone' => $phone['id']], ['api_key' => $api_key]);
             }
-            
+
             if ($adapter['meta_support_end_call_callback'])
             {
                 $phone['callback_end_call'] = \descartes\Router::url('Callback', 'end_call', ['id_phone' => $phone['id']], ['api_key' => $api_key]);

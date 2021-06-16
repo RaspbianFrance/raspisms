@@ -58,7 +58,7 @@ class User extends \descartes\Controller
         {
             $quota_percentage = $this->internal_quota->get_usage_percentage($entity['id']);
             $entity['quota_percentage'] = $quota_percentage * 100;
-            
+
             $quota = $this->internal_quota->get_user_quota($entity['id']);
             if (!$quota)
             {
@@ -80,7 +80,7 @@ class User extends \descartes\Controller
      *
      * @param array int $_GET['user_ids'] : User ids
      * @param mixed     $csrf
-     * @param int       $status      : 1 -> active, 0 -> suspended
+     * @param int       $status           : 1 -> active, 0 -> suspended
      *
      * @return boolean;
      */
@@ -159,17 +159,17 @@ class User extends \descartes\Controller
      * Cette fonction insert un nouveau user.
      *
      * @param $csrf : Le jeton CSRF
-     * @param string           $_POST['email']            : User email
-     * @param optional string  $_POST['password']         : User password, (if empty the password is randomly generated)
-     * @param optional boolean $_POST['admin']            : If true user is admin
-     * @param optional boolean $_POST['quota_enable']     : If true create a quota for the user
-     * @param boolean $_POST['quota_enable']     : If true create a quota for the user
-     * @param optional int $_POST['quota_credit'] : credit for quota
-     * @param optional int $_POST['quota_additional'] : additional credit
-     * @param optional string $_POST['quota_start_date'] : quota beginning date
-     * @param optional string $_POST['quota_renewal_interval'] : period to use on renewal to calculate new expiration date. Also use to calculate first expiration date.
-     * @param optional boolean $_POST['quota_auto_renew'] : Should the quota be automatically renewed on expiration
-     * @param optional boolean $_POST['quota_report_unused'] : Should unused credit be reported next month
+     * @param string           $_POST['email']                          : User email
+     * @param optional string  $_POST['password']                       : User password, (if empty the password is randomly generated)
+     * @param optional boolean $_POST['admin']                          : If true user is admin
+     * @param optional boolean $_POST['quota_enable']                   : If true create a quota for the user
+     * @param bool             $_POST['quota_enable']                   : If true create a quota for the user
+     * @param optional int     $_POST['quota_credit']                   : credit for quota
+     * @param optional int     $_POST['quota_additional']               : additional credit
+     * @param optional string  $_POST['quota_start_date']               : quota beginning date
+     * @param optional string  $_POST['quota_renewal_interval']         : period to use on renewal to calculate new expiration date. Also use to calculate first expiration date.
+     * @param optional boolean $_POST['quota_auto_renew']               : Should the quota be automatically renewed on expiration
+     * @param optional boolean $_POST['quota_report_unused']            : Should unused credit be reported next month
      * @param optional boolean $_POST['quota_report_unused_additional'] : Should unused additional credit be transfered next month
      */
     public function create($csrf)
@@ -194,7 +194,6 @@ class User extends \descartes\Controller
         $quota_report_unused = $_POST['quota_report_unused'] ?? false;
         $quota_report_unused_additional = $_POST['quota_report_unused_additional'] ?? false;
 
-
         if (!$email)
         {
             \FlashMessage\FlashMessage::push('danger', 'Vous devez au moins fournir une adresse e-mail pour l\'utilisateur.');
@@ -209,7 +208,6 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
 
-
         //Forge quota for user if needed
         $quota = null;
         if ($quota_enable)
@@ -218,15 +216,15 @@ class User extends \descartes\Controller
             $quota['credit'] = (int) $quota_credit;
             $quota['additional'] = (int) $quota_additional;
 
-            if ($quota_start_date === false || !\controllers\internals\Tool::validate_date($quota_start_date, 'Y-m-d H:i:s'))
+            if (false === $quota_start_date || !\controllers\internals\Tool::validate_date($quota_start_date, 'Y-m-d H:i:s'))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez définir une date de début valide pour le quota.');
 
                 return $this->redirect(\descartes\Router::url('User', 'add'));
             }
             $quota['start_date'] = new \DateTime($quota_start_date);
-            
-            if ($quota_renew_interval === false || !\controllers\internals\Tool::validate_period($quota_renew_interval))
+
+            if (false === $quota_renew_interval || !\controllers\internals\Tool::validate_period($quota_renew_interval))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez définir une durée de quota parmis la liste proposée.');
 
@@ -242,7 +240,6 @@ class User extends \descartes\Controller
             $quota['report_unused_additional'] = (bool) $quota_report_unused_additional;
         }
 
-
         $id_user = $this->internal_user->create($email, $password, $admin, null, \models\User::STATUS_ACTIVE, true, $quota);
         if (!$id_user)
         {
@@ -250,7 +247,6 @@ class User extends \descartes\Controller
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
-
 
         $mailer = new \controllers\internals\Mailer();
         $email_send = $mailer->enqueue($email, EMAIL_CREATE_USER, ['email' => $email, 'password' => $password]);
@@ -263,9 +259,9 @@ class User extends \descartes\Controller
 
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
-    
+
     /**
-     * Return the edition page for the users
+     * Return the edition page for the users.
      *
      * @param int... $ids : users ids
      */
@@ -285,7 +281,7 @@ class User extends \descartes\Controller
         {
             $user['quota'] = $this->internal_quota->get_user_quota($user['id']);
         }
-        
+
         $now = new \DateTime();
         $now = $now->format('Y-m-d H:i:00');
 
@@ -294,10 +290,9 @@ class User extends \descartes\Controller
             'now' => $now,
         ]);
     }
-    
-    
+
     /**
-     * Update a list of users
+     * Update a list of users.
      *
      * @param $csrf : Le jeton CSRF
      * @param array $_POST['users'] : Array of the users and new values, id as key. Quota may also be defined.
@@ -310,7 +305,7 @@ class User extends \descartes\Controller
 
             return $this->redirect(\descartes\Router::url('User', 'add'));
         }
-        
+
         $nb_update = 0;
         $users = $_POST['users'] ?? [];
         foreach ($users as $id_user => $user)
@@ -343,7 +338,6 @@ class User extends \descartes\Controller
                 return $this->redirect(\descartes\Router::url('User', 'add'));
             }
 
-
             //Forge quota for user if needed
             $quota = false;
             if ($quota_enable)
@@ -353,18 +347,18 @@ class User extends \descartes\Controller
                 $quota['consumed'] = (int) $quota_consumed;
                 $quota['additional'] = (int) $quota_additional;
 
-                if ($quota_start_date === false || !\controllers\internals\Tool::validate_date($quota_start_date, 'Y-m-d H:i:s'))
+                if (false === $quota_start_date || !\controllers\internals\Tool::validate_date($quota_start_date, 'Y-m-d H:i:s'))
                 {
                     \FlashMessage\FlashMessage::push('danger', 'L\'utilisateur #' . (int) $id_user . ' n\'as pas pu être mis à jour car la date de début du quota associé n\'est pas valide.');
 
                     continue;
                 }
                 $quota['start_date'] = new \DateTime($quota_start_date);
-                
-                if ($quota_renew_interval === false || !\controllers\internals\Tool::validate_period($quota_renew_interval))
+
+                if (false === $quota_renew_interval || !\controllers\internals\Tool::validate_period($quota_renew_interval))
                 {
                     \FlashMessage\FlashMessage::push('danger', 'L\'utilisateur #' . (int) $id_user . ' n\'as pas pu être mis à jour car la durée du quota associé n\'est pas valide.');
-                    
+
                     continue;
                 }
                 $quota['renew_interval'] = $quota_renew_interval;
@@ -376,13 +370,11 @@ class User extends \descartes\Controller
                 $quota['report_unused'] = (bool) $quota_report_unused;
                 $quota['report_unused_additional'] = (bool) $quota_report_unused_additional;
 
-
                 //Format dates
                 $quota['start_date'] = $quota['start_date']->format('Y-m-d H:i:s');
                 $quota['expiration_date'] = $quota['expiration_date']->format('Y-m-d H:i:s');
             }
 
-            
             $updated_user = [
                 'email' => $email,
                 'admin' => $admin,
@@ -397,22 +389,22 @@ class User extends \descartes\Controller
             if (!$success)
             {
                 \FlashMessage\FlashMessage::push('danger', 'L\'utilisateur #' . (int) $id_user . ' n\'as pas pu être mis à jour.');
-                
+
                 continue;
             }
 
-            $nb_update++;
+            ++$nb_update;
         }
 
         if ($nb_update != count($users))
         {
             \FlashMessage\FlashMessage::push('danger', 'Certains utilisateurs n\'ont pas pu être mis à jour.');
-            
+
             return $this->redirect(\descartes\Router::url('User', 'list'));
         }
-        
+
         \FlashMessage\FlashMessage::push('success', 'Tous les utilisateurs ont bien été mis à jour.');
-        
+
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
 }

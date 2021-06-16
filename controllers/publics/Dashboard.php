@@ -62,14 +62,13 @@ namespace controllers\publics;
             $nb_sendeds = $this->internal_sended->count_for_user($id_user);
             $nb_receiveds = $this->internal_received->count_for_user($id_user);
 
-
             //Récupération des 10 derniers Sms envoyés, Sms reçus et evenements enregistrés. Par date.
             $sendeds = $this->internal_sended->get_lasts_by_date_for_user($id_user, 10);
             $receiveds = $this->internal_received->get_lasts_by_date_for_user($id_user, 10);
             $events = $this->internal_event->get_lasts_by_date_for_user($id_user, 10);
 
             //Récupération du nombre de Sms envoyés et reçus depuis 1 mois jours ou depuis le début du quota si il existe
-            
+
             //Création de la date d'il y a 30 jours
             $now = new \DateTime();
             $one_month = new \DateInterval('P1M');
@@ -107,7 +106,7 @@ namespace controllers\publics;
                     'sendeds' => 0,
                     'receiveds' => 0,
                 ];
-                
+
                 $date->add($one_day);
             }
 

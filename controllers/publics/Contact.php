@@ -85,12 +85,12 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Contact', 'list'));
         }
-        
+
         /**
-         * This function will delete a list of contacts depending on a condition
+         * This function will delete a list of contacts depending on a condition.
          *
          * @param string $_POST['condition'] : Condition to use to delete contacts
-         * @param mixed     $csrf
+         * @param mixed  $csrf
          *
          * @return boolean;
          */
@@ -338,11 +338,11 @@ namespace controllers\publics;
                     break;
 
                 default:
-                    if ($read_file['extension'] === 'csv')
+                    if ('csv' === $read_file['extension'])
                     {
                         $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
                     }
-                    elseif ($read_file['extension'] === 'json')
+                    elseif ('json' === $read_file['extension'])
                     {
                         $result = $this->internal_contact->import_json($id_user, $read_file['content']);
                     }

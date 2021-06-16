@@ -164,11 +164,11 @@ namespace controllers\internals;
 
             return $objectDate && $objectDate->format($format) === $date;
         }
-        
+
         /**
          * Check if a sting represent a valid PHP period for creating an interval.
          *
-         * @param string $period   : Period string to check
+         * @param string $period : Period string to check
          *
          * @return bool : True if valid period, false else
          */
@@ -320,26 +320,27 @@ namespace controllers\internals;
         }
 
         /**
-         * Generate a highly random uuid based on timestamp and strong cryptographic random
+         * Generate a highly random uuid based on timestamp and strong cryptographic random.
          *
          * @return string
          */
         public static function random_uuid()
         {
             $bytes = random_bytes(16);
+
             return time() . '-' . bin2hex($bytes);
         }
 
-
         /**
-         * Create a user data public path
+         * Create a user data public path.
+         *
          * @param int $id_user : The user id
          *
          * @return string : The created path
-         
+         *
          * @exception Raise exception on error
          */
-        public static function create_user_public_path (int $id_user)
+        public static function create_user_public_path(int $id_user)
         {
             $new_dir = PWD_DATA_PUBLIC . '/' . $id_user;
             if (file_exists($new_dir))
@@ -354,18 +355,18 @@ namespace controllers\internals;
             }
 
             //We do chmod in two times because else umask fuck mkdir permissions
-            if (!chmod($new_dir, fileperms(PWD_DATA_PUBLIC) & 0777)) //Fileperms return garbage in addition to perms. Perms are only in weak bytes. We must use an octet notation with 0
-            {
+            if (!chmod($new_dir, fileperms(PWD_DATA_PUBLIC) & 0777))
+            { //Fileperms return garbage in addition to perms. Perms are only in weak bytes. We must use an octet notation with 0
                 throw new \Exception('Cannot give dir ' . $new_dir . ' rights : ' . decoct(fileperms(PWD_DATA_PUBLIC) & 0777)); //Show error in dec
             }
 
-            if (posix_getuid() === 0 && !chown($new_dir, fileowner(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper user
-            {
+            if (0 === posix_getuid() && !chown($new_dir, fileowner(PWD_DATA_PUBLIC)))
+            { //If we are root, try to give the file to a proper user
                 throw new \Exception('Cannot give dir ' . $new_dir . ' to user : ' . fileowner(PWD_DATA_PUBLIC));
             }
 
-            if (posix_getuid() === 0 && !chgrp($new_dir, filegroup(PWD_DATA_PUBLIC))) //If we are root, try to give the file to a proper group
-            {
+            if (0 === posix_getuid() && !chgrp($new_dir, filegroup(PWD_DATA_PUBLIC)))
+            { //If we are root, try to give the file to a proper group
                 throw new \Exception('Cannot give dir ' . $new_dir . ' to group : ' . filegroup(PWD_DATA_PUBLIC));
             }
 

@@ -242,7 +242,7 @@ namespace controllers\publics;
          * @param ?array $_POST['contacts']           : Numbers to send the message to
          * @param ?array $_POST['groups']             : Numbers to send the message to
          * @param ?array $_POST['conditional_groups'] : Numbers to send the message to
-         * @param ?array $_FILES['medias']             : The media to link to a scheduled
+         * @param ?array $_FILES['medias']            : The media to link to a scheduled
          */
         public function create($csrf)
         {
@@ -265,7 +265,7 @@ namespace controllers\publics;
             $files = $_FILES['medias'] ?? false;
 
             //Iterate over files to re-create individual $_FILES array
-            $files_arrays = []; 
+            $files_arrays = [];
             if ($files && is_array($files['name']))
             {
                 foreach ($files as $property_name => $files_values)
@@ -281,11 +281,11 @@ namespace controllers\publics;
                     }
                 }
             }
-            
+
             //Remove empty files input
             foreach ($files_arrays as $key => $file)
             {
-                if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                if (UPLOAD_ERR_NO_FILE === $file['error'])
                 {
                     unset($files_arrays[$key]);
                 }
@@ -325,7 +325,7 @@ namespace controllers\publics;
 
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
-            
+
             //If mms is enable and we have medias uploaded
             $media_ids = [];
             if ($_SESSION['user']['settings']['mms'] && $files_arrays)
@@ -339,15 +339,16 @@ namespace controllers\publics;
                     catch (\Exception $e)
                     {
                         \FlashMessage\FlashMessage::push('danger', 'Impossible d\'upload et d\'enregistrer le fichier ' . $file['name'] . ':' . $e->getMessage());
+
                         return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                     }
 
-                    $media_ids[] = $new_media_id; 
+                    $media_ids[] = $new_media_id;
                 }
             }
 
             $mms = (bool) count($media_ids);
-            
+
             $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
@@ -403,7 +404,7 @@ namespace controllers\publics;
                 }
 
                 //Iterate over files to re-create individual $_FILES array
-                $files_arrays = []; 
+                $files_arrays = [];
                 if ($files && is_array($files['name']))
                 {
                     foreach ($files as $property_name => $files_values)
@@ -423,7 +424,7 @@ namespace controllers\publics;
                 //Remove empty files input
                 foreach ($files_arrays as $key => $file)
                 {
-                    if ($file['error'] === UPLOAD_ERR_NO_FILE)
+                    if (UPLOAD_ERR_NO_FILE === $file['error'])
                     {
                         unset($files_arrays[$key]);
                     }
@@ -456,7 +457,7 @@ namespace controllers\publics;
                 {
                     continue;
                 }
-                
+
                 //If mms is enable and we have medias uploaded
                 if ($_SESSION['user']['settings']['mms'] && $files_arrays)
                 {
@@ -471,7 +472,7 @@ namespace controllers\publics;
                             continue 2;
                         }
 
-                        $media_ids[] = $new_media_id; 
+                        $media_ids[] = $new_media_id;
                     }
                 }
 
@@ -488,7 +489,7 @@ namespace controllers\publics;
                 $mms = (bool) count($media_ids);
 
                 $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
-                $nb_update++;
+                ++$nb_update;
             }
 
             if ($nb_update !== \count($scheduleds))

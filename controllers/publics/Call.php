@@ -34,7 +34,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Page for showing calls list
+         * Page for showing calls list.
          */
         public function list()
         {
@@ -51,12 +51,14 @@ namespace controllers\publics;
             {
                 switch ($entity['direction'])
                 {
-                    case \models\Call::DIRECTION_INBOUND :
+                    case \models\Call::DIRECTION_INBOUND:
                         $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
+
                         break;
-                    
-                    case \models\Call::DIRECTION_OUTBOUND :
+
+                    case \models\Call::DIRECTION_OUTBOUND:
                         $entity['destination_formatted'] = \controllers\internals\Tool::phone_link($entity['destination']);
+
                         break;
                 }
             }
@@ -66,10 +68,10 @@ namespace controllers\publics;
         }
 
         /**
-         * Delete a list of calls
+         * Delete a list of calls.
          *
          * @param array int $_GET['ids'] : Ids of calls to delete
-         * @param string $csrf : csrf token
+         * @param string    $csrf        : csrf token
          *
          * @return boolean;
          */

@@ -88,7 +88,6 @@ namespace controllers\publics;
                 $return['result'] = 'Message vide, il ne sera pas envoyé.';
             }
 
-
             //Add credit estimation
             $return['estimation_credit'] = $this->internal_quota->compute_credits_for_message($return['result']);
 

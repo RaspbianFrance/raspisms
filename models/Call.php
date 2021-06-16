@@ -12,13 +12,13 @@
 namespace models;
 
     /**
-     * Manage bdd operations for calls
-     */ 
+     * Manage bdd operations for calls.
+     */
     class Call extends StandardModel
     {
         const DIRECTION_INBOUND = 'inbound';
         const DIRECTION_OUTBOUND = 'outbound';
-        
+
         /**
          * Return a list of call for a user.
          * Add a column contact_name and phone_name when available.
@@ -62,11 +62,11 @@ namespace models;
         }
 
         /**
-         * Get a call for a user by his phone and uid
-         * 
-         * @param int $id_user : user id
+         * Get a call for a user by his phone and uid.
+         *
+         * @param int $id_user  : user id
          * @param int $id_phone : phone id
-         * @param int $uid : call uid
+         * @param int $uid      : call uid
          *
          * @return array : the call or an empty array
          */

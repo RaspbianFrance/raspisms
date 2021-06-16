@@ -39,7 +39,7 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
          * Return all medias for a sended.
          *
@@ -63,7 +63,7 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
          * Return all medias for a received.
          *
@@ -87,16 +87,16 @@ namespace models;
 
             return $this->_run_query($query, $params);
         }
-        
+
         /**
-         * Link a media to a scheduled
-         * 
-         * @param int $id_media : Media id
+         * Link a media to a scheduled.
+         *
+         * @param int $id_media     : Media id
          * @param int $id_scheduled : Scheduled id
          *
          * @return bool | int
          */
-        public function insert_media_scheduled (int $id_media, int $id_scheduled)
+        public function insert_media_scheduled(int $id_media, int $id_scheduled)
         {
             $entry = [
                 'id_media' => $id_media,
@@ -105,16 +105,16 @@ namespace models;
 
             return $this->_insert('media_scheduled', $entry) ? $this->_last_id() : false;
         }
-        
+
         /**
-         * Link a media to a received
-         * 
-         * @param int $id_media : Media id
+         * Link a media to a received.
+         *
+         * @param int $id_media    : Media id
          * @param int $id_received : Scheduled id
          *
          * @return bool | int
          */
-        public function insert_media_received (int $id_media, int $id_received)
+        public function insert_media_received(int $id_media, int $id_received)
         {
             $entry = [
                 'id_media' => $id_media,
@@ -123,16 +123,16 @@ namespace models;
 
             return $this->_insert('media_received', $entry) ? $this->_last_id() : false;
         }
-        
+
         /**
-         * Link a media to a sended
-         * 
-         * @param int $id_media : Media id
+         * Link a media to a sended.
+         *
+         * @param int $id_media  : Media id
          * @param int $id_sended : Scheduled id
          *
          * @return bool | int
          */
-        public function insert_media_sended (int $id_media, int $id_sended)
+        public function insert_media_sended(int $id_media, int $id_sended)
         {
             $entry = [
                 'id_media' => $id_media,
@@ -141,16 +141,16 @@ namespace models;
 
             return $this->_insert('media_sended', $entry) ? $this->_last_id() : false;
         }
-        
+
         /**
-         * Unlink a media of a scheduled
-         * 
-         * @param int $id_media : Media id
+         * Unlink a media of a scheduled.
+         *
+         * @param int $id_media     : Media id
          * @param int $id_scheduled : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_media_scheduled (int $id_media, int $id_scheduled)
+        public function delete_media_scheduled(int $id_media, int $id_scheduled)
         {
             $where = [
                 'id_media' => $id_media,
@@ -161,14 +161,14 @@ namespace models;
         }
 
         /**
-         * Unlink a media of a received
-         * 
-         * @param int $id_media : Media id
+         * Unlink a media of a received.
+         *
+         * @param int $id_media    : Media id
          * @param int $id_received : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_media_received (int $id_media, int $id_received)
+        public function delete_media_received(int $id_media, int $id_received)
         {
             $where = [
                 'id_media' => $id_media,
@@ -177,16 +177,16 @@ namespace models;
 
             return $this->_delete('media_received', $where);
         }
-        
+
         /**
-         * Unlink a media of a sended
-         * 
-         * @param int $id_media : Media id
+         * Unlink a media of a sended.
+         *
+         * @param int $id_media  : Media id
          * @param int $id_sended : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_media_sended (int $id_media, int $id_sended)
+        public function delete_media_sended(int $id_media, int $id_sended)
         {
             $where = [
                 'id_media' => $id_media,
@@ -195,16 +195,15 @@ namespace models;
 
             return $this->_delete('media_sended', $where);
         }
-        
-        
+
         /**
-         * Unlink all medias of a scheduled
-         * 
+         * Unlink all medias of a scheduled.
+         *
          * @param int $id_scheduled : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_all_for_scheduled (int $id_scheduled)
+        public function delete_all_for_scheduled(int $id_scheduled)
         {
             $where = [
                 'id_scheduled' => $id_scheduled,
@@ -212,15 +211,15 @@ namespace models;
 
             return $this->_delete('media_scheduled', $where);
         }
-        
+
         /**
-         * Unlink all medias of a received
-         * 
+         * Unlink all medias of a received.
+         *
          * @param int $id_received : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_all_for_received (int $id_received)
+        public function delete_all_for_received(int $id_received)
         {
             $where = [
                 'id_received' => $id_received,
@@ -230,13 +229,13 @@ namespace models;
         }
 
         /**
-         * Unlink all medias of a sended
-         * 
+         * Unlink all medias of a sended.
+         *
          * @param int $id_sended : Scheduled id
          *
          * @return bool | int
          */
-        public function delete_all_for_sended (int $id_sended)
+        public function delete_all_for_sended(int $id_sended)
         {
             $where = [
                 'id_sended' => $id_sended,
@@ -246,10 +245,11 @@ namespace models;
         }
 
         /**
-         * Find all unused medias
+         * Find all unused medias.
+         *
          * @return array
          */
-        public function gets_unused ()
+        public function gets_unused()
         {
             $query = '
                 SELECT `media`.*
@@ -264,7 +264,7 @@ namespace models;
                         AND `media_received`.id IS NULL
                         AND `media_scheduled`.id IS NULL 
             ';
-            
+
             return $this->_run_query($query);
         }
 

@@ -20,8 +20,8 @@ class Media extends StandardController
     /**
      * Create a media.
      *
-     * @param int   $id_user        : Id of the user
-     * @param string $tmpfile_path  : Path of the temporary local copy of the media
+     * @param int     $id_user      : Id of the user
+     * @param string  $tmpfile_path : Path of the temporary local copy of the media
      * @param ?string $extension    : Extension to use for the media
      *
      * @return int : Exception on error, new media id else
@@ -33,13 +33,13 @@ class Media extends StandardController
         {
             throw new \Exception('File ' . $tmpfile_path . ' does not exists.');
         }
-        
+
         if (!is_readable($tmpfile_path))
         {
             throw new \Exception('File ' . $tmpfile_path . ' is not readable.');
         }
 
-        $mimey = new \Mimey\MimeTypes;
+        $mimey = new \Mimey\MimeTypes();
         $extension = $extension ?? $mimey->getExtension(mime_content_type($tmpfile_path));
 
         $new_file_name = \controllers\internals\Tool::random_uuid() . '.' . $extension;
@@ -60,7 +60,7 @@ class Media extends StandardController
         {
             throw new \Exception('Cannot give file ' . $new_file_path . ' to user : ' . fileowner($user_path));
         }
-        
+
         if (!chgrp($new_file_path, filegroup($user_path)))
         {
             throw new \Exception('Cannot give file ' . $new_file_path . ' to group : ' . filegroup($user_path));
@@ -86,16 +86,17 @@ class Media extends StandardController
     }
 
     /**
-     * Upload and create a media
-     * 
-     * @param int   $id_user      : Id of the user
-     * @param array $file : array representing uploaded file, extracted from $_FILES['yourfile']
+     * Upload and create a media.
+     *
+     * @param int   $id_user : Id of the user
+     * @param array $file    : array representing uploaded file, extracted from $_FILES['yourfile']
+     *
      * @return int : Raise exception on error or return new media id on success
      */
     public function create_from_uploaded_file_for_user(int $id_user, array $file)
     {
         $upload_result = \controllers\internals\Tool::read_uploaded_file($file);
-        if ($upload_result['success'] !== true)
+        if (true !== $upload_result['success'])
         {
             throw new \Exception($upload_result['content']);
         }
@@ -110,15 +111,16 @@ class Media extends StandardController
         {
             throw new \Exception('Cannot move uploaded file to : ' . $tmp_file);
         }
-        
+
         return $this->create($id_user, $tmp_file, $upload_result['extension']);
     }
 
     /**
-     * Link a media to a scheduled, a received or a sended message
-     * @param int $id_media : Id of the media
+     * Link a media to a scheduled, a received or a sended message.
+     *
+     * @param int    $id_media      : Id of the media
      * @param string $resource_type : Type of resource to link the media to ('scheduled', 'received' or 'sended')
-     * @param int $resource_id : Id of the resource to link the media to
+     * @param int    $resource_id   : Id of the resource to link the media to
      *
      * @return mixed bool|int : false on error, the new link id else
      */
@@ -128,14 +130,17 @@ class Media extends StandardController
         {
         case 'scheduled':
             return $this->get_model()->insert_media_scheduled($id_media, $resource_id);
+
             break;
 
         case 'received':
             return $this->get_model()->insert_media_received($id_media, $resource_id);
+
             break;
 
         case 'sended':
             return $this->get_model()->insert_media_sended($id_media, $resource_id);
+
             break;
 
         default:
@@ -143,12 +148,12 @@ class Media extends StandardController
         }
     }
 
-
     /**
-     * Unlink a media of a scheduled, a received or a sended message
-     * @param int $id_media : Id of the media
+     * Unlink a media of a scheduled, a received or a sended message.
+     *
+     * @param int    $id_media      : Id of the media
      * @param string $resource_type : Type of resource to unlink the media of ('scheduled', 'received' or 'sended')
-     * @param int $resource_id : Id of the resource to unlink the media of
+     * @param int    $resource_id   : Id of the resource to unlink the media of
      *
      * @return mixed bool : false on error, true on success
      */
@@ -158,14 +163,17 @@ class Media extends StandardController
         {
         case 'scheduled':
             return $this->get_model()->delete_media_scheduled($id_media, $resource_id);
+
             break;
 
         case 'received':
             return $this->get_model()->delete_media_received($id_media, $resource_id);
+
             break;
 
         case 'sended':
             return $this->get_model()->delete_media_sended($id_media, $resource_id);
+
             break;
 
         default:
@@ -174,9 +182,10 @@ class Media extends StandardController
     }
 
     /**
-     * Unlink all medias of a scheduled, a received or a sended message
+     * Unlink all medias of a scheduled, a received or a sended message.
+     *
      * @param string $resource_type : Type of resource to unlink the media of ('scheduled', 'received' or 'sended')
-     * @param int $resource_id : Id of the resource to unlink the media of
+     * @param int    $resource_id   : Id of the resource to unlink the media of
      *
      * @return mixed bool : false on error, true on success
      */
@@ -186,14 +195,17 @@ class Media extends StandardController
         {
         case 'scheduled':
             return $this->get_model()->delete_all_for_scheduled($resource_id);
+
             break;
 
         case 'received':
             return $this->get_model()->delete_all_for_received($resource_id);
+
             break;
 
         case 'sended':
             return $this->get_model()->delete_all_for_sended($resource_id);
+
             break;
 
         default:
@@ -204,9 +216,9 @@ class Media extends StandardController
     /**
      * Update a media for a user.
      *
-     * @param int    $id_user      : user id
-     * @param int    $id_media     : Media id
-     * @param string $path         : Path of the file
+     * @param int    $id_user  : user id
+     * @param int    $id_media : Media id
+     * @param string $path     : Path of the file
      *
      * @return bool : false on error, true on success
      */
@@ -289,7 +301,8 @@ class Media extends StandardController
     }
 
     /**
-     * Find medias that are not used
+     * Find medias that are not used.
+     *
      * @return array
      */
     public function gets_unused()

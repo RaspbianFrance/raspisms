@@ -109,7 +109,6 @@ namespace controllers\internals;
                     'admin' => $admin,
                     'api_key' => $api_key,
                     'status' => $status,
-
                 ];
 
                 $success = $internal_user->update($user['id'], $user);
@@ -161,9 +160,8 @@ namespace controllers\internals;
             exit($success ? 0 : 1);
         }
 
-
         /**
-         * Delete medias that are no longer usefull
+         * Delete medias that are no longer usefull.
          */
         public function clean_unused_medias()
         {
@@ -176,23 +174,23 @@ namespace controllers\internals;
             {
                 $success = $internal_media->delete_for_user($media['id_user'], $media['id']);
 
-                echo ($success === false ? '[KO]' : '[OK]') . ' - ' . $media['path'] . "\n";
+                echo (false === $success ? '[KO]' : '[OK]') . ' - ' . $media['path'] . "\n";
             }
         }
 
         /**
-         * Do alerting for quota limits
-         */ 
+         * Do alerting for quota limits.
+         */
         public function quota_limit_alerting()
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
             $internal_quota = new \controllers\internals\Quota($bdd);
             $internal_quota->alerting_for_limit_close_and_reached();
         }
-        
+
         /**
-         * Do quota renewal
-         */ 
+         * Do quota renewal.
+         */
         public function renew_quotas()
         {
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');

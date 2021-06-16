@@ -43,7 +43,7 @@ namespace controllers\internals;
                 'mms' => $mms,
             ];
 
-            if ($text === '')
+            if ('' === $text)
             {
                 return false;
             }
@@ -66,6 +66,7 @@ namespace controllers\internals;
             if (!$id_scheduled)
             {
                 $this->bdd->rollBack();
+
                 return false;
             }
 
@@ -76,10 +77,10 @@ namespace controllers\internals;
                 if (!$id_media_scheduled)
                 {
                     $this->bdd->rollBack();
+
                     return false;
                 }
             }
-
 
             foreach ($numbers as $number)
             {
@@ -193,6 +194,7 @@ namespace controllers\internals;
                 if (!$id_media_scheduled)
                 {
                     $this->bdd->rollBack();
+
                     return false;
                 }
             }
@@ -254,7 +256,7 @@ namespace controllers\internals;
         {
             return $this->get_model()->gets_before_date_for_number_and_user($id_user, $date, $number);
         }
-        
+
         /**
          * Get messages scheduled after a date for a number and a user.
          *
@@ -349,7 +351,7 @@ namespace controllers\internals;
                             $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
                         }
                     }
-                    
+
                     $message = [
                         'id_user' => $scheduled['id_user'],
                         'id_scheduled' => $scheduled['id'],
@@ -405,7 +407,7 @@ namespace controllers\internals;
                     }
 
                     $added_contacts[$contact['id']] = true;
-                    
+
                     if (null === $phone_to_use)
                     {
                         if ($scheduled['mms'] && count($users_mms_phones))
