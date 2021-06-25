@@ -16,10 +16,8 @@ namespace adapters;
  */
 class OctopushVirtualNumberAdapter implements AdapterInterface
 {
-    const ERROR_CODE_OK = '000';
-    const SMS_TYPE_LOWCOST = 'XXX';
-    const SMS_TYPE_PREMIUM = 'FR';
-    const SMS_TYPE_INTERNATIONAL = 'WWW';
+    const SMS_TYPE_LOWCOST = 'sms_low_cost';
+    const SMS_TYPE_PREMIUM = 'sms_premium';
 
     /**
      * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
@@ -40,16 +38,16 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
      * Number phone to use.
      */
     private $number;
-
+    
     /**
-     * Number phone to use formated for octopush compatibility.
+     * Octopush SMS type
      */
-    private $formatted_number;
+    private $sms_type;
 
     /**
      * Octopush api baseurl.
      */
-    private $api_url = 'https://www.octopush-dm.com/api';
+    private $api_url = 'https://api.octopush.com/v1/public';
 
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
@@ -64,7 +62,14 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         $this->login = $this->data['login'];
         $this->api_key = $this->data['api_key'];
         $this->number = $this->data['number'];
-        $this->formatted_number = '+' . mb_substr($this->data['number'], 2);
+        
+        $this->sms_type = self::SMS_TYPE_LOWCOST;
+        if (($this->data['sms_type'] ?? false) && $this->data['sms_type'] === 'premium')
+        {
+            $this->sms_type = self::SMS_TYPE_PREMIUM;
+        }
+
+
     }
 
     /**
@@ -143,6 +148,12 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 'required' => true,
                 'number' => true,
             ],
+            [
+                'name' => 'sms_type',
+                'title' => 'Type de SMS à employer',
+                'description' => 'Type de SMS à employer coté Octopush, rentrez "low cost" ou "premium" selon le type de SMS que vous souhaitez employer. Laissez vide pour utiliser par défaut des SMS low cost.',
+                'required' => false,
+            ],
         ];
     }
 
@@ -214,16 +225,25 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
 
         try
         {
-            $data = [
-                'user_login' => $this->login,
-                'api_key' => $this->api_key,
-                'sms_text' => $text,
-                'sms_recipients' => str_replace('+', '00', $destination), //Must use 00 instead of + notation
-                'sms_sender' => $this->formatted_number,
-                'sms_type' => self::SMS_TYPE_LOWCOST,
+            $headers = [
+                'api-login: ' . $this->login,
+                'api-key: ' . $this->api_key,
+                'Content-Type: application/json',
             ];
 
-            $endpoint = $this->api_url . '/sms/json';
+            $data = [
+                'text' => $text,
+                'recipients' => [['phone_number' => $destination]], 
+                'sms_type' => $this->sms_type,
+                'purpose' => 'alert',
+                'sender' => $this->number,
+                'with_replies' => "True",
+            ];
+
+            $data = json_encode($data);
+
+
+            $endpoint = $this->api_url . '/sms-campaign/send';
 
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $endpoint);
@@ -231,10 +251,12 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            $response = curl_exec($curl);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            $curl_response = curl_exec($curl);
+            $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
-            if (false === $response)
+            if (false === $curl_response)
             {
                 $response['error'] = true;
                 $response['error_message'] = 'HTTP query failed.';
@@ -242,7 +264,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 return $response;
             }
 
-            $response_decode = json_decode($response, true);
+            $response_decode = json_decode($curl_response, true);
             if (null === $response_decode)
             {
                 $response['error'] = true;
@@ -251,15 +273,15 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 return $response;
             }
 
-            if (self::ERROR_CODE_OK !== $response_decode['error_code'])
+            if (200 !== $http_code)
             {
                 $response['error'] = true;
-                $response['error_message'] = 'Response indicate error code : ' . $response_decode['error_code'];
+                $response['error_message'] = 'Response indicate error code : ' . $response_decode['code'] . ' -> """' . $response_decode['message'] . '""" AND  HTTP CODE -> ' . $http_code;
 
                 return $response;
             }
 
-            $uid = $response_decode['ticket'] ?? false;
+            $uid = $response_decode['sms_ticket'] ?? false;
             if (!$uid)
             {
                 $response['error'] = true;
@@ -297,34 +319,36 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 return false;
             }
 
-            $data = [
-                'user_login' => $this->login,
-                'api_key' => $this->api_key,
+            if (!empty($this->data['sms_type']) && !in_array($this->data['sms_type'], ['premium', 'low cost']))
+            {
+                return false;
+            }
+            
+            $origin = \controllers\internals\Tool::parse_phone($this->data['number']);
+            if (!$origin)
+            {
+                return false;
+            }
+
+
+            $headers = [
+                'api-login: ' . $this->login,
+                'api-key: ' . $this->api_key,
+                'Content-Type: application/json',
             ];
 
             //Check service name
-            $endpoint = $this->api_url . '/balance/json';
+            $endpoint = $this->api_url . '/wallet/check-balance';
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $endpoint);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
             $response = curl_exec($curl);
+            $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
-            if (false === $response)
-            {
-                return false;
-            }
-
-            $response_decode = json_decode($response, true);
-            if (null === $response_decode)
-            {
-                return false;
-            }
-
-            if (self::ERROR_CODE_OK !== $response_decode['error_code'])
+            if ($http_code !== 200)
             {
                 return false;
             }
@@ -343,13 +367,22 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         header('Content-Encoding: none');
         header('Content-Length: 0');
 
-        $uid = $_POST['message_id'] ?? false;
-        $status = $_POST['status'] ?? false;
+
+        $input = file_get_contents('php://input');
+        $content = json_decode($input, true);
+        if (null === $content)
+        {
+            return false;
+        }
+        
+        $uid = $content['message_id'] ?? false;
+        $status = $content['status'] ?? false;
 
         if (false === $uid || false === $status)
         {
             return false;
         }
+
 
         switch ($status)
         {
@@ -358,10 +391,8 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
 
                 break;
 
+            case 'NOT_DELIVERED':
             case 'NOT_ALLOWED':
-            case 'INVALID_DESTINATION_ADDRESS':
-            case 'OUT_OF_DATE':
-            case 'EXPIRED':
             case 'BLACKLISTED_NUMBER':
                 $status = \models\Sended::STATUS_FAILED;
 
@@ -381,16 +412,23 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         $response = [
             'error' => false,
             'error_message' => null,
-            'uid' => null,
+            'sms' => null,
         ];
 
         header('Connection: close');
         header('Content-Encoding: none');
         header('Content-Length: 0');
+        
+        $input = file_get_contents('php://input');
+        $content = json_decode($input, true);
+        if (null === $content)
+        {
+            return false;
+        }
 
-        $number = $_POST['number'] ?? false;
-        $text = $_POST['text'] ?? false;
-        $at = $_POST['reception_date'] ?? false;
+        $number = $content['number'] ?? false;
+        $text = $content['text'] ?? false;
+        $at = $content['reception_date'] ?? false;
 
         if (!$number || !$text || !$at)
         {
@@ -400,11 +438,11 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             return $response;
         }
 
-        $origin = \controllers\internals\Tool::parse_phone('+' . mb_substr($number, 2));
+        $origin = \controllers\internals\Tool::parse_phone($number);
         if (!$origin)
         {
             $response['error'] = true;
-            $response['error_message'] = 'Invalid origin number : ' . mb_substr($number, 2);
+            $response['error_message'] = 'Invalid origin number : ' . $number;
 
             return $response;
         }

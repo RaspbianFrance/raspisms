@@ -191,7 +191,7 @@ use Monolog\Logger;
             }
 
             $sms = $response['sms'];
-            $mms = (bool) $sms['mms'] ?? false;
+            $mms = (bool) ($sms['mms'] ?? false);
             $medias = empty($sms['medias']) ? [] : $sms['medias'];
 
             $response = $this->internal_received->receive($this->user['id'], $id_phone, $sms['text'], $sms['origin'], $sms['at'], \models\Received::STATUS_UNREAD, $mms, $medias);
