@@ -139,4 +139,15 @@ jQuery(document).ready(function()
 			form.trigger("reset");
 		});
 	});
+
+    jQuery('body').on('change', '.datatable #check-all', function (e) {
+        if (jQuery(e.target).is(':checked'))
+        {
+            jQuery(e.target).parents('.datatable').find('input[type="checkbox"]').prop('checked', true);
+        }
+        else
+        {
+            jQuery(e.target).parents('.datatable').find('input[type="checkbox"]').prop('checked', false);
+        }
+    });
 });

@@ -51,7 +51,7 @@
                                                     <th>Date</th>
                                                     <th>Status</th>
                                                     <th>Commande</th>
-                                                    <th class="checkcolumn">&#10003;</th>
+                                                    <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                                 </tr>
                                             </thead>
                                             <tbody>

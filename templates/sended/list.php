@@ -44,7 +44,7 @@
                                                 <th>Message</th>
                                                 <th>Date</th>
                                                 <th>Statut</th>
-                                                <th class="checkcolumn">&#10003;</th>
+                                                <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>

@@ -43,7 +43,7 @@
                                                 <th>Date</th>
                                                 <th>Texte</th>
                                                 <?php if ($_SESSION['user']['admin']) { ?>
-                                                    <th class="checkcolumn">&#10003;</th>
+                                                    <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                                 <?php } ?>
                                             </tr>
                                         </thead>

@@ -43,7 +43,7 @@
                                                 <th>Nombre de contacts</th>
                                                 <th>Date de création</th>
                                                 <th>Dernière modification</th>
-                                                <th class="checkcolumn">&#10003;</th>
+                                                <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
                                         <tbody>

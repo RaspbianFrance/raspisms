@@ -42,7 +42,7 @@
                                                 <th>Nom</th>
                                                 <th>Script</th>
                                                 <th>Admin obligatoire</th>
-                                                <th class="checkcolumn">&#10003;</th>
+                                                <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
                                         <tbody>
