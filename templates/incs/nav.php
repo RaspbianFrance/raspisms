@@ -69,7 +69,7 @@
                             <?php } ?>
 						</ul>
                     </li>
-                    <?php if (!in_array('log', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
+                    <?php if (!in_array('logs', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
                         <li>
                             <a href="javascript:;" data-toggle="collapse" data-target="#logs"><i class="fa fa-fw fa-file-text"></i> Logs <i class="fa fa-fw fa-caret-down"></i></a>
                             <ul id="logs" class="collapse <?php echo in_array($page, array('events', 'smsstop', 'calls')) ? 'in' : ''; ?>">
