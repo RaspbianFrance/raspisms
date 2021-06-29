@@ -35,11 +35,6 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
     private $api_key;
 
     /**
-     * Number phone to use.
-     */
-    private $number;
-    
-    /**
      * Octopush SMS type
      */
     private $sms_type;
@@ -48,6 +43,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
      * Octopush api baseurl.
      */
     private $api_url = 'https://api.octopush.com/v1/public';
+
 
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
@@ -62,14 +58,12 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         $this->login = $this->data['login'];
         $this->api_key = $this->data['api_key'];
         $this->number = $this->data['number'];
-        
+
         $this->sms_type = self::SMS_TYPE_LOWCOST;
         if (($this->data['sms_type'] ?? false) && $this->data['sms_type'] === 'premium')
         {
             $this->sms_type = self::SMS_TYPE_PREMIUM;
         }
-
-
     }
 
     /**
@@ -119,6 +113,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 Envoi de SMS avec un numéro virtuel en utilisant <a target="_blank" href="https://www.octopush.com/">Octopush</a>. Pour trouver vos clés API Octopush <a target="_blank" href="' . $credentials_url . '">cliquez ici.</a><br/>
                 Pour plus d\'information sur l\'utilisation de ce téléphone, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/octopush_virtual_number.html" target="_blank">la documentation sur les téléphones "Octopush Numéro Virtuel".</a>
             ';
+
     }
 
     /**
@@ -154,7 +149,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 'description' => 'Type de SMS à employer coté Octopush, rentrez "low cost" ou "premium" selon le type de SMS que vous souhaitez employer. Laissez vide pour utiliser par défaut des SMS low cost.',
                 'required' => false,
             ],
-        ];
+       ];
     }
 
     /**
@@ -252,6 +247,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            
             $curl_response = curl_exec($curl);
             $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
@@ -314,23 +310,17 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         {
             $success = true;
 
-            if ($this->data['sender'] && (mb_strlen($this->data['sender']) < 3 || mb_strlen($this->data['sender'] > 11)))
-            {
-                return false;
-            }
-
             if (!empty($this->data['sms_type']) && !in_array($this->data['sms_type'], ['premium', 'low cost']))
             {
                 return false;
             }
-            
+
             $origin = \controllers\internals\Tool::parse_phone($this->data['number']);
             if (!$origin)
             {
                 return false;
             }
-
-
+            
             $headers = [
                 'api-login: ' . $this->login,
                 'api-key: ' . $this->api_key,
@@ -423,7 +413,10 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
         $content = json_decode($input, true);
         if (null === $content)
         {
-            return false;
+            $response['error'] = true;
+            $response['error_message'] = 'Cannot read input data from callback request.';
+            
+            return $response;
         }
 
         $number = $content['number'] ?? false;
