@@ -77,11 +77,11 @@ namespace controllers\publics;
             $stats_start_date_formated = $stats_start_date->format('Y-m-d');
 
             //If user have a quota and the quota start before today, use quota start date instead
-            $quota_limit = false;
+            $quota_unused = false;
             $quota = $this->internal_quota->get_user_quota($id_user);
             if ($quota && (new \DateTime($quota['start_date']) <= $now) && (new \DateTime($quota['expiration_date']) > $now))
             {
-                $quota_limit = $quota['credit'] + $quota['additional'];
+                $quota_unused = $quota['credit'] + $quota['additional'] - $quota['consumed'];
 
                 $stats_start_date = new \DateTime($quota['start_date']);
                 $stats_start_date_formated = $stats_start_date->format('Y-m-d');
@@ -141,7 +141,7 @@ namespace controllers\publics;
                 'nb_unreads' => $nb_unreads,
                 'avg_sendeds' => $avg_sendeds,
                 'avg_receiveds' => $avg_receiveds,
-                'quota_limit' => $quota_limit,
+                'quota_unused' => $quota_unused,
                 'sendeds' => $sendeds,
                 'receiveds' => $receiveds,
                 'events' => $events,
