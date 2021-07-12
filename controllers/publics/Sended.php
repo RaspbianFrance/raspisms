@@ -53,7 +53,7 @@ namespace controllers\publics;
          */
         public function list_json()
         {
-            $entities = $this->internal_sended->list_for_user($_SESSION['user']['id']);
+            $entities = $this->internal_sended->list_for_user($_SESSION['user']['id'], 10000);
             foreach ($entities as &$entity)
             {
                 $entity['destination_formatted'] = \controllers\internals\Tool::phone_link($entity['destination']);
