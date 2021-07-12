@@ -44,6 +44,11 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
      */
     private $api_url = 'https://api.octopush.com/v1/public';
 
+    /**
+     * Octopush phone number
+     */
+    private $number;
+
 
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
