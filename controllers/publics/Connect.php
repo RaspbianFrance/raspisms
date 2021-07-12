@@ -164,4 +164,5 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
+        
     }

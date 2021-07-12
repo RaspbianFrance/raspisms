@@ -204,4 +204,25 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
+        
+        /**
+         * Allow to stop impersonating a user
+         * @param mixed     $csrf
+         */
+        public function stop_impersonate()
+        {
+            $old_session = $_SESSION['old_session'] ?? false;
+            if (!$old_session)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Impossible de récupérer l\'identité originale, vous avez été deconnecté à la place.');
+
+                return $this->redirect(\descartes\Router::url('Connect', 'logout'));
+            }
+
+            $user_email = $_SESSION['user']['email'];
+            $_SESSION = $old_session;
+
+            \FlashMessage\FlashMessage::push('success', 'Vous n\'incarnez plus l\'utilisateur ' . $user_email . '.');
+            return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
+        }
     }

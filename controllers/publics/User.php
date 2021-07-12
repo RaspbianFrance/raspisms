@@ -18,6 +18,7 @@ class User extends \descartes\Controller
 {
     private $internal_user;
     private $internal_quota;
+    private $internal_setting;
 
     /**
      * Cette fonction est appelée avant toute les autres :
@@ -30,6 +31,7 @@ class User extends \descartes\Controller
         $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
         $this->internal_user = new \controllers\internals\User($bdd);
         $this->internal_quota = new \controllers\internals\Quota($bdd);
+        $this->internal_setting = new \controllers\internals\Setting($bdd);
 
         \controllers\internals\Tool::verifyconnect();
 
@@ -407,4 +409,68 @@ class User extends \descartes\Controller
 
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
+
+
+    /**
+     * Allow an admin to impersonate a user
+     * @param mixed     $csrf
+     * @param array int $_GET['user_ids'] : Ids of users to impersonate, the array should actually contain one id only, we keep use of array for simpler compatibility in UI
+     */
+    public function impersonate ($csrf)
+    {
+        if (!$this->verify_csrf($csrf))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        if (count($_GET['user_ids']) != 1)
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Vous devez séléctionner un et un seul utilisateur à incarner !');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        $id_user = (int) $_GET['user_ids'][0];
+
+        //Check if this user exists
+        $user = $this->internal_user->get($id_user);
+        if (!$user)
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Cet utilisateur n\'existe pas !');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        $settings = $this->internal_setting->gets_for_user($id_user);
+        if (!$settings)
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Impossible de charger les settings de cet utilisateur !');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        if (\models\User::STATUS_ACTIVE !== $user['status'])
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Impossible d\'incarner cet utilisateur car il est actuellement suspendu');
+
+            return $this->redirect(\descartes\Router::url('User', 'list'));
+        }
+
+        $user['settings'] = $settings;
+
+        //Save old session to get it back later 
+        $old_session = $_SESSION;
+        $_SESSION = [
+            'old_session' => $old_session, 
+            'impersonate' => true,
+            'connect' => true,
+            'user' => $user,
+        ];
+
+        \FlashMessage\FlashMessage::push('success', 'Vous incarnez désormais l\'utilisateur ' . $user['email'] . '.');
+        return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
+    }
+    
 }

@@ -21,7 +21,13 @@
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="<?php echo \descartes\Router::url('Account', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Déconnexion</a>
+                            <?php if ($_SESSION['impersonate'] ?? false) { ?>
+                                <li <?php echo $page == 'users' ? 'class="active"' : ''; ?>>
+                                    <a href="<?php echo \descartes\Router::url('Account', 'stop_impersonate', ['csrf' => $_SESSION['csrf']]); ?>"><i class="fa fa-fw fa-sign-out"></i> Ne plus incarner</a>
+                                </li>
+                            <?php } else { ?>
+                                <a href="<?php echo \descartes\Router::url('Account', 'logout'); ?>"><i class="fa fa-fw fa-power-off"></i> Déconnexion</a>
+                            <?php } ?>
 						</li>
 					</ul>
 				</li>

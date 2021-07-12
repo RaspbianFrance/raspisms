@@ -21,6 +21,7 @@
             'update_api_key' => '/account/update_api_key/{csrf}/',
             'delete' => '/account/delete/{csrf}/',
             'logout' => '/logout/',
+            'stop_impersonate' => '/stop_impersonate/{csrf}/',
         ],
 
         'Command' => [
@@ -148,6 +149,7 @@
             'edit' => '/user/edit/',
             'update' => '/user/update/{csrf}/',
             'update_status' => '/user/delete/{status}/{csrf}/',
+            'impersonate' => '/user/impersonate/{csrf}/',
         ],
 
         'Phone' => [
