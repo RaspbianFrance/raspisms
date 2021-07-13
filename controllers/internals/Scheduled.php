@@ -307,7 +307,7 @@ namespace controllers\internals;
                         $users_settings[$scheduled['id_user']][$name] = $value;
                     }
                 }
-                
+
                 if (!isset($users_smsstops[$scheduled['id_user']]) && $users_settings[$scheduled['id_user']]['smsstop'])
                 {
                     $users_smsstops[$scheduled['id_user']] = [];
@@ -315,7 +315,7 @@ namespace controllers\internals;
                     $smsstops = $internal_smsstop->gets_for_user($scheduled['id_user']);
                     foreach ($smsstops as $smsstop)
                     {
-                        $users_settings[$scheduled['id_user']][] = $smsstop['number'];
+                        $users_smsstops[$scheduled['id_user']][] = $smsstop['number'];
                     }
                 }
 

@@ -82,6 +82,6 @@ namespace controllers\internals;
          */
         public function check_for_stop (string $str)
         {
-            return trim(mb_strtolower($str)) == 'STOP';
+            return trim(mb_strtolower($str)) == 'stop';
         }
     }
