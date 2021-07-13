@@ -73,4 +73,15 @@ namespace controllers\internals;
 
             return $this->model;
         }
+
+        /**
+         * Parse a string to check if its a SMS stop
+         *
+         * @param string $str : The string to check
+         * @return bool : true if sms stop, false else
+         */
+        public function check_for_stop (string $str)
+        {
+            return trim(mb_strtolower($str)) == 'STOP';
+        }
     }

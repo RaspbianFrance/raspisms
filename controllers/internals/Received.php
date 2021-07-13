@@ -68,6 +68,14 @@ namespace controllers\internals;
                 return false;
             }
 
+            //Check if the received message is a SMS STOP and we must register it
+            $internal_smsstop = new SmsStop($this->bdd);
+            $is_stop = $internal_smsstop->check_for_stop($received['text']);
+            if ($is_stop)
+            {
+                $internal_smsstop->create($id_user, $origin);
+            }
+
             //Link medias
             $internal_media = new Media($this->bdd);
             foreach ($media_ids as $media_id)

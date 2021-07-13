@@ -285,7 +285,9 @@ namespace controllers\internals;
             $internal_group = new \controllers\internals\Group($this->bdd);
             $internal_conditional_group = new \controllers\internals\ConditionalGroup($this->bdd);
             $internal_phone = new \controllers\internals\Phone($this->bdd);
+            $internal_smsstop = new \controllers\internals\SmsStop($this->bdd);
 
+            $users_smsstops = [];
             $users_settings = [];
             $users_phones = [];
             $users_mms_phones = [];
@@ -303,6 +305,17 @@ namespace controllers\internals;
                     foreach ($settings as $name => $value)
                     {
                         $users_settings[$scheduled['id_user']][$name] = $value;
+                    }
+                }
+                
+                if (!isset($users_smsstops[$scheduled['id_user']]) && $users_settings[$scheduled['id_user']]['smsstop'])
+                {
+                    $users_smsstops[$scheduled['id_user']] = [];
+
+                    $smsstops = $internal_smsstop->gets_for_user($scheduled['id_user']);
+                    foreach ($smsstops as $smsstop)
+                    {
+                        $users_settings[$scheduled['id_user']][] = $smsstop['number'];
                     }
                 }
 
@@ -463,6 +476,12 @@ namespace controllers\internals;
                 {
                     //Remove empty messages
                     if ('' === trim($message['text']) && !$message['medias'])
+                    {
+                        continue;
+                    }
+
+                    //Remove messages to smsstops numbers
+                    if (in_array($message['destination'], $users_smsstops[$scheduled['id_user']]))
                     {
                         continue;
                     }
