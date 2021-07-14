@@ -53,7 +53,25 @@ namespace controllers\publics;
          */
         public function list_json()
         {
-            $entities = $this->internal_sended->list_for_user($_SESSION['user']['id']);
+
+            $draw = (int)($_GET['draw'] ?? false);
+
+            $columns = [
+                0 => 'phone_name',
+                1 => 'searchable_destination',
+                2 => 'text',
+                3 => 'at',
+                4 => 'status',
+            ];
+
+            $search = $_GET['search']['value'] ?? null;
+            $order_column = $columns[$_GET['order'][0]['column']] ?? null;
+            $order_desc = ($_GET['order'][0]['dir'] ?? 'asc') == 'desc' ? true : false;
+            $offset = (int) ($_GET['start'] ?? 0);
+            $limit = (int) ($_GET['length'] ?? 25);
+
+            $entities = $this->internal_sended->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc);
+            $count_entities = $this->internal_sended->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc, true);
             foreach ($entities as &$entity)
             {
                 $entity['destination_formatted'] = \controllers\internals\Tool::phone_link($entity['destination']);
@@ -63,8 +81,15 @@ namespace controllers\publics;
                 }
             }
 
+            $records_total = $this->internal_sended->count_for_user($_SESSION['user']['id']);
+
             header('Content-Type: application/json');
-            echo json_encode(['data' => $entities]);
+            echo json_encode([
+                'draw' => $draw,
+                'recordsTotal' => $records_total,
+                'recordsFiltered' => $count_entities,
+                'data' => $entities,
+            ]);
         }
 
         /**

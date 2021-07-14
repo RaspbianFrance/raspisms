@@ -14,6 +14,22 @@ namespace controllers\internals;
     class Sended extends StandardController
     {
         protected $model;
+        
+        /**
+         * Return the list of entries for a user.
+         *
+         * @param int  $id_user  : User id
+         * @param ?int $limit : Number of entry to return
+         * @param ?int $offset     : Number of entry to avoid
+         * @param ?string $search : String to search for
+         * @param ?array $orders : How to order results
+         *
+         * @return array : Entrys list
+         */
+        public function datatable_list_for_user(int $id_user, ?int $limit = null, ?int $offset = null, ?string $search = null, ?array $search_columns = [], ?string $order_column = null, bool $order_desc = false, $count = false)
+        {
+            return $this->get_model()->datatable_list_for_user($id_user, $limit, $offset, $search, $search_columns, $order_column, $order_desc, $count);
+        }
 
         /**
          * Create a sended.
