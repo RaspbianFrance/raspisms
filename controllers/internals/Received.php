@@ -16,6 +16,26 @@ namespace controllers\internals;
         protected $model;
 
         /**
+         * Return the list of entries for a user.
+         *
+         * @param int  $id_user  : User id
+         * @param ?int $limit : Number of entry to return
+         * @param ?int $offset     : Number of entry to avoid
+         * @param ?string $search : String to search for
+         * @param ?array $search_columns : List of columns to search on
+         * @param ?string $order_column : Name of the column to order by
+         * @param bool $order_desc : Should result be ordered DESC, if false order ASC
+         * @param bool $count : Should the query only count results
+         * @param bool $unread : Should only unread messages be returned
+         *
+         * @return array : Entrys list
+         */
+        public function datatable_list_for_user(int $id_user, ?int $limit = null, ?int $offset = null, ?string $search = null, ?array $search_columns = [], ?string $order_column = null, bool $order_desc = false, bool $count = false, bool $unread = false)
+        {
+            return $this->get_model()->datatable_list_for_user($id_user, $limit, $offset, $search, $search_columns, $order_column, $order_desc, $count, $unread);
+        }
+
+        /**
          * Return the list of unread messages for a user.
          *
          * @param int  $id_user  : User id
@@ -355,7 +375,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\Received
         {
             $this->model = $this->model ?? new \models\Received($this->bdd);
 

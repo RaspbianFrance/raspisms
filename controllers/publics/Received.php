@@ -47,11 +47,31 @@ namespace controllers\publics;
         }
 
         /**
-         * Return received as json.
+         * Return receiveds as json.
+         * 
+         * @param bool $unread : Should we only search for unread messages
          */
-        public function list_json()
+        public function list_json(bool $unread = false)
         {
-            $entities = $this->internal_received->list_for_user($_SESSION['user']['id']);
+            $draw = (int)($_GET['draw'] ?? false);
+
+            $columns = [
+                0 => 'searchable_origin',
+                1 => 'phone_name',
+                2 => 'text',
+                3 => 'at',
+                4 => 'status',
+                5 => 'command',
+            ];
+
+            $search = $_GET['search']['value'] ?? null;
+            $order_column = $columns[$_GET['order'][0]['column']] ?? null;
+            $order_desc = ($_GET['order'][0]['dir'] ?? 'asc') == 'desc' ? true : false;
+            $offset = (int) ($_GET['start'] ?? 0);
+            $limit = (int) ($_GET['length'] ?? 25);
+
+            $entities = $this->internal_received->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc, false, $unread);
+            $count_entities = $this->internal_received->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc, true, $unread);
             foreach ($entities as &$entity)
             {
                 $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
@@ -61,8 +81,15 @@ namespace controllers\publics;
                 }
             }
 
+            $records_total = $this->internal_received->count_for_user($_SESSION['user']['id']);
+
             header('Content-Type: application/json');
-            echo json_encode(['data' => $entities]);
+            echo json_encode([
+                'draw' => $draw,
+                'recordsTotal' => $records_total,
+                'recordsFiltered' => $count_entities,
+                'data' => $entities,
+            ]);
         }
 
         /**
@@ -71,25 +98,6 @@ namespace controllers\publics;
         public function list_unread()
         {
             $this->render('received/list', ['is_unread' => true]);
-        }
-
-        /**
-         * Return unred received as json.
-         */
-        public function list_unread_json()
-        {
-            $entities = $this->internal_received->list_unread_for_user($_SESSION['user']['id']);
-            foreach ($entities as &$entity)
-            {
-                $entity['origin_formatted'] = \controllers\internals\Tool::phone_link($entity['origin']);
-                if ($entity['mms'])
-                {
-                    $entity['medias'] = $this->internal_media->gets_for_received($entity['id']);
-                }
-            }
-
-            header('Content-Type: application/json');
-            echo json_encode(['data' => $entities]);
         }
 
         /**

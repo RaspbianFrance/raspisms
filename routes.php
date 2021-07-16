@@ -93,9 +93,11 @@
 
         'Received' => [
             'list' => '/received/',
-            'list_json' => '/received/json/',
+            'list_json' => [
+                '/received/json/',
+                '/received/json/{unread}/',
+            ],
             'list_unread' => '/unread/',
-            'list_unread_json' => '/unread/json/',
             'mark_as' => '/mark/{status}/{csrf}/',
             'delete' => '/received/delete/{csrf}/',
             'popup' => '/received/popup/',

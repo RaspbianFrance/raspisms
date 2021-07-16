@@ -87,9 +87,9 @@ jQuery(document).ready(function ()
             'targets': 'checkcolumn',
             'orderable': false,
         }],
-
+        "serverSide": true,
         "ajax": {
-            'url': '<?php echo $is_unread ? \descartes\Router::url('Received', 'list_unread_json') : \descartes\Router::url('Received', 'list_json'); ?>',
+            'url': '<?php echo $is_unread ? \descartes\Router::url('Received', 'list_json', ['unread' => true]) : \descartes\Router::url('Received', 'list_json'); ?>',
             'dataSrc': 'data',
         },
         "columns" : [

@@ -20,29 +20,60 @@ namespace models;
         const STATUS_READ = 'read';
 
         /**
-         * Return a list of received messages for a user.
-         * Add a column contact_name and phone_name when available.
+         * @param int  $id_user  : User id
+         * @param ?int $limit : Number of entry to return
+         * @param ?int $offset     : Number of entry to avoid
+         * @param ?string $search : String to search for
+         * @param ?array $search_columns : List of columns to search on
+         * @param ?string $order_column : Name of the column to order by
+         * @param bool $order_desc : Should result be ordered DESC, if false order ASC
+         * @param bool $count : Should the query only count results
+         * @param bool $unread : Should only unread messages be returned
          *
-         * @param int  $id_user : user id
-         * @param ?int $limit   : Number of entry to return or null
-         * @param ?int $offset  : Number of entry to ignore or null
-         *
-         * @return array
+         * @return array : Entrys list
          */
-        public function list_for_user(int $id_user, $limit, $offset)
+        public function datatable_list_for_user(int $id_user, ?int $limit = null, ?int $offset = null, ?string $search = null, ?array $search_columns = [], ?string $order_column = null, bool $order_desc = false, bool $count = false, bool $unread = false)
         {
-            $query = '
-                SELECT received.*, contact.name as contact_name, phone.name as phone_name
-                FROM received
-                LEFT JOIN contact
-                ON contact.number = received.origin
-                AND contact.id_user = received.id_user
-                LEFT JOIN phone
-                ON phone.id = received.id_phone
-                WHERE received.id_user = :id_user
-            ';
+            $params = [
+                'id_user' => $id_user,
+            ];
 
-            if (null !== $limit)
+            $query = $count ? 'SELECT COUNT(*) as nb' : 'SELECT * ';
+            $query .= '
+                FROM (
+                    SELECT received.*, contact.name as contact_name, phone.name as phone_name, IF(contact.name IS NULL, received.origin, CONCAT(received.origin, " (", contact.name, ")")) as searchable_origin
+                    FROM received
+                    LEFT JOIN contact
+                    ON contact.number = received.origin
+                    AND contact.id_user = received.id_user
+                    LEFT JOIN phone
+                    ON phone.id = received.id_phone
+                    WHERE received.id_user = :id_user
+                    ' . ($unread ? ' AND received.status = \'unread\'' : '') . '
+                ) as results
+';
+
+            if ($search && $search_columns)
+            {
+                $like_search = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search) . '%';
+                $params[':like_search'] = $like_search;
+                
+                $query .= ' WHERE (0';
+                    
+                foreach ($search_columns as $column)
+                {
+                    $query .= ' OR ' . $column . ' LIKE :like_search';
+                }
+
+                $query .= ')';
+            }
+
+            if ($order_column)
+            {
+                $query .= ' ORDER BY ' . $order_column . ($order_desc ? ' DESC' : ' ASC');
+            }
+
+            if (null !== $limit && !$count)
             {
                 $limit = (int) $limit;
 
@@ -54,11 +85,7 @@ namespace models;
                 }
             }
 
-            $params = [
-                'id_user' => $id_user,
-            ];
-
-            return $this->_run_query($query, $params);
+            return ($count ? $this->_run_query($query, $params)[0]['nb'] ?? 0 : $this->_run_query($query, $params)) ;
         }
 
         /**
