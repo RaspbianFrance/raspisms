@@ -307,7 +307,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \models\Sended
+        protected function get_model(): \descartes\Model
         {
             $this->model = $this->model ?? new \models\Sended($this->bdd);
 

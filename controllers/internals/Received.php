@@ -375,7 +375,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \models\Received
+        protected function get_model(): \descartes\Model
         {
             $this->model = $this->model ?? new \models\Received($this->bdd);
 
