@@ -410,13 +410,13 @@ class User extends \descartes\Controller
         return $this->redirect(\descartes\Router::url('User', 'list'));
     }
 
-
     /**
-     * Allow an admin to impersonate a user
+     * Allow an admin to impersonate a user.
+     *
      * @param mixed     $csrf
      * @param array int $_GET['user_ids'] : Ids of users to impersonate, the array should actually contain one id only, we keep use of array for simpler compatibility in UI
      */
-    public function impersonate ($csrf)
+    public function impersonate($csrf)
     {
         if (!$this->verify_csrf($csrf))
         {
@@ -425,7 +425,7 @@ class User extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('User', 'list'));
         }
 
-        if (count($_GET['user_ids']) != 1)
+        if (1 != count($_GET['user_ids']))
         {
             \FlashMessage\FlashMessage::push('danger', 'Vous devez séléctionner un et un seul utilisateur à incarner !');
 
@@ -460,17 +460,17 @@ class User extends \descartes\Controller
 
         $user['settings'] = $settings;
 
-        //Save old session to get it back later 
+        //Save old session to get it back later
         $old_session = $_SESSION;
         $_SESSION = [
-            'old_session' => $old_session, 
+            'old_session' => $old_session,
             'impersonate' => true,
             'connect' => true,
             'user' => $user,
         ];
 
         \FlashMessage\FlashMessage::push('success', 'Vous incarnez désormais l\'utilisateur ' . $user['email'] . '.');
+
         return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
     }
-    
 }

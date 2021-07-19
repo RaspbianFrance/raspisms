@@ -48,15 +48,15 @@ namespace models;
                     ON phone.id = sended.id_phone
                     WHERE sended.id_user = :id_user
                 ) as results
-';
+            ';
 
             if ($search && $search_columns)
             {
                 $like_search = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search) . '%';
                 $params[':like_search'] = $like_search;
-                
+
                 $query .= ' WHERE (0';
-                    
+
                 foreach ($search_columns as $column)
                 {
                     $query .= ' OR ' . $column . ' LIKE :like_search';
@@ -82,7 +82,7 @@ namespace models;
                 }
             }
 
-            return ($count ? $this->_run_query($query, $params)[0]['nb'] ?? 0 : $this->_run_query($query, $params)) ;
+            return $count ? $this->_run_query($query, $params)[0]['nb'] ?? 0 : $this->_run_query($query, $params);
         }
 
         /**

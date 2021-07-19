@@ -48,12 +48,12 @@ namespace controllers\publics;
 
         /**
          * Return receiveds as json.
-         * 
+         *
          * @param bool $unread : Should we only search for unread messages
          */
         public function list_json(bool $unread = false)
         {
-            $draw = (int)($_GET['draw'] ?? false);
+            $draw = (int) ($_GET['draw'] ?? false);
 
             $columns = [
                 0 => 'searchable_origin',

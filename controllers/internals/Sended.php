@@ -14,17 +14,16 @@ namespace controllers\internals;
     class Sended extends StandardController
     {
         protected $model;
-        
+
         /**
-         * 
-         * @param int  $id_user  : User id
-         * @param ?int $limit : Number of entry to return
-         * @param ?int $offset     : Number of entry to avoid
-         * @param ?string $search : String to search for
-         * @param ?array $search_columns : List of columns to search on
-         * @param ?string $order_column : Name of the column to order by
-         * @param bool $order_desc : Should result be ordered DESC, if false order ASC
-         * @param bool $count : Should the query only count results
+         * @param int     $id_user        : User id
+         * @param ?int    $limit          : Number of entry to return
+         * @param ?int    $offset         : Number of entry to avoid
+         * @param ?string $search         : String to search for
+         * @param ?array  $search_columns : List of columns to search on
+         * @param ?string $order_column   : Name of the column to order by
+         * @param bool    $order_desc     : Should result be ordered DESC, if false order ASC
+         * @param bool    $count          : Should the query only count results
          *
          * @return array : Entries list
          */
@@ -307,7 +306,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\Sended
         {
             $this->model = $this->model ?? new \models\Sended($this->bdd);
 

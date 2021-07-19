@@ -38,9 +38,9 @@ class OctopushShortcodeAdapter implements AdapterInterface
      * Sender name to use instead of shortcode.
      */
     private $sender;
-    
+
     /**
-     * Octopush SMS type
+     * Octopush SMS type.
      */
     private $sms_type;
 
@@ -48,7 +48,6 @@ class OctopushShortcodeAdapter implements AdapterInterface
      * Octopush api baseurl.
      */
     private $api_url = 'https://api.octopush.com/v1/public';
-
 
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
@@ -64,7 +63,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
         $this->api_key = $this->data['api_key'];
 
         $this->sms_type = self::SMS_TYPE_LOWCOST;
-        if (($this->data['sms_type'] ?? false) && $this->data['sms_type'] === 'premium')
+        if (($this->data['sms_type'] ?? false) && 'premium' === $this->data['sms_type'])
         {
             $this->sms_type = self::SMS_TYPE_PREMIUM;
         }
@@ -234,7 +233,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
 
             $data = [
                 'text' => $text,
-                'recipients' => [['phone_number' => $destination]], 
+                'recipients' => [['phone_number' => $destination]],
                 'sms_type' => $this->sms_type,
                 'purpose' => 'alert',
             ];
@@ -245,11 +244,10 @@ class OctopushShortcodeAdapter implements AdapterInterface
             }
             else
             {
-                $data['with_replies'] = "True";
+                $data['with_replies'] = 'True';
             }
 
             $data = json_encode($data);
-
 
             $endpoint = $this->api_url . '/sms-campaign/send';
 
@@ -260,7 +258,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            
+
             $curl_response = curl_exec($curl);
             $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
@@ -332,7 +330,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
             {
                 return false;
             }
-            
+
             $headers = [
                 'api-login: ' . $this->login,
                 'api-key: ' . $this->api_key,
@@ -350,7 +348,7 @@ class OctopushShortcodeAdapter implements AdapterInterface
             $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
-            if ($http_code !== 200)
+            if (200 !== $http_code)
             {
                 return false;
             }
@@ -369,14 +367,13 @@ class OctopushShortcodeAdapter implements AdapterInterface
         header('Content-Encoding: none');
         header('Content-Length: 0');
 
-
         $input = file_get_contents('php://input');
         $content = json_decode($input, true);
         if (null === $content)
         {
             return false;
         }
-        
+
         $uid = $content['message_id'] ?? false;
         $status = $content['status'] ?? false;
 
@@ -384,7 +381,6 @@ class OctopushShortcodeAdapter implements AdapterInterface
         {
             return false;
         }
-
 
         switch ($status)
         {
@@ -420,14 +416,14 @@ class OctopushShortcodeAdapter implements AdapterInterface
         header('Connection: close');
         header('Content-Encoding: none');
         header('Content-Length: 0');
-        
+
         $input = file_get_contents('php://input');
         $content = json_decode($input, true);
         if (null === $content)
         {
             $response['error'] = true;
             $response['error_message'] = 'Cannot read input data from callback request.';
-            
+
             return $response;
         }
 

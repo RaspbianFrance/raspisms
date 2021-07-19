@@ -146,7 +146,7 @@ class Webhook extends StandardController
     /**
      * Get the model for the Controller.
      */
-    protected function get_model(): \descartes\Model
+    protected function get_model(): \models\Webhook
     {
         $this->model = $this->model ?? new \models\Webhook($this->bdd);
 

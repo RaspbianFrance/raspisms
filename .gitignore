@@ -3,6 +3,7 @@
 .php_cs.cache
 .credentials
 .credentials*
+.vscode/
 vendor/
 scripts/
 composer.lock

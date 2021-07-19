@@ -130,7 +130,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\Group
         {
             $this->model = $this->model ?? new \models\Group($this->bdd);
 

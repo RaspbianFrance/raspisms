@@ -204,10 +204,11 @@ namespace controllers\publics;
 
             return $this->redirect(\descartes\Router::url('Connect', 'login'));
         }
-        
+
         /**
-         * Allow to stop impersonating a user
-         * @param mixed     $csrf
+         * Allow to stop impersonating a user.
+         *
+         * @param mixed $csrf
          */
         public function stop_impersonate()
         {
@@ -223,6 +224,7 @@ namespace controllers\publics;
             $_SESSION = $old_session;
 
             \FlashMessage\FlashMessage::push('success', 'Vous n\'incarnez plus l\'utilisateur ' . $user_email . '.');
+
             return $this->redirect(\descartes\Router::url('Dashboard', 'show'));
         }
     }

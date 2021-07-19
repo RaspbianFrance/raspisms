@@ -89,7 +89,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\Setting
         {
             $this->model = $this->model ?? new \models\Setting($this->bdd);
 

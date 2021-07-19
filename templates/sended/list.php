@@ -73,6 +73,7 @@ jQuery(document).ready(function ()
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
+        "orderMulti": false,
         "columnDefs": [{
             'targets': 'checkcolumn',
             'orderable': false,

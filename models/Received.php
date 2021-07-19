@@ -20,15 +20,15 @@ namespace models;
         const STATUS_READ = 'read';
 
         /**
-         * @param int  $id_user  : User id
-         * @param ?int $limit : Number of entry to return
-         * @param ?int $offset     : Number of entry to avoid
-         * @param ?string $search : String to search for
-         * @param ?array $search_columns : List of columns to search on
-         * @param ?string $order_column : Name of the column to order by
-         * @param bool $order_desc : Should result be ordered DESC, if false order ASC
-         * @param bool $count : Should the query only count results
-         * @param bool $unread : Should only unread messages be returned
+         * @param int     $id_user        : User id
+         * @param ?int    $limit          : Number of entry to return
+         * @param ?int    $offset         : Number of entry to avoid
+         * @param ?string $search         : String to search for
+         * @param ?array  $search_columns : List of columns to search on
+         * @param ?string $order_column   : Name of the column to order by
+         * @param bool    $order_desc     : Should result be ordered DESC, if false order ASC
+         * @param bool    $count          : Should the query only count results
+         * @param bool    $unread         : Should only unread messages be returned
          *
          * @return array : Entrys list
          */
@@ -57,9 +57,9 @@ namespace models;
             {
                 $like_search = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search) . '%';
                 $params[':like_search'] = $like_search;
-                
+
                 $query .= ' WHERE (0';
-                    
+
                 foreach ($search_columns as $column)
                 {
                     $query .= ' OR ' . $column . ' LIKE :like_search';
@@ -85,7 +85,7 @@ namespace models;
                 }
             }
 
-            return ($count ? $this->_run_query($query, $params)[0]['nb'] ?? 0 : $this->_run_query($query, $params)) ;
+            return $count ? $this->_run_query($query, $params)[0]['nb'] ?? 0 : $this->_run_query($query, $params);
         }
 
         /**

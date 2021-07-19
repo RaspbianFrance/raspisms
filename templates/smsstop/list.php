@@ -86,9 +86,9 @@ jQuery(document).ready(function ()
         "columns" : [
             {
                 data: 'number_formatted',
-            },
+            }
             <?php if ($_SESSION['user']['admin'] ?? false) { ?>
-            {
+            ,{
                 data: 'id',
                 render: function (data, type, row, meta) {
                     return '<input name="ids[]" type="checkbox" value="' + data + '">';

@@ -65,23 +65,24 @@ namespace controllers\internals;
         }
 
         /**
+         * Parse a string to check if its a SMS stop.
+         *
+         * @param string $str : The string to check
+         *
+         * @return bool : true if sms stop, false else
+         */
+        public function check_for_stop(string $str)
+        {
+            return 'stop' == trim(mb_strtolower($str));
+        }
+
+        /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\SmsStop
         {
             $this->model = $this->model ?? new \models\SmsStop($this->bdd);
 
             return $this->model;
-        }
-
-        /**
-         * Parse a string to check if its a SMS stop
-         *
-         * @param string $str : The string to check
-         * @return bool : true if sms stop, false else
-         */
-        public function check_for_stop (string $str)
-        {
-            return trim(mb_strtolower($str)) == 'stop';
         }
     }

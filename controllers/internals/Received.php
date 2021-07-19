@@ -18,15 +18,15 @@ namespace controllers\internals;
         /**
          * Return the list of entries for a user.
          *
-         * @param int  $id_user  : User id
-         * @param ?int $limit : Number of entry to return
-         * @param ?int $offset     : Number of entry to avoid
-         * @param ?string $search : String to search for
-         * @param ?array $search_columns : List of columns to search on
-         * @param ?string $order_column : Name of the column to order by
-         * @param bool $order_desc : Should result be ordered DESC, if false order ASC
-         * @param bool $count : Should the query only count results
-         * @param bool $unread : Should only unread messages be returned
+         * @param int     $id_user        : User id
+         * @param ?int    $limit          : Number of entry to return
+         * @param ?int    $offset         : Number of entry to avoid
+         * @param ?string $search         : String to search for
+         * @param ?array  $search_columns : List of columns to search on
+         * @param ?string $order_column   : Name of the column to order by
+         * @param bool    $order_desc     : Should result be ordered DESC, if false order ASC
+         * @param bool    $count          : Should the query only count results
+         * @param bool    $unread         : Should only unread messages be returned
          *
          * @return array : Entrys list
          */
@@ -375,7 +375,7 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        protected function get_model(): \descartes\Model
+        protected function get_model(): \models\Received
         {
             $this->model = $this->model ?? new \models\Received($this->bdd);
 

@@ -53,8 +53,7 @@ namespace controllers\publics;
          */
         public function list_json()
         {
-
-            $draw = (int)($_GET['draw'] ?? false);
+            $draw = (int) ($_GET['draw'] ?? false);
 
             $columns = [
                 0 => 'phone_name',

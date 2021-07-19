@@ -288,7 +288,7 @@ class Quota extends StandardController
     /**
      * Get the model for the Controller.
      */
-    protected function get_model(): \descartes\Model
+    protected function get_model(): \models\Quota
     {
         $this->model = $this->model ?? new \models\Quota($this->bdd);
 
