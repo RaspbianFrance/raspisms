@@ -138,5 +138,5 @@ namespace controllers\internals;
         /**
          * Get the model for the Controller.
          */
-        abstract protected function get_model(): \models\StandardModel;
+        abstract protected function get_model();
     }
