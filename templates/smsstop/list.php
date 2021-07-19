@@ -86,7 +86,6 @@ jQuery(document).ready(function ()
         "columns" : [
             {
                 data: 'number_formatted',
-                render: jQuery.fn.dataTable.render.text()
             },
             <?php if ($_SESSION['user']['admin'] ?? false) { ?>
             {
