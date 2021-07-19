@@ -45,19 +45,43 @@ namespace controllers\publics;
             return $this->render('contact/list');
         }
 
+
         /**
          * Return contacts as json.
          */
         public function list_json()
         {
-            $entities = $this->internal_contact->list_for_user($_SESSION['user']['id']);
+            $draw = (int) ($_GET['draw'] ?? false);
+
+            $columns = [
+                0 => 'name',
+                1 => 'number',
+                2 => 'created_at',
+                3 => 'updated_at',
+            ];
+
+            $search = $_GET['search']['value'] ?? null;
+            $order_column = $columns[$_GET['order'][0]['column']] ?? null;
+            $order_desc = ($_GET['order'][0]['dir'] ?? 'asc') == 'desc' ? true : false;
+            $offset = (int) ($_GET['start'] ?? 0);
+            $limit = (int) ($_GET['length'] ?? 25);
+
+            $entities = $this->internal_contact->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc);
+            $count_entities = $this->internal_contact->datatable_list_for_user($_SESSION['user']['id'], $limit, $offset, $search, $columns, $order_column, $order_desc, true);
             foreach ($entities as &$entity)
             {
                 $entity['number_formatted'] = \controllers\internals\Tool::phone_link($entity['number']);
             }
 
+            $records_total = $this->internal_contact->count_for_user($_SESSION['user']['id']);
+
             header('Content-Type: application/json');
-            echo json_encode(['data' => $entities]);
+            echo json_encode([
+                'draw' => $draw,
+                'recordsTotal' => $records_total,
+                'recordsFiltered' => $count_entities,
+                'data' => $entities,
+            ]);
         }
 
         /**
