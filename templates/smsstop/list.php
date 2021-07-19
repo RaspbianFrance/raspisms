@@ -40,7 +40,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Numéro</th>
-                                                <?php if ($_SESSION['user']['admin']) { ?>
+                                                <?php if ($_SESSION['user']['admin'] ?? false) { ?>
                                                     <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                                 <?php } ?>
                                             </tr>
@@ -50,7 +50,7 @@
                                     </table>
                                 </div>
                                 <div>
-                                    <?php if ($_SESSION['user']['admin']) { ?>
+                                    <?php if ($_SESSION['user']['admin'] ?? false) { ?>
                                         <div class="text-right col-xs-12 no-padding">
                                             <strong>Action pour la séléction :</strong>
                                             <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
@@ -74,11 +74,11 @@ jQuery(document).ready(function ()
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
+        "orderMulti": false,
         "columnDefs": [{
             'targets': 'checkcolumn',
             'orderable': false,
         }],
-
         "ajax": {
             'url': '<?php echo \descartes\Router::url('SmsStop', 'list_json'); ?>',
             'dataSrc': 'data',
@@ -86,13 +86,16 @@ jQuery(document).ready(function ()
         "columns" : [
             {
                 data: 'number_formatted',
+                render: jQuery.fn.dataTable.render.text()
             },
+            <?php if ($_SESSION['user']['admin'] ?? false) { ?>
             {
                 data: 'id',
                 render: function (data, type, row, meta) {
                     return '<input name="ids[]" type="checkbox" value="' + data + '">';
                 },
             },
+            <?php } ?>
         ],
         "deferRender": true
     });
