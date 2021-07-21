@@ -77,7 +77,7 @@ jQuery(document).ready(function ()
             'targets': 'checkcolumn',
             'orderable': false,
         }],
-
+        "order": [[2, "desc"]],
         "ajax": {
             'url': '<?php echo \descartes\Router::url('Call', 'list_json'); ?>',
             'dataSrc': 'data',

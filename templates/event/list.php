@@ -75,11 +75,13 @@ jQuery(document).ready(function ()
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
+        "orderMulti": false,
+        "order": [[1, "desc"]],
         "columnDefs": [{
             'targets': 'checkcolumn',
             'orderable': false,
         }],
-
+        "serverSide": true,
         "ajax": {
             'url': '<?php echo \descartes\Router::url('Event', 'list_json'); ?>',
             'dataSrc': 'data',
