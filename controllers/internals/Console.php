@@ -81,6 +81,21 @@ namespace controllers\internals;
 
             exit($user ? 0 : 1);
         }
+        
+        /**
+         * Check if a user exists based on id.
+         *
+         * @param string $id : User id
+         */
+        public function user_id_exists(string $id)
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $internal_user = new \controllers\internals\User($bdd);
+
+            $user = $internal_user->get($id);
+
+            exit($user ? 0 : 1);
+        }
 
         /**
          * Create a user or update an existing user.
@@ -103,7 +118,7 @@ namespace controllers\internals;
             if ($user)
             {
                 $api_key = $api_key ?? $internal_user->generate_random_api_key();
-                $user = [
+                $update_datas = [
                     'email' => $email,
                     'password' => $encrypt_password ? password_hash($password, PASSWORD_DEFAULT) : $password,
                     'admin' => $admin,
@@ -111,7 +126,7 @@ namespace controllers\internals;
                     'status' => $status,
                 ];
 
-                $success = $internal_user->update($user['id'], $user);
+                $success = $internal_user->update($user['id'], $update_datas);
                 echo json_encode(['id' => $user['id']]);
 
                 exit($success ? 0 : 1);

@@ -94,10 +94,10 @@ jQuery(document).ready(function ()
                 },
             },
             {data: 'at', render: jQuery.fn.dataTable.render.text()},
-            {data: 'text', render: jQuery.fn.dataTable.render.text()},
+            {data: 'text', render: jQuery.fn.dataTable.render.text()}
             
             <?php if ($_SESSION['user']['admin']) { ?>
-            {
+            ,{
                 data: 'id',
                 render: function (data, type, row, meta) {
                     return '<input name="ids[]" type="checkbox" value="' + data + '">';
