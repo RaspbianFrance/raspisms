@@ -92,39 +92,32 @@ jQuery(document).ready(function ()
             {
                 data: '_',
                 render: function (data, type, row, meta) {
-                    var html = '<div class="bold">Réception d\'un SMS : </div>';
+
+                    var html = '';
 
                     if (row.callback_reception) {
-                        html += '<div><code>' + row.callback_reception + '</code></div>';
-                    } else {
-                        html += '<div>Non disponible.</div>';
+                        html += '<div class="bold">Réception d\'un SMS : </div>';
+                        html += '<div><code>' + jQuery.fn.dataTable.render.text().display(row.callback_reception) + '</code></div>';
+                        html += '<br/>';
                     }
 
-                    html += '<br/>';
-                    html += '<div class="bold">Changement de statut d\'un SMS : </div>';
 
                     if (row.callback_status) {
-                        html += '<div><code>' + row.callback_status + '</code></div>';
-                    } else {
-                        html += '<div>Non disponible.</div>';
+                        html += '<div class="bold">Changement de statut d\'un SMS : </div>';
+                        html += '<div><code>' + jQuery.fn.dataTable.render.text().display(row.callback_status) + '</code></div>';
+                        html += '<br/>';
                     }
                     
-                    html += '<br/>';
-                    html += '<div class="bold">Notification d\'appel entrant : </div>';
 
                     if (row.callback_inbound_call) {
-                        html += '<div><code>' + row.callback_inbound_call + '</code></div>';
-                    } else {
-                        html += '<div>Non disponible.</div>';
+                        html += '<div class="bold">Notification d\'appel entrant : </div>';
+                        html += '<div><code>' + jQuery.fn.dataTable.render.text().display(row.callback_inbound_call) + '</code></div>';
+                        html += '<br/>';
                     }
                     
-                    html += '<br/>';
-                    html += '<div class="bold">Notification de fin d\'appel : </div>';
-                    console.log(row);
                     if (row.callback_end_call) {
-                        html += '<div><code>' + row.callback_end_call + '</code></div>';
-                    } else {
-                        html += '<div>Non disponible.</div>';
+                        html += '<div class="bold">Notification de fin d\'appel : </div>';
+                        html += '<div><code>' + jQuery.fn.dataTable.render.text().display(row.callback_end_call) + '</code></div>';
                     }
 
                     return html;

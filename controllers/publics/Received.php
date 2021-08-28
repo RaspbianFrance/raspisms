@@ -177,6 +177,7 @@ namespace controllers\publics;
                     continue;
                 }
 
+                $receiveds[$key]['text'] = $this->s($received['text'], false, true, false);
                 $receiveds[$key]['origin'] = $this->s($contact['name'], false, true, false) . ' (' . \controllers\internals\Tool::phone_link($received['origin']) . ')';
             }
 

@@ -114,11 +114,11 @@ jQuery(document).ready(function ()
                         for (i = 0; i < row.medias.length; i++) {
                             medias.push('<a href="' + HTTP_PWD + '/data/public/' + jQuery.fn.dataTable.render.text().display(row.medias[i].path) + '" target="_blank">Fichier ' + (i + 1) + '</a>');
                         }
-                        html = data + '<br/>' + medias.join(' - ');
+                        html = jQuery.fn.dataTable.render.text().display(data) + '<br/>' + medias.join(' - ');
                         return html;
                     }
 
-                    return data;
+                    return jQuery.fn.dataTable.render.text().display(data);
                 },
             },
             {data: 'at', render: jQuery.fn.dataTable.render.text()},

@@ -127,7 +127,6 @@
 
             data_container.find('.form-group').each(function (e) 
             {
-                console.log(this);
                 var current_input_name = jQuery(this).find('.contact-data-name');
                 var current_input_value = jQuery(this).find('.contact-data-value');
 

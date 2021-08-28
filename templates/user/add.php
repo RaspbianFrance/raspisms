@@ -178,13 +178,11 @@
         {
             if (event.target.value == 0)
             {
-                console.log('disable');
                 jQuery('.quota-settings').addClass('hidden');
                 jQuery('.quota-settings input, .quota-settings select').prop('disabled', true);
             }
             else
             {
-                console.log('enable');
                 jQuery('.quota-settings').removeClass('hidden');
                 jQuery('.quota-settings input, .quota-settings select').prop('disabled', false);
             }
