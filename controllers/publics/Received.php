@@ -172,12 +172,13 @@ namespace controllers\publics;
 
             foreach ($receiveds as $key => $received)
             {
+                $receiveds[$key]['text'] = $this->s($received['text'], false, true, false);
+                
                 if (!$contact = $this->internal_contact->get_by_number_and_user($_SESSION['user']['id'], $received['origin']))
                 {
                     continue;
                 }
 
-                $receiveds[$key]['text'] = $this->s($received['text'], false, true, false);
                 $receiveds[$key]['origin'] = $this->s($contact['name'], false, true, false) . ' (' . \controllers\internals\Tool::phone_link($received['origin']) . ')';
             }
 
