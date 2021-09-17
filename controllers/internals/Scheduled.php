@@ -328,6 +328,7 @@ namespace controllers\internals;
                 }
 
                 //Add medias to mms
+                $scheduled['medias'] = [];
                 if ($scheduled['mms'])
                 {
                     $internal_media = new Media($this->bdd);
@@ -481,7 +482,7 @@ namespace controllers\internals;
                     }
 
                     //Remove messages to smsstops numbers
-                    if (in_array($message['destination'], $users_smsstops[$scheduled['id_user']]))
+                    if (($users_smsstops[$scheduled['id_user']] ?? false) && in_array($message['destination'], $users_smsstops[$scheduled['id_user']]))
                     {
                         continue;
                     }
