@@ -47,8 +47,8 @@ class Sender extends AbstractDaemon
         $this->internal_scheduled = new \controllers\internals\Scheduled($this->bdd);
 
         //Get smss and transmit order to send to appropriate phone daemon
-        $smss = $this->internal_scheduled->get_smss_to_send();
-        $this->transmit_smss($smss); //Add new queue to array of queues
+        $smss_per_scheduled = $this->internal_scheduled->get_smss_to_send();
+        $this->transmit_smss($smss_per_scheduled); //Add new queue to array of queues
 
         usleep(0.5 * 1000000);
     }
@@ -56,34 +56,38 @@ class Sender extends AbstractDaemon
     /**
      * Function to transfer smss to send to phones daemons.
      *
-     * @param array $smss : Smss to send
+     * @param array $smss_per_scheduled : Smss to send per scheduled id
      */
-    public function transmit_smss(array $smss): void
+    public function transmit_smss(array $smss_per_scheduled): void
     {
-        foreach ($smss as $sms)
+        foreach ($smss_per_scheduled as $id_scheduled => $smss)
         {
-            //If queue not already exists
-            $queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $sms['id_phone']);
-            if (!msg_queue_exists($queue_id) || !isset($queues[$queue_id]))
+            foreach ($smss as $sms)
             {
-                $this->queues[$queue_id] = msg_get_queue($queue_id);
+                //If queue not already exists
+                $queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $sms['id_phone']);
+                if (!msg_queue_exists($queue_id) || !isset($queues[$queue_id]))
+                {
+                    $this->queues[$queue_id] = msg_get_queue($queue_id);
+                }
+
+                $msg = [
+                    'id_user' => $sms['id_user'],
+                    'id_scheduled' => $sms['id_scheduled'],
+                    'text' => $sms['text'],
+                    'id_phone' => $sms['id_phone'],
+                    'destination' => $sms['destination'],
+                    'flash' => $sms['flash'],
+                    'mms' => $sms['mms'],
+                    'medias' => $sms['medias'] ?? [],
+                ];
+
+                msg_send($this->queues[$queue_id], QUEUE_TYPE_SEND_MSG, $msg);
+                $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . $queue_id . '.');
             }
 
-            $msg = [
-                'id_user' => $sms['id_user'],
-                'id_scheduled' => $sms['id_scheduled'],
-                'text' => $sms['text'],
-                'id_phone' => $sms['id_phone'],
-                'destination' => $sms['destination'],
-                'flash' => $sms['flash'],
-                'mms' => $sms['mms'],
-                'medias' => $sms['medias'] ?? [],
-            ];
-
-            msg_send($this->queues[$queue_id], QUEUE_TYPE_SEND_MSG, $msg);
-
-            $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . $queue_id . '.');
-            $this->internal_scheduled->delete($sms['id_scheduled']);
+            $this->logger->info('Scheduled ' . $id_scheduled . ' treated and deleted.');
+            $this->internal_scheduled->delete($id_scheduled);
         }
     }
 

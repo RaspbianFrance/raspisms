@@ -274,11 +274,11 @@ namespace controllers\internals;
         /**
          * Get all messages to send and the number to use to send theme.
          *
-         * @return array : [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...]
+         * @return array : List of smss to send at this time per scheduled id ['1' => [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...], ...]
          */
         public function get_smss_to_send()
         {
-            $smss_to_send = [];
+            $smss_to_send_per_scheduled = [];
 
             $internal_templating = new \controllers\internals\Templating();
             $internal_setting = new \controllers\internals\Setting($this->bdd);
@@ -297,6 +297,8 @@ namespace controllers\internals;
             $scheduleds = $this->get_model()->gets_before_date($now);
             foreach ($scheduleds as $scheduled)
             {
+                $smss_to_send_per_scheduled[$scheduled['id']] = [];
+
                 if (!isset($users_settings[$scheduled['id_user']]))
                 {
                     $users_settings[$scheduled['id_user']] = [];
@@ -487,11 +489,11 @@ namespace controllers\internals;
                         continue;
                     }
 
-                    $smss_to_send[] = $message;
+                    $smss_to_send_per_scheduled[$scheduled['id']][] = $message;
                 }
             }
 
-            return $smss_to_send;
+            return $smss_to_send_per_scheduled;
         }
 
         /**
