@@ -278,7 +278,21 @@ namespace controllers\internals;
                 $return['error'] = true;
                 $return['error_message'] = $response['error_message'];
                 $status = \models\Sended::STATUS_FAILED;
-                $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
+                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
+
+                $sended = [
+                    'id' => $sended_id,
+                    'at' => $at,
+                    'status' => $status,
+                    'text' => $text,
+                    'destination' => $destination,
+                    'origin' => $id_phone,
+                    'mms' => $mms,
+                    'medias' => $medias,
+                ];
+    
+                $internal_webhook = new Webhook($this->bdd);
+                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $sended);
 
                 return $return;
             }
@@ -290,6 +304,7 @@ namespace controllers\internals;
             $sended = [
                 'id' => $sended_id,
                 'at' => $at,
+                'status' => $status,
                 'text' => $text,
                 'destination' => $destination,
                 'origin' => $id_phone,
