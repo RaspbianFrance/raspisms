@@ -45,11 +45,12 @@ namespace controllers\internals;
          * @param bool   $flash       : Is the sms a flash
          * @param bool   $mms         : Is the sms a MMS. By default false.
          * @param array  $medias      : Array of medias to link to the MMS
+         * @param ?int   $originating_scheduled : Id of the scheduled message that was responsible for sending this message. By default null.
          * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, array $medias = [], ?string $status = \models\Sended::STATUS_UNKNOWN)
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, array $medias = [], ?int $originating_scheduled = null, ?string $status = \models\Sended::STATUS_UNKNOWN)
         {
             $sended = [
                 'id_user' => $id_user,
@@ -62,6 +63,7 @@ namespace controllers\internals;
                 'flash' => $flash,
                 'mms' => $mms,
                 'status' => $status,
+                'originating_scheduled' => $originating_scheduled,
             ];
 
             //Ensure atomicity
@@ -105,24 +107,22 @@ namespace controllers\internals;
                 'status' => $status,
             ];
 
-            return (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
-        }
+            $success = (bool) $this->get_model()->update_for_user($id_user, $id_sended, $sended);
 
-        /**
-         * Update a sended status for a sended.
-         *
-         * @param int    $id_sended : Sended id
-         * @param string $status    : Status of a the sms (unknown, delivered, failed)
-         *
-         * @return bool : false on error, true on success
-         */
-        public function update_status(int $id_sended, string $status): bool
-        {
-            $sended = [
+            if (!$success)
+            {
+                return $success;
+            }
+
+            $webhook = [
+                'id' => $id_sended,
                 'status' => $status,
             ];
 
-            return (bool) $this->get_model()->update($id_sended, $sended);
+            $internal_webhook = new Webhook($this->bdd);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS_STATUS_CHANGE, $webhook);
+
+            return $success;
         }
 
         /**
@@ -231,7 +231,7 @@ namespace controllers\internals;
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, array $medias = [], string $status = \models\Sended::STATUS_UNKNOWN): array
+        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, array $medias = [], $originating_scheduled = null, string $status = \models\Sended::STATUS_UNKNOWN): array
         {
             $return = [
                 'error' => false,
@@ -278,7 +278,7 @@ namespace controllers\internals;
                 $return['error'] = true;
                 $return['error_message'] = $response['error_message'];
                 $status = \models\Sended::STATUS_FAILED;
-                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
+                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
 
                 $sended = [
                     'id' => $sended_id,
@@ -289,6 +289,7 @@ namespace controllers\internals;
                     'origin' => $id_phone,
                     'mms' => $mms,
                     'medias' => $medias,
+                    'originating_scheduled' => $originating_scheduled,
                 ];
     
                 $internal_webhook = new Webhook($this->bdd);
@@ -299,7 +300,7 @@ namespace controllers\internals;
 
             $internal_quota->consume_credit($id_user, $nb_credits);
 
-            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $status);
+            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
 
             $sended = [
                 'id' => $sended_id,
@@ -310,6 +311,7 @@ namespace controllers\internals;
                 'origin' => $id_phone,
                 'mms' => $mms,
                 'medias' => $medias,
+                'originating_scheduled' => $originating_scheduled,
             ];
 
             $internal_webhook = new Webhook($this->bdd);

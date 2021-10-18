@@ -90,6 +90,8 @@ jQuery(document).ready(function ()
                     switch (data) {
                         case 'send_sms':
                             return 'Envoi de SMS';
+                        case 'send_sms_status_change':
+                            return 'Mise à jour du statut d\'un SMS envoyé';
                         case 'receive_sms':
                             return 'Réception de SMS';
                         case 'inbound_call':

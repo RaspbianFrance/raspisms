@@ -50,6 +50,8 @@
 											<select name="webhooks[<?php $this->s($webhook['id']); ?>][type]" class="form-control" required>
                                                 <option <?php echo $webhook['type'] == 'receive_sms' ? 'selected="selected"' : '' ?> value="receive_sms">Réception d'un SMS</option>
                                                 <option <?php echo $webhook['type'] == 'send_sms' ? 'selected="selected"' : '' ?> value="send_sms">Envoi d'un SMS</option>
+												<option <?php echo $webhook['type'] == 'send_sms_status_change' ? 'selected="selected"' : '' ?> value="send_sms_status_change">Mise à jour du statut d'un SMS envoyé</option>
+												<option <?php echo $webhook['type'] == 'inbound_call' ? 'selected="selected"' : '' ?> value="inbound_call">Réception d'un appel téléphonique</option>
 											</select>
 										</div>	
 										<hr/>
