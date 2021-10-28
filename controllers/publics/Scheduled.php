@@ -298,6 +298,27 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
+            if (empty($at))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Vous ne pouvez pas créer un Sms sans date.');
+
+                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+            }
+
+            if (!is_string($at))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'La date doit être valide.');
+
+                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+            }
+
+            if (!is_string($text))
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Votre message doit être un texte.');
+
+                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+            }
+
             if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i'))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir une date valide.');
@@ -433,6 +454,27 @@ namespace controllers\publics;
                 if (empty($text))
                 {
                     continue;
+                }
+
+                if (empty($at))
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Vous ne pouvez pas créer un Sms sans date.');
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
+
+                if (!is_string($at))
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'La date doit être valide.');
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
+
+                if (!is_string($text))
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Votre message doit être un texte.');
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                 }
 
                 if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i'))

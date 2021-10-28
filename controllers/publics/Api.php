@@ -272,6 +272,26 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            if (!is_string($at))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' : at must be a string.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            if (!is_string($text))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' : text must be a string.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
             if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s'))
             {
                 $return = self::DEFAULT_RETURN;
@@ -281,6 +301,9 @@ namespace controllers\publics;
 
                 return $this->json($return);
             }
+
+            $at = (string) $at;
+            $text = (string) $text;
 
             if (($this->user['settings']['mms'] ?? false) && $mms)
             {
