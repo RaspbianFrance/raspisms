@@ -172,6 +172,7 @@ namespace adapters;
 
                 $curl = curl_init();
                 curl_setopt($curl, CURLOPT_URL, $endpoint);
+                curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
                 curl_setopt($curl, CURLOPT_POST, true);

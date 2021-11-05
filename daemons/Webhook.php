@@ -11,6 +11,7 @@
 
 namespace daemons;
 
+use GuzzleHttp\Promise\Utils;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -84,7 +85,7 @@ class Webhook extends AbstractDaemon
 
         try
         {
-            $responses = \GuzzleHttp\Promise\unwrap($promises);
+            $responses = Utils::unwrap($promises);
         }
         catch (\Exception $e)
         {
