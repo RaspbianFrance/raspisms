@@ -11,6 +11,7 @@
 
 namespace adapters;
 
+use controllers\internals\Quota;
 use controllers\internals\Tool;
 use descartes\Router;
 
@@ -24,6 +25,10 @@ class KannelAdapter implements AdapterInterface
 
     const KANNEL_SENDSMS_HTTP_CODE_ACCEPTED = 202;
     const KANNEL_SENDSMS_HTTP_CODE_QUEUED = 202;
+
+    const KANNEL_CODING_7_BITS = 0;
+    const KANNEL_CODING_8_BITS = 1;
+    const KANNEL_CODING_UCS_2 = 2;
 
     /**
      * DLR mask to transmit to kannel
@@ -284,6 +289,13 @@ class KannelAdapter implements AdapterInterface
                 'dlr-mask' => self::KANNEL_DLR_BITMASK,
                 'dlr-url' => $forged_dlr_url,
             ];
+
+            //If necessary, use utf8 sms to represent special chars
+            $use_utf8_sms = !Quota::is_gsm0338($text);
+            if ($use_utf8_sms)
+            {
+                $data['coding'] = self::KANNEL_CODING_8_BITS;
+            }
 
             if ($this->smsc)
             {

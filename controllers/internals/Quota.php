@@ -108,14 +108,13 @@ class Quota extends StandardController
     }
 
     /**
-     * Compute how many credit a message represent
-     * this function count 160 chars per SMS if it can be send as GSM 03.38 encoding and 70 chars per SMS if it can only be send as UTF8.
+     * Check if a message can be encoded as gsm0338 or if it must be UTF8
      *
      * @param string $text : Message to send
      *
-     * @return int : Number of credit to send this message
+     * @return bool : True if gsm0338, false if UTF8
      */
-    public static function compute_credits_for_message($text)
+    public static function is_gsm0338($text)
     {
         //Gsm 03.38 charset to detect if message is compatible or must use utf8
         $gsm0338 = [
@@ -144,11 +143,25 @@ class Quota extends StandardController
         {
             if (!in_array(mb_substr($text, $i, 1), $gsm0338))
             {
-                $is_gsm0338 = false;
-
-                break;
+                return false;
             }
         }
+
+        return true;
+    }
+
+    /**
+     * Compute how many credit a message represent
+     * this function count 160 chars per SMS if it can be send as GSM 03.38 encoding and 70 chars per SMS if it can only be send as UTF8.
+     *
+     * @param string $text : Message to send
+     *
+     * @return int : Number of credit to send this message
+     */
+    public static function compute_credits_for_message($text)
+    {
+        $len = mb_strlen($text);
+        $is_gsm0338 = self::is_gsm0338($text);
 
         return $is_gsm0338 ? ceil($len / 160) : ceil($len / 70);
     }
