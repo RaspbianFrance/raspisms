@@ -317,6 +317,13 @@ namespace controllers\publics;
 
             foreach ($numbers as $key => $number)
             {
+                if (!is_string($number))
+                {
+                    unset($numbers[$key]);
+
+                    continue;
+                }
+
                 $number = \controllers\internals\Tool::parse_phone($number);
 
                 if (!$number)
