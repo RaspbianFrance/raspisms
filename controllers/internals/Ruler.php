@@ -69,7 +69,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
         {
             try
             {
-                $result = $this->expression_language->evaluate($condition, $data);
+                @$result = $this->expression_language->evaluate($condition, $data);
 
                 return (bool) $result;
             }
