@@ -11,6 +11,7 @@
 
 namespace controllers\internals;
 
+use DateTime;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -37,15 +38,54 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             return isset($var);
         });
 
+        //Birthdate allow to compare two date to check if a date is a birthdate
+        $is_birthdate = new ExpressionFunction('is_birthdate', function ($birthdate, $comparison_date = null, $birthdate_format = null, $comparison_date_format = null)
+        {
+            return sprintf('isset(%1$s) && (new DateTime(%1$s, %3$s ?? null))->format(\'m-d\') == (new DateTime(%2$s ?? \'now\', %4$s ?? null))->format(\'m-d\'))', $birthdate, $comparison_date, $birthdate_format, $comparison_date_format);
+        }, function ($arguments, $birthdate, $comparison_date = null, $birthdate_format = null, $comparison_date_format = null)
+        {
+            if (!$birthdate)
+            {
+                return false;
+            }
+
+            if ($birthdate_format)
+            {
+                $birthdate = DateTime::createFromFormat($birthdate_format, $birthdate);
+            }
+            else
+            {
+                $birthdate = new DateTime($birthdate);
+            }
+
+            if ($comparison_date_format)
+            {
+                $comparison_date = DateTime::createFromFormat($comparison_date_format, $comparison_date);
+            }
+            else
+            {
+                $comparison_date = new DateTime($comparison_date ?? 'now');
+            }
+
+            if (!$birthdate || !$comparison_date)
+            {
+                return false;
+            }
+
+            return ($birthdate->format('m-d') == $comparison_date->format('m-d'));
+        });
+
         return [
             $neutralized_constant,
             $exists,
+            $is_birthdate,
             ExpressionFunction::fromPhp('mb_strtolower', 'lower'),
             ExpressionFunction::fromPhp('mb_strtoupper', 'upper'),
             ExpressionFunction::fromPhp('mb_substr', 'substr'),
             ExpressionFunction::fromPhp('mb_strlen', 'strlen'),
             ExpressionFunction::fromPhp('abs', 'abs'),
-            ExpressionFunction::fromPhp('strtotime', 'date'),
+            ExpressionFunction::fromPhp('date', 'strtotime'),
+            ExpressionFunction::fromPhp('date', 'date'),
         ];
     }
 }
