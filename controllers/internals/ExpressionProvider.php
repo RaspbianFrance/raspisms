@@ -38,54 +38,35 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             return isset($var);
         });
 
-        //Birthdate allow to compare two date to check if a date is a birthdate
-        $is_birthdate = new ExpressionFunction('is_birthdate', function ($birthdate, $comparison_date = null, $birthdate_format = null, $comparison_date_format = null)
+        //Check if today is birthday given a birthdate as string and a potential format
+        $is_birthday = new ExpressionFunction('is_birthday', function ($birthdate, $format = null)
         {
-            return sprintf('isset(%1$s) && (new DateTime(%1$s, %3$s ?? null))->format(\'m-d\') == (new DateTime(%2$s ?? \'now\', %4$s ?? null))->format(\'m-d\'))', $birthdate, $comparison_date, $birthdate_format, $comparison_date_format);
-        }, function ($arguments, $birthdate, $comparison_date = null, $birthdate_format = null, $comparison_date_format = null)
+            return sprintf('isset(%1$s) && ((%2$s ? DateTime::createFromFormat(%2$s, %1$s) : new DateTime(%1$s))->format(\'m-d\') == (new DateTime())->format(\'m-d\'))', $birthdate, $format);
+        }, function ($arguments, $birthdate, $format = null)
         {
-            if (!$birthdate)
+            if (!($birthdate ?? false))
             {
                 return false;
             }
+            
+            $birthdate = $format ? DateTime::createFromFormat($format, $birthdate) : new DateTime($birthdate);
 
-            if ($birthdate_format)
-            {
-                $birthdate = DateTime::createFromFormat($birthdate_format, $birthdate);
-            }
-            else
-            {
-                $birthdate = new DateTime($birthdate);
-            }
-
-            if ($comparison_date_format)
-            {
-                $comparison_date = DateTime::createFromFormat($comparison_date_format, $comparison_date);
-            }
-            else
-            {
-                $comparison_date = new DateTime($comparison_date ?? 'now');
-            }
-
-            if (!$birthdate || !$comparison_date)
-            {
-                return false;
-            }
-
-            return ($birthdate->format('m-d') == $comparison_date->format('m-d'));
+            return ($birthdate && ($birthdate->format('m-d') == (new DateTime())->format('m-d')));
         });
 
         return [
             $neutralized_constant,
             $exists,
-            $is_birthdate,
+            $is_birthday,
             ExpressionFunction::fromPhp('mb_strtolower', 'lower'),
             ExpressionFunction::fromPhp('mb_strtoupper', 'upper'),
             ExpressionFunction::fromPhp('mb_substr', 'substr'),
             ExpressionFunction::fromPhp('mb_strlen', 'strlen'),
             ExpressionFunction::fromPhp('abs', 'abs'),
-            ExpressionFunction::fromPhp('date', 'strtotime'),
+            ExpressionFunction::fromPhp('strtotime', 'strtotime'),
             ExpressionFunction::fromPhp('date', 'date'),
+            ExpressionFunction::fromPhp('intval', 'intval'),
+            ExpressionFunction::fromPhp('boolval', 'boolval'),
         ];
     }
 }
