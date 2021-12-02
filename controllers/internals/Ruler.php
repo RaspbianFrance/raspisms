@@ -43,17 +43,14 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
         {
             try
             {
-                $this->expression_language->parse($condition, array_keys($data));
+                //Use @ to hide notices on non defined vars
+                @$this->expression_language->parse($condition, array_keys($data));
 
                 return true;
             }
-            catch (\Exception $e)
+            catch (\Throwable $t) //Catch both, exceptions and php error
             {
                 return false;
-            }
-            catch (\Throwable $t)
-            {
-                //Just ignore non critical php warning and notice
             }
         }
 
@@ -69,11 +66,12 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
         {
             try
             {
+                //Use @ to hide notices on non defined vars
                 @$result = $this->expression_language->evaluate($condition, $data);
 
                 return (bool) $result;
             }
-            catch (\Exception $e)
+            catch (\Throwable $t) //Catch both, exceptions and php error
             {
                 return null;
             }

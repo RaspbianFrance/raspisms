@@ -38,20 +38,18 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             return isset($var);
         });
 
-        //Check if today is birthday given a birthdate as string and a potential format
-        $is_birthday = new ExpressionFunction('is_birthday', function ($birthdate, $format = null)
+        //Check if today is birthday given a birthdate as DateTime
+        $is_birthday = new ExpressionFunction('is_birthday', function ($birthdate)
         {
-            return sprintf('isset(%1$s) && ((%2$s ? DateTime::createFromFormat(%2$s, %1$s) : new DateTime(%1$s))->format(\'m-d\') == (new DateTime())->format(\'m-d\'))', $birthdate, $format);
-        }, function ($arguments, $birthdate, $format = null)
+            return sprintf('isset(%1$s) && is_a(%1$s, \'DateTime\') && %1$s->format(\'m-d\') == (new \\DateTime())->format(\'m-d\')', $birthdate);
+        }, function ($arguments, DateTime $birthdate)
         {
             if (!($birthdate ?? false))
             {
                 return false;
             }
-            
-            $birthdate = $format ? DateTime::createFromFormat($format, $birthdate) : new DateTime($birthdate);
 
-            return ($birthdate && ($birthdate->format('m-d') == (new DateTime())->format('m-d')));
+            return $birthdate->format('m-d') == (new DateTime())->format('m-d');
         });
 
         return [
@@ -63,10 +61,11 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             ExpressionFunction::fromPhp('mb_substr', 'substr'),
             ExpressionFunction::fromPhp('mb_strlen', 'strlen'),
             ExpressionFunction::fromPhp('abs', 'abs'),
-            ExpressionFunction::fromPhp('strtotime', 'strtotime'),
-            ExpressionFunction::fromPhp('date', 'date'),
+            ExpressionFunction::fromPhp('date_create', 'date'),
+            ExpressionFunction::fromPhp('date_create_from_format', 'date_from_format'),
             ExpressionFunction::fromPhp('intval', 'intval'),
             ExpressionFunction::fromPhp('boolval', 'boolval'),
+            ExpressionFunction::fromPhp('count', 'count'),
         ];
     }
 }
