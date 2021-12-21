@@ -20,6 +20,7 @@ use Monolog\Logger;
 class Phone extends AbstractDaemon
 {
     private $max_inactivity = 5 * 60;
+    private $read_delay = 20 / 0.5;
     private $msg_queue;
     private $msg_queue_id;
     private $webhook_queue;
@@ -56,13 +57,20 @@ class Phone extends AbstractDaemon
     {
         usleep(0.5 * 1000000); //Micro sleep for perfs
 
+        $read_tick = ($read_tick ?? 0) + 1; //Count tick
+
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
 
         //Send smss in queue
         $this->send_smss();
 
-        //Read received smss
-        $this->read_smss();
+        //Read only every x ticks (x/2 seconds) to prevent too many call
+        if ($read_tick >= $this->read_delay)
+        {
+            //Read received smss
+            $this->read_smss();
+            $read_tick = 0;
+        }
 
         //Stop after 5 minutes of inactivity to avoid useless daemon
         if ((microtime(true) - $this->last_message_at) > $this->max_inactivity)
