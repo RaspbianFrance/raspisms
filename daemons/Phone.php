@@ -70,7 +70,6 @@ class Phone extends AbstractDaemon
         {
             //Read received smss
             $this->read_smss();
-            $this->logger->info('Read smss' );
             $this->read_tick = 0;
         }
 
