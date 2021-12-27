@@ -74,13 +74,6 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
             }
 
-            if (!\controllers\internals\Tool::is_admin())
-            {
-                \FlashMessage\FlashMessage::push('danger', 'Vous devez être administrateur pour pouvoir supprimer un "STOP Sms" !');
-
-                return $this->redirect(\descartes\Router::url('SmsStop', 'list'));
-            }
-
             $ids = $_GET['ids'] ?? [];
             foreach ($ids as $id)
             {

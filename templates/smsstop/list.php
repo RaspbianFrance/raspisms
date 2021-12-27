@@ -40,9 +40,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Numéro</th>
-                                                <?php if ($_SESSION['user']['admin'] ?? false) { ?>
-                                                    <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
-                                                <?php } ?>
+                                                <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -50,12 +48,10 @@
                                     </table>
                                 </div>
                                 <div>
-                                    <?php if ($_SESSION['user']['admin'] ?? false) { ?>
-                                        <div class="text-right col-xs-12 no-padding">
-                                            <strong>Action pour la séléction :</strong>
-                                            <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
-                                        </div>
-                                    <?php } ?>
+                                    <div class="text-right col-xs-12 no-padding">
+                                        <strong>Action pour la séléction :</strong>
+                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('SmsStop', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                    </div>
                                 </div>
                             </form>
 						</div>
@@ -87,14 +83,12 @@ jQuery(document).ready(function ()
             {
                 data: 'number_formatted',
             }
-            <?php if ($_SESSION['user']['admin'] ?? false) { ?>
             ,{
                 data: 'id',
                 render: function (data, type, row, meta) {
                     return '<input name="ids[]" type="checkbox" value="' + data + '">';
                 },
             },
-            <?php } ?>
         ],
         "deferRender": true
     });
