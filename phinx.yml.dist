@@ -12,6 +12,6 @@ environments:
         user: '%APP_DATABASE_USER%'
         pass: '%APP_DATABASE_PASS%'
         port: 3306
-        charset: utf8
+        charset: utf8mb4
 
 version_order: creation
