@@ -94,7 +94,7 @@ class Sender extends AbstractDaemon
     public function on_start()
     {
         $this->logger->info('Starting Sender with pid ' . getmypid());
-        $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+        $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
     }
 
     public function on_stop()

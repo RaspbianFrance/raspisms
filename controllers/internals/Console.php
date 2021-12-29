@@ -55,7 +55,7 @@ namespace controllers\internals;
          */
         public function phone($id_phone)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_phone = new \controllers\internals\Phone($bdd);
 
             $phone = $internal_phone->get($id_phone);
@@ -74,7 +74,7 @@ namespace controllers\internals;
          */
         public function user_exists(string $email)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_user = new \controllers\internals\User($bdd);
 
             $user = $internal_user->get_by_email($email);
@@ -89,7 +89,7 @@ namespace controllers\internals;
          */
         public function user_id_exists(string $id)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_user = new \controllers\internals\User($bdd);
 
             $user = $internal_user->get($id);
@@ -111,7 +111,7 @@ namespace controllers\internals;
          */
         public function create_update_user(string $email, string $password, bool $admin, ?string $api_key = null, string $status = \models\User::STATUS_ACTIVE, bool $encrypt_password = true)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_user = new \controllers\internals\User($bdd);
 
             $user = $internal_user->get_by_email($email);
@@ -146,7 +146,7 @@ namespace controllers\internals;
          */
         public function update_user_status(string $id, string $status)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_user = new \controllers\internals\User($bdd);
 
             $user = $internal_user->get($id);
@@ -167,7 +167,7 @@ namespace controllers\internals;
          */
         public function delete_user(string $id)
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_user = new \controllers\internals\User($bdd);
 
             $success = $internal_user->delete($id);
@@ -180,7 +180,7 @@ namespace controllers\internals;
          */
         public function clean_unused_medias()
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_media = new \controllers\internals\Media($bdd);
 
             $medias = $internal_media->gets_unused();
@@ -198,7 +198,7 @@ namespace controllers\internals;
          */
         public function quota_limit_alerting()
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_quota = new \controllers\internals\Quota($bdd);
             $internal_quota->alerting_for_limit_close_and_reached();
         }
@@ -208,7 +208,7 @@ namespace controllers\internals;
          */
         public function renew_quotas()
         {
-            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
             $internal_quota = new \controllers\internals\Quota($bdd);
             $internal_quota->renew_quotas();
         }

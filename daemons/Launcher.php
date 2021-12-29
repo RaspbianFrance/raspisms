@@ -44,7 +44,7 @@ class Launcher extends AbstractDaemon
     public function run()
     {
         //Create the internal controllers
-        $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'UTF8');
+        $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, 'utf8mb4');
         $this->internal_phone = new \controllers\internals\Phone($this->bdd);
 
         $this->start_sender_daemon();
