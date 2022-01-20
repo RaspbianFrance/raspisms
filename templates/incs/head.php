@@ -40,7 +40,9 @@
 		<!-- DataTables -->
 		<link href="<?php echo HTTP_PWD_CSS; ?>/datatables/datatables.min.css" rel="stylesheet" type="text/css">
 		<script src="<?php echo HTTP_PWD_JS; ?>/datatables/datatables.min.js"></script>
-		
+		<!-- Qrcode lib -->
+		<script src="<?php echo HTTP_PWD_JS; ?>/qrcode.min.js"></script>
+
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/custom.js"></script>
 

@@ -42,7 +42,18 @@
 									<div class="panel-body">
 										<strong>Adresse e-mail :</strong> <?php $this->s($_SESSION['user']['email']); ?><br/>
 										<strong>Niveau administrateur :</strong> <?php echo $_SESSION['user']['admin'] ? 'Oui' : 'Non'; ?><br/>
-										<strong>Clef API :</strong> <?php echo $_SESSION['user']['api_key']; ?><br/>
+										<br/>
+										<div id="api-key-container" class="">
+											<strong>Clef API :</strong> 
+											<span id="show-api-key-link" class="visible">
+												<a href="#">Cliquez pour afficher la clef API.</a><br/>
+											</span>
+											<span id="api-key" class="hidden">
+												<?php echo $_SESSION['user']['api_key']; ?><br/>
+												<div style="margin-top: 15px" id="api-key-qrcode"></div>
+											</span>
+											
+										</div>
 									</div>
 								</div>
 								<div class="panel panel-default">
@@ -146,6 +157,25 @@
 			});
 			window.location = url;
 		});
+
+		jQuery('#show-api-key-link').on('click', function (e)
+		{
+			e.preventDefault();
+			jQuery(this).toggleClass('visible').toggleClass('hidden');
+			jQuery('#api-key').toggleClass('visible').toggleClass('hidden');
+		});
+
+		var qrcode = new QRCode("api-key-qrcode", {
+			text: <?= json_encode($_SESSION['user']['api_key']); ?>,
+			width: 128,
+			height: 128,
+			colorDark : "#000000",
+			colorLight : "#ffffff",
+			correctLevel : QRCode.CorrectLevel.H
+		});
+
+
+		jQuery('')
 	});
 </script>
 <?php
