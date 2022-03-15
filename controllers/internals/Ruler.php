@@ -48,8 +48,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
                 return true;
             }
-            catch (\Throwable $t) //Catch both, exceptions and php error
-            {
+            catch (\Throwable $t)
+            { //Catch both, exceptions and php error
                 return false;
             }
         }
@@ -71,8 +71,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
                 return (bool) $result;
             }
-            catch (\Throwable $t) //Catch both, exceptions and php error
-            {
+            catch (\Throwable $t)
+            { //Catch both, exceptions and php error
                 return null;
             }
         }

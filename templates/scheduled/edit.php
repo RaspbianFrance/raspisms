@@ -85,19 +85,41 @@
 									<div class="form-group">
 										<label>Date d'envoi du SMS</label>
 										<input name="scheduleds[<?php $this->s($scheduled['id']); ?>][at]" class="form-control form-datetime auto-width" type="text" value="<?php $this->s($scheduled['at']); ?>" readonly>
-									</div>	
-									<div class="form-group">
-										<label>Numéros cibles</label>
-										<div class="form-group scheduleds-number-groupe-container" scheduled-id="<?php $this->s($scheduled['id']); ?>" >
-											<?php foreach ($scheduled['numbers'] as $number) { ?>
-												<div class="form-group scheduleds-number-groupe">
-													<input name="" class="form-control phone-international-input" type="tel" value="<?php $this->s($number); ?>" scheduled-id="<?php $this->s($scheduled['id']); ?>">
-													<span class="remove-scheduleds-number fa fa-times"></span>
-												</div>
-											<?php } ?>
-											<div class="add-number-button fa fa-plus-circle"></div>
-										</div>
 									</div>
+                                    <div class="form-group">
+                                        <label>Numéros cibles</label>
+                                        <div class="form-group scheduleds-number-groupe-container container-fluid" data-scheduled-id="<?php $this->s($scheduled['id']); ?>">
+                                            <?php foreach ($scheduled['numbers'] as $number_key => $number) { ?>
+                                                <div class="row scheduleds-number-groupe">
+                                                    <div class="col-xs-4">
+                                                        <label>Numéro cible : </label><br/>
+                                                        <input name="" data-uid="<?= $number_key ?>" class="form-control phone-international-input" type="tel" value="<?php $this->s($number['number']); ?>" >
+                                                    </div>
+                                                    <div class="scheduleds-number-data-container col-xs-8">
+                                                        <label>Données associées : </label>
+                                                        <?php foreach ($number['data'] as $data_key => $data_value) { ?>
+                                                            <div class="form-group" data-uid="<?= $number_key ?>">
+                                                                <input value="<?php $this->s($data_key); ?>" name="" class="form-control scheduled-number-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
+                                                                : 
+                                                                <input value="<?php $this->s($data_value); ?>" name="" class="form-control scheduled-number-data-value" type="text" placeholder="Valeur de la donnée">
+                                                                <a href="#" class="scheduled-number-data-remove"><span class="fa fa-times"></span></a>
+                                                            </div>
+                                                        <?php } ?>
+                                                        <div class="form-group" data-uid="<?= $number_key ?>">
+                                                                <input name="" class="form-control scheduled-number-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">
+                                                                : 
+                                                                <input name="" class="form-control scheduled-number-data-value" type="text" placeholder="Valeur de la donnée">
+                                                        </div>
+                                                    </div>
+                                                    <?php if (!($first ?? true)) { ?>
+                                                        <a href="#" class="scheduleds-number-groupe-remove"><span class="fa fa-times"></span></a>
+                                                    <?php } ?>
+                                                    <?php $first = false; ?>
+                                                </div>
+                                            <?php } ?>
+                                            <div class="text-center"><div class="add-number-button fa fa-plus-circle"></div></div>
+                                        </div>
+                                    </div>
 									<div class="form-group">
 										<label>Contacts cibles</label>
 										<input class="add-contacts form-control" name="scheduleds[<?php $this->s($scheduled['id']); ?>][contacts][]" value="<?php $this->s(json_encode($scheduled['contacts'])); ?>" />
@@ -112,6 +134,15 @@
                                             <input class="add-conditional-groups form-control" name="scheduleds[<?php $this->s($scheduled['id']); ?>][conditional_groups][]" value="<?php $this->s(json_encode($scheduled['conditional_groups'])); ?>" />
                                         </div>
                                     <?php } ?>
+                                    <div class="form-group scheduled-media-group">
+                                        <label>Ajouter un fichier CSV de destinataires</label>
+                                        <p class="italic small help description-scheduled-csv">
+                                            Le SMS sera envoyé à tous les numéros inclus dans le fichier CSV. Assurez-vous que le fichier CSV respecte le format indiqué dans la documentation sur <a href="https://documentation.raspisms.fr/users/sms/csv.html" target="_blank">l'envoi de SMS à un fichier CSV.</a>
+                                        </p>
+                                        <div class="form-group">
+                                            <input class="" name="scheduleds_<?php $this->s($scheduled['id']); ?>_csv" value="" type="file" multiple />
+                                        </div>
+                                    </div>
 									<?php if ($_SESSION['user']['settings']['sms_flash']) { ?>
 										<div class="form-group">
 											<label>Envoyer comme un SMS Flash : </label>
@@ -210,7 +241,9 @@
 
         jQuery('.phone-international-input').each(function ()
         {
-            var hidden_input_name = 'scheduleds[' + jQuery(this).attr('scheduled-id') + '][numbers][]';
+            var scheduledId = jQuery(this).parents('.scheduleds-number-groupe-container').attr('data-scheduled-id');
+            var uid = jQuery(this).attr('data-uid');
+            var hidden_input_name = 'scheduleds[' + scheduledId + '][numbers][' + uid + '][number]';
             window.intlTelInput(this, {
                 hiddenInput: hidden_input_name,
                 defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
@@ -223,22 +256,32 @@
             });
         });
 
-		jQuery('body').on('click', '.add-number-button', function(e)
+        jQuery('body').on('click', '.add-number-button', function(e)
         {
             var random_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-			var scheduledId = jQuery(this).parents('.scheduleds-number-groupe-container').attr('scheduled-id');
+            var scheduledId = jQuery(this).parents('.scheduleds-number-groupe-container').attr('data-scheduled-id');
 			var newScheduledsNumberGroupe = '' +
-			'<div class="form-group scheduleds-number-groupe">' +
-				'<input name="" class="form-control phone-international-input" type="tel" scheduled-id="' + scheduledId + '" id="' + random_id + '">' +
-				' <span class="remove-scheduleds-number fa fa-times"></span>' +
-			'</div>';
+			'<div class="row scheduleds-number-groupe" data-scheduled-id="' + scheduledId + '">' +
+                '<div class="col-xs-4">' +
+                    '<label>Numéro cible : </label><br/>' +
+                    '<input id="' + random_id + '" name="" class="form-control phone-international-input" type="tel" >' +
+                '</div>' +
+                '<div class="scheduleds-number-data-container col-xs-8">' +
+                    '<label>Données associées : </label>' +
+                    '<div class="form-group" data-uid="' + random_id + '">' +
+                        '<input name="" class="form-control scheduled-number-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
+                        ' : ' +
+                        '<input name="" class="form-control scheduled-number-data-value" type="text" placeholder="Valeur de la donnée">' +
+                    '</div>' +
+                '</div>' +
+                '<a href="#" class="scheduleds-number-groupe-remove"><span class="fa fa-times"></span></a>' +
+            '</div>';
 
-			jQuery(this).before(newScheduledsNumberGroupe);
-
-            var hidden_input_name = 'scheduleds[' + scheduledId + '][numbers][]';
-            var phone_input = jQuery('#' + random_id)[0];
-			window.intlTelInput(phone_input, {
-                hiddenInput: hidden_input_name,
+            jQuery(this).parent('div').before(newScheduledsNumberGroupe);
+            
+            var number_input = jQuery('#' + random_id)[0];
+			var iti_number_input = window.intlTelInput(number_input, {
+                hiddenInput: 'scheduleds[' + scheduledId + '][numbers][' + random_id + '][number]',
 				defaultCountry: '<?php $this->s($_SESSION['user']['settings']['default_phone_country']); ?>',
 				preferredCountries: <?php $this->s(json_encode(explode(',', $_SESSION['user']['settings']['preferred_phone_country'])), false, false); ?>,
                 <?php if ($_SESSION['user']['settings']['authorized_phone_country'] ?? false) { ?>
@@ -246,8 +289,19 @@
                 <?php } ?>
 				nationalMode: true,
 				utilsScript: '<?php echo HTTP_PWD_JS; ?>/intlTelInput/utils.js'
-			});
+            });
 
+            number_inputs.push({
+                'number_input': number_input,
+                'iti_number_input': iti_number_input,
+            });
+        });
+
+        jQuery('body').on('click', '.scheduleds-number-groupe-remove', function (e)
+        {
+            e.preventDefault();
+            jQuery(this).parent('.scheduleds-number-groupe').remove();
+            return false;
         });
 
         jQuery('body').on('click', '.btn-delete-media', function (e)
@@ -284,6 +338,75 @@
                 },
                 dataType: 'json'
             });
+        });
+
+        jQuery('.scheduleds-number-groupe-container').on('input', '.scheduled-number-data-value, .scheduled-number-data-name', function (e) 
+        {
+            var scheduled_number = jQuery(this).parents('.scheduleds-number-groupe');
+            var focus_group = jQuery(this).parent('.form-group');
+            var focus_input = this;
+            var input_name = focus_group.find('.scheduled-number-data-name');
+            var input_value = focus_group.find('.scheduled-number-data-value');
+            var uid = focus_group.attr('data-uid')
+
+            scheduled_number.find('.form-group').each(function (e) 
+            {
+                var current_input_name = jQuery(this).find('.scheduled-number-data-name');
+                var current_input_value = jQuery(this).find('.scheduled-number-data-value');
+
+                if (current_input_value.is(focus_input) || current_input_name.is(focus_input))
+                {
+                    return true;
+                }
+
+                if (jQuery(current_input_name).val() === '' && jQuery(current_input_value).val() === '')
+                {
+                    jQuery(this).remove();
+                }
+
+                return true;
+            });
+
+            if (input_name.val() === '' || input_value.val() === '')
+            {
+                return true;
+            }
+
+            var template = '' +
+                    '<div class="form-group" data-uid="' + uid + '">' +
+                        '<input name="" class="form-control scheduled-number-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
+                        ' : ' +
+                        '<input name="" class="form-control scheduled-number-data-value" type="text" placeholder="Valeur de la donnée">' +
+                        ' <a href="#" class="scheduled-number-data-remove"><span class="fa fa-times"></span></a>' +
+                    '</div>';
+            scheduled_number.find('.scheduleds-number-data-container').append(template);
+        });
+
+        jQuery('.scheduleds-number-groupe-container').on('click', '.scheduled-number-data-remove', function (e)
+        {
+            e.preventDefault();
+            if (jQuery('.scheduleds-number-data-container .form-group').length > 1)
+            {
+                jQuery(this).parent('.form-group').remove();
+            }
+
+            return false;
+        });
+
+        
+        jQuery('form').on('submit', function (e)
+        {
+            jQuery('.scheduleds-number-data-container .form-group').each(function ()
+            {
+                var name = jQuery(this).find('.scheduled-number-data-name').val();
+                name = name.replace(/\W/g, '');
+                var scheduled_id = jQuery(this).parents('.scheduleds-number-groupe-container').attr('data-scheduled-id')
+                var uid = jQuery(this).attr('data-uid');
+                name = 'scheduleds[' + scheduled_id + '][numbers][' + uid + '][data][' + name + ']';
+                jQuery(this).find('.scheduled-number-data-value').attr('name', name);
+            });
+
+            return true;    
         });
 	});
 </script>

@@ -58,7 +58,7 @@ class Phone extends AbstractDaemon
     {
         usleep(0.5 * 1000000); //Micro sleep for perfs
 
-        $this->read_tick += 1;
+        ++$this->read_tick;
 
         $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 
@@ -155,7 +155,7 @@ class Phone extends AbstractDaemon
 
                 continue;
             }
-            
+
             $this->logger->info('Successfully send message : ' . json_encode($message));
         }
     }

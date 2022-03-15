@@ -75,12 +75,13 @@ namespace models;
          *
          * @param int    $id_scheduled : Scheduled id
          * @param string $number       : Number
+         * @param string $data         : Data to link to number
          *
          * @return mixed (bool|int) : False on error, new row id else
          */
-        public function insert_scheduled_number(int $id_scheduled, string $number)
+        public function insert_scheduled_number(int $id_scheduled, string $number, string $data)
         {
-            $success = $this->_insert('scheduled_number', ['id_scheduled' => $id_scheduled, 'number' => $number]);
+            $success = $this->_insert('scheduled_number', ['id_scheduled' => $id_scheduled, 'number' => $number, 'data' => $data]);
 
             return $success ? $this->_last_id() : false;
         }

@@ -108,7 +108,7 @@ class Quota extends StandardController
     }
 
     /**
-     * Check if a message can be encoded as gsm0338 or if it must be UTF8
+     * Check if a message can be encoded as gsm0338 or if it must be UTF8.
      *
      * @param string $text : Message to send
      *

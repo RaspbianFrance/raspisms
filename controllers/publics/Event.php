@@ -42,7 +42,7 @@ namespace controllers\publics;
         {
             $this->render('event/list');
         }
-        
+
         /**
          * Return events as json.
          */

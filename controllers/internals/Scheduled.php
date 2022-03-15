@@ -24,7 +24,7 @@ namespace controllers\internals;
          * @param ?int   $id_phone              : Id of the phone to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
          * @param bool   $mms                   : Is the sms a mms, by default false
-         * @param array  $numbers               : Numbers to send message to
+         * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
          * @param array  $conditional_group_ids : Conditional Groups ids to send message to
@@ -84,7 +84,7 @@ namespace controllers\internals;
 
             foreach ($numbers as $number)
             {
-                $this->get_model()->insert_scheduled_number($id_scheduled, $number);
+                $this->get_model()->insert_scheduled_number($id_scheduled, $number['number'], $number['data']);
             }
 
             $internal_contact = new Contact($this->bdd);
@@ -146,7 +146,7 @@ namespace controllers\internals;
          * @param ?int   $id_phone              : Id of the phone to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
          * @param bool   $mms                   : Is the sms a mms, by default false
-         * @param array  $numbers               : Numbers to send message to
+         * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
          * @param array  $conditional_group_ids : Conditional Groups ids to send message to
@@ -201,7 +201,7 @@ namespace controllers\internals;
 
             foreach ($numbers as $number)
             {
-                $this->get_model()->insert_scheduled_number($id_scheduled, $number);
+                $this->get_model()->insert_scheduled_number($id_scheduled, $number['number'], $number['data']);
             }
 
             $internal_contact = new Contact($this->bdd);
@@ -494,6 +494,72 @@ namespace controllers\internals;
             }
 
             return $smss_to_send_per_scheduled;
+        }
+
+        /**
+         * Parse a CSV file of numbers, potentially associated with datas.
+         *
+         * @param resource $file_handler : File handler pointing to the file
+         *
+         * @throws Exception : raise exception if file is not valid
+         *
+         * @return mixed : array of numbers ['number' => '+XXXX...', 'data' => ['key' => 'value', ...]]
+         */
+        public function parse_csv_numbers_file($file_handler)
+        {
+            $numbers = [];
+
+            $head = null;
+            $line_nb = 0;
+            while ($line = fgetcsv($file_handler))
+            {
+                ++$line_nb;
+                if (null === $head)
+                {
+                    $head = $line;
+
+                    continue;
+                }
+
+                //Padding line with '' entries to make sure its same length as head
+                //this allow to mix users with data with users without data
+                $line = array_pad($line, \count($head), '');
+
+                $line = array_combine($head, $line);
+                if (false === $line)
+                {
+                    continue;
+                }
+
+                $phone_number = \controllers\internals\Tool::parse_phone($line[array_keys($line)[0]] ?? '');
+                if (!$phone_number)
+                {
+                    throw new \Exception('Erreur à la ligne ' . $line_nb . ' colonne 1, numéro de téléphone invalide.');
+                }
+
+                $data = [];
+                $i = 0;
+                foreach ($line as $key => $value)
+                {
+                    ++$i;
+                    if ($i < 2)
+                    { // Ignore first column
+                        continue;
+                    }
+
+                    if ('' === $value)
+                    {
+                        continue;
+                    }
+
+                    $key = mb_ereg_replace('[\W]', '', $key);
+                    $data[$key] = $value;
+                }
+
+                $numbers[] = ['number' => $phone_number, 'data' => $data];
+            }
+
+            return $numbers;
         }
 
         /**

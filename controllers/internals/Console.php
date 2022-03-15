@@ -81,7 +81,7 @@ namespace controllers\internals;
 
             exit($user ? 0 : 1);
         }
-        
+
         /**
          * Check if a user exists based on id.
          *

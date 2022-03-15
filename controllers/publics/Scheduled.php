@@ -197,7 +197,8 @@ namespace controllers\publics;
                 $numbers = $this->internal_scheduled->get_numbers($scheduled['id']);
                 foreach ($numbers as $number)
                 {
-                    $scheduleds[$key]['numbers'][] = $number['number'];
+                    $number['data'] = json_decode($number['data'] ?? '[]');
+                    $scheduleds[$key]['numbers'][] = $number;
                 }
 
                 $contacts = $this->internal_scheduled->get_contacts($scheduled['id']);
@@ -259,10 +260,12 @@ namespace controllers\publics;
             $flash = (bool) ($_POST['flash'] ?? false);
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $numbers = $_POST['numbers'] ?? [];
+            $numbers = is_array($numbers) ? $numbers : [$numbers];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
             $files = $_FILES['medias'] ?? false;
+            $csv_file = $_FILES['csv'] ?? false;
 
             //Iterate over files to re-create individual $_FILES array
             $files_arrays = [];
@@ -326,16 +329,63 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
+            if ($csv_file)
+            {
+                $uploaded_file = \controllers\internals\Tool::read_uploaded_file($csv_file);
+                if (!$uploaded_file['success'])
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Impossible de traiter ce fichier CSV : ' . $uploaded_file['content']);
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
+
+                try
+                {
+                    $csv_numbers = $this->internal_scheduled->parse_csv_numbers_file($uploaded_file['content']);
+                    if (!$csv_numbers)
+                    {
+                        \FlashMessage\FlashMessage::push('danger', 'Aucun destinataire valide dans le fichier CSV, assurez-vous de fournir un fichier CSV valide.');
+
+                        return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                    }
+
+                    $numbers = array_merge($csv_numbers, $numbers);
+                }
+                catch (\Exception $e)
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Impossible de traiter ce fichier CSV : ' . $e->getMessage());
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
+            }
+
             foreach ($numbers as $key => $number)
             {
-                $number = \controllers\internals\Tool::parse_phone($number);
+                // If number is not an array turn it into an array
+                $number = is_array($number) ? $number : ['number' => $number, 'data' => []];
+                $number['data'] = $number['data'] ?? [];
+                $number['number'] = \controllers\internals\Tool::parse_phone($number['number'] ?? '');
 
-                if (!$number)
+                if (!$number['number'])
                 {
                     unset($numbers[$key]);
 
                     continue;
                 }
+
+                $clean_data = [];
+                foreach ($number['data'] as $data_key => $value)
+                {
+                    if ('' === $value)
+                    {
+                        continue;
+                    }
+
+                    $data_key = mb_ereg_replace('[\W]', '', $data_key);
+                    $clean_data[$data_key] = (string) $value;
+                }
+                $clean_data = json_encode($clean_data);
+                $number['data'] = $clean_data;
 
                 $numbers[$key] = $number;
             }
@@ -415,6 +465,7 @@ namespace controllers\publics;
                 $groups = $scheduled['groups'] ?? [];
                 $conditional_groups = $scheduled['conditional_groups'] ?? [];
                 $files = $_FILES['scheduleds_' . $id_scheduled . '_medias'] ?? false;
+                $csv_file = $_FILES['scheduleds_' . $id_scheduled . '_csv'] ?? false;
                 $media_ids = $scheduled['media_ids'] ?? [];
 
                 //Check scheduled exists and belong to user
@@ -482,15 +533,58 @@ namespace controllers\publics;
                     continue;
                 }
 
+                if ($csv_file)
+                {
+                    $uploaded_file = \controllers\internals\Tool::read_uploaded_file($csv_file);
+                    if (!$uploaded_file['success'])
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        $csv_numbers = $this->internal_scheduled->parse_csv_numbers_file($uploaded_file['content']);
+                        if (!$csv_numbers)
+                        {
+                            continue;
+                        }
+
+                        $numbers = array_merge($csv_numbers, $numbers);
+                    }
+                    catch (\Exception $e)
+                    {
+                        continue;
+                    }
+                }
+
+                $numbers = is_array($numbers) ? $numbers : [$numbers];
                 foreach ($numbers as $key => $number)
                 {
-                    $number = \controllers\internals\Tool::parse_phone($number);
-                    if (!$number)
+                    // If number is not an array turn it into an array
+                    $number = is_array($number) ? $number : ['number' => $number, 'data' => []];
+                    $number['data'] = $number['data'] ?? [];
+                    $number['number'] = \controllers\internals\Tool::parse_phone($number['number'] ?? '');
+
+                    if (!$number['number'])
                     {
                         unset($numbers[$key]);
 
                         continue;
                     }
+
+                    $clean_data = [];
+                    foreach ($number['data'] as $data_key => $value)
+                    {
+                        if ('' === $value)
+                        {
+                            continue;
+                        }
+
+                        $data_key = mb_ereg_replace('[\W]', '', $data_key);
+                        $clean_data[$data_key] = (string) $value;
+                    }
+                    $clean_data = json_encode($clean_data);
+                    $number['data'] = $clean_data;
 
                     $numbers[$key] = $number;
                 }

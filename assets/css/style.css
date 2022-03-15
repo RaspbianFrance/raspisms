@@ -373,6 +373,46 @@ footer img
     text-align: right;
 }
 
+.scheduleds-number-groupe
+{
+	padding-top: 15px;
+	padding-bottom: 15px;
+	background-color: #eee;
+	border-radius: 4px;
+	margin-bottom: 15px;
+	position: relative;
+}
+
+.scheduleds-number-groupe-remove
+{
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	color: #888;
+}
+
+.scheduleds-number-groupe-remove:hover
+{
+	color: #555;
+}
+
+.scheduleds-number-data-container .form-group:last-of-type
+{
+	margin-bottom: 0;
+}
+
+.scheduled-number-data-name 
+{
+    width: 30%;
+	display: inline-block;
+}
+
+.scheduled-number-data-value
+{
+    width: 65%;
+	display: inline-block;
+}
+
 /* AUDIO RECEPTION MESSAGE */
 #reception-sound
 {
@@ -414,9 +454,16 @@ footer img
     width: 50%;
 }
 
-.contact-data-container .contact-data-remove
+.contact-data-container .contact-data-remove,
+.scheduled-number-data-remove
 {
     color: #c9302c;
+}
+
+.contact-data-container .contact-data-remove:hover,
+.scheduled-number-data-remove:hover
+{
+    color: #9b2420;
 }
 
 

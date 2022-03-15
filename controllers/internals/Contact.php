@@ -31,7 +31,7 @@ namespace controllers\internals;
         {
             return $this->get_model()->datatable_list_for_user($id_user, $limit, $offset, $search, $search_columns, $order_column, $order_desc, $count);
         }
-        
+
         /**
          * Return a contact for a user by a number.
          *

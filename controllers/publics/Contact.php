@@ -45,7 +45,6 @@ namespace controllers\publics;
             return $this->render('contact/list');
         }
 
-
         /**
          * Return contacts as json.
          */

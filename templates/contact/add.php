@@ -61,7 +61,7 @@
                                         <?php foreach ($_SESSION['previous_http_post']['data'] ?? [] as $key => $value) { ?>
                                             <?php if ($value == null) { continue; } ?>
                                             <div class="form-group">
-                                            <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*" value="<?php $this->s($key) ?>">
+                                                <input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*" value="<?php $this->s($key) ?>">
                                                  : 
                                                 <input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée" value="<?php $this->s($value) ?>">
                                                 <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>
@@ -136,7 +136,7 @@
                     '<input name="" class="form-control contact-data-name" type="text" placeholder="Nom de la donnée" pattern="[a-zA-Z0-9_]*">' +
                     ' : ' +
                     '<input name="" class="form-control contact-data-value" type="text" placeholder="Valeur de la donnée">' +
-                    ' <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>' +
+                    '  <a href="#" class="contact-data-remove"><span class="fa fa-times"></span></a>' +
                 '</div>';
             jQuery('.contact-data-container').append(template);
         });

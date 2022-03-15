@@ -39,14 +39,14 @@ namespace controllers\internals;
          * @param int $id_phone : Id of the number the message was send with
          * @param $at : Reception date
          * @param $text : Text of the message
-         * @param string $destination : Number of the receiver
-         * @param string $uid         : Uid of the sms on the adapter service used
-         * @param string $adapter     : Name of the adapter service used to send the message
-         * @param bool   $flash       : Is the sms a flash
-         * @param bool   $mms         : Is the sms a MMS. By default false.
-         * @param array  $medias      : Array of medias to link to the MMS
+         * @param string $destination           : Number of the receiver
+         * @param string $uid                   : Uid of the sms on the adapter service used
+         * @param string $adapter               : Name of the adapter service used to send the message
+         * @param bool   $flash                 : Is the sms a flash
+         * @param bool   $mms                   : Is the sms a MMS. By default false.
+         * @param array  $medias                : Array of medias to link to the MMS
          * @param ?int   $originating_scheduled : Id of the scheduled message that was responsible for sending this message. By default null.
-         * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
+         * @param string $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
          */
@@ -220,11 +220,12 @@ namespace controllers\internals;
          * @param int                        $id_user  : Id of user to create sended message for
          * @param int                        $id_phone : Id of the phone the message was send with
          * @param $text : Text of the message
-         * @param string $destination : Number of the receiver
-         * @param bool   $flash       : Is the sms a flash. By default false.
-         * @param bool   $mms         : Is the sms a MMS. By default false.
-         * @param array  $medias      : Array of medias to link to the MMS
-         * @param string $status      : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
+         * @param string     $destination           : Number of the receiver
+         * @param bool       $flash                 : Is the sms a flash. By default false.
+         * @param bool       $mms                   : Is the sms a MMS. By default false.
+         * @param array      $medias                : Array of medias to link to the MMS
+         * @param string     $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
+         * @param null|mixed $originating_scheduled
          *
          * @return array : [
          *               bool 'error' => false if success, true else
@@ -291,7 +292,7 @@ namespace controllers\internals;
                     'medias' => $medias,
                     'originating_scheduled' => $originating_scheduled,
                 ];
-    
+
                 $internal_webhook = new Webhook($this->bdd);
                 $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $sended);
 

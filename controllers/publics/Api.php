@@ -222,6 +222,7 @@ namespace controllers\publics;
             $groups = $_POST['groups'] ?? [];
             $conditional_groups = $_POST['conditional_groups'] ?? [];
             $files = $_FILES['medias'] ?? false;
+            $csv_file = $_FILES['numbers_csv'] ?? false;
 
             $numbers = \is_array($numbers) ? $numbers : [$numbers];
             $contacts = \is_array($contacts) ? $contacts : [$contacts];
@@ -315,22 +316,66 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            if ($csv_file)
+            {
+                $uploaded_file = \controllers\internals\Tool::read_uploaded_file($csv_file);
+                if (!$uploaded_file['success'])
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'csv : ' . $uploaded_file['content'];
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+
+                try
+                {
+                    $csv_numbers = $this->internal_scheduled->parse_csv_numbers_file($uploaded_file['content'], true);
+                    if (!$csv_numbers)
+                    {
+                        throw new \Exception('no valid number in csv file.');
+                    }
+
+                    foreach ($csv_numbers as $csv_number)
+                    {
+                        $csv_number['data'] = json_encode($csv_number['data']);
+                        $numbers[] = $csv_number;
+                    }
+                }
+                catch (\Exception $e)
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'csv : ' . $e->getMessage();
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+            }
+
             foreach ($numbers as $key => $number)
             {
-                if (!is_string($number))
+                // If number is not an array turn it into an array
+                $number = is_array($number) ? $number : ['number' => $number, 'data' => '[]'];
+                $number['data'] = $number['data'] ?? '[]';
+                $number['number'] = \controllers\internals\Tool::parse_phone($number['number'] ?? '');
+
+                if (!$number['number'])
                 {
                     unset($numbers[$key]);
 
                     continue;
                 }
 
-                $number = \controllers\internals\Tool::parse_phone($number);
-
-                if (!$number)
+                if (null === json_decode($number['data']))
                 {
-                    unset($numbers[$key]);
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'number data must be a valid json or leave not set.';
+                    $this->auto_http_code(false);
 
-                    continue;
+                    return $this->json($return);
                 }
 
                 $numbers[$key] = $number;
@@ -368,7 +413,7 @@ namespace controllers\publics;
                 {
                     try
                     {
-                        $new_media_id = $this->internal_media->upload_and_create_for_user($this->user['id'], $file);
+                        $new_media_id = $this->internal_media->create_from_uploaded_file_for_user($this->user['id'], $file);
                     }
                     catch (\Exception $e)
                     {

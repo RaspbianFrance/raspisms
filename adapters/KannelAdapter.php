@@ -13,7 +13,6 @@ namespace adapters;
 
 use controllers\internals\Quota;
 use controllers\internals\Tool;
-use descartes\Router;
 
 /**
  * Kannel adapter.
@@ -31,15 +30,15 @@ class KannelAdapter implements AdapterInterface
     const KANNEL_CODING_UCS_2 = 2;
 
     /**
-     * DLR mask to transmit to kannel
-     * 
+     * DLR mask to transmit to kannel.
+     *
      * 1 -> Delivered to phone
      * 2 -> not delivered
      * 16 -> non delivered to SMSC
-     * 
+     *
      * (see https://gist.github.com/grantpullen/3d550f31c454e80fda8fc0d5b9105fd0)
      */
-    const KANNEL_DLR_BITMASK = 1 + 2 + 16; 
+    const KANNEL_DLR_BITMASK = 1 + 2 + 16;
 
     /**
      * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
@@ -47,7 +46,7 @@ class KannelAdapter implements AdapterInterface
     private $data;
 
     /**
-     * Kannel send-sms service url
+     * Kannel send-sms service url.
      */
     private $kannel_sendsms_url;
 
@@ -62,17 +61,17 @@ class KannelAdapter implements AdapterInterface
     private $password;
 
     /**
-     * Phone number of the sender, this number may or may not actually be overrided by the SMSC
+     * Phone number of the sender, this number may or may not actually be overrided by the SMSC.
      */
     private $from;
 
     /**
-     * SMSC's id to use for sending the message
+     * SMSC's id to use for sending the message.
      */
     private $smsc;
 
     /**
-     * SMS Delivery Report Url
+     * SMS Delivery Report Url.
      */
     private $dlr_url;
 
@@ -91,7 +90,7 @@ class KannelAdapter implements AdapterInterface
         $this->password = $this->data['password'];
         $this->from = $this->data['from'];
         $this->dlr_url = $this->data['dlr_url'];
-        
+
         $this->smsc = $this->data['smsc'] ?? null;
     }
 
@@ -265,7 +264,6 @@ class KannelAdapter implements AdapterInterface
             //in order to retrieve it in raspisms and update the status
             $sms_uid = Tool::random_uuid();
 
-
             //Forge dlr Url by adding new query parts to url provided within phone settings
             $dlr_url_parts = parse_url($this->dlr_url);
 
@@ -278,7 +276,6 @@ class KannelAdapter implements AdapterInterface
             $dlr_url_parts['query'] = http_build_query($dlr_url_query_parts) . '&type=%d'; //Kannel will replace %d by the delivery report value. We cannot set type in bild query or it get double encoded
 
             $forged_dlr_url = Tool::unparse_url($dlr_url_parts);
-            
 
             $data = [
                 'username' => $this->username,
@@ -389,11 +386,11 @@ class KannelAdapter implements AdapterInterface
 
             switch (true)
             {
-                case 403 == $http_code : //Bad credentials
-                case 404 == $http_code : //Cannot find url
+                case 403 == $http_code: //Bad credentials
+                case 404 == $http_code: //Cannot find url
                     return false;
 
-                case $http_code >= 500 : //Server error
+                case $http_code >= 500: //Server error
                     return false;
             }
 
@@ -414,7 +411,7 @@ class KannelAdapter implements AdapterInterface
     {
         $status = $_GET['type'] ?? false;
         $uid = $_GET['sms_uid'] ?? false;
-        
+
         if (!$status || !$uid)
         {
             return false;

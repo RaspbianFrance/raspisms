@@ -313,7 +313,7 @@ namespace controllers\publics;
             $mms = (bool) count($media_ids);
 
             //Destinations must be an array of number
-            $destinations = [$destination];
+            $destinations = [['number' => $destination]];
 
             if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $mms, $destinations, [], [], [], $media_ids))
             {
