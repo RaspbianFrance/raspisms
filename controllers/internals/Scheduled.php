@@ -11,6 +11,9 @@
 
 namespace controllers\internals;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+
     class Scheduled extends StandardController
     {
         protected $model;
@@ -380,7 +383,12 @@ namespace controllers\internals;
 
                     if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
                     {
-                        $render = $internal_templating->render($scheduled['text']);
+                        $number['data'] = json_decode($number['data'] ?? '[]', true);
+
+                        $metas = ['number' => $number['number']];
+                        $data = ['contact' => $number['data'], 'contact_metas' => $metas];
+
+                        $render = $internal_templating->render($scheduled['text'], $data);
 
                         if (!$render['success'])
                         {

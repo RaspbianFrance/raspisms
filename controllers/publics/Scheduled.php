@@ -294,6 +294,12 @@ namespace controllers\publics;
                 }
             }
 
+            //Remove empty csv file input
+            if ($csv_file && UPLOAD_ERR_NO_FILE === $csv_file['error'])
+            {
+                $csv_file = false;
+            }
+
             if (empty($text))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous ne pouvez pas créer un Sms sans message.');
@@ -500,6 +506,12 @@ namespace controllers\publics;
                     {
                         unset($files_arrays[$key]);
                     }
+                }
+
+                //Remove empty csv file input
+                if ($csv_file && UPLOAD_ERR_NO_FILE === $csv_file['error'])
+                {
+                    $csv_file = false;
                 }
 
                 if (empty($text))
