@@ -176,6 +176,19 @@ namespace controllers\publics;
                     $entries[$key]['contacts'] = $this->internal_group->get_contacts($entry['id']);
                 }
             }
+            // Special case for phone as we might need to remove adapter_data for security reason
+            elseif ('phone' == $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    if (!$entry['adapter']::meta_hide_data())
+                    {
+                        continue;
+                    }
+
+                    unset($entries[$key]['adapter_data']);
+                }
+            }
 
             $return = self::DEFAULT_RETURN;
             $return['response'] = $entries;

@@ -119,6 +119,15 @@ class KannelAdapter implements AdapterInterface
     {
         return false;
     }
+    
+    /**
+     * Should this adapter data be hidden after creation
+     * this help to prevent API credentials to other service leak if an attacker gain access to RaspiSMS through user credentials.
+     */
+    public static function meta_hide_data(): bool
+    {
+        return false;
+    }
 
     /**
      * Name of the adapter.
