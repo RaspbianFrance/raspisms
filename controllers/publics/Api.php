@@ -33,6 +33,7 @@ namespace controllers\publics;
             'SUSPENDED_USER' => 16,
             'CANNOT_DELETE' => 32,
             'CANNOT_UPLOAD_FILE' => 64,
+            'CANNOT_UPDATE' => 128,
         ];
 
         const ERROR_MESSAGES = [
@@ -43,6 +44,7 @@ namespace controllers\publics;
             'SUSPENDED_USER' => 'This user account is currently suspended.',
             'CANNOT_DELETE' => 'Cannot delete this entry.',
             'CANNOT_UPLOAD_FILE' => 'Failed to upload or save an uploaded file : ',
+            'CANNOT_UPDATE' => 'Cannot update this entry : ',
         ];
 
         private $internal_user;
@@ -625,6 +627,154 @@ namespace controllers\publics;
             }
 
             $return['response'] = $phone_id;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
+         * Update an existing phone.
+         *
+         * @param int $id : Id of phone to update
+         * @param string (optionnal) $_POST['name']         : New phone name
+         * @param string (optionnal) $_POST['adapter']      : New phone adapter
+         * @param array  (optionnal) $_POST['adapter_data'] : New phone adapter data
+         *
+         * @return int : id phone the new phone on success
+         */
+        public function post_update_phone(int $id)
+        {
+            $return = self::DEFAULT_RETURN;
+
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id);
+            if (!$phone)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'] . ' No phone with this id.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $name = $_POST['name'] ?? $phone['name'];
+            $adapter = $_POST['adapter'] ?? $phone['adapter'];
+            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data']);
+            $adapter_data = is_array($adapter_data) ? $adapter_data : [$adapter_data];
+
+
+            if (!$name && !$adapter && !$adapter_data)
+            {
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ' You must specify at least one name, adapter or adapter_data.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+
+            $phone_with_same_name = $this->internal_phone->get_by_name($name);
+            if ($phone_with_same_name && $phone_with_same_name['id'] != $phone['id'])
+            {
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' This name is already used for another phone.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $adapters = $this->internal_adapter->list_adapters();
+            $find_adapter = false;
+            foreach ($adapters as $metas)
+            {
+                if ($metas['meta_classname'] === $adapter)
+                {
+                    $find_adapter = $metas;
+
+                    break;
+                }
+            }
+
+            if (!$find_adapter)
+            {
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' adapter. Adapter "' . $adapter . '" does not exists.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //If missing required data fields, error
+            foreach ($find_adapter['meta_data_fields'] as $field)
+            {
+                if (false === $field['required'])
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_data[$field['name']]))
+                {
+                    continue;
+                }
+
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ' You must speicify param ' . $field['name'] . ' (' . $field['description'] . ') for this phone.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //If field phone number is invalid
+            foreach ($find_adapter['meta_data_fields'] as $field)
+            {
+                if (false === ($field['number'] ?? false))
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_data[$field['name']]))
+                {
+                    $adapter_data[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_data[$field['name']]);
+
+                    if ($adapter_data[$field['name']])
+                    {
+                        continue;
+                    }
+                }
+
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' field ' . $field['name'] . ' is not a valid phone number.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $adapter_data_json = json_encode($adapter_data);
+
+            //Check adapter is working correctly with thoses names and data
+            $adapter_classname = $find_adapter['meta_classname'];
+            $adapter_instance = new $adapter_classname($adapter_data_json);
+            $adapter_working = $adapter_instance->test();
+
+            if (!$adapter_working)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'] . ' : Impossible to validate this phone, verify adapters parameters.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $success = $this->internal_phone->update_for_user($this->user['id'], $phone['id'], $name, $adapter, $adapter_data);
+            if (!$success)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $return['response'] = $success;
             $this->auto_http_code(true);
 
             return $this->json($return);

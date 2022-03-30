@@ -199,6 +199,9 @@
             'post_phone' => [
                 '/api/phone/',
             ],
+            'post_update_phone' => [
+                '/api/phone/{id}/',
+            ],
             'delete_phone' => [
                 '/api/phone/{id}/',
             ],
