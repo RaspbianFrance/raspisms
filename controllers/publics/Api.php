@@ -222,6 +222,7 @@ namespace controllers\publics;
          * @param string $_POST['contacts']           : Array of ids of contacts to send message to
          * @param string $_POST['groups']             : Array of ids of groups to send message to
          * @param string $_POST['conditional_groups'] : Array of ids of conditional groups to send message to
+         * @param string $_POST['numbers_csv']        : CSV file with numbers and potentially data associated with numbers for templating to send the sms to
          *
          * @return : Id of scheduled created
          */

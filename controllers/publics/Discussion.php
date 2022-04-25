@@ -94,7 +94,7 @@ namespace controllers\publics;
         }
 
         /**
-         * Cette fonction récupère l'ensemble des messages pour un numéro, recçus, envoyés, en cours.
+         * Cette fonction récupère l'ensemble des messages pour un numéro, reçus, envoyés, en cours.
          *
          * @param string $number         : Le numéro cible
          * @param string $transaction_id : Le numéro unique de la transaction ajax (sert à vérifier si la requete doit être prise en compte)
@@ -313,7 +313,7 @@ namespace controllers\publics;
             $mms = (bool) count($media_ids);
 
             //Destinations must be an array of number
-            $destinations = [['number' => $destination]];
+            $destinations = [['number' => $destination, 'data' => '[]']];
 
             if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $mms, $destinations, [], [], [], $media_ids))
             {
@@ -327,80 +327,5 @@ namespace controllers\publics;
             echo json_encode($return);
 
             return true;
-        }
-
-        /**
-         * Cette fonction retourne les id des sms qui sont envoyés.
-         *
-         * @return string : json string Tableau des ids des sms qui sont envoyés
-         */
-        public function checksendeds()
-        {
-            $_SESSION['discussion_wait_progress'] = isset($_SESSION['discussion_wait_progress']) ? $_SESSION['discussion_wait_progress'] : [];
-
-            $scheduleds = $this->internal_scheduled->gets_in_for_user($_SESSION['user']['id'], $_SESSION['discussion_wait_progress']);
-
-            //On va chercher à chaque fois si on a trouvé le sms. Si ce n'est pas le cas c'est qu'il a été envoyé
-            $sendeds = [];
-            foreach ($_SESSION['discussion_wait_progress'] as $key => $id_scheduled)
-            {
-                $found = false;
-                foreach ($scheduleds as $scheduled)
-                {
-                    if ($id_scheduled === $scheduled['id'])
-                    {
-                        $found = true;
-                    }
-                }
-
-                if (!$found)
-                {
-                    unset($_SESSION['discussion_wait_progress'][$key]);
-                    $sendeds[] = $id_scheduled;
-                }
-            }
-
-            echo json_encode($sendeds);
-
-            return true;
-        }
-
-        /**
-         * Cette fonction retourne les messages reçus pour un numéro après la date $_SESSION['discussion_last_checkreceiveds'].
-         *
-         * @param string $number : Le numéro de téléphone pour lequel on veux les messages
-         *
-         * @return string : json string Un tableau avec les messages
-         */
-        public function checkreceiveds($number)
-        {
-            $now = new \DateTime();
-            $now = $now->format('Y-m-d H:i');
-
-            $_SESSION['discussion_last_checkreceiveds'] = isset($_SESSION['discussion_last_checkreceiveds']) ? $_SESSION['discussion_last_checkreceiveds'] : $now;
-
-            $receiveds = $this->internal_received->get_since_for_number_by_date($_SESSION['discussion_last_checkreceiveds'], $number);
-
-            //On va gérer le cas des messages en double en stockant ceux déjà reçus et en eliminant les autres
-            $_SESSION['discussion_already_receiveds'] = isset($_SESSION['discussion_already_receiveds']) ? $_SESSION['discussion_already_receiveds'] : [];
-
-            foreach ($receiveds as $key => $received)
-            {
-                //Sms jamais recu
-                if (false === array_search($received['id'], $_SESSION['discussion_already_receiveds'], true))
-                {
-                    $_SESSION['discussion_already_receiveds'][] = $received['id'];
-
-                    continue;
-                }
-
-                //Sms déjà reçu => on le supprime des resultats
-                unset($receiveds[$key]);
-            }
-
-            //On met à jour la date de dernière verif
-            $_SESSION['discussion_last_checkreceiveds'] = $now;
-
-            echo json_encode($receiveds);
         }
     }
