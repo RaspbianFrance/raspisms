@@ -105,17 +105,7 @@
         var html = '';
         jQuery.each(data_fields, function (index, field)
         {
-            if (!field.number)
-            {
-                html += '<div class="form-group">' +
-                            '<label>' + field.title + '</label>' +
-                            '<p class="italic small help">' + field.description + '</p>' +
-                            '<div class="form-group">' + 
-                                '<input name="adapter_data[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') +  '>' +
-                            '</div>' +
-                        '</div>';
-            }
-            else
+            if (field.type == 'phone_number')
             {
                 var random_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                 html += '' +
@@ -133,6 +123,27 @@
                 };
 
                 numbers.push(number);
+                
+            }
+            else if (field.type == 'boolean')
+            {
+                html += '<div class="form-group">' +
+                            '<label>' + field.title + '</label>' +
+                            '<p class="italic small help">' + field.description + '</p>' +
+                            '<div class="form-group">' + 
+                                '<input type="checkbox" id="adapter_data[' + field.name + ']" name="adapter_data[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '" checked' :  'value="1"') +  '><label class="switch" for="adapter_data[' + field.name + ']"></label>' +
+                            '</div>' +
+                        '</div>';
+            }
+            else
+            {
+                html += '<div class="form-group">' +
+                            '<label>' + field.title + '</label>' +
+                            '<p class="italic small help">' + field.description + '</p>' +
+                            '<div class="form-group">' + 
+                                '<input name="adapter_data[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' ' + (field.default_value ? 'value="' + field.default_value + '"' :  '') +  '>' +
+                            '</div>' +
+                        '</div>';
             }
         });
 

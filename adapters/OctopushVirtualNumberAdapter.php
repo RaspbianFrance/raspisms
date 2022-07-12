@@ -154,7 +154,7 @@ class OctopushVirtualNumberAdapter implements AdapterInterface
                 'title' => 'Numéro de téléphone virtuel',
                 'description' => 'Numéro de téléphone virtuel Octopush à utiliser.',
                 'required' => true,
-                'number' => true,
+                'type' => 'phone_number',
             ],
             [
                 'name' => 'sms_type',

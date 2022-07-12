@@ -135,7 +135,7 @@ namespace adapters;
                     'title' => 'Numéro',
                     'description' => 'Numéro de téléphone virtuel chez OVH.',
                     'required' => true,
-                    'number' => true,
+                    'type' => 'phone_number',
                 ],
                 [
                     'name' => 'app_key',

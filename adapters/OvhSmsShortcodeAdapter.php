@@ -144,6 +144,13 @@ namespace adapters;
                     'description' => 'Paramètre "Consumer Key" obtenu lors de la génération de la clef API OVH.',
                     'required' => true,
                 ],
+                [
+                    'name' => 'no_stop_clause',
+                    'title' => 'Désactiver la clause "STOP SMS" automatique',
+                    'description' => 'En cochant ce paramètre, la clause "STOP SMS" ne sera pas ajoutée automatiquement au SMS par OVH.',
+                    'required' => false,
+                    'type' => 'boolean'
+                ],
             ];
         }
 
@@ -222,6 +229,7 @@ namespace adapters;
                     'message' => $text,
                     'receivers' => [$destination],
                     'senderForResponse' => true,
+                    'noStopClause' => (bool) ($this->data['no_stop_clause'] ?? false),
                 ];
 
                 if ($this->data['sender'])
@@ -325,7 +333,7 @@ namespace adapters;
             {
                 $success = true;
 
-                if ($this->data['sender'] && (mb_strlen($this->data['sender']) < 3 || mb_strlen($this->data['sender'] > 11)))
+                if ($this->data['sender'] && (mb_strlen($this->data['sender']) < 3 || mb_strlen($this->data['sender']) > 11))
                 {
                     return false;
                 }
@@ -333,6 +341,7 @@ namespace adapters;
                 //Check service name
                 $endpoint = '/sms/' . $this->data['service_name'];
                 $response = $this->api->get($endpoint);
+
 
                 return $success && (bool) $response;
             }

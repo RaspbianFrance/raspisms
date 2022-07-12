@@ -140,7 +140,7 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
                 'title' => 'Numéro de téléphone virtuel',
                 'description' => 'Numéro de téléphone virtuel Twilio à utiliser parmis les numéro actifs (format international), <a href="https://www.twilio.com/console/phone-numbers/incoming" target="_blank">voir la liste ici</a>.',
                 'required' => true,
-                'number' => true,
+                'type' => 'phone_number',
             ],
             [
                 'name' => 'status_change_callback',

@@ -484,6 +484,54 @@ footer img
     padding-left: 15px;
 }
 
+#adapter-data-fields input[type="checkbox"]
+{
+	display: block;
+	width: auto;
+}
+
+#adapter-data-fields input[type=checkbox]{
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+#adapter-data-fields .switch {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 44px;
+	height: 24px;
+	background: #aaa;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+}
+
+#adapter-data-fields .switch:after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	border-radius: 20px;
+	transition: 0.3s;
+}
+
+#adapter-data-fields input:checked + .switch {
+	background: #5cb85c;
+}
+
+#adapter-data-fields input:checked + .switch:after {
+	left: calc(100% - 2px);
+	transform: translateX(-100%);
+}
+
+#adapter-data-fields .switch:active:after {
+	width: 30px;
+}
+
 /* DATATABLES */
 .dataTables_paginate
 {

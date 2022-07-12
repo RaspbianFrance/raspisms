@@ -211,7 +211,7 @@ class Phone extends \descartes\Controller
         //If field phone number is invalid
         foreach ($find_adapter['meta_data_fields'] as $field)
         {
-            if (false === ($field['number'] ?? false))
+            if ('phone_number' !== ($field['type'] ?? false))
             {
                 continue;
             }
