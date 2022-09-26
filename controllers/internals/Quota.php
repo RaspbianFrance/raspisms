@@ -252,7 +252,7 @@ class Quota extends StandardController
             $renew_interval = $quota['renew_interval'] ?? 'P0D';
             $new_start_date = new \DateTime($quota['expiration_date']);
             $new_expiration_date = clone $new_start_date;
-            $new_expiration_date->add(new \DateInterval($quota['renew_interval']));
+            $new_expiration_date->add(new \DateInterval($renew_interval));
 
             $report = 0;
             if ($quota['report_unused'] && $unused_credit > 0)

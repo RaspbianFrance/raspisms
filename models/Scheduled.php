@@ -13,6 +13,8 @@ namespace models;
 
     class Scheduled extends StandardModel
     {
+        const SMS_LENGTH_LIMIT = 1000;
+
         /**
          * Return numbers for a scheduled message.
          *

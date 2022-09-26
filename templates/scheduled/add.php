@@ -49,7 +49,7 @@
                                         Vous pouvez obtenir une prévisualisation du résultat pour un contact, ainsi qu'une estimation du nombre de crédits qui seront utilisés par SMS, en cliquant sur le boutton <b>"Prévisualiser"</b>.
                                     </p>
                                 <?php } ?>
-                                <textarea name="text" class="form-control" required><?php $this->s($_SESSION['previous_http_post']['text'] ?? '') ?></textarea>
+                                <textarea name="text" class="form-control" required maxlength="<?= \models\Scheduled::SMS_LENGTH_LIMIT; ?>"><?php $this->s($_SESSION['previous_http_post']['text'] ?? '') ?></textarea>
                                 <?php if ($_SESSION['user']['settings']['templating']) { ?>
                                     <div class="scheduled-preview-container">
                                         <label>Prévisualiser pour : </label>

@@ -328,6 +328,13 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
             }
 
+            if (mb_strlen($text) > \models\Scheduled::SMS_LENGTH_LIMIT)
+            {
+                \FlashMessage\FlashMessage::push('danger', 'Votre message doit faire moins de ' . \models\Scheduled::SMS_LENGTH_LIMIT . ' caractères.');
+
+                return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+            }
+
             if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s') && !\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i'))
             {
                 \FlashMessage\FlashMessage::push('danger', 'Vous devez fournir une date valide.');
@@ -536,6 +543,13 @@ namespace controllers\publics;
                 if (!is_string($text))
                 {
                     \FlashMessage\FlashMessage::push('danger', 'Votre message doit être un texte.');
+
+                    return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
+                }
+
+                if (mb_strlen($text) > \models\Scheduled::SMS_LENGTH_LIMIT)
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Votre message doit faire moins de ' . \models\Scheduled::SMS_LENGTH_LIMIT . ' caractères.');
 
                     return $this->redirect(\descartes\Router::url('Scheduled', 'add'));
                 }

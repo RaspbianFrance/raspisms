@@ -47,7 +47,7 @@
                                                 Vous pouvez obtenir une prévisualisation du résultat pour un contact en cliquant sur le boutton <b>"Prévisualiser"</b>.
                                             </p>
                                         <?php } ?>
-										<textarea name="scheduleds[<?php $this->s($scheduled['id']); ?>][text]" class="form-control" required><?php $this->s($scheduled['text'], true); ?></textarea>
+										<textarea name="scheduleds[<?php $this->s($scheduled['id']); ?>][text]" class="form-control" required maxlength="<?= \models\Scheduled::SMS_LENGTH_LIMIT; ?>"><?php $this->s($scheduled['text'], true); ?></textarea>
                                         <?php if ($_SESSION['user']['settings']['templating']) { ?>
                                             <div class="scheduled-preview-container">
                                                 <label>Prévisualiser pour : </label>

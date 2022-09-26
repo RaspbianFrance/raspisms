@@ -309,6 +309,16 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            if (mb_strlen($text) > \models\Scheduled::SMS_LENGTH_LIMIT)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' : text must be less than ' . \models\Scheduled::SMS_LENGTH_LIMIT . ' char.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
             if (!\controllers\internals\Tool::validate_date($at, 'Y-m-d H:i:s'))
             {
                 $return = self::DEFAULT_RETURN;
