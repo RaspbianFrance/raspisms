@@ -155,6 +155,14 @@ use Monolog\Logger;
         {
             $this->logger->info('Callback reception call with adapter uid : ' . $adapter_uid);
 
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+            if (!$phone)
+            {
+                $this->logger->error('Callback reception use non existing phone : ' . $id_phone);
+
+                return false;
+            }
+
             //Search for an adapter
             $find_adapter = false;
             $adapters = $this->internal_adapter->list_adapters();
