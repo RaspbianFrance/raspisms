@@ -63,7 +63,7 @@ class Sender extends AbstractDaemon
         foreach ($smss_per_scheduled as $id_scheduled => $smss)
         {
             //If queue not  already exists
-            if (!msg_queue_exists($QUEUE_ID_PHONE) || !isset($this->queue))
+            if (!msg_queue_exists(QUEUE_ID_PHONE) || !isset($this->queue))
             {
                 $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
             }
