@@ -23,7 +23,6 @@ class Phone extends AbstractDaemon
     private $read_delay = 20 / 0.5;
     private $read_tick = 0;
     private $msg_queue;
-    private $msg_queue_id;
     private $webhook_queue;
     private $last_message_at;
     private $phone;
@@ -38,7 +37,6 @@ class Phone extends AbstractDaemon
     public function __construct(array $phone)
     {
         $this->phone = $phone;
-        $this->msg_queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $this->phone['id']);
 
         $name = 'RaspiSMS Daemon Phone ' . $this->phone['id'];
         $logger = new Logger($name);
@@ -87,7 +85,7 @@ class Phone extends AbstractDaemon
         //Set last message at to construct time
         $this->last_message_at = microtime(true);
 
-        $this->msg_queue = msg_get_queue($this->msg_queue_id);
+        $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
 
         //Instanciate adapter
         $adapter_class = $this->phone['adapter'];
@@ -98,11 +96,7 @@ class Phone extends AbstractDaemon
 
     public function on_stop()
     {
-        //Delete queue on daemon close
-        $this->logger->info('Closing queue : ' . $this->msg_queue_id);
-        msg_remove_queue($this->msg_queue);
-
-        $this->logger->info('Stopping Phone daemon with pid ' . getmypid());
+            $this->logger->info('Stopping Phone daemon with pid ' . getmypid());
     }
 
     public function handle_other_signals($signal)
@@ -125,8 +119,10 @@ class Phone extends AbstractDaemon
             $maxsize = 409600;
             $message = null;
 
+            // Message type is forged from a prefix concat with the phone ID
+            $message_type = (int) QUEUE_TYPE_SEND_MSG_PREFIX . $this->phone['id'];
             $error_code = null;
-            $success = msg_receive($this->msg_queue, QUEUE_TYPE_SEND_MSG, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+            $success = msg_receive($this->msg_queue, $message_type, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
 
             if (!$success && MSG_ENOMSG !== $error_code)
             {

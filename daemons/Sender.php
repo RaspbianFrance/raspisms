@@ -23,7 +23,7 @@ class Sender extends AbstractDaemon
     private $internal_scheduled;
     private $internal_received;
     private $bdd;
-    private $queues = [];
+    private $msg_queue;
 
     public function __construct()
     {
@@ -62,15 +62,14 @@ class Sender extends AbstractDaemon
     {
         foreach ($smss_per_scheduled as $id_scheduled => $smss)
         {
+            //If queue not  already exists
+            if (!msg_queue_exists($QUEUE_ID_PHONE) || !isset($this->queue))
+            {
+                $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
+            }
+
             foreach ($smss as $sms)
             {
-                //If queue not already exists
-                $queue_id = (int) (QUEUE_ID_PHONE_PREFIX . $sms['id_phone']);
-                if (!msg_queue_exists($queue_id) || !isset($queues[$queue_id]))
-                {
-                    $this->queues[$queue_id] = msg_get_queue($queue_id);
-                }
-
                 $msg = [
                     'id_user' => $sms['id_user'],
                     'id_scheduled' => $sms['id_scheduled'],
@@ -82,8 +81,10 @@ class Sender extends AbstractDaemon
                     'medias' => $sms['medias'] ?? [],
                 ];
 
-                msg_send($this->queues[$queue_id], QUEUE_TYPE_SEND_MSG, $msg);
-                $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . $queue_id . '.');
+                // Message type is forged from a prefix concat with the phone ID
+                $message_type = (int) QUEUE_TYPE_SEND_MSG_PREFIX . $sms['id_phone'];
+                msg_send($this->msg_queue, $message_type, $msg);
+                $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . QUEUE_ID_PHONE . ' with message type ' . $message_type . '.');
             }
 
             $this->logger->info('Scheduled ' . $id_scheduled . ' treated and deleted.');
@@ -99,6 +100,10 @@ class Sender extends AbstractDaemon
 
     public function on_stop()
     {
+        //Delete queue on daemon close
+        $this->logger->info('Closing queue : ' . $this->msg_queue);
+        msg_remove_queue($this->msg_queue);
+
         $this->logger->info('Stopping Sender with pid ' . getmypid());
     }
 
