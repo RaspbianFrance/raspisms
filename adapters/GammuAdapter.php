@@ -188,6 +188,7 @@ namespace adapters;
             }
 
             $command_parts = [
+                'LC_ALL=C',
                 'gammu',
                 '--config',
                 escapeshellarg($this->data['config_file']),
@@ -339,6 +340,7 @@ namespace adapters;
             }
 
             $command_parts = [
+                'LC_ALL=C',
                 'gammu',
                 '--config',
                 escapeshellarg($this->data['config_file']),
@@ -351,6 +353,7 @@ namespace adapters;
 
             //Check security status
             $command_parts = [
+                'LC_ALL=C',
                 'gammu',
                 '--config',
                 escapeshellarg($this->data['config_file']),
