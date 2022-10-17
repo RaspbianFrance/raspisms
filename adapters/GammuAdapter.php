@@ -337,7 +337,9 @@ namespace adapters;
             {
                 return true;
             }
-
+            
+            // The command returns 123 on failed execution (even if SIM is already unlocked), and returns 0 if unlock was successful
+            // We can directly return true if command was succesful
             $command_parts = [
                 'gammu',
                 '--config',
@@ -348,8 +350,13 @@ namespace adapters;
             ];
 
             $result = $this->exec_command($command_parts);
+            if (0 === $result['return'])
+            {
+                return true;
+            }
 
             //Check security status
+            // The command returns 0 regardless of the SIM security state
             $command_parts = [
                 'gammu',
                 '--config',
