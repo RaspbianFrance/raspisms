@@ -195,7 +195,7 @@ namespace adapters;
                 'sendsms',
                 'TEXT',
                 escapeshellarg($destination),
-                '-text',
+                '-textutf8',
                 escapeshellarg($text),
                 '-validity',
                 'MAX',
