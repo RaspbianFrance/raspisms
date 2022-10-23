@@ -4,7 +4,7 @@
 
 # (C) 2003 - 2018 Michal Čihař <michal@cihar.com> - python-gammu
 # (C) 2015 - 2021 Raspian France <raspbianfrance@gmail.com> - RaspianFrance/raspisms
-# (C) 2022 Orsiris de Jong <orsiris.dejong@netperfect.fr> - NetInvent SASU
+# (C) 2022 - Orsiris de Jong <orsiris.dejong@netperfect.fr> - NetInvent SASU
 
 
 from __future__ import print_function
@@ -215,11 +215,14 @@ if __name__ == "__main__":
         # We need to check if we have gammu >= 1.42.0 since deleting sms with lower versions fail with:
         # Cannot delete sms: {'Text': 'The type of memory is not available or has been disabled.', 'Where': 'DeleteSMS', 'Code': 81}
         # see https://github.com/gammu/gammu/issues/460
-        gammu_version = get_gammu_version()
-        if gammu_version[0] >= 1 and gammu_version[1] >= 42:
-            delete = True
-        else:
-            logger.warning("Cannot delete SMS. You need gammu >= 1.42.0.")
-
+        try:
+            gammu_version = get_gammu_version()
+            if gammu_version[0] >= 1 and gammu_version[1] >= 42:
+                delete = True
+            else:
+                logger.warning("Cannot delete SMS. You need gammu >= 1.42.0.")
+        except TypeError:
+            logger.warning("Cannot get gammu version. SMS Deleting might not work properly.")
+            
     show_read = args.show_read
     main(config_file, delete, show_read)
