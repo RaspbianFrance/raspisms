@@ -12,8 +12,8 @@ from __future__ import print_function
 
 __intname__ = "gammu_get_unread_sms.py"
 __author__ = "Orsiris de Jong - <orsiris.dejong@netperfect.fr>"
-__version__ = "2.0.0"
-__build__ = "2022102001"
+__version__ = "2.0.1"
+__build__ = "2022102301"
 __compat__ = "python2.7+"
 
 
@@ -113,11 +113,10 @@ def load_sms_from_gammu(state_machine):
             remaining_sms = remaining_sms - len(sms)
             sms_list.append(sms)
 
-        # Concat multiSMS into list of sms that go together
-
     except gammu.ERR_EMPTY:
         logger.debug("Finished reading all messages")
 
+    # Concat multiple SMS into list of sms that go together using LinkSMS
     return gammu.LinkSMS(sms_list)
 
 
