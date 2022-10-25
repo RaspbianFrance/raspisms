@@ -12,8 +12,8 @@ from __future__ import print_function
 
 __intname__ = "gammu_get_unread_sms.py"
 __author__ = "Orsiris de Jong - <orsiris.dejong@netperfect.fr>"
-__version__ = "2.0.1"
-__build__ = "2022102301"
+__version__ = "2.0.2"
+__build__ = "2022102501"
 __compat__ = "python2.7+"
 
 
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_logger(log_file):
+    # We would normally use ofunctions.logger_utils here with logger_get_logger(), but let's keep no dependencies
     try:
         try:
             filehandler = RotatingFileHandler(
@@ -50,15 +51,21 @@ def get_logger(log_file):
                 )
             except OSError as exc:
                 print("Cannot create log file: %s" % exc.__str__())
-                return None
+                filehandler = None
 
         _logger = logging.getLogger()
         if _DEBUG:
             _logger.setLevel(logging.DEBUG)
         else:
             _logger.setLevel(logging.INFO)
-        _logger.addHandler(filehandler)
-        _logger.addHandler(logging.StreamHandler())
+
+        formatter = logging.Formatter("%(asctime)s :: %(levelname)s :: %(message)s")
+        if filehandler:
+            filehandler.setFormatter(formatter)
+            _logger.addHandler(filehandler)
+        consolehandler = logging.StreamHandler()
+        consolehandler.setFormatter(formatter)
+        _logger.addHandler(consolehandler)
         return _logger
     except Exception as exc:
         print("Cannot create logger instance: %s" % exc.__str__())
@@ -160,6 +167,8 @@ def render_sms_as_json(state_machine, sms_list, delete_sms, show_read_sms):
 
 def main(config_file, delete_sms, show_read):
     # type: (bool, bool) -> None
+    logger.debug("Running gammu receiver with config {}".format(config_file))
+
     try:
         # Mandatory modem config file
         # config_file = sys.argv[1]
@@ -222,6 +231,6 @@ if __name__ == "__main__":
                 logger.warning("Cannot delete SMS. You need gammu >= 1.42.0.")
         except TypeError:
             logger.warning("Cannot get gammu version. SMS Deleting might not work properly.")
-            
+
     show_read = args.show_read
     main(config_file, delete, show_read)
