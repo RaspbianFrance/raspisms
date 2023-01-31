@@ -53,7 +53,7 @@ class Launcher extends AbstractDaemon
 
         $this->start_mailer_daemon();
 
-        $phones = $this->internal_phone->get_all();
+        $phones = $this->internal_phone->get_all_for_active_users();
         $this->start_phones_daemons($phones);
 
         sleep(1);

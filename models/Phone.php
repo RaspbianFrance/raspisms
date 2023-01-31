@@ -13,6 +13,31 @@ namespace models;
 
     class Phone extends StandardModel
     {
+
+        /**
+         * Return all hones that belongs to active users
+         *
+         * @return array
+         */
+        public function get_all_for_active_users()
+        {
+            $query = '
+                SELECT phone.*
+                FROM phone
+                LEFT JOIN user
+                ON phone.id_user = user.id
+                WHERE user.status = :status
+            ';
+
+            $params = [
+                'status' => \models\User::STATUS_ACTIVE,
+            ];
+
+            $result = $this->_run_query($query, $params);
+
+            return $result;
+        }
+
         /**
          * Return a phone by his name and user.
          *

@@ -13,7 +13,7 @@
         "twilio/sdk": "^6.1",
         "symfony/yaml": "^5.0",
         "phpmailer/phpmailer": "^6.1",
-        "ralouphie/mimey": "^2.1",
+        "xantios/mimey": ">=2.1",
         "kreait/firebase-php": "^5.14"
     },
     "require-dev": {

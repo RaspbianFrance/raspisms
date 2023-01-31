@@ -20,6 +20,18 @@ namespace controllers\internals;
         protected $model;
 
         /**
+         * Return all phones for active users.
+         *
+         * @param int $id_user : user id
+         *
+         * @return array
+         */
+        public function get_all_for_active_users()
+        {
+            return $this->get_model()->get_all_for_active_users();
+        }
+
+        /**
          * Return all phones of a user.
          *
          * @param int $id_user : user id
