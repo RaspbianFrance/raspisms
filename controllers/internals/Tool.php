@@ -166,6 +166,24 @@ namespace controllers\internals;
         }
 
         /**
+         * Check if a relative format date (see https://www.php.net/manual/en/datetime.formats.relative.php) is valid.
+         *
+         * @param string $date   : Relative date
+         *
+         * @return bool : True if valid, false else
+         */
+        public static function validate_relative_date($date)
+        {
+            try {
+                $d = new \DateTime($date);
+            } catch (\Throwable $th) {
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
          * Check if a sting represent a valid PHP period for creating an interval.
          *
          * @param string $period : Period string to check

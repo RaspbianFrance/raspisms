@@ -131,9 +131,10 @@ class Phone extends \descartes\Controller
      * Create a new phone.
      *
      * @param $csrf : CSRF token
-     * @param string $_POST['name']         : Phone name
-     * @param string $_POST['adapter']      : Phone adapter
-     * @param array  $_POST['adapter_data'] : Phone adapter data
+     * @param string $_POST['name']          : Phone name
+     * @param string $_POST['adapter']       : Phone adapter
+     * @param ?array  $_POST['adapter_data'] : Phone adapter data
+     * @param ?array $_POST['limits']        : Limits in number of SMS for a period to be applied to this phone.
      */
     public function create($csrf)
     {
@@ -148,6 +149,8 @@ class Phone extends \descartes\Controller
         $name = $_POST['name'] ?? false;
         $adapter = $_POST['adapter'] ?? false;
         $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
+        $limits = $_POST['limits'] ?? [];
+        $limits = is_array($limits) ? $limits : [$limits];
 
         if (!$name || !$adapter)
         {
@@ -156,12 +159,36 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $name_exist = $this->internal_phone->get_by_name($name);
+        $name_exist = $this->internal_phone->get_by_name_and_user($id_user, $name);
         if ($name_exist)
         {
             \FlashMessage\FlashMessage::push('danger', 'Ce nom est déjà utilisé pour un autre téléphone.');
 
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        if ($limits)
+        {
+            foreach ($limits as $key => $limit)
+            {
+                $startpoint = $limit['startpoint'] ?? false;
+                $volume = $limit['volume'] ?? false;
+
+                if (!$startpoint || !$volume)
+                {
+                    unset($limits[$key]);
+                    continue;
+                }
+
+                $volume = (int) $volume;
+                $limits[$key]['volume'] = max($volume, 1);
+
+                if (!\controllers\internals\Tool::validate_relative_date($startpoint))
+                {
+                    unset($limits[$key]);
+                    continue;
+                }
+            }
         }
 
         $adapters = $this->internal_adapter->list_adapters();
@@ -245,7 +272,7 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_data);
+        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_data, $limits);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');

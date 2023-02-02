@@ -44,15 +44,15 @@ namespace controllers\internals;
         }
 
         /**
-         * Return a phone by his name.
+         * Return a list of phone limits
          *
-         * @param string $name : Phone name
+         * @param int $id_phone : Phone id
          *
          * @return array
          */
-        public function get_by_name(string $name)
+        public function get_limits(int $id_phone)
         {
-            return $this->get_model()->get_by_name($name);
+            return $this->get_model()->get_limits($id_phone);
         }
 
         /**
@@ -137,10 +137,11 @@ namespace controllers\internals;
          * @param string      $name         : The name of the phone
          * @param string      $adapter      : The adapter to use the phone
          * @param string json $adapter_data : A JSON string representing adapter's data (for example credentials for an api)
+         * @param array       $limits       : An array of limits for this phone. Each limit must be an array with a key volume and a key startpoint
          *
          * @return bool|int : false on error, new id on success
          */
-        public function create(int $id_user, string $name, string $adapter, string $adapter_data)
+        public function create(int $id_user, string $name, string $adapter, string $adapter_data, array $limits = [])
         {
             $phone = [
                 'id_user' => $id_user,
@@ -149,7 +150,31 @@ namespace controllers\internals;
                 'adapter_data' => $adapter_data,
             ];
 
-            return $this->get_model()->insert($phone);
+            //Use transaction to garanty atomicity
+            $this->bdd->beginTransaction();
+
+            $new_phone_id = $this->get_model()->insert($phone);
+            if (!$new_phone_id)
+            {
+                $this->bdd->rollBack();
+
+                return false;
+            }
+
+            foreach ($limits as $limit)
+            {
+                $limit_id = $this->get_model()->insert_phone_limit($new_phone_id, $limit['volume'], $limit['startpoint']);
+                
+                if (!$limit_id)
+                {
+                    $this->bdd->rollBack();
+
+                    return false;
+                }
+            }
+
+            $success = $this->bdd->commit();
+            return ($success ? $new_phone_id : false);
         }
 
         /**

@@ -15,7 +15,7 @@ namespace models;
     {
 
         /**
-         * Return all hones that belongs to active users
+         * Return all phones that belongs to active users
          *
          * @return array
          */
@@ -62,6 +62,48 @@ namespace models;
         {
             return $this->_select_one('phone', ['name' => $name]);
         }
+
+
+        /**
+         * Return a list of phone limits
+         *
+         * @param int $id_phone : Phone id
+         *
+         * @return array
+         */
+        public function get_limits(int $id_phone)
+        {
+            return $this->_select('phone_limit', ['id_phone' => $id_phone]);
+        }
+
+        /**
+         * Add a limit for a phone.
+         *
+         * @param int $id_phone      : Phone id
+         * @param int $volume        : Limit in volume of SMS
+         * @param string $startpoint :  A relative time to use as startpoint for counting volume. See https://www.php.net/manual/en/datetime.formats.relative.php
+         *
+         * @return mixed (bool|int) : False on error, new row id else
+         */
+        public function insert_phone_limit(int $id_phone, int $volume, string $startpoint)
+        {
+            $success = $this->_insert('phone_limit', ['id_phone' => $id_phone, 'volume' => $volume, 'startpoint' => $startpoint]);
+
+            return $success ? $this->_last_id() : false;
+        }
+
+        /**
+         * Delete limits for a phone
+         *
+         * @param array $id_phone : Phone id
+         *
+         * @return array
+         */
+        public function delete_phone_limits(int $id_phone)
+        {
+            return $this->_delete('phone_limit', ['id_phone' => $id_phone]);
+        }
+
 
         /**
          * Return table name.

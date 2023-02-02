@@ -48,7 +48,7 @@
 									</div>
 								</div>
                                 <div class="form-group">
-                                    <label>Type de téléphone : </label>
+                                    <label>Type de téléphone</label>
                                     <p class="italic small help" id="description-adapter-general">
                                         Le type de téléphone utilisé par RaspiSMS pour envoyer ou recevoir les SMS. Pour plus d'information, consultez <a href="https://documentation.raspisms.fr/users/adapters/overview.html" target="_blank">la documentation de RaspiSMS</a> concernant les différents types de téléphones.
                                     </p>
@@ -67,7 +67,7 @@
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <div id="adapter-data-container" class="form-group">
+                                <div id="adapter-data-container" class="form-group well">
                                     <div id="adapter-data-description-container">
                                         <h4>Description du téléphone</h4>
                                         <div id="adapter-data-description"></div>
@@ -76,6 +76,15 @@
                                     <div id="adapter-data-fields-container">
                                         <h4>Réglages du téléphone</h4>
                                         <div id="adapter-data-fields"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Limites des volumes d'envoi du téléphone</label>
+                                    <p class="italic small help">
+                                        Défini le nombre maximum de SMS qui pourront être envoyés avec ce téléphone sur des périodes de temps données.
+                                    </p>
+                                    <div class="form-group phone-limits-container container-fluid">
+                                        <div class="text-center"><div class="add-phone-limit-button fa fa-plus-circle"></div></div>
                                     </div>
                                 </div>
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
@@ -173,6 +182,47 @@
         jQuery('#adapter-select').on('change', function (e)
         {
             change_adapter();
+        });
+
+        jQuery('body').on('click', '.phone-limits-group-remove', function (e)
+        {
+            e.preventDefault();
+            jQuery(this).parent('.phone-limits-group').remove();
+            return false;
+        });
+
+        jQuery('body').on('click', '.add-phone-limit-button', function(e)
+        {
+            var random_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+			var newLimit = '' +
+			'<div class="row phone-limits-group">'+
+                '<div class="col-xs-4">'+
+                    '<label>Période</label><br/>'+
+                    '<select name="limits[' + random_id + '][startpoint]" class="form-control" id="adapter-select" required>'+
+                        '<option value="" disabled selected>Période sur laquelle appliquer la limite</option>'+
+                        '<option value="today">Par jour</option>'+
+                        '<option value="-24 hours">24 heures glissantes</option>'+
+                        '<option value="this week midnight">Cette semaine</option>'+
+                        '<option value="-7 days">7 jours glissants</option>'+
+                        '<option value="this week midnight -1 week">Ces deux dernières semaines</option>'+
+                        '<option value="-14 days">14 jours glissants</option>'+
+                        '<option value="this month midnight">Ce mois</option>'+
+                        '<option value="-1 month">1 mois glissant</option>'+
+                        '<option value="-28 days">28 jours glissants</option>'+
+                        '<option value="-30 days">30 jours glissants</option>'+
+                        '<option value="-31 days">31 jours glissants</option>'+
+                    '</select>'+
+                '</div>'+
+                '<div class="scheduleds-number-data-container col-xs-8">'+
+                    '<label>Volume</label>'+
+                    '<div class="form-group">'+
+                        '<input name="limits[' + random_id + '][volume]" class="form-control" type="number" min="1" placeholder="Nombre de SMS maximum sur la période.">'+
+                    '</div>'+
+                '</div>'+
+                '<a href="#" class="phone-limits-group-remove"><span class="fa fa-times"></span></a>'+
+            '</div>';
+
+            jQuery(this).parent('div').before(newLimit);
         });
 	});
 </script>

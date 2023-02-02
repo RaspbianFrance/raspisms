@@ -311,7 +311,8 @@ footer img
 }
 
 /* SCHEDULEDS */
-.add-number-button
+.add-number-button,
+.add-phone-limit-button
 {
 	display: inline-block;
 	color: #DADFE1;
@@ -319,7 +320,8 @@ footer img
 	vertical-align: top;
 }
 
-.add-number-button:hover
+.add-number-button:hover,
+.add-phone-limit-button:hover
 {
 	color: #3498DB;
 	cursor: pointer;
@@ -373,7 +375,8 @@ footer img
     text-align: right;
 }
 
-.scheduleds-number-groupe
+.scheduleds-number-groupe,
+.phone-limits-group
 {
 	padding-top: 15px;
 	padding-bottom: 15px;
@@ -383,7 +386,8 @@ footer img
 	position: relative;
 }
 
-.scheduleds-number-groupe-remove
+.scheduleds-number-groupe-remove,
+.phone-limits-group-remove
 {
 	position: absolute;
 	top: 15px;
@@ -391,7 +395,8 @@ footer img
 	color: #888;
 }
 
-.scheduleds-number-groupe-remove:hover
+.scheduleds-number-groupe-remove:hover,
+.phone-limits-group-remove:hover
 {
 	color: #555;
 }

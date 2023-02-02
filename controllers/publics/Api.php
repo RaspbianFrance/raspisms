@@ -535,7 +535,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $name_exist = $this->internal_phone->get_by_name($name);
+            $name_exist = $this->internal_phone->get_by_name_and_user($this->user['id'], $name);
             if ($name_exist)
             {
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
@@ -683,7 +683,7 @@ namespace controllers\publics;
             }
 
 
-            $phone_with_same_name = $this->internal_phone->get_by_name($name);
+            $phone_with_same_name = $this->internal_phone->get_by_name_and_user($this->user['id'], $name);
             if ($phone_with_same_name && $phone_with_same_name['id'] != $phone['id'])
             {
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
