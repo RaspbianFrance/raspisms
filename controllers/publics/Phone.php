@@ -55,6 +55,9 @@ class Phone extends \descartes\Controller
 
         foreach ($phones as &$phone)
         {
+            $limits = $this->internal_phone->get_limits($phone['id']);
+            $phone['limits'] = $limits;
+
             $adapter = $adapters[$phone['adapter']] ?? false;
 
             if (!$adapter)
