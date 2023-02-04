@@ -506,6 +506,7 @@ namespace controllers\publics;
          * @param string $_POST['name']         : Phone name
          * @param string $_POST['adapter']      : Phone adapter
          * @param array  $_POST['adapter_data'] : Phone adapter data
+         * @param ?array $_POST['limits']       : Array of limits in number of SMS for a period to be applied to this phone.
          *
          * @return int : id phone the new phone on success
          */
@@ -516,6 +517,8 @@ namespace controllers\publics;
             $name = $_POST['name'] ?? false;
             $adapter = $_POST['adapter'] ?? false;
             $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
+            $limits = $_POST['limits'] ?? [];
+            $limits = is_array($limits) ? $limits : [$limits];
 
             if (!$name)
             {
@@ -543,6 +546,36 @@ namespace controllers\publics;
                 $this->auto_http_code(false);
 
                 return $this->json($return);
+            }
+
+            if ($limits)
+            {
+                foreach ($limits as $key => $limit)
+                {
+                    if (!is_array($limit))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                    
+                    $startpoint = $limit['startpoint'] ?? false;
+                    $volume = $limit['volume'] ?? false;
+
+                    if (!$startpoint || !$volume)
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+
+                    $volume = (int) $volume;
+                    $limits[$key]['volume'] = max($volume, 1);
+
+                    if (!\controllers\internals\Tool::validate_relative_date($startpoint))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                }
             }
 
             $adapters = $this->internal_adapter->list_adapters();
@@ -627,7 +660,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_data);
+            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_data, $limits);
             if (false === $phone_id)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
@@ -667,10 +700,14 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            $limits = $this->internal_phone->get_limits(($phone['id']));
+
             $name = $_POST['name'] ?? $phone['name'];
             $adapter = $_POST['adapter'] ?? $phone['adapter'];
             $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data']);
             $adapter_data = is_array($adapter_data) ? $adapter_data : [$adapter_data];
+            $limits = $_POST['limits'] ?? $limits;
+            $limits = is_array($limits) ? $limits : [$limits];
 
 
             if (!$name && !$adapter && !$adapter_data)
@@ -691,6 +728,36 @@ namespace controllers\publics;
                 $this->auto_http_code(false);
 
                 return $this->json($return);
+            }
+
+            if ($limits)
+            {
+                foreach ($limits as $key => $limit)
+                {
+                    if (!is_array($limit))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                    
+                    $startpoint = $limit['startpoint'] ?? false;
+                    $volume = $limit['volume'] ?? false;
+
+                    if (!$startpoint || !$volume)
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+
+                    $volume = (int) $volume;
+                    $limits[$key]['volume'] = max($volume, 1);
+
+                    if (!\controllers\internals\Tool::validate_relative_date($startpoint))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                }
             }
 
             $adapters = $this->internal_adapter->list_adapters();
@@ -775,7 +842,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $success = $this->internal_phone->update_for_user($this->user['id'], $phone['id'], $name, $adapter, $adapter_data);
+            $success = $this->internal_phone->update_for_user($this->user['id'], $phone['id'], $name, $adapter, $adapter_data_json, $limits);
             if (!$success)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];

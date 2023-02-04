@@ -56,6 +56,7 @@
                                     </div>
                                     <div class="text-right col-xs-6 no-padding">
                                         <strong>Action pour la séléction :</strong>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
                                         <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                     </div>
                                 </div>

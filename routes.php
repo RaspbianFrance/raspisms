@@ -160,6 +160,8 @@
             'add' => '/phone/add/',
             'create' => '/phone/create/{csrf}/',
             'delete' => '/phone/delete/{csrf}/',
+            'edit' => '/phone/edit/',
+            'update' => '/phone/update/{csrf}/',
         ],
         
         'Call' => [

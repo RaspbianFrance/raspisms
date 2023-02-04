@@ -184,20 +184,52 @@ namespace controllers\internals;
          * @param int    $id           : Phone id
          * @param string $name         : The name of the phone
          * @param string $adapter      : The adapter to use the phone
-         * @param array  $adapter_data : An array of the data of the adapter (for example credentials for an api)
+         * @param string json $adapter_data : A JSON string representing adapter's data (for example credentials for an api)
+         * @param array  $limits       : An array of limits for this phone. Each limit must be an array with a key volume and a key startpoint
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id, string $name, string $adapter, array $adapter_data): bool
+        public function update_for_user(int $id_user, int $id, string $name, string $adapter, string $adapter_data, array $limits = []): bool
         {
             $phone = [
                 'id_user' => $id_user,
                 'name' => $name,
                 'adapter' => $adapter,
-                'adapter_data' => json_encode($adapter_data),
+                'adapter_data' => $adapter_data,
             ];
 
-            return (bool) $this->get_model()->update_for_user($id_user, $id, $phone);
+            //Use transaction to garanty atomicity
+            $this->bdd->beginTransaction();
+            
+            $nb_delete = $this->get_model()->delete_phone_limits($id);
+
+            foreach ($limits as $limit)
+            {
+                $limit_id = $this->get_model()->insert_phone_limit($id, $limit['volume'], $limit['startpoint']);
+                
+                if (!$limit_id)
+                {
+                    $this->bdd->rollBack();
+
+                    return false;
+                }
+            }
+
+            $nb_update = $this->get_model()->update_for_user($id_user, $id, $phone);
+            
+            $success = $this->bdd->commit();
+
+            if (!$success)
+            {
+                return false;
+            }
+
+            if ($nb_update == 0 && count($limits) == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /**

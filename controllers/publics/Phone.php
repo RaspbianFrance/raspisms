@@ -134,7 +134,7 @@ class Phone extends \descartes\Controller
      * @param string $_POST['name']          : Phone name
      * @param string $_POST['adapter']       : Phone adapter
      * @param ?array  $_POST['adapter_data'] : Phone adapter data
-     * @param ?array $_POST['limits']        : Limits in number of SMS for a period to be applied to this phone.
+     * @param ?array $_POST['limits']        : Array of limits in number of SMS for a period to be applied to this phone.
      */
     public function create($csrf)
     {
@@ -171,6 +171,12 @@ class Phone extends \descartes\Controller
         {
             foreach ($limits as $key => $limit)
             {
+                if (!is_array($limit))
+                {
+                    unset($limits[$key]);
+                    continue;
+                }
+
                 $startpoint = $limit['startpoint'] ?? false;
                 $volume = $limit['volume'] ?? false;
 
@@ -281,6 +287,217 @@ class Phone extends \descartes\Controller
         }
 
         \FlashMessage\FlashMessage::push('success', 'Le téléphone a bien été créé.');
+
+        return $this->redirect(\descartes\Router::url('Phone', 'list'));
+    }
+
+
+    /**
+     * Return the edit page for phones
+     *
+     * @param int... $ids : Phones ids
+     */
+    public function edit()
+    {
+        $ids = $_GET['ids'] ?? [];
+        $id_user = $_SESSION['user']['id'];
+
+        $phones = $this->internal_phone->gets_in_for_user($id_user, $ids);
+
+        if (!$phones)
+        {
+            return $this->redirect(\descartes\Router::url('Phone', 'list'));
+        }
+
+        foreach ($phones as &$phone)
+        {
+            $limits = $this->internal_phone->get_limits($phone['id']);
+            $phone['limits'] = $limits;
+        }
+
+        $phone_data = json_decode($phone['adapter_data'], true);
+        $adapters = $this->internal_adapter->list_adapters();
+        foreach ($adapters as &$adapter)
+        {
+            foreach ($adapter['meta_data_fields'] as &$data_field) 
+            {
+                if (key_exists($data_field['name'], $phone_data))
+                {
+                    $data_field['value'] = $phone_data[$data_field['name']];
+                }
+            }
+        }
+
+        $this->render('phone/edit', [
+            'phones' => $phones,
+            'adapters' => $adapters,
+        ]);
+    }
+
+
+    /**
+     * Update multiple phones.
+     *
+     * @param $csrf : CSRF token
+     * @param string $_POST['phones']['id']['name']          : Phone name
+     * @param string $_POST['phones']['id']['adapter']       : Phone adapter
+     * @param ?array $_POST['phones']['id']['adapter_data'] : Phone adapter data
+     * @param ?array $_POST['phones']['id']['limits']        : Array of limits in number of SMS for a period to be applied to this phone.
+     */
+    public function update($csrf)
+    {
+        if (!$this->verify_csrf($csrf))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        if (!$_POST['phones'])
+        {
+            return $this->redirect(\descartes\Router::url('Phone', 'list'));
+        }
+
+        $id_user = $_SESSION['user']['id'];
+
+        $nb_update = 0;
+        foreach ($_POST['phones'] as $id_phone => $phone)
+        {
+            $name = $phone['name'] ?? false;
+            $adapter = $phone['adapter'] ?? false;
+            $adapter_data = !empty($phone['adapter_data']) ? $phone['adapter_data'] : [];
+            $limits = $phone['limits'] ?? [];
+            $limits = is_array($limits) ? $limits : [$limits];
+
+            if (!$name || !$adapter)
+            {
+                continue;
+            }
+
+            $phone_with_same_name = $this->internal_phone->get_by_name_and_user($id_user, $name);
+            if ($phone_with_same_name && $phone_with_same_name['id'] != $id_phone)
+            {
+                continue;
+            }
+
+            if ($limits)
+            {
+                foreach ($limits as $key => $limit)
+                {
+                    if (!is_array($limit))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                    
+                    $startpoint = $limit['startpoint'] ?? false;
+                    $volume = $limit['volume'] ?? false;
+
+                    if (!$startpoint || !$volume)
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+
+                    $volume = (int) $volume;
+                    $limits[$key]['volume'] = max($volume, 1);
+
+                    if (!\controllers\internals\Tool::validate_relative_date($startpoint))
+                    {
+                        unset($limits[$key]);
+                        continue;
+                    }
+                }
+            }
+
+            $adapters = $this->internal_adapter->list_adapters();
+            $find_adapter = false;
+            foreach ($adapters as $metas)
+            {
+                if ($metas['meta_classname'] === $adapter)
+                {
+                    $find_adapter = $metas;
+
+                    break;
+                }
+            }
+
+            if (!$find_adapter)
+            {
+                continue;
+            }
+
+            if ($find_adapter['meta_hidden'])
+            {
+                continue;
+            }
+
+            //If missing required data fields, error
+            foreach ($find_adapter['meta_data_fields'] as $field)
+            {
+                if (false === $field['required'])
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_data[$field['name']]))
+                {
+                    continue;
+                }
+
+                continue 2;
+            }
+
+            //If field phone number is invalid
+            foreach ($find_adapter['meta_data_fields'] as $field)
+            {
+                if ('phone_number' !== ($field['type'] ?? false))
+                {
+                    continue;
+                }
+
+                if (!empty($adapter_data[$field['name']]))
+                {
+                    $adapter_data[$field['name']] = \controllers\internals\Tool::parse_phone($adapter_data[$field['name']]);
+
+                    if ($adapter_data[$field['name']])
+                    {
+                        continue;
+                    }
+                }
+
+                continue 2;
+            }
+
+            $adapter_data = json_encode($adapter_data);
+
+            //Check adapter is working correctly with thoses names and data
+            $adapter_classname = $find_adapter['meta_classname'];
+            $adapter_instance = new $adapter_classname($adapter_data);
+            $adapter_working = $adapter_instance->test();
+
+            if (!$adapter_working)
+            {
+                continue;
+            }
+
+            $success = $this->internal_phone->update_for_user($id_user, $id_phone, $name, $adapter, $adapter_data, $limits);
+            if (!$success)
+            {
+                continue;
+            }
+
+            $nb_update ++;
+        }
+
+        if ($nb_update !== \count($_POST['phones']))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Certains téléphones n\'ont pas pu êtres mis à jour.');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'list'));
+        }
+
+        \FlashMessage\FlashMessage::push('success', 'Tous les téléphones ont été modifiés avec succès.');
 
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
     }

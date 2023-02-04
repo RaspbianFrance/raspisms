@@ -198,7 +198,7 @@
 			'<div class="row phone-limits-group">'+
                 '<div class="col-xs-4">'+
                     '<label>Période</label><br/>'+
-                    '<select name="limits[' + random_id + '][startpoint]" class="form-control" id="adapter-select" required>'+
+                    '<select name="limits[' + random_id + '][startpoint]" class="form-control" required>'+
                         '<option value="" disabled selected>Période sur laquelle appliquer la limite</option>'+
                         '<option value="today">Par jour</option>'+
                         '<option value="-24 hours">24 heures glissantes</option>'+
