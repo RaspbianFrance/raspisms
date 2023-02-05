@@ -50,6 +50,15 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
+                                            <label>Priorité d'utilisation du téléphone</label>
+                                            <p class="italic small help">
+                                                Lors de l'envoi de SMS sans téléphone spécifié, les téléphones avec la plus haute priorité seront utilisés en premier.
+                                            </p>
+                                            <div class="form-group">
+                                                <input required="required" name="phones[<?php $this->s($phone['id']); ?>][priority]" class="form-control" type="number" min="0" placeholder="Priorité d'utilisation" value="<?php $this->s($phone['priority']) ?>">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label>Type de téléphone</label>
                                             <p class="italic small help description-adapter-general">
                                                 Le type de téléphone utilisé par RaspiSMS pour envoyer ou recevoir les SMS. Pour plus d'information, consultez <a href="https://documentation.raspisms.fr/users/adapters/overview.html" target="_blank">la documentation de RaspiSMS</a> concernant les différents types de téléphones.

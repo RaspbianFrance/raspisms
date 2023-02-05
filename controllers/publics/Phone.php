@@ -138,6 +138,7 @@ class Phone extends \descartes\Controller
      * @param string $_POST['adapter']       : Phone adapter
      * @param ?array  $_POST['adapter_data'] : Phone adapter data
      * @param ?array $_POST['limits']        : Array of limits in number of SMS for a period to be applied to this phone.
+     * @param int $_POST['priority']         : Priority with which to use phone to send SMS. Default 0.
      */
     public function create($csrf)
     {
@@ -150,6 +151,8 @@ class Phone extends \descartes\Controller
 
         $id_user = $_SESSION['user']['id'];
         $name = $_POST['name'] ?? false;
+        $priority = $_POST['priority'] ?? 0;
+        $priority = max(((int) $priority), 0);
         $adapter = $_POST['adapter'] ?? false;
         $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
         $limits = $_POST['limits'] ?? [];
@@ -281,7 +284,7 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'add'));
         }
 
-        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_data, $limits);
+        $success = $this->internal_phone->create($id_user, $name, $adapter, $adapter_data, $priority, $limits);
         if (!$success)
         {
             \FlashMessage\FlashMessage::push('danger', 'Impossible de créer ce téléphone.');
@@ -346,6 +349,7 @@ class Phone extends \descartes\Controller
      * @param string $_POST['phones']['id']['adapter']       : Phone adapter
      * @param ?array $_POST['phones']['id']['adapter_data'] : Phone adapter data
      * @param ?array $_POST['phones']['id']['limits']        : Array of limits in number of SMS for a period to be applied to this phone.
+     * @param int    $_POST['phones']['id']['priority']         : Priority with which to use phone to send SMS. Default 0.
      */
     public function update($csrf)
     {
@@ -367,6 +371,8 @@ class Phone extends \descartes\Controller
         foreach ($_POST['phones'] as $id_phone => $phone)
         {
             $name = $phone['name'] ?? false;
+            $priority = $phone['priority'] ?? 0;
+            $priority = max(((int) $priority), 0);
             $adapter = $phone['adapter'] ?? false;
             $adapter_data = !empty($phone['adapter_data']) ? $phone['adapter_data'] : [];
             $limits = $phone['limits'] ?? [];
@@ -484,7 +490,7 @@ class Phone extends \descartes\Controller
                 continue;
             }
 
-            $success = $this->internal_phone->update_for_user($id_user, $id_phone, $name, $adapter, $adapter_data, $limits);
+            $success = $this->internal_phone->update_for_user($id_user, $id_phone, $name, $adapter, $adapter_data, $priority, $limits);
             if (!$success)
             {
                 continue;

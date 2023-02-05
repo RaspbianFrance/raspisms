@@ -137,15 +137,17 @@ namespace controllers\internals;
          * @param string      $name         : The name of the phone
          * @param string      $adapter      : The adapter to use the phone
          * @param string json $adapter_data : A JSON string representing adapter's data (for example credentials for an api)
+         * @param int         $priority     : Priority with which to use phone to send SMS. Default 0.
          * @param array       $limits       : An array of limits for this phone. Each limit must be an array with a key volume and a key startpoint
          *
          * @return bool|int : false on error, new id on success
          */
-        public function create(int $id_user, string $name, string $adapter, string $adapter_data, array $limits = [])
+        public function create(int $id_user, string $name, string $adapter, string $adapter_data, int $priority = 0, array $limits = [])
         {
             $phone = [
                 'id_user' => $id_user,
                 'name' => $name,
+                'priority' => $priority,
                 'adapter' => $adapter,
                 'adapter_data' => $adapter_data,
             ];
@@ -185,17 +187,19 @@ namespace controllers\internals;
          * @param string $name         : The name of the phone
          * @param string $adapter      : The adapter to use the phone
          * @param string json $adapter_data : A JSON string representing adapter's data (for example credentials for an api)
+         * @param int         $priority     : Priority with which to use phone to send SMS. Default 0.
          * @param array  $limits       : An array of limits for this phone. Each limit must be an array with a key volume and a key startpoint
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id, string $name, string $adapter, string $adapter_data, array $limits = []): bool
+        public function update_for_user(int $id_user, int $id, string $name, string $adapter, string $adapter_data, int $priority = 0, array $limits = []): bool
         {
             $phone = [
                 'id_user' => $id_user,
                 'name' => $name,
                 'adapter' => $adapter,
                 'adapter_data' => $adapter_data,
+                'priority' => $priority,
             ];
 
             //Use transaction to garanty atomicity

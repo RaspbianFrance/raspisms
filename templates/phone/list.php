@@ -41,6 +41,7 @@
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Nom</th>
+                                                <th>Priorité</th>
                                                 <th>Type de téléphone</th>
                                                 <th>Callbacks</th>
                                                 <th>Limites</th>
@@ -90,6 +91,7 @@ jQuery(document).ready(function ()
         "columns" : [
             {data: 'id', render: jQuery.fn.dataTable.render.text()},
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {data: 'priority', render: jQuery.fn.dataTable.render.text()},
             {data: 'adapter', render: jQuery.fn.dataTable.render.text()},
             {
                 data: '_',

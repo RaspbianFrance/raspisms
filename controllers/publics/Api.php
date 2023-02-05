@@ -506,6 +506,7 @@ namespace controllers\publics;
          * @param string $_POST['name']         : Phone name
          * @param string $_POST['adapter']      : Phone adapter
          * @param array  $_POST['adapter_data'] : Phone adapter data
+         * @param int    $priority              : Priority with which to use phone to send SMS. Default 0.
          * @param ?array $_POST['limits']       : Array of limits in number of SMS for a period to be applied to this phone.
          *
          * @return int : id phone the new phone on success
@@ -517,6 +518,8 @@ namespace controllers\publics;
             $name = $_POST['name'] ?? false;
             $adapter = $_POST['adapter'] ?? false;
             $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : [];
+            $priority = $_POST['priority'] ?? 0;
+            $priority = max(((int) $priority), 0);
             $limits = $_POST['limits'] ?? [];
             $limits = is_array($limits) ? $limits : [$limits];
 
@@ -660,7 +663,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_data, $limits);
+            $phone_id = $this->internal_phone->create($this->user['id'], $name, $adapter, $adapter_data, $priority, $limits);
             if (false === $phone_id)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
@@ -683,6 +686,7 @@ namespace controllers\publics;
          * @param string (optionnal) $_POST['name']         : New phone name
          * @param string (optionnal) $_POST['adapter']      : New phone adapter
          * @param array  (optionnal) $_POST['adapter_data'] : New phone adapter data
+         * @param int         $priority     : Priority with which to use phone to send SMS. Default 0.
          *
          * @return int : id phone the new phone on success
          */
@@ -703,6 +707,8 @@ namespace controllers\publics;
             $limits = $this->internal_phone->get_limits(($phone['id']));
 
             $name = $_POST['name'] ?? $phone['name'];
+            $priority = $_POST['priority'] ?? $phone['priority'];
+            $priority = max(((int) $priority), 0);
             $adapter = $_POST['adapter'] ?? $phone['adapter'];
             $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data']);
             $adapter_data = is_array($adapter_data) ? $adapter_data : [$adapter_data];
@@ -842,7 +848,7 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            $success = $this->internal_phone->update_for_user($this->user['id'], $phone['id'], $name, $adapter, $adapter_data_json, $limits);
+            $success = $this->internal_phone->update_for_user($this->user['id'], $phone['id'], $name, $adapter, $adapter_data_json, $priority, $limits);
             if (!$success)
             {
                 $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
