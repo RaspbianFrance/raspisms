@@ -479,6 +479,8 @@ use Monolog\Logger;
                     $mms_phones = $internal_phone->gets_phone_supporting_mms_for_user($id_user, $internal_phone::MMS_SENDING);
                     foreach ($mms_phones as &$mms_phone)
                     {
+                        $limits = $internal_phone->get_limits($mms_phone['id']);
+
                         $remaining_volume = PHP_INT_MAX;
                         foreach ($limits as $limit)
                         {

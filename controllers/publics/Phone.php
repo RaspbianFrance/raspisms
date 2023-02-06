@@ -315,23 +315,12 @@ class Phone extends \descartes\Controller
             return $this->redirect(\descartes\Router::url('Phone', 'list'));
         }
 
+        $adapters = $this->internal_adapter->list_adapters();
+
         foreach ($phones as &$phone)
         {
             $limits = $this->internal_phone->get_limits($phone['id']);
             $phone['limits'] = $limits;
-        }
-
-        $phone_data = json_decode($phone['adapter_data'], true);
-        $adapters = $this->internal_adapter->list_adapters();
-        foreach ($adapters as &$adapter)
-        {
-            foreach ($adapter['meta_data_fields'] as &$data_field) 
-            {
-                if (key_exists($data_field['name'], $phone_data))
-                {
-                    $data_field['value'] = $phone_data[$data_field['name']];
-                }
-            }
         }
 
         $this->render('phone/edit', [

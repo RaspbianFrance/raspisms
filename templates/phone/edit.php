@@ -70,7 +70,10 @@
                                                             value="<?= $adapter['meta_classname'] ?>"
                                                             data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                             data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
-                                                            <?= ($phone['adapter'] ?? '') == $adapter['meta_classname'] ? 'selected' : ''  ?>
+                                                            <?php if ($phone['adapter'] == $adapter['meta_classname']) { ?>
+                                                                data-phone-adapter-data="<?php $this->s($phone['adapter_data']); ?>"
+                                                                selected
+                                                            <?php } ?>
                                                         >
                                                             <?php $this->s($adapter['meta_name']); ?>
                                                         </option>
@@ -153,12 +156,33 @@
         var data_fields = option.attr('data-data-fields');
         data_fields = JSON.parse(data_fields);
 
+        if (option.attr('data-phone-adapter-data'))
+        {
+            var phone_adapter_data = option.attr('data-phone-adapter-data');
+            phone_adapter_data = JSON.parse(phone_adapter_data);
+        }
+
         var numbers = [];
 
         var html = '';
         jQuery.each(data_fields, function (index, field)
         {
-            value = field.value ? field.value : (field.default_value ? field.default_value : null);
+            if (phone_adapter_data)
+            {
+                if (field.name in phone_adapter_data)
+                {
+                    value = phone_adapter_data[field.name];
+                }
+                else
+                {
+                    value = field.default_value ? field.default_value : null;
+                }
+            }
+            else
+            {
+                value = field.default_value ? field.default_value : null;
+            }
+            
 
             if (field.type == 'phone_number')
             {

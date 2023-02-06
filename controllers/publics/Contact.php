@@ -372,6 +372,7 @@ namespace controllers\publics;
                     else
                     {
                         $invalid_type = true;
+                        $result = false;
                     }
             }
 

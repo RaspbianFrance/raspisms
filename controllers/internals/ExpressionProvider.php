@@ -44,11 +44,6 @@ class ExpressionProvider implements ExpressionFunctionProviderInterface
             return sprintf('isset(%1$s) && is_a(%1$s, \'DateTime\') && %1$s->format(\'m-d\') == (new \\DateTime())->format(\'m-d\')', $birthdate);
         }, function ($arguments, DateTime $birthdate)
         {
-            if (!($birthdate ?? false))
-            {
-                return false;
-            }
-
             return $birthdate->format('m-d') == (new DateTime())->format('m-d');
         });
 
