@@ -601,6 +601,11 @@ use Monolog\Logger;
                         continue;
                     }
 
+                    // If we must force GSM 7 alphabet
+                    if ((int) ($users_settings[$id_user]['force_gsm_alphabet'] ?? false))
+                    {
+                        $text = Tool::convert_to_gsm0338($text);
+                    }
 
                     /*
                         Choose phone if no phone defined for message

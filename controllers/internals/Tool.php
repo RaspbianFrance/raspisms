@@ -11,6 +11,8 @@
 
 namespace controllers\internals;
 
+use BenMorel\GsmCharsetConverter\Converter;
+
     /**
      * Some tools frequently used.
      * Not a standard controller as it's not linked to a model in any way.
@@ -411,5 +413,18 @@ namespace controllers\internals;
             $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
 
             return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
+        }
+
+
+        /**
+         * Transform an UTF-8 string into a valid GSM 7 string (GSM 03.38), remplacing invalid chars with best equivalent whenever possible
+         * 
+         * @param string $text : Input text to convert into gsm string
+         * @return string : An UTF-8 string with GSM alphabet only
+         */
+        public static function convert_to_gsm0338(string $text): string
+        {
+            $converter = new Converter();
+            return $converter->cleanUpUtf8String($text, true, '?');
         }
     }

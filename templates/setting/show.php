@@ -54,6 +54,25 @@
 										</form>
 									</div>
                                 </div>
+                                <div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-font fa-fw"></i> Alphabet SMS optimisé</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'force_gsm_alphabet', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Optimiser la taille des SMS en remplaçant les caractères spéciaux par leur équivalent GSM 7-bit : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['force_gsm_alphabet'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h4 class="panel-title"><i class="fa fa-picture-o fa-fw"></i> Support des MMS</h4>

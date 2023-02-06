@@ -83,6 +83,12 @@ namespace controllers\publics;
             $result = $this->internal_templating->render($template, $data);
             $return = $result;
 
+            // If we must force GSM 7 alphabet
+            if ((int) ($_SESSION['user']['settings']['force_gsm_alphabet'] ?? false))
+            {
+                $return['result'] = \controllers\internals\Tool::convert_to_gsm0338($return['result']);
+            }
+
             if (!trim($result['result']))
             {
                 $return['result'] = 'Message vide, il ne sera pas envoyé.';
