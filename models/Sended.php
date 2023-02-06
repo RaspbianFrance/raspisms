@@ -189,7 +189,7 @@ namespace models;
          */
         public function count_since_for_phone_and_user(int $id_user, int $id_phone, \DateTime $since) : int
         {
-            return $this->_count('sended', ['id_user' => $id_user, 'id_phone' => $id_phone, '>=at' => $since]);
+            return $this->_count('sended', ['id_user' => $id_user, 'id_phone' => $id_phone, '>=at' => $since->format('c')]);
         }
 
         /**
