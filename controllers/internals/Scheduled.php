@@ -275,236 +275,6 @@ use Monolog\Logger;
         }
 
         /**
-         * Get all messages to send and the number to use to send theme.
-         *
-         * @return array : List of smss to send at this time per scheduled id ['1' => [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...], ...]
-         */
-        public function get_smss_to_send()
-        {
-            $smss_to_send_per_scheduled = [];
-
-            $internal_templating = new \controllers\internals\Templating();
-            $internal_setting = new \controllers\internals\Setting($this->bdd);
-            $internal_group = new \controllers\internals\Group($this->bdd);
-            $internal_conditional_group = new \controllers\internals\ConditionalGroup($this->bdd);
-            $internal_phone = new \controllers\internals\Phone($this->bdd);
-            $internal_smsstop = new \controllers\internals\SmsStop($this->bdd);
-
-            $users_smsstops = [];
-            $users_settings = [];
-            $users_phones = [];
-            $users_mms_phones = [];
-
-            $now = new \DateTime();
-            $now = $now->format('Y-m-d H:i:s');
-            $scheduleds = $this->get_model()->gets_before_date($now);
-            foreach ($scheduleds as $scheduled)
-            {
-                $smss_to_send_per_scheduled[$scheduled['id']] = [];
-
-                if (!isset($users_settings[$scheduled['id_user']]))
-                {
-                    $users_settings[$scheduled['id_user']] = [];
-
-                    $settings = $internal_setting->gets_for_user($scheduled['id_user']);
-                    foreach ($settings as $name => $value)
-                    {
-                        $users_settings[$scheduled['id_user']][$name] = $value;
-                    }
-                }
-
-                if (!isset($users_smsstops[$scheduled['id_user']]) && $users_settings[$scheduled['id_user']]['smsstop'])
-                {
-                    $users_smsstops[$scheduled['id_user']] = [];
-
-                    $smsstops = $internal_smsstop->gets_for_user($scheduled['id_user']);
-                    foreach ($smsstops as $smsstop)
-                    {
-                        $users_smsstops[$scheduled['id_user']][] = $smsstop['number'];
-                    }
-                }
-
-                if (!isset($users_phones[$scheduled['id_user']]))
-                {
-                    $phones = $internal_phone->gets_for_user($scheduled['id_user']);
-                    $mms_phones = $internal_phone->gets_phone_supporting_mms_for_user($scheduled['id_user'], $internal_phone::MMS_SENDING);
-                    $users_phones[$scheduled['id_user']] = $phones ?: [];
-                    $users_mms_phones[$scheduled['id_user']] = $mms_phones ?: [];
-                }
-
-                //Add medias to mms
-                $scheduled['medias'] = [];
-                if ($scheduled['mms'])
-                {
-                    $internal_media = new Media($this->bdd);
-                    $scheduled['medias'] = $internal_media->gets_for_scheduled($scheduled['id']);
-                }
-
-                $phone_to_use = null;
-                foreach ($users_phones[$scheduled['id_user']] as $phone)
-                {
-                    if ($phone['id'] !== $scheduled['id_phone'])
-                    {
-                        continue;
-                    }
-
-                    $phone_to_use = $phone;
-                }
-
-                $messages = [];
-
-                //Add messages for numbers
-                $numbers = $this->get_numbers($scheduled['id']);
-                foreach ($numbers as $number)
-                {
-                    if (null === $phone_to_use)
-                    {
-                        if ($scheduled['mms'] && count($users_mms_phones))
-                        {
-                            $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
-                            $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];
-                        }
-                        else
-                        {
-                            $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
-                            $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
-                        }
-                    }
-
-                    $message = [
-                        'id_user' => $scheduled['id_user'],
-                        'id_scheduled' => $scheduled['id'],
-                        'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
-                        'destination' => $number['number'],
-                        'flash' => $scheduled['flash'],
-                        'mms' => $scheduled['mms'],
-                        'medias' => $scheduled['medias'],
-                    ];
-
-                    if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
-                    {
-                        $number['data'] = json_decode($number['data'] ?? '[]', true);
-
-                        $metas = ['number' => $number['number']];
-                        $data = ['contact' => $number['data'], 'contact_metas' => $metas];
-
-                        $render = $internal_templating->render($scheduled['text'], $data);
-
-                        if (!$render['success'])
-                        {
-                            continue;
-                        }
-
-                        $message['text'] = $render['result'];
-                    }
-                    else
-                    {
-                        $message['text'] = $scheduled['text'];
-                    }
-
-                    $messages[] = $message;
-                }
-
-                //Add messages for contacts
-                $contacts = $this->get_contacts($scheduled['id']);
-
-                $groups = $this->get_groups($scheduled['id']);
-                foreach ($groups as $group)
-                {
-                    $contacts_to_add = $internal_group->get_contacts($group['id']);
-                    $contacts = array_merge($contacts, $contacts_to_add);
-                }
-
-                $conditional_groups = $this->get_conditional_groups($scheduled['id']);
-                foreach ($conditional_groups as $conditional_group)
-                {
-                    $contacts_to_add = $internal_conditional_group->get_contacts_for_condition_and_user($scheduled['id_user'], $conditional_group['condition']);
-                    $contacts = array_merge($contacts, $contacts_to_add);
-                }
-
-                $added_contacts = [];
-                foreach ($contacts as $contact)
-                {
-                    if ($added_contacts[$contact['id']] ?? false)
-                    {
-                        continue;
-                    }
-
-                    $added_contacts[$contact['id']] = true;
-
-                    if (null === $phone_to_use)
-                    {
-                        if ($scheduled['mms'] && count($users_mms_phones))
-                        {
-                            $rnd_key = array_rand($users_mms_phones[$scheduled['id_user']]);
-                            $random_phone = $users_mms_phones[$scheduled['id_user']][$rnd_key];
-                        }
-                        else
-                        {
-                            $rnd_key = array_rand($users_phones[$scheduled['id_user']]);
-                            $random_phone = $users_phones[$scheduled['id_user']][$rnd_key];
-                        }
-                    }
-
-                    $message = [
-                        'id_user' => $scheduled['id_user'],
-                        'id_scheduled' => $scheduled['id'],
-                        'id_phone' => $phone_to_use['id'] ?? $random_phone['id'],
-                        'destination' => $contact['number'],
-                        'flash' => $scheduled['flash'],
-                        'mms' => $scheduled['mms'],
-                        'medias' => $scheduled['medias'],
-                    ];
-
-                    if ((int) ($users_settings[$scheduled['id_user']]['templating'] ?? false))
-                    {
-                        $contact['data'] = json_decode($contact['data'], true);
-
-                        //Add metas of contact by adding contact without data
-                        $metas = $contact;
-                        unset($metas['data'], $metas['id_user']);
-
-                        $data = ['contact' => $contact['data'], 'contact_metas' => $metas];
-
-                        $render = $internal_templating->render($scheduled['text'], $data);
-
-                        if (!$render['success'])
-                        {
-                            continue;
-                        }
-
-                        $message['text'] = $render['result'];
-                    }
-                    else
-                    {
-                        $message['text'] = $scheduled['text'];
-                    }
-
-                    $messages[] = $message;
-                }
-
-                foreach ($messages as $message)
-                {
-                    //Remove empty messages
-                    if ('' === trim($message['text']) && !$message['medias'])
-                    {
-                        continue;
-                    }
-
-                    //Remove messages to smsstops numbers
-                    if (($users_smsstops[$scheduled['id_user']] ?? false) && in_array($message['destination'], $users_smsstops[$scheduled['id_user']]))
-                    {
-                        continue;
-                    }
-
-                    $smss_to_send_per_scheduled[$scheduled['id']][] = $message;
-                }
-            }
-
-            return $smss_to_send_per_scheduled;
-        }
-
-        /**
          * Parse a CSV file of numbers, potentially associated with datas.
          *
          * @param resource $file_handler : File handler pointing to the file
@@ -626,5 +396,281 @@ use Monolog\Logger;
             $this->model = $this->model ?? new \models\Scheduled($this->bdd);
 
             return $this->model;
+        }
+
+
+        /**
+         * Get all messages to send and the number to use to send theme.
+         *
+         * @return array : List of smss to send at this time per scheduled id ['1' => [['id_scheduled', 'text', 'id_phone', 'destination', 'flash', 'mms', 'medias'], ...], ...]
+         */
+        public function get_smss_to_send()
+        {
+            $sms_per_scheduled = [];
+
+            $internal_templating = new \controllers\internals\Templating();
+            $internal_setting = new \controllers\internals\Setting($this->bdd);
+            $internal_group = new \controllers\internals\Group($this->bdd);
+            $internal_conditional_group = new \controllers\internals\ConditionalGroup($this->bdd);
+            $internal_phone = new \controllers\internals\Phone($this->bdd);
+            $internal_smsstop = new \controllers\internals\SmsStop($this->bdd);
+            $internal_sended = new \controllers\internals\Sended($this->bdd);
+
+            $users_smsstops = [];
+            $users_settings = [];
+            $users_phones = [];
+            $users_mms_phones = [];
+
+            $now = new \DateTime();
+            $now = $now->format('Y-m-d H:i:s');
+            $scheduleds = $this->get_model()->gets_before_date($now);
+            foreach ($scheduleds as $scheduled)
+            {
+                $id_scheduled = $scheduled['id'];
+                $id_user = $scheduled['id_user'];
+
+                $sms_per_scheduled[$id_scheduled] = [];
+
+                // Forge cache of data about users, sms stops, phones, etc.
+                if (!isset($users_settings[$id_user]))
+                {
+                    $users_settings[$id_user] = [];
+
+                    $settings = $internal_setting->gets_for_user($id_user);
+                    foreach ($settings as $name => $value)
+                    {
+                        $users_settings[$id_user][$name] = $value;
+                    }
+                }
+
+                if (!isset($users_smsstops[$id_user]) && $users_settings[$id_user]['smsstop'])
+                {
+                    $users_smsstops[$id_user] = [];
+
+                    $smsstops = $internal_smsstop->gets_for_user($id_user);
+                    foreach ($smsstops as $smsstop)
+                    {
+                        $users_smsstops[$id_user][] = $smsstop['number'];
+                    }
+                }
+
+                if (!isset($users_phones[$id_user]))
+                {
+                    $users_phones[$id_user] = [];
+                    $users_mms_phones[$id_user] = [];
+
+                    $phones = $internal_phone->gets_for_user($id_user);
+                    foreach ($phones as &$phone)
+                    {
+                        $limits = $internal_phone->get_limits($phone['id']);
+
+                        $remaining_volume = PHP_INT_MAX;
+                        foreach ($limits as $limit)
+                        {
+                            $startpoint = new \DateTime($limit['startpoint']);
+                            $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $phone['id'], $startpoint);
+                            $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                        }
+
+                        $phone['remaining_volume'] = $remaining_volume;
+                        $users_phones[$id_user][$phone['id']] = $phone;
+                    }
+
+                    $mms_phones = $internal_phone->gets_phone_supporting_mms_for_user($id_user, $internal_phone::MMS_SENDING);
+                    foreach ($mms_phones as &$mms_phone)
+                    {
+                        $remaining_volume = PHP_INT_MAX;
+                        foreach ($limits as $limit)
+                        {
+                            $startpoint = new \DateTime($limit['startpoint']);
+                            $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $mms_phone['id'], $startpoint);
+                            $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                        }
+
+                        $mms_phone['remaining_volume'] = $remaining_volume;
+                        $mms_phones[$id_user][$mms_phone['id']] = $mms_phone;
+                    }
+                }
+
+
+                //Add medias to mms
+                $scheduled['medias'] = [];
+                if ($scheduled['mms'])
+                {
+                    $internal_media = new Media($this->bdd);
+                    $scheduled['medias'] = $internal_media->gets_for_scheduled($id_scheduled);
+                }
+
+                $phone_to_use = null;
+                if ($scheduled['id_phone'])
+                {
+                    $phone_to_use = $users_phones[$id_user][$scheduled['id_phone']] ?? null;
+                }
+
+
+                // We turn all contacts, groups and conditional groups into just contacts
+                $contacts = $this->get_contacts($id_scheduled);
+
+                $groups = $this->get_groups($id_scheduled);
+                foreach ($groups as $group)
+                {
+                    $contacts_to_add = $internal_group->get_contacts($group['id']);
+                    $contacts = array_merge($contacts, $contacts_to_add);
+                }
+
+                $conditional_groups = $this->get_conditional_groups($id_scheduled);
+                foreach ($conditional_groups as $conditional_group)
+                {
+                    $contacts_to_add = $internal_conditional_group->get_contacts_for_condition_and_user($id_user, $conditional_group['condition']);
+                    $contacts = array_merge($contacts, $contacts_to_add);
+                }
+
+
+                // We turn all numbers and contacts into simple targets with number, data and meta so we can forge all messages from onlye one data source
+                $targets = [];
+                
+                $numbers = $this->get_numbers($id_scheduled);
+                foreach ($numbers as $number)
+                {
+                    $metas = ['number' => $number['number']];
+                    $targets[] = [
+                        'number' => $number['number'],
+                        'data' => $number['data'],
+                        'metas' => $metas,
+                    ];
+                }
+
+                foreach ($contacts as $contact)
+                {
+                    $metas = $contact;
+                    unset($metas['data'], $metas['id_user']);
+
+                    $targets[] = [
+                        'number' => $contact['number'],
+                        'data' => $contact['data'],
+                        'metas' => $metas,
+                    ];
+                }
+
+                // Pass on all targets to deduplicate destinations, remove number in sms stops, etc.
+                $used_destinations = [];
+                foreach ($targets as $key => $target)
+                {
+                    if (in_array($target['number'], $used_destinations))
+                    {
+                        unset($targets[$key]);
+                        continue;
+                    }
+
+                    //Remove messages to smsstops numbers
+                    if (($users_smsstops[$id_user] ?? false) && in_array($target['number'], $users_smsstops[$id_user]))
+                    {
+                        continue;
+                    }
+
+                    $used_destinations[] = $target['number'];
+                }
+                
+                
+                // Finally, we forge all messages and select phone to use
+                foreach ($targets as $target)
+                {
+                    // Forge message if templating enable
+                    $text = $scheduled['text'];
+                    if ((int) ($users_settings[$id_user]['templating'] ?? false)) // Cast to int because it is more reliable than bool on strings
+                    {
+                        $target['data'] = json_decode($target['data'], true);
+                        $data = ['contact' => $target['data'], 'contact_metas' => $target['metas']];
+
+                        $render = $internal_templating->render($scheduled['text'], $data);
+
+                        if (!$render['success'])
+                        {
+                            continue;
+                        }
+
+                        $text = $render['result'];
+                    }
+
+                    // Ignore empty messages
+                    if ('' === trim($text) && !$scheduled['medias'])
+                    {
+                        continue;
+                    }
+
+
+                    /*
+                        Choose phone if no phone defined for message
+                        Phones are choosen using type, priority and remaining volume :
+                            1 - If sms is a mms, try to use mms phone if any available. If mms phone available use mms phone, else use default.
+                            2 - In group of phones, keep only phones with remaining volume. If no phones with remaining volume, keep all.
+                            3 - Groupe keeped phones by priority get group with biggest priority.
+                            4 - Get a random phone in this group.
+                            5 - If their is no phone matching, keep phone at null so sender will directly mark it as failed
+                    */
+                    $random_phone = null;
+                    if (null === $phone_to_use)
+                    {
+                        $phones_subset = $users_phones[$id_user];
+                        if ($scheduled['mms'] && count($users_mms_phones[$id_user]))
+                        {
+                            $phones_subset = $users_mms_phones[$id_user];
+                        }
+
+                        $phones_subset = array_filter($phones_subset, function ($phone) {
+                            return $phone['remaining_volume'] > 0;
+                        });
+
+                        $max_priority_phones = [];
+                        $max_priority = PHP_INT_MIN;
+                        foreach ($phones_subset as $phone)
+                        {
+                            if ($phone['priority'] < $max_priority)
+                            {
+                                continue;
+                            }
+                            elseif ($phone['priority'] == $max_priority)
+                            {
+                                $max_priority_phones[] = $phone;
+                            }
+                            elseif ($phone['priority'] > $max_priority)
+                            {
+                                $max_priority_phones = [$phone];
+                                $max_priority = $phone['priority'];
+                            }
+                        }
+
+                        if ($max_priority_phones)
+                        {
+                            $phones_subset = $max_priority_phones;
+                            $random_phone = $phones_subset[array_rand($phones_subset)];
+                        }
+                    }
+                    
+                    $id_phone = $phone_to_use['id'] ?? $random_phone['id'] ?? null;
+                    $sms_per_scheduled[$id_scheduled][] = [
+                        'id_user' => $id_user,
+                        'id_scheduled' => $id_scheduled,
+                        'id_phone' => $id_phone,
+                        'destination' => $target['number'],
+                        'flash' => $scheduled['flash'],
+                        'mms' => $scheduled['mms'],
+                        'medias' => $scheduled['medias'],
+                        'text' => $text,
+                    ];
+
+                    // If we found a matching phone, consume one sms from remaining volume, dont forget mms phone
+                    if ($id_phone)
+                    {
+                        $users_phones[$id_user][$id_phone]['remaining_volume'] --;
+                        if ($users_mms_phones[$id_user][$id_phone] ?? false)
+                        {
+                            $users_mms_phones[$id_user][$id_phone] --;
+                        }
+                    }
+                }
+            }
+
+            return $sms_per_scheduled;
         }
     }
