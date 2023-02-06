@@ -651,31 +651,13 @@ use Monolog\Logger;
                         }
                     }
 
-
-                    $id_phone = $phone_to_use['id'] ?? $random_phone['id'] ?? null;
-                    
-                    $forcefail = false;
-                    if (!$id_phone) // This should only happen if the user try to send a message without any phone
+                    // This should only happen if the user try to send a message without any phone in his account, then we simply ignore.
+                    if (!$random_phone && !$phone_to_use)
                     {
-                        $forcefail = true;
-                    }
-
-                    if ($users_phones[$id_user][$id_phone] ?? false)
-                    {
-                        if ($users_phones[$id_user][$id_phone]['remaining_volume'] <= 0)
-                        {
-                            $forcefail = true;
-                        }
-
-                        // Consume one sms from remaining volume of phone, dont forget to do the same for the entry in mms phones
-                        $users_phones[$id_user][$id_phone]['remaining_volume'] --;
-                        if ($users_mms_phones[$id_user][$id_phone] ?? false)
-                        {
-                            $users_mms_phones[$id_user][$id_phone] --;
-                        }
+                        continue;
                     }
                     
-                    
+                    $id_phone = $phone_to_use['id'] ?? $random_phone['id'];
                     $sms_per_scheduled[$id_scheduled][] = [
                         'id_user' => $id_user,
                         'id_scheduled' => $id_scheduled,
@@ -685,10 +667,14 @@ use Monolog\Logger;
                         'mms' => $scheduled['mms'],
                         'medias' => $scheduled['medias'],
                         'text' => $text,
-                        'forcefail' => $forcefail,
                     ];
 
-                    
+                    // Consume one sms from remaining volume of phone, dont forget to do the same for the entry in mms phones
+                    $users_phones[$id_user][$id_phone]['remaining_volume'] --;
+                    if ($users_mms_phones[$id_user][$id_phone] ?? false)
+                    {
+                        $users_mms_phones[$id_user][$id_phone] --;
+                    }
                 }
             }
 

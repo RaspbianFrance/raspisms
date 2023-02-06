@@ -253,17 +253,6 @@ namespace controllers\internals;
                 'error_message' => null,
             ];
 
-            //If we reached our max quota, do not send the message
-            $internal_quota = new Quota($this->bdd);
-            $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
-            if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
-            {
-                $return['error'] = false;
-                $return['error_message'] = 'Not enough credit to send message.';
-
-                return $return;
-            }
-
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $media_uris = [];
             foreach ($medias as $media)
@@ -286,38 +275,56 @@ namespace controllers\internals;
                 $text .= "\n" . join(' - ', $media_urls);
             }
 
-            $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
-
-            if ($response['error'])
+            //If we reached our max quota, do not send the message
+            $internal_quota = new Quota($this->bdd);
+            $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
+            if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
             {
                 $return['error'] = true;
-                $return['error_message'] = $response['error_message'];
-                $status = \models\Sended::STATUS_FAILED;
-                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
-
-                $sended = [
-                    'id' => $sended_id,
-                    'at' => $at,
-                    'status' => $status,
-                    'text' => $text,
-                    'destination' => $destination,
-                    'origin' => $id_phone,
-                    'mms' => $mms,
-                    'medias' => $medias,
-                    'originating_scheduled' => $originating_scheduled,
-                ];
-
-                $internal_webhook = new Webhook($this->bdd);
-                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $sended);
-
-                return $return;
+                $return['error_message'] = 'Not enough credit to send message.';
             }
 
-            $internal_quota->consume_credit($id_user, $nb_credits);
+            //If we reached limit for this phone, do not send the message
+            $internal_phone = new Phone($this->bdd);
+            $internal_sended = new Sended($this->bdd);
+            $limits = $internal_phone->get_limits($id_phone);
 
-            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $response['uid'] ?? uniqid(), $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
+            $remaining_volume = PHP_INT_MAX;
+            foreach ($limits as $limit)
+            {
+                $startpoint = new \DateTime($limit['startpoint']);
+                $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
+                $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+            }
 
-            $sended = [
+            if ($remaining_volume < 1)
+            {
+                $return['error'] = true;
+                $return['error_message'] = 'Phone send limit have been reached.';
+            }
+
+            $uid = uniqid();
+            if (!$return['error'])
+            {
+                $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
+                $uid = $response['uid'] ?? $uid;
+
+                if ($response['error'])
+                {
+                    $return['error'] = true;
+                    $return['error_message'] = $response['error_message'];
+                }
+                else // If send with success, consume credit
+                {
+                    $internal_quota->consume_credit($id_user, $nb_credits);
+                }
+            }
+
+            // If we fail to send or not, we will always save message as sended, only the status will change.
+            $status = $return['error'] ? \models\Sended::STATUS_FAILED : \models\Sended::STATUS_UNKNOWN;
+            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
+            
+            $webhook_body = [
                 'id' => $sended_id,
                 'at' => $at,
                 'status' => $status,
@@ -330,7 +337,7 @@ namespace controllers\internals;
             ];
 
             $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $sended);
+            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $webhook_body);
 
             return $return;
         }

@@ -119,9 +119,9 @@ interface AdapterInterface
      * @param array  $medias      : Array of medias to link to the MMS, [['http_url' => HTTP public url of the media et 'local_uri' => local uri to media file]]
      *
      * @return array : [
-     *               bool 'error' => false if no error, true else
-     *               ?string 'error_message' => null if no error, else error message
-     *               array 'uid' => Uid of the sms created on success
+     *               bool 'error' => false if no error, true else,
+     *               ?string 'error_message' => null if no error, else error message,
+     *               array 'uid' => Uid of the sms created on success,
      *               ]
      */
     public function send(string $destination, string $text, bool $flash = false, bool $mms = false, array $medias = []): array;
