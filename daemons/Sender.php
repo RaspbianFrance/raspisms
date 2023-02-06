@@ -22,6 +22,7 @@ class Sender extends AbstractDaemon
     private $internal_phone;
     private $internal_scheduled;
     private $internal_received;
+    private $internal_sended;
     private $bdd;
     private $msg_queue;
 
@@ -45,6 +46,7 @@ class Sender extends AbstractDaemon
     {
         //Create the internal controllers
         $this->internal_scheduled = new \controllers\internals\Scheduled($this->bdd);
+        $this->internal_sended = new \controllers\internals\Sended($this->bdd);
 
         //Get smss and transmit order to send to appropriate phone daemon
         $smss_per_scheduled = $this->internal_scheduled->get_smss_to_send();
@@ -62,8 +64,8 @@ class Sender extends AbstractDaemon
     {
         foreach ($smss_per_scheduled as $id_scheduled => $smss)
         {
-            //If queue not  already exists
-            if (!msg_queue_exists(QUEUE_ID_PHONE) || !isset($this->queue))
+            //If queue not already exists
+            if (!msg_queue_exists(QUEUE_ID_PHONE) || !isset($this->msg_queue))
             {
                 $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
             }

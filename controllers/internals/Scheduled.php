@@ -552,6 +552,7 @@ use Monolog\Logger;
                     ];
                 }
 
+                
                 // Pass on all targets to deduplicate destinations, remove number in sms stops, etc.
                 $used_destinations = [];
                 foreach ($targets as $key => $target)
@@ -603,7 +604,7 @@ use Monolog\Logger;
                         Choose phone if no phone defined for message
                         Phones are choosen using type, priority and remaining volume :
                             1 - If sms is a mms, try to use mms phone if any available. If mms phone available use mms phone, else use default.
-                            2 - In group of phones, keep only phones with remaining volume. If no phones with remaining volume, keep all.
+                            2 - In group of phones, keep only phones with remaining volume. If no phones with remaining volume, use all phones instead.
                             3 - Groupe keeped phones by priority get group with biggest priority.
                             4 - Get a random phone in this group.
                             5 - If their is no phone matching, keep phone at null so sender will directly mark it as failed
@@ -612,14 +613,15 @@ use Monolog\Logger;
                     if (null === $phone_to_use)
                     {
                         $phones_subset = $users_phones[$id_user];
-                        if ($scheduled['mms'] && count($users_mms_phones[$id_user]))
+                        if ($scheduled['mms'])
                         {
-                            $phones_subset = $users_mms_phones[$id_user];
+                            $phones_subset = $users_mms_phones[$id_user] ?: $phones_subset;
                         }
 
-                        $phones_subset = array_filter($phones_subset, function ($phone) {
+                        $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
                             return $phone['remaining_volume'] > 0;
                         });
+                        $phones_subset = $remaining_volume_phones ?: $phones_subset;
 
                         $max_priority_phones = [];
                         $max_priority = PHP_INT_MIN;
@@ -640,14 +642,20 @@ use Monolog\Logger;
                             }
                         }
 
-                        if ($max_priority_phones)
+                        $phones_subset = $max_priority_phones;
+                        if ($phones_subset)
                         {
-                            $phones_subset = $max_priority_phones;
                             $random_phone = $phones_subset[array_rand($phones_subset)];
                         }
                     }
+
+                    // This should only happen if the user try to send a message without any phone in his account, then we simply ignore.
+                    if (!$random_phone && !$phone_to_use)
+                    {
+                        continue;
+                    }
                     
-                    $id_phone = $phone_to_use['id'] ?? $random_phone['id'] ?? null;
+                    $id_phone = $phone_to_use['id'] ?? $random_phone['id'];
                     $sms_per_scheduled[$id_scheduled][] = [
                         'id_user' => $id_user,
                         'id_scheduled' => $id_scheduled,
@@ -659,14 +667,11 @@ use Monolog\Logger;
                         'text' => $text,
                     ];
 
-                    // If we found a matching phone, consume one sms from remaining volume, dont forget mms phone
-                    if ($id_phone)
+                    // Consume one sms from remaining volume of phone, dont forget to do the same for the entry in mms phones
+                    $users_phones[$id_user][$id_phone]['remaining_volume'] --;
+                    if ($users_mms_phones[$id_user][$id_phone] ?? false)
                     {
-                        $users_phones[$id_user][$id_phone]['remaining_volume'] --;
-                        if ($users_mms_phones[$id_user][$id_phone] ?? false)
-                        {
-                            $users_mms_phones[$id_user][$id_phone] --;
-                        }
+                        $users_mms_phones[$id_user][$id_phone] --;
                     }
                 }
             }

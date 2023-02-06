@@ -180,6 +180,20 @@ namespace controllers\internals;
         }
 
         /**
+         * Get number of sended SMS since a date for a phone
+         * 
+         * @param int $id_user : User id
+         * @param int $id_phone : Phone id we want the number of sended message for
+         * @param \DateTime $since : Date since which we want sended number
+         * 
+         * @return int
+         */
+        public function count_since_for_phone_and_user(int $id_user, int $id_phone, \DateTime $since): int
+        {
+            return $this->get_model()->count_since_for_phone_and_user($id_user, $id_phone, $since);
+        }
+
+        /**
          * Get number of sended SMS for every date since a date for a specific user.
          *
          * @param int       $id_user : user id
