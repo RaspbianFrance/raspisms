@@ -192,6 +192,45 @@ namespace controllers\publics;
         }
 
         /**
+         * Return contacts of a group as json array
+         * @param int $id_group = Group id
+         * 
+         * @return json
+         */
+        public function preview (int $id_group)
+        {
+            $return = [
+                'success' => false,
+                'result' => 'Une erreur inconnue est survenue.',
+            ];
+
+            $group = $this->internal_group->get_for_user($_SESSION['user']['id'], $id_group);
+
+            if (!$group)
+            {
+                $return['result'] = 'Ce groupe n\'existe pas.';
+                echo json_encode($return);
+
+                return false;
+            }
+
+            $contacts = $this->internal_group->get_contacts($id_group);
+            if (!$contacts)
+            {
+                $return['result'] = 'Aucun contact dans le groupe.';
+                echo json_encode($return);
+
+                return false;
+            }
+
+            $return['success'] = true;
+            $return['result'] = $contacts;
+            echo json_encode($return);
+
+            return true;
+        }
+
+        /**
          * Cette fonction retourne la liste des groups sous forme JSON.
          */
         public function json_list()

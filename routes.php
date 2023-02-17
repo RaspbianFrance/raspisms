@@ -76,6 +76,7 @@
             'delete' => '/group/delete/{csrf}/',
             'edit' => '/group/edit/',
             'update' => '/group/update/{csrf}/',
+            'preview' => '/group/preview/{id_group}/',
             'json_list' => '/groups.json/',
         ],
         
@@ -88,6 +89,7 @@
             'edit' => '/conditional_group/edit/',
             'update' => '/conditional_group/update/{csrf}/',
             'contacts_preview' => '/conditional_group/preview/',
+            'preview' => '/conditional_group/preview/{id_group}/',
             'json_list' => '/conditional_groups.json/',
         ],
 

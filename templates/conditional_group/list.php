@@ -43,6 +43,7 @@
                                                 <th>Condition</th>
                                                 <th>Date de création</th>
                                                 <th>Dernière modification</th>
+                                                <th>Preview</th>
                                                 <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
@@ -69,9 +70,56 @@
 		</div>
 	</div>
 </div>
+<div class="modal fade" tabindex="-1" id="preview-text-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Prévisualisation des contacts</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 jQuery(document).ready(function ()
 {
+    jQuery('body').on('click', '.preview-button', function (e)
+    {
+        e.preventDefault();
+        var group_id = jQuery(this).attr('data-id-group');
+
+        jQuery.ajax({
+            type: "GET",
+            url: HTTP_PWD + '/conditional_group/preview/' + group_id + '/',
+            success: function (data) {
+                if (!data.success) {
+                    jQuery('#preview-text-modal').find('.modal-body').text(data.result);
+                } else {
+                    html = '';
+
+                    for (contact of data.result)
+                    {
+                        html += '<div class="preview-contact well">';
+                        html += '   <div class="preview-contact-name">' + jQuery.fn.dataTable.render.text().display(contact.name) + '</div>'
+                        html += '   <div class="preview-contact-number">' + jQuery.fn.dataTable.render.text().display(contact.number) + '</div>'
+                        html += '   <code class="preview-contact-data">' + jQuery.fn.dataTable.render.text().display(contact.data) + '</code>'
+                        html += '</div>';
+                        console.log(contact);
+                    }
+
+                    jQuery('#preview-text-modal').find('.modal-body').html(html);
+                }
+                jQuery('#preview-text-modal').modal({'keyboard': true});
+            },
+            dataType: 'json'
+        });
+    });
+    
     jQuery('.datatable').DataTable({
         "pageLength": 25,
         "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
@@ -98,6 +146,12 @@ jQuery(document).ready(function ()
             {data: 'created_at'},
             {data: 'updated_at'},
             {
+                data: '_',
+                render: function (data, type, row, meta) {
+                    return '<a class="btn btn-info preview-button" href="#" data-id-group="' + jQuery.fn.dataTable.render.text().display(row.id) + '"><span class="fa fa-eye"></span></a>';
+                },
+            },
+            {
                 data: 'id',
                 render: function (data, type, row, meta) {
                     return '<input name="conditional_group_ids[]" type="checkbox" value="' + data + '">';
@@ -106,7 +160,6 @@ jQuery(document).ready(function ()
         ],
         "deferRender": true
     });
-
 });
 </script>
 <?php

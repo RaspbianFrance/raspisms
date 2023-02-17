@@ -186,6 +186,45 @@ namespace controllers\publics;
         }
 
         /**
+         * Return contacts of a group as json array
+         * @param int $id_group = Group id
+         * 
+         * @return json
+         */
+        public function preview (int $id_group)
+        {
+            $return = [
+                'success' => false,
+                'result' => 'Une erreur inconnue est survenue.',
+            ];
+
+            $group = $this->internal_conditional_group->get_for_user($_SESSION['user']['id'], $id_group);
+
+            if (!$group)
+            {
+                $return['result'] = 'Ce groupe n\'existe pas.';
+                echo json_encode($return);
+
+                return false;
+            }
+
+            $contacts = $this->internal_conditional_group->get_contacts_for_condition_and_user($_SESSION['user']['id'], $group['condition']);
+            if (!$contacts)
+            {
+                $return['result'] = 'Aucun contact dans le groupe.';
+                echo json_encode($return);
+
+                return false;
+            }
+
+            $return['success'] = true;
+            $return['result'] = $contacts;
+            echo json_encode($return);
+
+            return true;
+        }
+
+        /**
          * Try to get the preview of contacts for a conditionnal group.
          *
          * @param string $_POST['condition'] : Condition to apply

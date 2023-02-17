@@ -471,6 +471,16 @@ footer img
     color: #9b2420;
 }
 
+/* PREVIEW CONTACT */
+.preview-contact-name
+{
+    font-weight: bold;
+}
+
+.preview-contact-number
+{
+    font-style: italic;
+}
 
 /* PHONE */
 #adapter-data-container
