@@ -490,7 +490,7 @@ use Monolog\Logger;
                         }
 
                         $mms_phone['remaining_volume'] = $remaining_volume;
-                        $mms_phones[$id_user][$mms_phone['id']] = $mms_phone;
+                        $users_mms_phones[$id_user][$mms_phone['id']] = $mms_phone;
                     }
                 }
 
