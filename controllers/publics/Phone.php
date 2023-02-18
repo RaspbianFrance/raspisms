@@ -88,6 +88,11 @@ class Phone extends \descartes\Controller
             {
                 $phone['callback_end_call'] = \descartes\Router::url('Callback', 'end_call', ['id_phone' => $phone['id']], ['api_key' => $api_key]);
             }
+
+            if ($adapter['meta_support_phone_status'])
+            {
+                $phone['support_phone_status'] = true;
+            }
         }
 
         header('Content-Type: application/json');
@@ -425,7 +430,14 @@ class Phone extends \descartes\Controller
                 continue;
             }
 
-            if ($find_adapter['meta_hidden'])
+            $current_phone = $this->internal_phone->get_for_user($id_user, $id_phone);
+            if (!$current_phone)
+            {
+                continue;
+            }
+
+            // We can only use an hidden adapter if it was already the adapter we was using
+            if ($find_adapter['meta_hidden'] && $adapter != $current_phone['adapter']) 
             {
                 continue;
             }
@@ -497,6 +509,46 @@ class Phone extends \descartes\Controller
 
         \FlashMessage\FlashMessage::push('success', 'Tous les téléphones ont été modifiés avec succès.');
 
+        return $this->redirect(\descartes\Router::url('Phone', 'list'));
+    }
+
+
+    /**
+     * Re-check phone status
+     * @param array int $_GET['ids'] : ids of phones we want to update status
+     * @param $csrf : CSRF token
+     */
+    public function update_status ($csrf)
+    {
+        if (!$this->verify_csrf($csrf))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        $ids = $_GET['ids'] ?? [];
+        $id_user = $_SESSION['user']['id'];
+
+        foreach ($ids as $id)
+        {
+            $phone = $this->internal_phone->get_for_user($id_user, $id);
+            
+            //Check adapter is working correctly with thoses names and data
+            $adapter_classname = $phone['adapter'];
+            if (!call_user_func([$adapter_classname, 'meta_support_phone_status']))
+            {
+                continue;
+            }
+
+            $adapter_instance = new $adapter_classname($phone['adapter_data']);
+            $new_status = $adapter_instance->check_phone_status();
+
+            $status_update = $this->internal_phone->update_status($id, $new_status);
+        }
+
+        \FlashMessage\FlashMessage::push('success', 'Les status des téléphones ont bien été mis à jour.');
+            
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
     }
 }

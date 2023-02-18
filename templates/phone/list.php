@@ -58,6 +58,7 @@
                                     </div>
                                     <div class="text-right col-xs-6 no-padding">
                                         <strong>Action pour la séléction :</strong>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'update_status', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-refresh"></span> Rafraichir le status</button>
                                         <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
                                         <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                     </div>
@@ -90,7 +91,28 @@ jQuery(document).ready(function ()
         },
         "columns" : [
             {data: 'id', render: jQuery.fn.dataTable.render.text()},
-            {data: 'name', render: jQuery.fn.dataTable.render.text()},
+            {
+                data: 'name', 
+                render: function (data, type, row, meta) {
+                    html = jQuery.fn.dataTable.render.text().display(data)
+                    switch (row.status)
+                    {
+                        case 'available':
+                            html += ' - <span class="text-success">Disponible</span>'
+                            break;
+
+                        case 'unavailable':
+                            html += ' - <span class="text-danger">Indisponible</span>'
+                            break;
+
+                        case 'no_credit':
+                            html += ' - <span class="text-warning">Plus de crédit</span>'
+                            break;
+                    }
+
+                    return html
+                },
+            },
             {data: 'priority', render: jQuery.fn.dataTable.render.text()},
             {data: 'adapter', render: jQuery.fn.dataTable.render.text()},
             {

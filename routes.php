@@ -164,6 +164,7 @@
             'delete' => '/phone/delete/{csrf}/',
             'edit' => '/phone/edit/',
             'update' => '/phone/update/{csrf}/',
+            'update_status' => '/phone/update_status/{csrf}/'
         ],
         
         'Call' => [
@@ -205,6 +206,9 @@
             ],
             'post_update_phone' => [
                 '/api/phone/{id}/',
+            ],
+            'post_update_phone_status' => [
+                '/api/phone/{id}/status/',
             ],
             'delete_phone' => [
                 '/api/phone/{id}/',

@@ -111,7 +111,7 @@ jQuery(document).ready(function ()
             {
                 data: '_',
                 render: function (data, type, row, meta) {
-                    return '<a class="btn btn-info preview-button" href="#" data-id-group="' + jQuery.fn.dataTable.render.text().display(row.id) + '"><span class="fa fa-eye"></span></a>';
+                    return '<a class="btn btn-info preview-button inline" href="#" data-id-group="' + jQuery.fn.dataTable.render.text().display(row.id) + '"><span class="fa fa-eye"></span></a>';
                 },
             },
             {

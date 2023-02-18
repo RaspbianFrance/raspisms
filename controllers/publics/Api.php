@@ -710,7 +710,7 @@ namespace controllers\publics;
             $priority = $_POST['priority'] ?? $phone['priority'];
             $priority = max(((int) $priority), 0);
             $adapter = $_POST['adapter'] ?? $phone['adapter'];
-            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data']);
+            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data'], true);
             $adapter_data = is_array($adapter_data) ? $adapter_data : [$adapter_data];
             $limits = $_POST['limits'] ?? $limits;
             $limits = is_array($limits) ? $limits : [$limits];
@@ -886,6 +886,46 @@ namespace controllers\publics;
             }
 
             $return['response'] = true;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
+         * Trigger re-checking of a phone status
+         *
+         * @param int $id : Id of phone to re-check status
+         */
+        public function post_update_phone_status ($id)
+        {
+            $return = self::DEFAULT_RETURN;
+
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id);
+            if (!$phone)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //Check adapter is working correctly with thoses names and data
+            $adapter_classname = $phone['adapter'];
+            if (!call_user_func([$adapter_classname, 'meta_support_phone_status']))
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $adapter_instance = new $adapter_classname($phone['adapter_data']);
+            $new_status = $adapter_instance->check_phone_status();
+
+            $status_update = $this->internal_phone->update_status($id, $new_status);
+            $return['response'] = $new_status;
             $this->auto_http_code(true);
 
             return $this->json($return);

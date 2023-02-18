@@ -14,6 +14,10 @@ namespace models;
     class Phone extends StandardModel
     {
 
+        const STATUS_AVAILABLE = 'available';
+        const STATUS_UNAVAILABLE = 'unavailable';
+        const STATUS_NO_CREDIT = 'no_credit';
+
         /**
          * Return all phones that belongs to active users
          *

@@ -117,6 +117,14 @@ namespace adapters;
         }
 
         /**
+         * Does the implemented service support updating phone status.
+         */
+        public static function meta_support_phone_status(): bool
+        {
+            return false;
+        }
+
+        /**
          * Does the implemented service support flash smss.
          */
         public static function meta_support_flash(): bool
@@ -285,6 +293,16 @@ namespace adapters;
 
                 return $response;
             }
+        }
+
+        /**
+         * Method called to verify phone status
+         * 
+         * @return string : Return one phone status among 'available', 'unavailable', 'no_credit'
+         */
+        public function check_phone_status(): string
+        {
+            return \models\Phone::STATUS_AVAILABLE;
         }
 
         public function test(): bool

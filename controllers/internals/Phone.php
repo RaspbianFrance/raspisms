@@ -237,6 +237,19 @@ namespace controllers\internals;
         }
 
         /**
+         * Update a phone status.
+         *         
+         * @param int    $id           : Phone id
+         * @param string $status      : The new status of the phone
+         *
+         * @return bool : false on error, true on success
+         */
+        public function update_status(int $id, string $status) : bool
+        {
+            return (bool) $this->get_model()->update($id, ['status' => $status]);
+        }
+
+        /**
          * Get the model for the Controller.
          */
         protected function get_model(): \models\Phone

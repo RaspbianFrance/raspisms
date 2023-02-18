@@ -65,13 +65,15 @@
                                             </p>
                                             <select name="phones[<?php $this->s($phone['id']); ?>][adapter]" class="form-control adapter-select">
                                                 <?php foreach ($adapters as $adapter) { ?>
-                                                    <?php if ($adapter['meta_hidden'] === false) { ?>
+                                                    <?php if ($adapter['meta_hidden'] === false || $phone['adapter'] == $adapter['meta_classname']) { ?>
                                                         <option 
                                                             value="<?= $adapter['meta_classname'] ?>"
                                                             data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                             data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
                                                             <?php if ($phone['adapter'] == $adapter['meta_classname']) { ?>
-                                                                data-phone-adapter-data="<?php $this->s($phone['adapter_data']); ?>"
+                                                                <?php if (!$adapter['meta_hide_data']) { ?>
+                                                                    data-phone-adapter-data="<?php $this->s($phone['adapter_data']); ?>"
+                                                                <?php } ?>
                                                                 selected
                                                             <?php } ?>
                                                         >
