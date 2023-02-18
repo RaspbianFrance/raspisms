@@ -11,6 +11,8 @@
 
 namespace controllers\internals;
 
+use Exception;
+
     class Sended extends StandardController
     {
         protected $model;
@@ -275,71 +277,84 @@ namespace controllers\internals;
                 $text .= "\n" . join(' - ', $media_urls);
             }
 
-            //If we reached our max quota, do not send the message
-            $internal_quota = new Quota($this->bdd);
-            $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
-            if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
+            try
             {
-                $return['error'] = true;
-                $return['error_message'] = 'Not enough credit to send message.';
-            }
+                //If we reached our max quota, do not send the message
+                $internal_quota = new Quota($this->bdd);
+                $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
+                if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
+                {
+                    throw new Exception('Not enough credit to send message.');
+                }
 
-            //If we reached limit for this phone, do not send the message
-            $internal_phone = new Phone($this->bdd);
-            $internal_sended = new Sended($this->bdd);
-            $limits = $internal_phone->get_limits($id_phone);
+                // If this phone status indicate it is not available
+                $internal_phone = new Phone($this->bdd);
+                $phone = $internal_phone->get_for_user($id_user, $id_phone);
+                if (!$phone || $phone['status'] != \models\Phone::STATUS_AVAILABLE)
+                {
+                    throw new Exception('Invalid phone status : ' . $phone['status']);
+                }
 
-            $remaining_volume = PHP_INT_MAX;
-            foreach ($limits as $limit)
-            {
-                $startpoint = new \DateTime($limit['startpoint']);
-                $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
-                $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
-            }
+                //If we reached limit for this phone, do not send the message
+                $limits = $internal_phone->get_limits($id_phone);
 
-            if ($remaining_volume < 1)
-            {
-                $return['error'] = true;
-                $return['error_message'] = 'Phone send limit have been reached.';
-            }
+                $remaining_volume = PHP_INT_MAX;
+                foreach ($limits as $limit)
+                {
+                    $startpoint = new \DateTime($limit['startpoint']);
+                    $consumed = $this->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
+                    $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                }
 
-            $uid = uniqid();
-            if (!$return['error'])
-            {
+                if ($remaining_volume < 1)
+                {
+                    throw new Exception('Phone send limit have been reached.');
+                }
+
                 $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
-                $uid = $response['uid'] ?? $uid;
 
                 if ($response['error'])
                 {
-                    $return['error'] = true;
-                    $return['error_message'] = $response['error_message'];
+                    throw new Exception($response['error_message']);
                 }
-                else // If send with success, consume credit
-                {
-                    $internal_quota->consume_credit($id_user, $nb_credits);
-                }
+
+                $uid = $response['uid'];
+                $status = \models\Sended::STATUS_UNKNOWN;
+
+                // If send with success, consume credit
+                $internal_quota->consume_credit($id_user, $nb_credits);
             }
+            catch (Exception $e)
+            {
+                $return['error'] = true;
+                $return['error_message'] = $e->getMessage();
 
-            // If we fail to send or not, we will always save message as sended, only the status will change.
-            $status = $return['error'] ? \models\Sended::STATUS_FAILED : \models\Sended::STATUS_UNKNOWN;
-            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
-            
-            $webhook_body = [
-                'id' => $sended_id,
-                'at' => $at,
-                'status' => $status,
-                'text' => $text,
-                'destination' => $destination,
-                'origin' => $id_phone,
-                'mms' => $mms,
-                'medias' => $medias,
-                'originating_scheduled' => $originating_scheduled,
-            ];
+                $uid = uniqid();
+                $status = \models\Sended::STATUS_FAILED;
+                
+                return $return;
+            }
+            finally
+            {
+                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
+                
+                $webhook_body = [
+                    'id' => $sended_id,
+                    'at' => $at,
+                    'status' => $status,
+                    'text' => $text,
+                    'destination' => $destination,
+                    'origin' => $id_phone,
+                    'mms' => $mms,
+                    'medias' => $medias,
+                    'originating_scheduled' => $originating_scheduled,
+                ];
 
-            $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $webhook_body);
+                $internal_webhook = new Webhook($this->bdd);
+                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $webhook_body);
 
-            return $return;
+                return $return;
+            }
         }
 
         /**

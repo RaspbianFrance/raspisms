@@ -625,8 +625,9 @@ use Monolog\Logger;
                             $phones_subset = $users_mms_phones[$id_user] ?: $phones_subset;
                         }
 
+                        // Keep only phones with remaining volume and available status
                         $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
-                            return $phone['remaining_volume'] > 0;
+                            return $phone['remaining_volume'] > 0 && $phone['status'] == \models\Phone::STATUS_AVAILABLE;
                         });
                         $phones_subset = $remaining_volume_phones ?: $phones_subset;
 
