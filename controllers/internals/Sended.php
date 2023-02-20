@@ -329,13 +329,13 @@ use Exception;
                 $return['error'] = true;
                 $return['error_message'] = $e->getMessage();
 
-                $uid = uniqid();
                 $status = \models\Sended::STATUS_FAILED;
                 
                 return $return;
             }
             finally
             {
+                $uid = $uid ?? uniqid();
                 $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
                 
                 $webhook_body = [

@@ -1,11 +1,11 @@
 <?php
 	//Template dashboard
 	
-	$this->render('incs/head', ['title' => 'Groupes - Show All'])
+	$this->render('incs/head', ['title' => 'Groupes de Téléphones - Show All'])
 ?>
 <div id="wrapper">
 <?php
-	$this->render('incs/nav', ['page' => 'groupes'])
+	$this->render('incs/nav', ['page' => 'phone_groups'])
 ?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -13,14 +13,14 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<h1 class="page-header">
-						Dashboard <small>Groupes</small>
+						Dashboard <small>Groupes de téléphones</small>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
 							<i class="fa fa-dashboard"></i> <a href="<?php echo \descartes\Router::url('Dashboard', 'show'); ?>">Dashboard</a>
 						</li>
 						<li class="active">
-							<i class="fa fa-group"></i> Groupes
+							<i class="fa fa-list-alt"></i> Groupes de téléphones
 						</li>
 					</ol>
 				</div>
@@ -31,7 +31,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title"><i class="fa fa-group fa-fw"></i> Liste des groupes</h3>
+							<h3 class="panel-title"><i class="fa fa-list-alt fa-fw"></i> Liste des groupes de téléphones</h3>
 						</div>
                         <div class="panel-body">
                             <form method="GET">
@@ -40,7 +40,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Nom</th>
-                                                <th>Nombre de contacts</th>
+                                                <th>Nombre de téléphones</th>
                                                 <th>Date de création</th>
                                                 <th>Dernière modification</th>
                                                 <th>Preview</th>
@@ -53,13 +53,12 @@
                                 </div>
                                 <div>
                                     <div class="col-xs-6 no-padding">
-                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('Group', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe</a>
+                                        <a class="btn btn-success" href="<?php echo \descartes\Router::url('PhoneGroup', 'add'); ?>"><span class="fa fa-plus"></span> Ajouter un groupe de téléphones</a>
                                     </div>
                                     <div class="text-right col-xs-6 no-padding">
                                         <strong>Action pour la séléction :</strong>
-                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Scheduled', 'add'); ?>"><span class="fa fa-send"></span> Envoyer un message</button>
-                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Group', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('PhoneGroup', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('PhoneGroup', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                     </div>
                                 </div>
                             </form>
@@ -75,7 +74,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Prévisualisation des contacts</h4>
+                <h4 class="modal-title">Prévisualisation des téléphones</h4>
             </div>
             <div class="modal-body">
             </div>
@@ -100,12 +99,12 @@ jQuery(document).ready(function ()
         }],
 
         "ajax": {
-            'url': '<?php echo \descartes\Router::url('Group', 'list_json'); ?>',
+            'url': '<?php echo \descartes\Router::url('PhoneGroup', 'list_json'); ?>',
             'dataSrc': 'data',
         },
         "columns" : [
             {data: 'name', render: jQuery.fn.dataTable.render.text()},
-            {data: 'nb_contact', render: jQuery.fn.dataTable.render.text()},
+            {data: 'nb_phone', render: jQuery.fn.dataTable.render.text()},
             {data: 'created_at'},
             {data: 'updated_at'},
             {
@@ -117,7 +116,7 @@ jQuery(document).ready(function ()
             {
                 data: 'id',
                 render: function (data, type, row, meta) {
-                    return '<input name="group_ids[]" type="checkbox" value="' + data + '">';
+                    return '<input name="ids[]" type="checkbox" value="' + data + '">';
                 },
             },
         ],
@@ -131,19 +130,18 @@ jQuery(document).ready(function ()
 
         jQuery.ajax({
             type: "GET",
-            url: HTTP_PWD + '/group/preview/' + group_id + '/',
+            url: HTTP_PWD + '/phone_group/preview/' + group_id + '/',
             success: function (data) {
                 if (!data.success) {
                     jQuery('#preview-text-modal').find('.modal-body').text(data.result);
                 } else {
                     html = '';
 
-                    for (contact of data.result)
+                    for (phone of data.result)
                     {
-                        html += '<div class="preview-contact well">';
-                        html += '   <div class="preview-contact-name">' + jQuery.fn.dataTable.render.text().display(contact.name) + '</div>'
-                        html += '   <div class="preview-contact-number">' + jQuery.fn.dataTable.render.text().display(contact.number) + '</div>'
-                        html += '   <code class="preview-contact-data">' + jQuery.fn.dataTable.render.text().display(contact.data) + '</code>'
+                        html += '<div class="preview-phone well">';
+                        html += '   <div class="preview-phone-name"><span class="bold">Nom : </span>' + jQuery.fn.dataTable.render.text().display(phone.name) + '</div>'
+                        html += '   <div class="preview-phone-adapter"><span class="bold">Type : </span>' + jQuery.fn.dataTable.render.text().display(phone.adapter_name) + '</div>'
                         html += '</div>';
                     }
 

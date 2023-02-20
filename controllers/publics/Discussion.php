@@ -315,7 +315,7 @@ namespace controllers\publics;
             //Destinations must be an array of number
             $destinations = [['number' => $destination, 'data' => '[]']];
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, false, $mms, $destinations, [], [], [], $media_ids))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, null, false, $mms, $destinations, [], [], [], $media_ids))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

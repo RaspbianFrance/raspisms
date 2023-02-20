@@ -551,4 +551,13 @@ class Phone extends \descartes\Controller
             
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
     }
+
+    /**
+     * Return a list of phones as a JSON array
+     */
+    public function json_list()
+    {
+        header('Content-Type: application/json');
+        echo json_encode($this->internal_phone->list_for_user($_SESSION['user']['id']));
+    }
 }

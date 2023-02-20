@@ -110,8 +110,16 @@
                         </li>
 					<?php } ?>
                     <?php if (!in_array('phones', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
-                        <li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
-                            <a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#phones"><i class="fa fa-fw fa-phone"></i> Téléphones <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="phones" class="collapse <?php echo in_array($page, array('phones', 'phone_groups')) ? 'in' : ''; ?>">
+                                <li <?php echo $page == 'phones' ? 'class="active"' : ''; ?>>
+                                    <a href="<?php echo \descartes\Router::url('Phone', 'list'); ?>"><i class="fa fa-fw fa-phone"></i> Téléphones</a>
+                                </li>
+                                <li <?php echo $page == 'phone_groups' ? 'class="active"' : ''; ?>>
+                                    <a href="<?php echo \descartes\Router::url('PhoneGroup', 'list'); ?>"><i class="fa fa-list-alt fa-fw"></i> Groupes de Téléphones</a>
+                                </li>
+                            </ul>
                         </li>
 					<?php } ?>
                     <?php if (!in_array('settings', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
