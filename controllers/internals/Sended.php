@@ -255,6 +255,9 @@ use Exception;
                 'error_message' => null,
             ];
 
+            $internal_setting = new Setting();
+            $user_settings = $internal_setting->gets_for_user($id_user);
+
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $media_uris = [];
             foreach ($medias as $media)
@@ -295,20 +298,23 @@ use Exception;
                     throw new Exception('Invalid phone status : ' . $phone['status']);
                 }
 
-                //If we reached limit for this phone, do not send the message
-                $limits = $internal_phone->get_limits($id_phone);
-
-                $remaining_volume = PHP_INT_MAX;
-                foreach ($limits as $limit)
+                //If we reached limit for this phone and phone limits are enabled, do not send the message
+                if ((int) ($users_settings['phone_limit'] ?? false))
                 {
-                    $startpoint = new \DateTime($limit['startpoint']);
-                    $consumed = $this->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
-                    $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
-                }
+                    $limits = $internal_phone->get_limits($id_phone);
 
-                if ($remaining_volume < 1)
-                {
-                    throw new Exception('Phone send limit have been reached.');
+                    $remaining_volume = PHP_INT_MAX;
+                    foreach ($limits as $limit)
+                    {
+                        $startpoint = new \DateTime($limit['startpoint']);
+                        $consumed = $this->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
+                        $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                    }
+
+                    if ($remaining_volume < 1)
+                    {
+                        throw new Exception('Phone send limit have been reached.');
+                    }
                 }
 
                 $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);

@@ -41,10 +41,14 @@
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Nom</th>
-                                                <th>Priorité</th>
+                                                <?php if ($_SESSION['user']['settings']['phone_priority']) { ?>
+                                                    <th>Priorité</th>
+                                                <?php } ?>
                                                 <th>Type de téléphone</th>
                                                 <th>Callbacks</th>
-                                                <th>Limites</th>
+                                                <?php if ($_SESSION['user']['settings']['phone_limit']) { ?>
+                                                    <th>Limites</th>
+                                                <?php } ?>
                                                 <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
                                             </tr>
                                         </thead>
@@ -113,7 +117,9 @@ jQuery(document).ready(function ()
                     return html
                 },
             },
-            {data: 'priority', render: jQuery.fn.dataTable.render.text()},
+            <?php if ($_SESSION['user']['settings']['phone_priority']) { ?>
+                {data: 'priority', render: jQuery.fn.dataTable.render.text()},
+            <?php } ?>
             {data: 'adapter', render: jQuery.fn.dataTable.render.text()},
             {
                 data: '_',
@@ -149,61 +155,63 @@ jQuery(document).ready(function ()
                     return html;
                 },
             },
-            {
-                data: 'limits',
-                render: function (limits) {
-                    if (!limits.length)
-                    {
-                        return 'Pas de limites.';
-                    }
-
-                    var html = '';
-                    for (limit of limits)
-                    {
-                        switch (limit.startpoint)
+            <?php if ($_SESSION['user']['settings']['phone_limit']) { ?>
+                {
+                    data: 'limits',
+                    render: function (limits) {
+                        if (!limits.length)
                         {
-                            case "today" : 
-                                var startpoint = 'Par jour';
-                                break;
-                            case "-24 hours" : 
-                                var startpoint = '24 heures glissantes';
-                                break;
-                            case "this week midnight" : 
-                                var startpoint = 'Cette semaine';
-                                break;
-                            case "-7 days" : 
-                                var startpoint = '7 jours glissants';
-                                break;
-                            case "this week midnight -1 week" : 
-                                var startpoint = 'Ces deux dernières semaines';
-                                break;
-                            case "-14 days" : 
-                                var startpoint = '14 jours glissants';
-                                break;
-                            case "this month midnight" : 
-                                var startpoint = 'Ce mois';
-                                break;
-                            case "-1 month" : 
-                                var startpoint = '1 mois glissant';
-                                break;
-                            case "-28 days" : 
-                                var startpoint = '28 jours glissants';
-                                break;
-                            case "-30 days" : 
-                                var startpoint = '30 jours glissants';
-                                break;
-                            case "-31 days" : 
-                                var startpoint = '31 jours glissants';
-                                break;
-                            default : 
-                                var startpoint = 'Inconnu'
+                            return 'Pas de limites.';
                         }
-                        html += '<div><span class="bold">' + jQuery.fn.dataTable.render.text().display(startpoint) + ' : </span>' + jQuery.fn.dataTable.render.text().display(limit.volume) + '</div>';
-                    }
 
-                    return html;
+                        var html = '';
+                        for (limit of limits)
+                        {
+                            switch (limit.startpoint)
+                            {
+                                case "today" : 
+                                    var startpoint = 'Par jour';
+                                    break;
+                                case "-24 hours" : 
+                                    var startpoint = '24 heures glissantes';
+                                    break;
+                                case "this week midnight" : 
+                                    var startpoint = 'Cette semaine';
+                                    break;
+                                case "-7 days" : 
+                                    var startpoint = '7 jours glissants';
+                                    break;
+                                case "this week midnight -1 week" : 
+                                    var startpoint = 'Ces deux dernières semaines';
+                                    break;
+                                case "-14 days" : 
+                                    var startpoint = '14 jours glissants';
+                                    break;
+                                case "this month midnight" : 
+                                    var startpoint = 'Ce mois';
+                                    break;
+                                case "-1 month" : 
+                                    var startpoint = '1 mois glissant';
+                                    break;
+                                case "-28 days" : 
+                                    var startpoint = '28 jours glissants';
+                                    break;
+                                case "-30 days" : 
+                                    var startpoint = '30 jours glissants';
+                                    break;
+                                case "-31 days" : 
+                                    var startpoint = '31 jours glissants';
+                                    break;
+                                default : 
+                                    var startpoint = 'Inconnu'
+                            }
+                            html += '<div><span class="bold">' + jQuery.fn.dataTable.render.text().display(startpoint) + ' : </span>' + jQuery.fn.dataTable.render.text().display(limit.volume) + '</div>';
+                        }
+
+                        return html;
+                    },
                 },
-            },
+            <?php } ?>
             {
                 data: 'id',
                 render: function (data, type, row, meta) {

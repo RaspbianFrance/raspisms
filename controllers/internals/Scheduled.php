@@ -669,32 +669,46 @@ use Monolog\Logger;
                             $phones_subset = $mms_only ?: $phones_subset;
                         }
 
-                        // Keep only phones with remaining volume and available status
+                        // Keep only available phones
                         $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
-                            return $phone['remaining_volume'] > 0 && $phone['status'] == \models\Phone::STATUS_AVAILABLE;
+                            return $phone['status'] == \models\Phone::STATUS_AVAILABLE;
                         });
                         $phones_subset = $remaining_volume_phones ?: $phones_subset;
 
-                        $max_priority_phones = [];
-                        $max_priority = PHP_INT_MIN;
-                        foreach ($phones_subset as $phone)
+                        
+                        // Keep only phones with remaining volume
+                        if ((int) ($users_settings[$id_user]['phone_limit'] ?? false))
                         {
-                            if ($phone['priority'] < $max_priority)
-                            {
-                                continue;
-                            }
-                            elseif ($phone['priority'] == $max_priority)
-                            {
-                                $max_priority_phones[] = $phone;
-                            }
-                            elseif ($phone['priority'] > $max_priority)
-                            {
-                                $max_priority_phones = [$phone];
-                                $max_priority = $phone['priority'];
-                            }
+                            $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
+                                return $phone['remaining_volume'] > 0;
+                            });
+                            $phones_subset = $remaining_volume_phones ?: $phones_subset;
                         }
 
-                        $phones_subset = $max_priority_phones;
+                        if ((int) ($users_settings[$id_user]['phone_priority'] ?? false))
+                        {
+                            $max_priority_phones = [];
+                            $max_priority = PHP_INT_MIN;
+                            foreach ($phones_subset as $phone)
+                            {
+                                if ($phone['priority'] < $max_priority)
+                                {
+                                    continue;
+                                }
+                                elseif ($phone['priority'] == $max_priority)
+                                {
+                                    $max_priority_phones[] = $phone;
+                                }
+                                elseif ($phone['priority'] > $max_priority)
+                                {
+                                    $max_priority_phones = [$phone];
+                                    $max_priority = $phone['priority'];
+                                }
+                            }
+
+                            $phones_subset = $max_priority_phones;
+                        }
+                        
                         if ($phones_subset)
                         {
                             $random_phone = $phones_subset[array_rand($phones_subset)];
