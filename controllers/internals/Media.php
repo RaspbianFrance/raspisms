@@ -48,22 +48,12 @@ class Media extends StandardController
 
         if (!file_put_contents($new_file_path, 'a'))
         {
-            throw new \Exception('pute de merde');
+            throw new \Exception('Cannot write file ' . $new_file_path);
         }
 
         if (!rename($tmpfile_path, $new_file_path))
         {
             throw new \Exception('Cannot create file ' . $new_file_path);
-        }
-
-        if (!chown($new_file_path, fileowner($user_path)))
-        {
-            throw new \Exception('Cannot give file ' . $new_file_path . ' to user : ' . fileowner($user_path));
-        }
-
-        if (!chgrp($new_file_path, filegroup($user_path)))
-        {
-            throw new \Exception('Cannot give file ' . $new_file_path . ' to group : ' . filegroup($user_path));
         }
 
         if (!chmod($new_file_path, self::DEFAULT_CHMOD))
