@@ -208,6 +208,7 @@
                 '/api/list/{entry_type}/',
                 '/api/list/{entry_type}/{page}/',
             ],
+            'get_usage' => '/api/usage/',
             'post_scheduled' => [
                 '/api/scheduled/',
             ],

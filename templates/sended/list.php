@@ -42,6 +42,7 @@
                                                 <th>Expéditeur</th>
                                                 <th>Destinataire</th>
                                                 <th>Message</th>
+                                                <th>Tag</th>
                                                 <th>Date</th>
                                                 <th>Statut</th>
                                                 <th class="checkcolumn"><input type="checkbox" id="check-all"/></th>
@@ -74,7 +75,7 @@ jQuery(document).ready(function ()
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
         "orderMulti": false,
-        "order": [[3, "desc"]],
+        "order": [[4, "desc"]],
         "columnDefs": [{
             'targets': 'checkcolumn',
             'orderable': false,
@@ -111,6 +112,7 @@ jQuery(document).ready(function ()
                     return jQuery.fn.dataTable.render.text().display(data);
                 },
             },
+            {data: 'tag', render: jQuery.fn.dataTable.render.text()},
             {data: 'at', render: jQuery.fn.dataTable.render.text()},
             {
                 data: 'status',

@@ -131,6 +131,17 @@
                                     </div>
                                 </div>
                             <?php } ?>
+
+                            <div class="form-group">
+                                <label>Tag à associé à la campagne</label>
+                                <p class="italic small help">
+                                    Vous pouvez renseigner une chaine de caractère qui sera associée à tous les SMS envoyés. Utile pour associer un identifiant interne à vos systèmes. Laissez vide si vous ne voulez pas associé de chaine.
+                                </p>
+                                <div class="form-group">
+                                    <input name="tag" class="form-control" type="text" placeholder="Ex: region-001" maxlength="255">
+                                </div>
+                            </div>
+
                             <?php if (count($phones) || count($phone_groups)) { ?>
                                 <div class="form-group">
                                     <label>Numéro à employer : </label>

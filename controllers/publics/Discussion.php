@@ -234,6 +234,7 @@ namespace controllers\publics;
             $at = $now;
             $text = $_POST['text'] ?? '';
             $destination = $_POST['destination'] ?? false;
+            $tag = $_POST['tag'] ?? null;
             $id_phone = $_POST['id_phone'] ?? false;
             $files = $_FILES['medias'] ?? false;
 
@@ -315,7 +316,7 @@ namespace controllers\publics;
             //Destinations must be an array of number
             $destinations = [['number' => $destination, 'data' => '[]']];
 
-            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, null, false, $mms, $destinations, [], [], [], $media_ids))
+            if (!$this->internal_scheduled->create($id_user, $at, $text, $id_phone, null, false, $mms, $tag, $destinations, [], [], [], $media_ids))
             {
                 $return['success'] = false;
                 $return['message'] = 'Impossible de créer le Sms';

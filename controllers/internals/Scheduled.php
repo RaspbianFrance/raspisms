@@ -23,20 +23,21 @@ use Monolog\Logger;
          *
          * @param int $id_user : User to insert scheduled for
          * @param $at : Scheduled date to send
-         * @param string $text                  : Text of the message
-         * @param ?int   $id_phone              : Id of the phone to send message with, null by default
-         * @param ?int   $id_phone_group        : Id of the phone group to send message with, null by default
-         * @param bool   $flash                 : Is the sms a flash sms, by default false
-         * @param bool   $mms                   : Is the sms a mms, by default false
-         * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
-         * @param array  $contacts_ids          : Contact ids to send message to
-         * @param array  $groups_ids            : Group ids to send message to
-         * @param array  $conditional_group_ids : Conditional Groups ids to send message to
-         * @param array  $media_ids             : Ids of the medias to link to scheduled message
+         * @param string  $text                  : Text of the message
+         * @param ?int    $id_phone              : Id of the phone to send message with, null by default
+         * @param ?int    $id_phone_group        : Id of the phone group to send message with, null by default
+         * @param bool    $flash                 : Is the sms a flash sms, by default false
+         * @param bool    $mms                   : Is the sms a mms, by default false
+         * @param ?string $tag                   : A string tag to associate to sended SMS
+         * @param array   $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
+         * @param array   $contacts_ids          : Contact ids to send message to
+         * @param array   $groups_ids            : Group ids to send message to
+         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         * @param array   $media_ids             : Ids of the medias to link to scheduled message
          *
          * @return bool : false on error, new id on success
          */
-        public function create(int $id_user, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
+        public function create(int $id_user, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, ?string $tag = null, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
@@ -46,6 +47,7 @@ use Monolog\Logger;
                 'id_phone_group' => $id_phone_group,
                 'flash' => $flash,
                 'mms' => $mms,
+                'tag' => $tag,
             ];
 
             if ('' === $text)
@@ -163,6 +165,7 @@ use Monolog\Logger;
          * @param ?int   $id_phone_group        : Id of the phone group to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
          * @param bool   $mms                   : Is the sms a mms, by default false
+         * @param ?string $tag                   : A string tag to associate to sended SMS
          * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
@@ -171,7 +174,7 @@ use Monolog\Logger;
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
+        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, ?string $tag = null, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
@@ -181,6 +184,7 @@ use Monolog\Logger;
                 'id_phone_group' => $id_phone_group,
                 'mms' => $mms,
                 'flash' => $flash,
+                'tag' => $tag,
             ];
 
             if (null !== $id_phone)
@@ -729,6 +733,7 @@ use Monolog\Logger;
                         'destination' => $target['number'],
                         'flash' => $scheduled['flash'],
                         'mms' => $scheduled['mms'],
+                        'tag' => $scheduled['tag'],
                         'medias' => $scheduled['medias'],
                         'text' => $text,
                     ];

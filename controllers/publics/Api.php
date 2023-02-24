@@ -233,6 +233,74 @@ namespace controllers\publics;
         }
 
         /**
+         * Return info about volume of sms sended for a period
+         *
+         * @param ?string $_POST['start']   : Date from which to get sms volume, format Y-m-d H:i:s. Default to null.
+         * @param ?string $_POST['end']     : Date up to which to get sms volume, format Y-m-d H:i:s. Default to null.
+         * @param ?string $_POST['tag']    : Tag to filter SMS by. If set, only sended sms with a matching tag will be counted. Default to null.
+         *
+         * @return : List of entries
+         */
+        public function get_usage()
+        {
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
+            $tag = $_GET['tag'] ?? null;
+
+            $return = self::DEFAULT_RETURN;
+
+            if ($start)
+            {
+                if (!\controllers\internals\Tool::validate_date($start, 'Y-m-d H:i:s'))
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'start must be a date of format "Y-m-d H:i:s".';
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+
+                $start = new \DateTime($start);
+            }
+
+            if ($end)
+            {
+                if (!\controllers\internals\Tool::validate_date($end, 'Y-m-d H:i:s'))
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'end must be a date of format "Y-m-d H:i:s".';
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+
+                $end = new \DateTime($end);
+            }
+
+            $total_sended = 0;
+            $phones_volumes = [];
+
+            $phones = $this->internal_phone->gets_for_user($this->user['id']);
+            foreach ($phones as $phone)
+            {
+                $nb_sended = $this->internal_sended->count_since_for_phone_and_user($this->user['id'], $phone['id'], $start, $end, $tag);
+                $total_sended += $nb_sended;
+                $phones_volumes[$phone['id']] = $nb_sended;
+            }
+
+            $return['response'] = [
+                'total' => $total_sended,
+                'phones_volumes' => $phones_volumes,
+            ];
+
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
          * Schedule a message to be send.
          *
          * @param string $_POST['at']                 : Date to send message at format Y-m-d H:i:s
@@ -241,6 +309,7 @@ namespace controllers\publics;
          * @param string $_POST['id_phone_group']     : Default null. Id of phone group to send the message from. If null abd id_phone null, use a random phone
          * @param string $_POST['flash']              : Default false. Is the sms a flash sms.
          * @param string $_POST['mms']                : Default false. Is the sms a mms.
+         * @param string $_POST['tag']                : Default null. Tag to associate to every sms of the campaign.
          * @param string $_POST['numbers']            : Array of numbers to send message to
          * @param string $_POST['contacts']           : Array of ids of contacts to send message to
          * @param string $_POST['groups']             : Array of ids of groups to send message to
@@ -257,6 +326,7 @@ namespace controllers\publics;
             $id_phone_group = empty($_POST['id_phone_group']) ? null : $_POST['id_phone_group'];
             $flash = (bool) ($_POST['flash'] ?? false);
             $mms = (bool) ($_POST['mms'] ?? false);
+            $tag = $_POST['tag'] ?? null;
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
@@ -505,7 +575,7 @@ namespace controllers\publics;
                 }
             }
 
-            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $id_phone_group, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
                 $return = self::DEFAULT_RETURN;

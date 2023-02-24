@@ -46,13 +46,14 @@ use Exception;
          * @param string $adapter               : Name of the adapter service used to send the message
          * @param bool   $flash                 : Is the sms a flash
          * @param bool   $mms                   : Is the sms a MMS. By default false.
+         * @param ?string $tag                   : A string tag to associate to sended SMS
          * @param array  $medias                : Array of medias to link to the MMS
          * @param ?int   $originating_scheduled : Id of the scheduled message that was responsible for sending this message. By default null.
          * @param string $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, array $medias = [], ?int $originating_scheduled = null, ?string $status = \models\Sended::STATUS_UNKNOWN)
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, ?string $tag = null, array $medias = [], ?int $originating_scheduled = null, ?string $status = \models\Sended::STATUS_UNKNOWN)
         {
             $sended = [
                 'id_user' => $id_user,
@@ -64,6 +65,7 @@ use Exception;
                 'adapter' => $adapter,
                 'flash' => $flash,
                 'mms' => $mms,
+                'tag' => $tag,
                 'status' => $status,
                 'originating_scheduled' => $originating_scheduled,
             ];
@@ -186,13 +188,15 @@ use Exception;
          * 
          * @param int $id_user : User id
          * @param int $id_phone : Phone id we want the number of sended message for
-         * @param \DateTime $since : Date since which we want sended number
+         * @param ?\DateTime $since : Date since which we want sended number. Default to null.
+         * @param ?\DateTime $before : Date up to which we want sended number. Default to null.
+         * @param ?string $tag_like : Tag to filter sms by, this is not a = but a LIKE operator
          * 
          * @return int
          */
-        public function count_since_for_phone_and_user(int $id_user, int $id_phone, \DateTime $since): int
+        public function count_since_for_phone_and_user(int $id_user, int $id_phone, ?\DateTime $since, ?\DateTime $before = null, ?string $tag_like = null): int
         {
-            return $this->get_model()->count_since_for_phone_and_user($id_user, $id_phone, $since);
+            return $this->get_model()->count_since_for_phone_and_user($id_user, $id_phone, $since, $before, $tag_like);
         }
 
         /**
@@ -238,6 +242,7 @@ use Exception;
          * @param $text : Text of the message
          * @param string     $destination           : Number of the receiver
          * @param bool       $flash                 : Is the sms a flash. By default false.
+         * @param ?string    $tag                   : A string tag to associate to sended SMS
          * @param bool       $mms                   : Is the sms a MMS. By default false.
          * @param array      $medias                : Array of medias to link to the MMS
          * @param string     $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
@@ -248,7 +253,7 @@ use Exception;
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, array $medias = [], $originating_scheduled = null, string $status = \models\Sended::STATUS_UNKNOWN): array
+        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, ?string $tag = null, array $medias = [], $originating_scheduled = null, string $status = \models\Sended::STATUS_UNKNOWN): array
         {
             $return = [
                 'error' => false,
@@ -299,7 +304,7 @@ use Exception;
                 }
 
                 //If we reached limit for this phone and phone limits are enabled, do not send the message
-                if ((int) ($users_settings['phone_limit'] ?? false))
+                if ((int) ($user_settings['phone_limit'] ?? false))
                 {
                     $limits = $internal_phone->get_limits($id_phone);
 
@@ -342,7 +347,7 @@ use Exception;
             finally
             {
                 $uid = $uid ?? uniqid();
-                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
+                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $tag, $medias, $originating_scheduled, $status);
                 
                 $webhook_body = [
                     'id' => $sended_id,

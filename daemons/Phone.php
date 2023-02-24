@@ -144,7 +144,7 @@ class Phone extends AbstractDaemon
             //Do message sending
             $this->logger->info('Try send message : ' . json_encode($message));
 
-            $response = $internal_sended->send($this->adapter, $this->phone['id_user'], $this->phone['id'], $message['text'], $message['destination'], $message['flash'], $message['mms'], $message['medias'], $message['id_scheduled']);
+            $response = $internal_sended->send($this->adapter, $this->phone['id_user'], $this->phone['id'], $message['text'], $message['destination'], $message['flash'], $message['mms'], $message['tag'], $message['medias'], $message['id_scheduled']);
             if ($response['error'])
             {
                 $this->logger->error('Failed send message : ' . json_encode($message) . ' with error : ' . $response['error_message']);

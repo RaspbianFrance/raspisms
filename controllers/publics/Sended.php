@@ -59,8 +59,9 @@ namespace controllers\publics;
                 0 => 'phone_name',
                 1 => 'searchable_destination',
                 2 => 'text',
-                3 => 'at',
-                4 => 'status',
+                3 => 'tag',
+                4 => 'at',
+                5 => 'status',
             ];
 
             $search = $_GET['search']['value'] ?? null;

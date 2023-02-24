@@ -144,7 +144,7 @@
         
         /**
          * Generate IN query params and values
-         * @param string $values : Values to generate in array from
+         * @param array $values : Values to generate in array from
          * @return array : Array ['QUERY' => string 'IN(...)', 'PARAMS' => [parameters to pass to execute]]
         */
         protected function _generate_in_from_array ($values)
@@ -214,6 +214,11 @@
                     $operator = '>';
                     break;
 
+                case ('%' == $first_char) :
+                    $true_fieldname = mb_substr($fieldname, 1);
+                    $operator = 'LIKE';
+                    break;
+
                 case ('=' == $first_char) :
                     $true_fieldname = mb_substr($fieldname, 1);
                     $operator = '=';
@@ -227,8 +232,11 @@
             //Protect against injection in fieldname
             $true_fieldname = preg_replace('#[^a-zA-Z0-9_]#', '', $true_fieldname);
 
-            $query = '`' . $true_fieldname . '` ' . $operator . ' :where_' . $true_fieldname;
-            $param = ['where_' . $true_fieldname => $value];
+            // Add a uid to fieldname so we can combine multiple rules on same field
+            $uid = uniqid();
+
+            $query = '`' . $true_fieldname . '` ' . $operator . ' :where_' . $true_fieldname . '_' . $uid;
+            $param = ['where_' . $true_fieldname . '_' . $uid => $value];
 
             return ['QUERY' => $query, 'PARAM' => $param];
         }
@@ -358,7 +366,6 @@
                 }
 
                 $query = "SELECT COUNT(*) as `count` FROM `" . $table . "` WHERE 1 " . (count($wheres) ? 'AND ' : '') . implode(' AND ', $wheres);
-                
                 $query = $this->pdo->prepare($query);
 
                 foreach ($params as $label => &$param)
