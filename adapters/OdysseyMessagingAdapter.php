@@ -37,14 +37,9 @@ class OdysseyMessagingAdapter implements AdapterInterface
     private $data;
 
     /**
-     * Odyssey account.
+     * Odyssey login.
      */
-    private $account;
-
-    /**
-     * Odyssey user.
-     */
-    private $user;
+    private $login;
 
     /**
      * Odyssey password.
@@ -70,8 +65,7 @@ class OdysseyMessagingAdapter implements AdapterInterface
     {
         $this->data = json_decode($data, true);
 
-        $this->account = $this->data['account'];
-        $this->user = $this->data['user'];
+        $this->login = $this->data['login'];
         $this->password = $this->data['password'];
 
         $this->sender = $this->data['sender'] ?? null;
@@ -142,15 +136,9 @@ class OdysseyMessagingAdapter implements AdapterInterface
     {
         return [
             [
-                'name' => 'account',
-                'title' => 'Odyssey Account',
-                'description' => 'Numéro de compte Odyssey à employer.',
-                'required' => true,
-            ],
-            [
-                'name' => 'user',
-                'title' => 'Odyssey User',
-                'description' => 'User du compte Odyssey à employer.',
+                'name' => 'login',
+                'title' => 'Odyssey login',
+                'description' => 'Login du compte Odyssey à employer.',
                 'required' => true,
             ],
             [
@@ -246,7 +234,7 @@ class OdysseyMessagingAdapter implements AdapterInterface
 
         try
         {
-            $credentials = base64_encode($this->account . '.' . $this->user . ':' . $this->password);
+            $credentials = base64_encode($this->login . ':' . $this->password);
             $headers = [
                 'Authorization: Basic ' . $credentials,
                 'Content-Type: application/json',
@@ -357,7 +345,7 @@ class OdysseyMessagingAdapter implements AdapterInterface
                 return false;
             }
 
-            $credentials = base64_encode($this->account . '.' . $this->user . ':' . $this->password);
+            $credentials = base64_encode($this->login . ':' . $this->password);
             $headers = [
                 'Authorization: Basic ' . $credentials,
                 'Content-Type: application/json',
