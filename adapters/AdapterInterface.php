@@ -80,6 +80,11 @@ interface AdapterInterface
     public static function meta_support_read(): bool;
 
     /**
+     * Does the implemented service support updating phone status.
+     */
+    public static function meta_support_phone_status(): bool;
+
+    /**
      * Does the implemented service support reception callback.
      */
     public static function meta_support_reception(): bool;
@@ -151,6 +156,15 @@ interface AdapterInterface
      * @return bool : False on error, true else
      */
     public function test(): bool;
+
+
+    /**
+     * Method called to verify phone status
+     * 
+     * @return string : Return one phone status among 'available', 'unavailable', 'no_credit'
+     */
+    public function check_phone_status(): string;
+
 
     /**
      * Method called on reception of a status update notification for a SMS.

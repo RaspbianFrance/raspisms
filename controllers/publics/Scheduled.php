@@ -18,6 +18,7 @@ namespace controllers\publics;
     {
         private $internal_scheduled;
         private $internal_phone;
+        private $internal_phone_group;
         private $internal_contact;
         private $internal_group;
         private $internal_conditional_group;
@@ -34,6 +35,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_phone_group = new \controllers\internals\PhoneGroup($bdd);
             $this->internal_contact = new \controllers\internals\Contact($bdd);
             $this->internal_group = new \controllers\internals\Group($bdd);
             $this->internal_conditional_group = new \controllers\internals\ConditionalGroup($bdd);
@@ -118,6 +120,7 @@ namespace controllers\publics;
 
             $contacts = $this->internal_contact->gets_for_user($id_user);
             $phones = $this->internal_phone->gets_for_user($id_user);
+            $phone_groups = $this->internal_phone_group->gets_for_user($id_user);
 
             $contact_ids = (isset($_GET['contact_ids']) && \is_array($_GET['contact_ids'])) ? $_GET['contact_ids'] : [];
             $group_ids = (isset($_GET['group_ids']) && \is_array($_GET['group_ids'])) ? $_GET['group_ids'] : [];
@@ -153,6 +156,7 @@ namespace controllers\publics;
                 'now' => $now->format('Y-m-d H:i'),
                 'contacts' => $contacts,
                 'phones' => $phones,
+                'phone_groups' => $phone_groups,
                 'prefilled_contacts' => $prefilled_contacts,
                 'prefilled_groups' => $prefilled_groups,
                 'prefilled_conditional_groups' => $prefilled_conditional_groups,
@@ -179,6 +183,7 @@ namespace controllers\publics;
 
             $all_contacts = $this->internal_contact->gets_for_user($_SESSION['user']['id']);
             $phones = $this->internal_phone->gets_for_user($_SESSION['user']['id']);
+            $phone_groups = $this->internal_phone_group->gets_for_user($id_user);
             $scheduleds = $this->internal_scheduled->gets_in_for_user($_SESSION['user']['id'], $ids);
 
             //Pour chaque message on ajoute les numéros, les contacts & les groups
@@ -226,6 +231,7 @@ namespace controllers\publics;
             $this->render('scheduled/edit', [
                 'scheduleds' => $scheduleds,
                 'phones' => $phones,
+                'phone_groups' => $phone_groups,
                 'contacts' => $all_contacts,
             ]);
         }
@@ -238,7 +244,7 @@ namespace controllers\publics;
          * @param string $_POST['at']                 : Date to send message for
          * @param string $_POST['text']               : Text of the message
          * @param ?bool  $_POST['flash']              : Is the message a flash message (by default false)
-         * @param ?int   $_POST['id_phone']           : Id of the phone to send message from, if null use random phone
+         * @param ?int   $_POST['id_phone']           : Id of the phone or phone group to send message from. id will be preceed by phone_ of phonegroup_ depending on type of ressource to use, if null use random phone
          * @param ?array $_POST['numbers']            : Numbers to send the message to
          * @param ?array $_POST['contacts']           : Numbers to send the message to
          * @param ?array $_POST['groups']             : Numbers to send the message to
@@ -258,6 +264,7 @@ namespace controllers\publics;
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $flash = (bool) ($_POST['flash'] ?? false);
+            $tag = ($_POST['tag'] ?? null) ?: null;
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
             $numbers = $_POST['numbers'] ?? [];
             $numbers = is_array($numbers) ? $numbers : [$numbers];
@@ -433,7 +440,12 @@ namespace controllers\publics;
 
             $mms = (bool) count($media_ids);
 
-            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
+            // Check if we must send message to a phone or a phone_group based on if id_phone start with 'phone_' or 'phonegroup_'
+            $original_id_phone = $id_phone;
+            $id_phone = str_starts_with($original_id_phone, 'phone_') ? mb_substr($original_id_phone, mb_strlen('phone_')) : null;
+            $id_phone_group = str_starts_with($original_id_phone, 'phonegroup_') ? mb_substr($original_id_phone, mb_strlen('phonegroup_')) : null;
+
+            $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
                 \FlashMessage\FlashMessage::push('danger', 'Impossible de créer le Sms.');
@@ -473,6 +485,7 @@ namespace controllers\publics;
                 $text = $scheduled['text'] ?? false;
                 $id_phone = empty($scheduled['id_phone']) ? null : $scheduled['id_phone'];
                 $flash = (bool) ($scheduled['flash'] ?? false);
+                $tag = ($scheduled['tag'] ?? null) ?: null;
                 $numbers = $scheduled['numbers'] ?? [];
                 $contacts = $scheduled['contacts'] ?? [];
                 $groups = $scheduled['groups'] ?? [];
@@ -650,7 +663,11 @@ namespace controllers\publics;
 
                 $mms = (bool) count($media_ids);
 
-                $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
+                $original_id_phone = $id_phone;
+                $id_phone = str_starts_with($original_id_phone, 'phone_') ? mb_substr($original_id_phone, mb_strlen('phone_')) : null;
+                $id_phone_group = str_starts_with($original_id_phone, 'phonegroup_') ? mb_substr($original_id_phone, mb_strlen('phonegroup_')) : null;
+
+                $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
                 ++$nb_update;
             }
 

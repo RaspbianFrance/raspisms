@@ -23,27 +23,31 @@ use Monolog\Logger;
          *
          * @param int $id_user : User to insert scheduled for
          * @param $at : Scheduled date to send
-         * @param string $text                  : Text of the message
-         * @param ?int   $id_phone              : Id of the phone to send message with, null by default
-         * @param bool   $flash                 : Is the sms a flash sms, by default false
-         * @param bool   $mms                   : Is the sms a mms, by default false
-         * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
-         * @param array  $contacts_ids          : Contact ids to send message to
-         * @param array  $groups_ids            : Group ids to send message to
-         * @param array  $conditional_group_ids : Conditional Groups ids to send message to
-         * @param array  $media_ids             : Ids of the medias to link to scheduled message
+         * @param string  $text                  : Text of the message
+         * @param ?int    $id_phone              : Id of the phone to send message with, null by default
+         * @param ?int    $id_phone_group        : Id of the phone group to send message with, null by default
+         * @param bool    $flash                 : Is the sms a flash sms, by default false
+         * @param bool    $mms                   : Is the sms a mms, by default false
+         * @param ?string $tag                   : A string tag to associate to sended SMS
+         * @param array   $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
+         * @param array   $contacts_ids          : Contact ids to send message to
+         * @param array   $groups_ids            : Group ids to send message to
+         * @param array   $conditional_group_ids : Conditional Groups ids to send message to
+         * @param array   $media_ids             : Ids of the medias to link to scheduled message
          *
          * @return bool : false on error, new id on success
          */
-        public function create(int $id_user, $at, string $text, ?int $id_phone = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
+        public function create(int $id_user, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, ?string $tag = null, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'id_phone' => $id_phone,
+                'id_phone_group' => $id_phone_group,
                 'flash' => $flash,
                 'mms' => $mms,
+                'tag' => $tag,
             ];
 
             if ('' === $text)
@@ -57,6 +61,17 @@ use Monolog\Logger;
                 $find_phone = $internal_phone->get_for_user($id_user, $id_phone);
 
                 if (!$find_phone)
+                {
+                    return false;
+                }
+            }
+
+            if (null !== $id_phone_group)
+            {
+                $internal_phone_group = new PhoneGroup($this->bdd);
+                $find_phone_group = $internal_phone_group->get_for_user($id_user, $id_phone_group);
+
+                if (!$find_phone_group)
                 {
                     return false;
                 }
@@ -147,8 +162,10 @@ use Monolog\Logger;
          * @param $at : Scheduled date to send
          * @param string $text                  : Text of the message
          * @param ?int   $id_phone              : Id of the phone to send message with, null by default
+         * @param ?int   $id_phone_group        : Id of the phone group to send message with, null by default
          * @param bool   $flash                 : Is the sms a flash sms, by default false
          * @param bool   $mms                   : Is the sms a mms, by default false
+         * @param ?string $tag                   : A string tag to associate to sended SMS
          * @param array  $numbers               : Array of numbers to send message to, a number is an array ['number' => '+33XXX', 'data' => '{"key":"value", ...}']
          * @param array  $contacts_ids          : Contact ids to send message to
          * @param array  $groups_ids            : Group ids to send message to
@@ -157,15 +174,17 @@ use Monolog\Logger;
          *
          * @return bool : false on error, true on success
          */
-        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?string $id_phone = null, bool $flash = false, bool $mms = false, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
+        public function update_for_user(int $id_user, int $id_scheduled, $at, string $text, ?int $id_phone = null, ?int $id_phone_group = null, bool $flash = false, bool $mms = false, ?string $tag = null, array $numbers = [], array $contacts_ids = [], array $groups_ids = [], array $conditional_group_ids = [], array $media_ids = [])
         {
             $scheduled = [
                 'id_user' => $id_user,
                 'at' => $at,
                 'text' => $text,
                 'id_phone' => $id_phone,
+                'id_phone_group' => $id_phone_group,
                 'mms' => $mms,
                 'flash' => $flash,
+                'tag' => $tag,
             ];
 
             if (null !== $id_phone)
@@ -174,6 +193,17 @@ use Monolog\Logger;
                 $find_phone = $internal_phone->get_for_user($id_user, $id_phone);
 
                 if (!$find_phone)
+                {
+                    return false;
+                }
+            }
+
+            if (null !== $id_phone_group)
+            {
+                $internal_phone_group = new PhoneGroup($this->bdd);
+                $find_phone_group = $internal_phone_group->get_for_user($id_user, $id_phone_group);
+
+                if (!$find_phone_group)
                 {
                     return false;
                 }
@@ -413,13 +443,14 @@ use Monolog\Logger;
             $internal_group = new \controllers\internals\Group($this->bdd);
             $internal_conditional_group = new \controllers\internals\ConditionalGroup($this->bdd);
             $internal_phone = new \controllers\internals\Phone($this->bdd);
+            $internal_phone_group = new \controllers\internals\PhoneGroup($this->bdd);
             $internal_smsstop = new \controllers\internals\SmsStop($this->bdd);
             $internal_sended = new \controllers\internals\Sended($this->bdd);
 
             $users_smsstops = [];
             $users_settings = [];
             $users_phones = [];
-            $users_mms_phones = [];
+            $users_phone_groups = [];            
 
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
@@ -457,7 +488,6 @@ use Monolog\Logger;
                 if (!isset($users_phones[$id_user]))
                 {
                     $users_phones[$id_user] = [];
-                    $users_mms_phones[$id_user] = [];
 
                     $phones = $internal_phone->gets_for_user($id_user);
                     foreach ($phones as &$phone)
@@ -475,25 +505,25 @@ use Monolog\Logger;
                         $phone['remaining_volume'] = $remaining_volume;
                         $users_phones[$id_user][$phone['id']] = $phone;
                     }
-
-                    $mms_phones = $internal_phone->gets_phone_supporting_mms_for_user($id_user, $internal_phone::MMS_SENDING);
-                    foreach ($mms_phones as &$mms_phone)
-                    {
-                        $limits = $internal_phone->get_limits($mms_phone['id']);
-
-                        $remaining_volume = PHP_INT_MAX;
-                        foreach ($limits as $limit)
-                        {
-                            $startpoint = new \DateTime($limit['startpoint']);
-                            $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $mms_phone['id'], $startpoint);
-                            $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
-                        }
-
-                        $mms_phone['remaining_volume'] = $remaining_volume;
-                        $users_mms_phones[$id_user][$mms_phone['id']] = $mms_phone;
-                    }
                 }
 
+                if (!isset($users_phone_groups[$id_user]))
+                {
+                    $users_phone_groups[$id_user] = [];
+
+                    $phone_groups = $internal_phone_group->gets_for_user($id_user);
+                    foreach ($phone_groups as $phone_group)
+                    {
+                        $phones = $internal_phone_group->get_phones($phone_group['id']);
+                        $phone_group['phones'] = [];
+                        foreach ($phones as $phone) 
+                        {
+                            $phone_group['phones'][] = $phone['id'];
+                        }
+
+                        $users_phone_groups[$id_user][$phone_group['id']] = $phone_group;
+                    }
+                }
 
                 //Add medias to mms
                 $scheduled['medias'] = [];
@@ -507,6 +537,12 @@ use Monolog\Logger;
                 if ($scheduled['id_phone'])
                 {
                     $phone_to_use = $users_phones[$id_user][$scheduled['id_phone']] ?? null;
+                }
+
+                $phone_group_to_use = null;
+                if ($scheduled['id_phone_group'])
+                {
+                    $phone_group_to_use = $users_phone_groups[$id_user][$scheduled['id_phone_group']] ?? null;
                 }
 
 
@@ -620,36 +656,63 @@ use Monolog\Logger;
                     if (null === $phone_to_use)
                     {
                         $phones_subset = $users_phones[$id_user];
-                        if ($scheduled['mms'])
+
+                        if ($phone_group_to_use)
                         {
-                            $phones_subset = $users_mms_phones[$id_user] ?: $phones_subset;
+                            $phones_subset = array_filter($phones_subset, function ($phone) use ($phone_group_to_use) {
+                                return in_array($phone['id'], $phone_group_to_use['phones']);
+                            });
                         }
 
+                        if ($scheduled['mms'])
+                        {
+                            $mms_only = array_filter($phones_subset, function ($phone) {
+                                return $phone['adapter']::meta_support_mms_sending();
+                            });
+
+                            $phones_subset = $mms_only ?: $phones_subset;
+                        }
+
+                        // Keep only available phones
                         $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
-                            return $phone['remaining_volume'] > 0;
+                            return $phone['status'] == \models\Phone::STATUS_AVAILABLE;
                         });
                         $phones_subset = $remaining_volume_phones ?: $phones_subset;
 
-                        $max_priority_phones = [];
-                        $max_priority = PHP_INT_MIN;
-                        foreach ($phones_subset as $phone)
+                        
+                        // Keep only phones with remaining volume
+                        if ((int) ($users_settings[$id_user]['phone_limit'] ?? false))
                         {
-                            if ($phone['priority'] < $max_priority)
-                            {
-                                continue;
-                            }
-                            elseif ($phone['priority'] == $max_priority)
-                            {
-                                $max_priority_phones[] = $phone;
-                            }
-                            elseif ($phone['priority'] > $max_priority)
-                            {
-                                $max_priority_phones = [$phone];
-                                $max_priority = $phone['priority'];
-                            }
+                            $remaining_volume_phones = array_filter($phones_subset, function ($phone) {
+                                return $phone['remaining_volume'] > 0;
+                            });
+                            $phones_subset = $remaining_volume_phones ?: $phones_subset;
                         }
 
-                        $phones_subset = $max_priority_phones;
+                        if ((int) ($users_settings[$id_user]['phone_priority'] ?? false))
+                        {
+                            $max_priority_phones = [];
+                            $max_priority = PHP_INT_MIN;
+                            foreach ($phones_subset as $phone)
+                            {
+                                if ($phone['priority'] < $max_priority)
+                                {
+                                    continue;
+                                }
+                                elseif ($phone['priority'] == $max_priority)
+                                {
+                                    $max_priority_phones[] = $phone;
+                                }
+                                elseif ($phone['priority'] > $max_priority)
+                                {
+                                    $max_priority_phones = [$phone];
+                                    $max_priority = $phone['priority'];
+                                }
+                            }
+
+                            $phones_subset = $max_priority_phones;
+                        }
+                        
                         if ($phones_subset)
                         {
                             $random_phone = $phones_subset[array_rand($phones_subset)];
@@ -670,16 +733,13 @@ use Monolog\Logger;
                         'destination' => $target['number'],
                         'flash' => $scheduled['flash'],
                         'mms' => $scheduled['mms'],
+                        'tag' => $scheduled['tag'],
                         'medias' => $scheduled['medias'],
                         'text' => $text,
                     ];
 
-                    // Consume one sms from remaining volume of phone, dont forget to do the same for the entry in mms phones
+                    // Consume one sms from remaining volume of phone
                     $users_phones[$id_user][$id_phone]['remaining_volume'] --;
-                    if ($users_mms_phones[$id_user][$id_phone] ?? false)
-                    {
-                        $users_mms_phones[$id_user][$id_phone] --;
-                    }
                 }
             }
 

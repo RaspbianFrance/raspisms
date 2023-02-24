@@ -40,6 +40,7 @@
 							<form action="<?php echo \descartes\Router::url('Phone', 'update', ['csrf' => $_SESSION['csrf']]);?>" method="POST">
                                 <?php foreach ($phones as $phone) { ?>
                                     <div class="entry-container" data-entry-id="<?php $this->s($phone['id']); ?>">
+
                                         <div class="form-group">
                                             <label>Nom du téléphone</label>
                                             <p class="italic small help">
@@ -49,15 +50,19 @@
                                             <input required="required" name="phones[<?php $this->s($phone['id']); ?>][name]" class="form-control" placeholder="Nom du téléphone" value="<?php $this->s($phone['name']); ?>">
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Priorité d'utilisation du téléphone</label>
-                                            <p class="italic small help">
-                                                Lors de l'envoi de SMS sans téléphone spécifié, les téléphones avec la plus haute priorité seront utilisés en premier.
-                                            </p>
+
+                                        <?php if ($_SESSION['user']['settings']['phone_priority']) { ?>
                                             <div class="form-group">
-                                                <input required="required" name="phones[<?php $this->s($phone['id']); ?>][priority]" class="form-control" type="number" min="0" placeholder="Priorité d'utilisation" value="<?php $this->s($phone['priority']) ?>">
+                                                <label>Priorité d'utilisation du téléphone</label>
+                                                <p class="italic small help">
+                                                    Lors de l'envoi de SMS sans téléphone spécifié, les téléphones avec la plus haute priorité seront utilisés en premier.
+                                                </p>
+                                                <div class="form-group">
+                                                    <input required="required" name="phones[<?php $this->s($phone['id']); ?>][priority]" class="form-control" type="number" min="0" placeholder="Priorité d'utilisation" value="<?php $this->s($phone['priority']) ?>">
+                                                </div>
                                             </div>
-                                        </div>
+                                        <?php } ?>
+
                                         <div class="form-group">
                                             <label>Type de téléphone</label>
                                             <p class="italic small help description-adapter-general">
@@ -65,13 +70,15 @@
                                             </p>
                                             <select name="phones[<?php $this->s($phone['id']); ?>][adapter]" class="form-control adapter-select">
                                                 <?php foreach ($adapters as $adapter) { ?>
-                                                    <?php if ($adapter['meta_hidden'] === false) { ?>
+                                                    <?php if ($adapter['meta_hidden'] === false || $phone['adapter'] == $adapter['meta_classname']) { ?>
                                                         <option 
                                                             value="<?= $adapter['meta_classname'] ?>"
                                                             data-description="<?php $this->s($adapter['meta_description']); ?>"
                                                             data-data-fields="<?php $this->s(json_encode($adapter['meta_data_fields'])); ?>"
                                                             <?php if ($phone['adapter'] == $adapter['meta_classname']) { ?>
-                                                                data-phone-adapter-data="<?php $this->s($phone['adapter_data']); ?>"
+                                                                <?php if (!$adapter['meta_hide_data']) { ?>
+                                                                    data-phone-adapter-data="<?php $this->s($phone['adapter_data']); ?>"
+                                                                <?php } ?>
                                                                 selected
                                                             <?php } ?>
                                                         >
@@ -92,44 +99,48 @@
                                                 <div class="adapter-data-fields"></div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Limites des volumes d'envoi du téléphone</label>
-                                            <p class="italic small help">
-                                                Défini le nombre maximum de SMS qui pourront être envoyés avec ce téléphone sur des périodes de temps données.
-                                            </p>
-                                            <div class="form-group phone-limits-container container-fluid">
-                                                <?php foreach ($phone['limits'] as $limit) { ?>
-                                                    <div class="row phone-limits-group">
-                                                        <div class="col-xs-4">
-                                                            <label>Période</label><br/>
-                                                            <?php $random_id = uniqid(); ?>
-                                                            <select name="phones[<?= $phone['id']; ?>][limits][<?= $random_id; ?>][startpoint]" class="form-control" required>
-                                                                <option value="" disabled selected>Période sur laquelle appliquer la limite</option>
-                                                                <option <?= $limit['startpoint'] == 'today' ? 'selected' : ''; ?> value="today">Par jour</option>
-                                                                <option <?= $limit['startpoint'] == '-24 hours' ? 'selected' : ''; ?> value="-24 hours">24 heures glissantes</option>
-                                                                <option <?= $limit['startpoint'] == 'this week midnight' ? 'selected' : ''; ?> value="this week midnight">Cette semaine</option>
-                                                                <option <?= $limit['startpoint'] == '-7 days' ? 'selected' : ''; ?> value="-7 days">7 jours glissants</option>
-                                                                <option <?= $limit['startpoint'] == 'this week midnight -1 week' ? 'selected' : ''; ?> value="this week midnight -1 week">Ces deux dernières semaines</option>
-                                                                <option <?= $limit['startpoint'] == '-14 days' ? 'selected' : ''; ?> value="-14 days">14 jours glissants</option>
-                                                                <option <?= $limit['startpoint'] == 'this month midnight' ? 'selected' : ''; ?> value="this month midnight">Ce mois</option>
-                                                                <option <?= $limit['startpoint'] == '-1 month' ? 'selected' : ''; ?> value="-1 month">1 mois glissant</option>
-                                                                <option <?= $limit['startpoint'] == '-28 days' ? 'selected' : ''; ?> value="-28 days">28 jours glissants</option>
-                                                                <option <?= $limit['startpoint'] == '-30 days' ? 'selected' : ''; ?> value="-30 days">30 jours glissants</option>
-                                                                <option <?= $limit['startpoint'] == '-31 days' ? 'selected' : ''; ?> value="-31 days">31 jours glissants</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="scheduleds-number-data-container col-xs-8">
-                                                            <label>Volume</label>
-                                                            <div class="form-group">
-                                                                <input name="phones[<?= $phone['id']; ?>][limits][<?= $random_id; ?>][volume]" class="form-control" type="number" min="1" value="<?php $this->s($limit['volume']); ?>" placeholder="Nombre de SMS maximum sur la période.">
+
+                                        <?php if ($_SESSION['user']['settings']['phone_limit']) { ?>
+                                            <div class="form-group">
+                                                <label>Limites des volumes d'envoi du téléphone</label>
+                                                <p class="italic small help">
+                                                    Défini le nombre maximum de SMS qui pourront être envoyés avec ce téléphone sur des périodes de temps données.
+                                                </p>
+                                                <div class="form-group phone-limits-container container-fluid">
+                                                    <?php foreach ($phone['limits'] as $limit) { ?>
+                                                        <div class="row phone-limits-group">
+                                                            <div class="col-xs-4">
+                                                                <label>Période</label><br/>
+                                                                <?php $random_id = uniqid(); ?>
+                                                                <select name="phones[<?= $phone['id']; ?>][limits][<?= $random_id; ?>][startpoint]" class="form-control" required>
+                                                                    <option value="" disabled selected>Période sur laquelle appliquer la limite</option>
+                                                                    <option <?= $limit['startpoint'] == 'today' ? 'selected' : ''; ?> value="today">Par jour</option>
+                                                                    <option <?= $limit['startpoint'] == '-24 hours' ? 'selected' : ''; ?> value="-24 hours">24 heures glissantes</option>
+                                                                    <option <?= $limit['startpoint'] == 'this week midnight' ? 'selected' : ''; ?> value="this week midnight">Cette semaine</option>
+                                                                    <option <?= $limit['startpoint'] == '-7 days' ? 'selected' : ''; ?> value="-7 days">7 jours glissants</option>
+                                                                    <option <?= $limit['startpoint'] == 'this week midnight -1 week' ? 'selected' : ''; ?> value="this week midnight -1 week">Ces deux dernières semaines</option>
+                                                                    <option <?= $limit['startpoint'] == '-14 days' ? 'selected' : ''; ?> value="-14 days">14 jours glissants</option>
+                                                                    <option <?= $limit['startpoint'] == 'this month midnight' ? 'selected' : ''; ?> value="this month midnight">Ce mois</option>
+                                                                    <option <?= $limit['startpoint'] == '-1 month' ? 'selected' : ''; ?> value="-1 month">1 mois glissant</option>
+                                                                    <option <?= $limit['startpoint'] == '-28 days' ? 'selected' : ''; ?> value="-28 days">28 jours glissants</option>
+                                                                    <option <?= $limit['startpoint'] == '-30 days' ? 'selected' : ''; ?> value="-30 days">30 jours glissants</option>
+                                                                    <option <?= $limit['startpoint'] == '-31 days' ? 'selected' : ''; ?> value="-31 days">31 jours glissants</option>
+                                                                </select>
                                                             </div>
+                                                            <div class="scheduleds-number-data-container col-xs-8">
+                                                                <label>Volume</label>
+                                                                <div class="form-group">
+                                                                    <input name="phones[<?= $phone['id']; ?>][limits][<?= $random_id; ?>][volume]" class="form-control" type="number" min="1" value="<?php $this->s($limit['volume']); ?>" placeholder="Nombre de SMS maximum sur la période.">
+                                                                </div>
+                                                            </div>
+                                                            <a href="#" class="phone-limits-group-remove"><span class="fa fa-times"></span></a>
                                                         </div>
-                                                        <a href="#" class="phone-limits-group-remove"><span class="fa fa-times"></span></a>
-                                                    </div>
-                                                <?php } ?>
-                                                <div class="text-center"><div class="add-phone-limit-button fa fa-plus-circle"></div></div>
+                                                    <?php } ?>
+                                                    <div class="text-center"><div class="add-phone-limit-button fa fa-plus-circle"></div></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        <?php } ?>
+                                        
                                     </div>
                                     <hr/>
                                 <?php } ?>

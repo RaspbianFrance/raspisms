@@ -164,6 +164,20 @@
             'delete' => '/phone/delete/{csrf}/',
             'edit' => '/phone/edit/',
             'update' => '/phone/update/{csrf}/',
+            'update_status' => '/phone/update_status/{csrf}/',
+            'json_list' => '/phones.json/',
+        ],
+
+        'PhoneGroup' => [
+            'list' => '/phone_group/',
+            'list_json' => '/phone_group/json/',
+            'add' => '/phone_group/add/',
+            'create' => '/phone_group/create/{csrf}/',
+            'delete' => '/phone_group/delete/{csrf}/',
+            'edit' => '/phone_group/edit/',
+            'update' => '/phone_group/update/{csrf}/',
+            'preview' => '/phone_group/preview/{id_group}/',
+            'json_list' => '/phone_group.json/',
         ],
         
         'Call' => [
@@ -194,6 +208,7 @@
                 '/api/list/{entry_type}/',
                 '/api/list/{entry_type}/{page}/',
             ],
+            'get_usage' => '/api/usage/',
             'post_scheduled' => [
                 '/api/scheduled/',
             ],
@@ -205,6 +220,9 @@
             ],
             'post_update_phone' => [
                 '/api/phone/{id}/',
+            ],
+            'post_update_phone_status' => [
+                '/api/phone/{id}/status/',
             ],
             'delete_phone' => [
                 '/api/phone/{id}/',

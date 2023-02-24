@@ -44,18 +44,22 @@
                                         Le nom du téléphone qui enverra et recevra les messages.
                                     </p>
 									<div class="form-group">
-                                    <input required="required" name="name" class="form-control" placeholder="Nom du téléphone" value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
+                                        <input required="required" name="name" class="form-control" placeholder="Nom du téléphone" value="<?php $this->s($_SESSION['previous_http_post']['name'] ?? '') ?>">
 									</div>
 								</div>
-                                <div class="form-group">
-                                    <label>Priorité d'utilisation du téléphone</label>
-                                    <p class="italic small help">
-                                        Lors de l'envoi de SMS sans téléphone spécifié, les téléphones avec la plus haute priorité seront utilisés en premier.
-                                    </p>
-									<div class="form-group">
-                                        <input required="required" name="priority" class="form-control" type="number" min="0" placeholder="Priorité d'utilisation" value="<?php $this->s($_SESSION['previous_http_post']['priority'] ?? 0) ?>">
-									</div>
-								</div>
+
+                                <?php if ($_SESSION['user']['settings']['phone_priority']) { ?>
+                                    <div class="form-group">
+                                        <label>Priorité d'utilisation du téléphone</label>
+                                        <p class="italic small help">
+                                            Lors de l'envoi de SMS sans téléphone spécifié, les téléphones avec la plus haute priorité seront utilisés en premier.
+                                        </p>
+                                        <div class="form-group">
+                                            <input required="required" name="priority" class="form-control" type="number" min="0" placeholder="Priorité d'utilisation" value="<?php $this->s($_SESSION['previous_http_post']['priority'] ?? 0) ?>">
+                                        </div>
+                                    </div>
+                                <?php } ?>
+
                                 <div class="form-group">
                                     <label>Type de téléphone</label>
                                     <p class="italic small help" id="description-adapter-general">
@@ -87,15 +91,19 @@
                                         <div id="adapter-data-fields"></div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Limites des volumes d'envoi du téléphone</label>
-                                    <p class="italic small help">
-                                        Défini le nombre maximum de SMS qui pourront être envoyés avec ce téléphone sur des périodes de temps données.
-                                    </p>
-                                    <div class="form-group phone-limits-container container-fluid">
-                                        <div class="text-center"><div class="add-phone-limit-button fa fa-plus-circle"></div></div>
+
+                                <?php if ($_SESSION['user']['settings']['phone_limit']) { ?>
+                                    <div class="form-group">
+                                        <label>Limites des volumes d'envoi du téléphone</label>
+                                        <p class="italic small help">
+                                            Défini le nombre maximum de SMS qui pourront être envoyés avec ce téléphone sur des périodes de temps données.
+                                        </p>
+                                        <div class="form-group phone-limits-container container-fluid">
+                                            <div class="text-center"><div class="add-phone-limit-button fa fa-plus-circle"></div></div>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php } ?>
+                                
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Phone', 'list'); ?>">Annuler</a>
 								<input type="submit" class="btn btn-success" value="Enregistrer le téléphone" /> 	
 							</form>

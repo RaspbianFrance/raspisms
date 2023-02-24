@@ -49,6 +49,7 @@ namespace controllers\publics;
 
         private $internal_user;
         private $internal_phone;
+        private $internal_phone_group;
         private $internal_received;
         private $internal_sended;
         private $internal_scheduled;
@@ -72,6 +73,7 @@ namespace controllers\publics;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $this->internal_user = new \controllers\internals\User($bdd);
             $this->internal_phone = new \controllers\internals\Phone($bdd);
+            $this->internal_phone_group = new \controllers\internals\PhoneGroup($bdd);
             $this->internal_received = new \controllers\internals\Received($bdd);
             $this->internal_sended = new \controllers\internals\Sended($bdd);
             $this->internal_scheduled = new \controllers\internals\Scheduled($bdd);
@@ -118,14 +120,14 @@ namespace controllers\publics;
         /**
          * List all entries of a certain type for the current user, sorted by id.
          *
-         * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'media']
+         * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'phone_group', 'media']
          * @param int    $page       : Pagination number, Default = 0. Group of 25 results.
          *
          * @return : List of entries
          */
         public function get_entries(string $entry_type, int $page = 0)
         {
-            $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'media'];
+            $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'phone_group', 'media'];
 
             if (!\in_array($entry_type, $entry_types, true))
             {
@@ -191,6 +193,26 @@ namespace controllers\publics;
                     unset($entries[$key]['adapter_data']);
                 }
             }
+            // Special case for phone group we must add phones because its a join
+            elseif ('phone_group' === $entry_type)
+            {
+                foreach ($entries as $key => $entry)
+                {
+                    $phones = $this->internal_phone_group->get_phones($entry['id']);
+                    // Hide meta data of phones if needed
+                    foreach ($phones as &$phone)
+                    {
+                        if (!$phone['adapter']::meta_hide_data())
+                        {
+                            continue;
+                        }
+
+                        unset($phone['adapter_data']);
+                    }
+
+                    $entries[$key]['phones'] = $phones;
+                }
+            }
 
             $return = self::DEFAULT_RETURN;
             $return['response'] = $entries;
@@ -211,13 +233,83 @@ namespace controllers\publics;
         }
 
         /**
+         * Return info about volume of sms sended for a period
+         *
+         * @param ?string $_POST['start']   : Date from which to get sms volume, format Y-m-d H:i:s. Default to null.
+         * @param ?string $_POST['end']     : Date up to which to get sms volume, format Y-m-d H:i:s. Default to null.
+         * @param ?string $_POST['tag']    : Tag to filter SMS by. If set, only sended sms with a matching tag will be counted. Default to null.
+         *
+         * @return : List of entries
+         */
+        public function get_usage()
+        {
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
+            $tag = $_GET['tag'] ?? null;
+
+            $return = self::DEFAULT_RETURN;
+
+            if ($start)
+            {
+                if (!\controllers\internals\Tool::validate_date($start, 'Y-m-d H:i:s'))
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'start must be a date of format "Y-m-d H:i:s".';
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+
+                $start = new \DateTime($start);
+            }
+
+            if ($end)
+            {
+                if (!\controllers\internals\Tool::validate_date($end, 'Y-m-d H:i:s'))
+                {
+                    $return = self::DEFAULT_RETURN;
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'end must be a date of format "Y-m-d H:i:s".';
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+
+                $end = new \DateTime($end);
+            }
+
+            $total_sended = 0;
+            $phones_volumes = [];
+
+            $phones = $this->internal_phone->gets_for_user($this->user['id']);
+            foreach ($phones as $phone)
+            {
+                $nb_sended = $this->internal_sended->count_since_for_phone_and_user($this->user['id'], $phone['id'], $start, $end, $tag);
+                $total_sended += $nb_sended;
+                $phones_volumes[$phone['id']] = $nb_sended;
+            }
+
+            $return['response'] = [
+                'total' => $total_sended,
+                'phones_volumes' => $phones_volumes,
+            ];
+
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
          * Schedule a message to be send.
          *
          * @param string $_POST['at']                 : Date to send message at format Y-m-d H:i:s
          * @param string $_POST['text']               : Text of the message to send
-         * @param string $_POST['id_phone']           : Default null. Id of phone to send the message from. If null use a random phone
+         * @param string $_POST['id_phone']           : Default null. Id of phone to send the message from. If null and id_phone_group null, use a random phone
+         * @param string $_POST['id_phone_group']     : Default null. Id of phone group to send the message from. If null abd id_phone null, use a random phone
          * @param string $_POST['flash']              : Default false. Is the sms a flash sms.
          * @param string $_POST['mms']                : Default false. Is the sms a mms.
+         * @param string $_POST['tag']                : Default null. Tag to associate to every sms of the campaign.
          * @param string $_POST['numbers']            : Array of numbers to send message to
          * @param string $_POST['contacts']           : Array of ids of contacts to send message to
          * @param string $_POST['groups']             : Array of ids of groups to send message to
@@ -231,8 +323,10 @@ namespace controllers\publics;
             $at = $_POST['at'] ?? false;
             $text = $_POST['text'] ?? false;
             $id_phone = empty($_POST['id_phone']) ? null : $_POST['id_phone'];
+            $id_phone_group = empty($_POST['id_phone_group']) ? null : $_POST['id_phone_group'];
             $flash = (bool) ($_POST['flash'] ?? false);
             $mms = (bool) ($_POST['mms'] ?? false);
+            $tag = $_POST['tag'] ?? null;
             $numbers = $_POST['numbers'] ?? [];
             $contacts = $_POST['contacts'] ?? [];
             $groups = $_POST['groups'] ?? [];
@@ -417,6 +511,16 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            if ($id_phone && $id_phone_group)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone, id_phone_group : You must specify at most one of id_phone or id_phone_group, not both.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
             $phone = null;
             if ($id_phone)
             {
@@ -428,6 +532,22 @@ namespace controllers\publics;
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
                 $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone : You must specify an id_phone number among thoses of user phones.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $phone_group = null;
+            if ($id_phone_group)
+            {
+                $phone_group = $this->internal_phone_group->get_for_user($this->user['id'], $id_phone_group);
+            }
+
+            if ($id_phone_group && !$phone_group)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'id_phone_group : You must specify an id_phone_group number among thoses of user phone groups.';
                 $this->auto_http_code(false);
 
                 return $this->json($return);
@@ -455,7 +575,7 @@ namespace controllers\publics;
                 }
             }
 
-            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $flash, $mms, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
             {
                 $return = self::DEFAULT_RETURN;
@@ -710,7 +830,7 @@ namespace controllers\publics;
             $priority = $_POST['priority'] ?? $phone['priority'];
             $priority = max(((int) $priority), 0);
             $adapter = $_POST['adapter'] ?? $phone['adapter'];
-            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data']);
+            $adapter_data = !empty($_POST['adapter_data']) ? $_POST['adapter_data'] : json_decode($phone['adapter_data'], true);
             $adapter_data = is_array($adapter_data) ? $adapter_data : [$adapter_data];
             $limits = $_POST['limits'] ?? $limits;
             $limits = is_array($limits) ? $limits : [$limits];
@@ -886,6 +1006,37 @@ namespace controllers\publics;
             }
 
             $return['response'] = true;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
+         * Trigger re-checking of a phone status
+         *
+         * @param int $id : Id of phone to re-check status
+         */
+        public function post_update_phone_status ($id)
+        {
+            $return = self::DEFAULT_RETURN;
+
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id);
+            if (!$phone)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            //Check adapter is working correctly with thoses names and data
+            $adapter_classname = $phone['adapter'];
+            $adapter_instance = new $adapter_classname($phone['adapter_data']);
+            $new_status = $adapter_instance->check_phone_status();
+
+            $status_update = $this->internal_phone->update_status($id, $new_status);
+            $return['response'] = $new_status;
             $this->auto_http_code(true);
 
             return $this->json($return);

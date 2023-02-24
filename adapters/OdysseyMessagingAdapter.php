@@ -11,34 +11,25 @@
 
 namespace adapters;
 
-use controllers\internals\Quota;
-use controllers\internals\Tool;
+use DateTime;
 
 /**
- * Kannel adapter.
+ * Odyssey Messaging SMS service
  */
-class KannelAdapter implements AdapterInterface
+class OdysseyMessagingAdapter implements AdapterInterface
 {
-    const KANNEL_SENDSMS_RESULTS_ACCEPTED = 0;
-    const KANNEL_SENDSMS_RESULTS_QUEUED = 3;
-
-    const KANNEL_SENDSMS_HTTP_CODE_ACCEPTED = 202;
-    const KANNEL_SENDSMS_HTTP_CODE_QUEUED = 202;
-
-    const KANNEL_CODING_7_BITS = 0;
-    const KANNEL_CODING_8_BITS = 1;
-    const KANNEL_CODING_UCS_2 = 2;
-
-    /**
-     * DLR mask to transmit to kannel.
-     *
-     * 1 -> Delivered to phone
-     * 2 -> not delivered
-     * 16 -> non delivered to SMSC
-     *
-     * (see https://gist.github.com/grantpullen/3d550f31c454e80fda8fc0d5b9105fd0)
-     */
-    const KANNEL_DLR_BITMASK = 1 + 2 + 16;
+    const EVENT_TYPES = [
+        'OPT_OUT' => 1,
+        'SYSTEM_ERROR' => 2,
+        'END_OF_ITEM' => 3,
+        'END_OF_JOB' => 4,
+        'JOB_STATUS_CHANGED' => 5,
+        'REAL_TIME_STATUS' => 6,
+        'RETRIEVE_FILE' => 7,
+        'INBOUND_SMS' => 8,
+        'ITEM_STATUS_CHANGED' => 9,
+        'DATA_COLLECTION_FILLED' => 10,
+    ];
 
     /**
      * Data used to configure interaction with the implemented service. (e.g : Api credentials, ports numbers, etc.).
@@ -46,52 +37,38 @@ class KannelAdapter implements AdapterInterface
     private $data;
 
     /**
-     * Kannel send-sms service url.
+     * Odyssey login.
      */
-    private $kannel_sendsms_url;
+    private $login;
 
     /**
-     * Kannel send-sms username.
-     */
-    private $username;
-
-    /**
-     * Kannel send-sms password.
+     * Odyssey password.
      */
     private $password;
 
     /**
-     * Phone number of the sender, this number may or may not actually be overrided by the SMSC.
+     * Sender name to use instead of shortcode.
      */
-    private $from;
+    private $sender;
 
     /**
-     * SMSC's id to use for sending the message.
+     * Odyssey api baseurl.
      */
-    private $smsc;
-
-    /**
-     * SMS Delivery Report Url.
-     */
-    private $dlr_url;
+    private $api_url = 'https://api.odyssey-services.fr/api/v1';
 
     /**
      * Adapter constructor, called when instanciated by RaspiSMS.
      *
-     * @param string      $number : Phone number the adapter is used for
      * @param json string $data   : JSON string of the data to configure interaction with the implemented service
      */
     public function __construct(string $data)
     {
         $this->data = json_decode($data, true);
 
-        $this->kannel_sendsms_url = $this->data['kannel_sendsms_url'];
-        $this->username = $this->data['username'];
+        $this->login = $this->data['login'];
         $this->password = $this->data['password'];
-        $this->from = $this->data['from'];
-        $this->dlr_url = $this->data['dlr_url'];
 
-        $this->smsc = $this->data['smsc'] ?? null;
+        $this->sender = $this->data['sender'] ?? null;
     }
 
     /**
@@ -108,7 +85,7 @@ class KannelAdapter implements AdapterInterface
      */
     public static function meta_uid(): string
     {
-        return 'kannel_adapter';
+        return 'odyssey_messaging_adapter';
     }
 
     /**
@@ -119,7 +96,7 @@ class KannelAdapter implements AdapterInterface
     {
         return false;
     }
-    
+
     /**
      * Should this adapter data be hidden after creation
      * this help to prevent API credentials to other service leak if an attacker gain access to RaspiSMS through user credentials.
@@ -135,7 +112,7 @@ class KannelAdapter implements AdapterInterface
      */
     public static function meta_name(): string
     {
-        return 'Kannel';
+        return 'Odyssey Messaging';
     }
 
     /**
@@ -144,11 +121,9 @@ class KannelAdapter implements AdapterInterface
      */
     public static function meta_description(): string
     {
-        $kannel_homepage = 'https://www.kannel.org';
-
         return '
-                Envoi de SMS via le logiciel Kannel, pour plus d\'information sur Kannel, voir <a target="_blank" href="' . $kannel_homepage . '">le site du projet.</a><br/>
-                Pour plus d\'information sur l\'utilisation de ce type de téléphone, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/kannel.html" target="_blank">la documentation sur le téléphone "Kannel".</a>
+                Envoi de SMS avec <a target="_blank" href="https://www.odyssey-messaging.com/">Odyssey Messaging</a>.
+                Pour plus d\'information sur l\'utilisation de ce type de téléphone, reportez-vous à <a href="https://documentation.raspisms.fr/users/adapters/odyssey_messaging.html" target="_blank">la documentation sur le téléphone "Odyssey Messaging".</a>
             ';
     }
 
@@ -161,41 +136,23 @@ class KannelAdapter implements AdapterInterface
     {
         return [
             [
-                'name' => 'kannel_sendsms_url',
-                'title' => 'Adresse URL du service kannel sendsms',
-                'description' => 'Adresse URL du service sendsms de Kannel (ex : http://smsbox.host.name:13013/cgi-bin/sendsms)',
-                'required' => true,
-            ],
-            [
-                'name' => 'username',
-                'title' => 'Nom de l\'utilisateur',
-                'description' => 'Nom d\'utilisateur du service send-sms de Kannel.',
+                'name' => 'login',
+                'title' => 'Odyssey login',
+                'description' => 'Login du compte Odyssey à employer.',
                 'required' => true,
             ],
             [
                 'name' => 'password',
-                'title' => 'Mot de passe de l\'utilisateur',
-                'description' => 'Mot de passe de l\'utilisateur du service send-sms de Kannel.',
+                'title' => 'Mot de passe',
+                'description' => 'Mot de passe du compte Odyssey à employer.',
                 'required' => true,
             ],
             [
-                'name' => 'from',
-                'title' => 'Numéro de téléphone émetteur ou nom de l\'émetteur',
-                'description' => 'Numéro de téléphone à transmettre au SMS Center, ou nom à afficher à la place du numéro (dans ce cas, entre 3 et 11 caractères), dans la très grande majorité des cas, ce numéro ou ce nom sera écrasé par le SMSC.',
-                'required' => true,
-            ],
-            [
-                'name' => 'dlr_url',
-                'title' => 'Adresse URL de livraison du Delivery Report du SMS',
-                'description' => 'Adresse URL de livraison du Delivery Report du SMS qui sera transmis à Kannel. Vous devriez probablement laisser ce champs tel quel.',
-                'required' => true,
-                'default_value' => \descartes\Router::url('Callback', 'update_sended_status', ['adapter_uid' => self::meta_uid()], ['api_key' => $_SESSION['user']['api_key'] ?? '']),
-            ],
-            [
-                'name' => 'smsc',
-                'title' => 'Identifiant unique du SMSC',
-                'description' => 'Identifiant du SMSC (sms-id) à utiliser pour envoyer le message.<br/>
-                                  <b>Laissez vide pour laisser Kannel décider du routage vers le SMSC.</b>',
+                'name' => 'sender',
+                'title' => 'Nom de l\'expéditeur',
+                'description' => 'Nom de l\'expéditeur à afficher à la place du numéro (11 caractères max).<br/>
+                                  <b>Laissez vide pour ne pas utiliser d\'expéditeur nommé.</b><br/>
+                                  <b>Si vous utilisez un expéditeur nommé, le destinataire ne pourra pas répondre.</b>',
                 'required' => false,
             ],
         ];
@@ -277,52 +234,36 @@ class KannelAdapter implements AdapterInterface
 
         try
         {
-            //As kannel does not return uid of the SMS when sending it, we create our own uid and will pass it to kannel's delivery report url
-            //in order to retrieve it in raspisms and update the status
-            $sms_uid = Tool::random_uuid();
-
-            //Forge dlr Url by adding new query parts to url provided within phone settings
-            $dlr_url_parts = parse_url($this->dlr_url);
-
-            //Append sms uid and delivery report value to the original dlr_url query parts
-            $dlr_url_parts['query'] = $dlr_url_parts['query'] ?? '';
-            $dlr_url_query_parts = [];
-            parse_str($dlr_url_parts['query'], $dlr_url_query_parts);
-            unset($dlr_url_query_parts['type']);
-            $dlr_url_query_parts['sms_uid'] = $sms_uid; //Pass uid as param so raspisms can identify sms to update
-            $dlr_url_parts['query'] = http_build_query($dlr_url_query_parts) . '&type=%d'; //Kannel will replace %d by the delivery report value. We cannot set type in bild query or it get double encoded
-
-            $forged_dlr_url = Tool::unparse_url($dlr_url_parts);
-
-            $data = [
-                'username' => $this->username,
-                'password' => $this->password,
-                'text' => $text,
-                'to' => $destination,
-                'from' => $this->from,
-                'dlr-mask' => self::KANNEL_DLR_BITMASK,
-                'dlr-url' => $forged_dlr_url,
+            $credentials = base64_encode($this->login . ':' . $this->password);
+            $headers = [
+                'Authorization: Basic ' . $credentials,
+                'Content-Type: application/json',
             ];
 
-            //If necessary, use utf8 sms to represent special chars
-            $use_utf8_sms = !Quota::is_gsm0338($text);
-            if ($use_utf8_sms)
+            $data = [
+                'JobType' => 'SMS',
+                'Text' => $text,
+                'TrackingID' => uniqid(),
+                'AdhocRecipients' => [['Name' => uniqid(), 'Address' => str_replace('+', '00', $destination)]],
+            ];
+
+            if ($this->sender)
             {
-                $data['coding'] = self::KANNEL_CODING_8_BITS;
+                $data['Parameter'] = ['Sender' => $this->sender, 'Media' => 1];
             }
 
-            if ($this->smsc)
-            {
-                $data['smsc'] = $this->smsc;
-            }
+            $data = json_encode($data);
 
-            $endpoint = $this->kannel_sendsms_url . '?' . http_build_query($data);
+            $endpoint = $this->api_url . '/SMSJobs';
 
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $endpoint);
             curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
             $curl_response = curl_exec($curl);
             $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -336,15 +277,33 @@ class KannelAdapter implements AdapterInterface
                 return $response;
             }
 
-            if (!in_array($http_code, [self::KANNEL_SENDSMS_HTTP_CODE_ACCEPTED, self::KANNEL_SENDSMS_HTTP_CODE_QUEUED]))
+            $response_decode = json_decode($curl_response, true);
+            if (null === $response_decode)
             {
                 $response['error'] = true;
-                $response['error_message'] = 'Response error with HTTP code : ' . $http_code . ' -> ' . $curl_response;
+                $response['error_message'] = 'Invalid JSON for response.';
 
                 return $response;
             }
 
-            $response['uid'] = $sms_uid;
+            if (200 !== $http_code)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Response indicate error : ' . $response_decode['Message'] . ' -> """' . json_encode($response_decode['ModelState']) . '""" AND  HTTP CODE -> ' . $http_code;
+
+                return $response;
+            }
+
+            $uid = $response_decode['JobNumber'] ?? false;
+            if (!$uid)
+            {
+                $response['error'] = true;
+                $response['error_message'] = 'Cannot extract SMS uid';
+
+                return $response;
+            }
+
+            $response['uid'] = $uid;
 
             return $response;
         }
@@ -376,52 +335,35 @@ class KannelAdapter implements AdapterInterface
     {
         try
         {
-            if (!$this->username || !$this->password || !$this->from || !$this->dlr_url)
+            if ($this->data['sender'] && (mb_strlen($this->data['sender']) < 3 || mb_strlen($this->data['sender'] > 11)))
             {
                 return false;
             }
 
-            //Check kannel url is a valid http/https url to protect against ssrf
-            //This is mainly cosmetic, the real protection is in CURLOPT_PROTOCOLS
-            if (!mb_ereg_match('^http(s?)://', $this->kannel_sendsms_url))
+            if (!empty($this->data['sms_type']) && !in_array($this->data['sms_type'], ['premium', 'low cost']))
             {
                 return false;
             }
 
-            //Check credentials and kannel url
-            $data = [
-                'username' => $this->username,
-                'password' => $this->password,
+            $credentials = base64_encode($this->login . ':' . $this->password);
+            $headers = [
+                'Authorization: Basic ' . $credentials,
+                'Content-Type: application/json',
             ];
 
-            $endpoint = $this->kannel_sendsms_url . '?' . http_build_query($data);
-
+            //Check service name
+            $endpoint = $this->api_url . '/JobTypes';
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $endpoint);
-            curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS); //Protect curl against non http(s) queries and redirects
+            curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-
-            $curl_response = curl_exec($curl);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            $response = curl_exec($curl);
             $http_code = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
-            if (false === $curl_response)
-            {
-                return false;
-            }
-
-            switch (true)
-            {
-                case 403 == $http_code: //Bad credentials
-                case 404 == $http_code: //Cannot find url
-                    return false;
-
-                case $http_code >= 500: //Server error
-                    return false;
-            }
-
-            if (!filter_var($this->dlr_url, FILTER_VALIDATE_URL))
+            if (200 !== $http_code)
             {
                 return false;
             }
@@ -436,29 +378,45 @@ class KannelAdapter implements AdapterInterface
 
     public static function status_change_callback()
     {
-        $status = $_GET['type'] ?? false;
-        $uid = $_GET['sms_uid'] ?? false;
+        header('Connection: close');
+        header('Content-Encoding: none');
+        header('Content-Length: 0');
 
-        if (!$status || !$uid)
+        $input = file_get_contents('php://input');
+        $content = json_decode($input, true);
+        if (null === $content)
         {
             return false;
         }
 
-        switch ((int) $status)
+        $event_type = $content['EventType'] ?? false;
+        if ($event_type != self::EVENT_TYPES['ITEM_STATUS_CHANGED'])
         {
-            case 1:
+            return false;
+        }
+
+        $uid = $content['JobNumber'] ?? false;
+        $status = $content['Outcome'] ?? false;
+
+        if (false === $uid || false === $status)
+        {
+            return false;
+        }
+
+        switch ($status)
+        {
+            case 'S':
                 $status = \models\Sended::STATUS_DELIVERED;
 
                 break;
 
-            case 2:
-            case 16:
-                $status = \models\Sended::STATUS_FAILED;
+            case 'B':
+                $status = \models\Sended::STATUS_UNKNOWN;
 
                 break;
 
             default:
-                $status = \models\Sended::STATUS_UNKNOWN;
+                $status = \models\Sended::STATUS_FAILED;
 
                 break;
         }
@@ -478,9 +436,28 @@ class KannelAdapter implements AdapterInterface
         header('Content-Encoding: none');
         header('Content-Length: 0');
 
-        $text = file_get_contents('php://input');
-        $number = $_SERVER['HTTP_X_KANNEL_TO'] ?? false;
-        $at = $_SERVER['HTTP_X_KANNEL_TIME'] ?? false;
+        $input = file_get_contents('php://input');
+        $content = json_decode($input, true);
+        if (null === $content)
+        {
+            $response['error'] = true;
+            $response['error_message'] = 'Cannot read input data from callback request.';
+
+            return $response;
+        }
+
+        $event_type = $content['EventType'] ?? false;
+        if ($event_type != self::EVENT_TYPES['INBOUND_SMS'])
+        {
+            $response['error'] = true;
+            $response['error_message'] = 'Invalid event type : ' . $event_type . '.';
+
+            return $response;
+        }
+
+        $number = $content['From'] ?? false;
+        $text = $content['Message'] ?? false;
+        $at = $content['EventDateTime'] ?? false;
 
         if (!$number || !$text || !$at)
         {
@@ -489,6 +466,20 @@ class KannelAdapter implements AdapterInterface
 
             return $response;
         }
+
+        $matches = null;
+        $match = preg_match('#/Date\(([0-9]+)\+([0-9]+)\)/#', $at, $matches);
+        $timestamp = ($matches[1] ?? null);
+        if (!$match || !$timestamp)
+        {
+            $response['error'] = true;
+            $response['error_message'] = 'Invalid date.';
+
+            return $response;
+        }
+
+        $at = DateTime::createFromFormat('U', $timestamp / 1000);
+        $at = $at->format('Y-m-d H:i:s');
 
         $origin = \controllers\internals\Tool::parse_phone($number);
         if (!$origin)

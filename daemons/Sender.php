@@ -80,6 +80,7 @@ class Sender extends AbstractDaemon
                     'destination' => $sms['destination'],
                     'flash' => $sms['flash'],
                     'mms' => $sms['mms'],
+                    'tag' => $sms['tag'],
                     'medias' => $sms['medias'] ?? [],
                 ];
 

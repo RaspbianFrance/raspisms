@@ -153,12 +153,28 @@
 										</div>
 									<?php } ?>
                                     <div class="form-group">
+                                        <label>Tag à associé à la campagne</label>
+                                        <p class="italic small help">
+                                            Vous pouvez renseigner une chaine de caractère qui sera associée à tous les SMS envoyés. Utile pour associer un identifiant interne à vos systèmes. Laissez vide si vous ne voulez pas associé de chaine.
+                                        </p>
+                                        <div class="form-group">
+                                            <input name="scheduleds[<?php $this->s($scheduled['id']); ?>][tag]" class="form-control" type="text" placeholder="Ex: region-001" maxlength="255" value="<?php $this->s($scheduled['tag']); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Numéro à employer : </label>
                                         <select name="scheduleds[<?php $this->s($scheduled['id']); ?>][id_phone]" class="form-control">
                                             <option <?php echo ($scheduled['id_phone'] ? '' : 'selected="selected"'); ?> value="">N'importe lequel</option>
-                                            <?php foreach ($phones as $phone) { ?>
-                                                <option <?php echo ($scheduled['id_phone'] == $phone['id'] ? 'selected="selected"' : '' ); ?> value="<?php $this->s($phone['id']); ?>"><?php $this->s($phone['name']); ?></option>
-                                            <?php } ?>
+                                            <optgroup label="Téléphones">
+                                                <?php foreach ($phones as $phone) { ?>
+                                                    <option <?php echo (($scheduled['id_phone'] && $scheduled['id_phone'] == $phone['id']) ? 'selected="selected"' : '' ); ?> value="phone_<?php $this->s($phone['id']); ?>"><?php $this->s($phone['name']); ?></option>
+                                                <?php } ?>
+                                            </optgroup>
+                                            <optgroup label="Groupes de téléphones">
+                                                <?php foreach ($phone_groups as $phone_group) { ?>
+                                                    <option <?php echo (($scheduled['id_phone_group'] && $scheduled['id_phone_group'] == $phone_group['id']) ? 'selected="selected"' : '' ); ?> value="phonegroup_<?php $this->s($phone_group['id']); ?>"><?php $this->s($phone_group['name']); ?></option>
+                                                <?php } ?>
+                                            </optgroup>
                                         </select>
                                     </div>
 									<hr/>

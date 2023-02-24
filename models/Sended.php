@@ -183,13 +183,35 @@ namespace models;
          * 
          * @param int $id_user : User id
          * @param int $id_phone : Phone id we want the number of sended message for
-         * @param \DateTime $since : Date since which we want sended number
+         * @param ?\DateTime $since : Date since which we want sended Number. Default to null.
+         * @param ?\DateTime $before : Date up to which we want sended number. Default to null.
+         * @param ?string $tag_like : Tag to filter sms by, this is not a = but a LIKE operator
          * 
          * @return int
          */
-        public function count_since_for_phone_and_user(int $id_user, int $id_phone, \DateTime $since) : int
+        public function count_since_for_phone_and_user(int $id_user, int $id_phone, ?\DateTime $since = null, ?\DateTime $before = null, ?string $tag_like = null) : int
         {
-            return $this->_count('sended', ['id_user' => $id_user, 'id_phone' => $id_phone, '>=at' => $since->format('c')]);
+            $data = [
+                'id_user' => $id_user, 
+                'id_phone' => $id_phone,
+            ];
+
+            if ($since)
+            {
+                $data['>=at'] = $since->format('c');
+            }
+
+            if ($before)
+            {
+                $data['<=at'] = $before->format('c');
+            }
+
+            if ($tag_like)
+            {
+                $data['%tag'] = $tag_like;
+            }
+
+            return $this->_count('sended', $data);
         }
 
         /**

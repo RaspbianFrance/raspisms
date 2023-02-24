@@ -11,6 +11,8 @@
 
 namespace controllers\internals;
 
+use Exception;
+
     class Sended extends StandardController
     {
         protected $model;
@@ -44,13 +46,14 @@ namespace controllers\internals;
          * @param string $adapter               : Name of the adapter service used to send the message
          * @param bool   $flash                 : Is the sms a flash
          * @param bool   $mms                   : Is the sms a MMS. By default false.
+         * @param ?string $tag                   : A string tag to associate to sended SMS
          * @param array  $medias                : Array of medias to link to the MMS
          * @param ?int   $originating_scheduled : Id of the scheduled message that was responsible for sending this message. By default null.
          * @param string $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
          *
          * @return mixed : false on error, new sended id else
          */
-        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, array $medias = [], ?int $originating_scheduled = null, ?string $status = \models\Sended::STATUS_UNKNOWN)
+        public function create(int $id_user, int $id_phone, $at, string $text, string $destination, string $uid, string $adapter, bool $flash = false, bool $mms = false, ?string $tag = null, array $medias = [], ?int $originating_scheduled = null, ?string $status = \models\Sended::STATUS_UNKNOWN)
         {
             $sended = [
                 'id_user' => $id_user,
@@ -62,6 +65,7 @@ namespace controllers\internals;
                 'adapter' => $adapter,
                 'flash' => $flash,
                 'mms' => $mms,
+                'tag' => $tag,
                 'status' => $status,
                 'originating_scheduled' => $originating_scheduled,
             ];
@@ -184,13 +188,15 @@ namespace controllers\internals;
          * 
          * @param int $id_user : User id
          * @param int $id_phone : Phone id we want the number of sended message for
-         * @param \DateTime $since : Date since which we want sended number
+         * @param ?\DateTime $since : Date since which we want sended number. Default to null.
+         * @param ?\DateTime $before : Date up to which we want sended number. Default to null.
+         * @param ?string $tag_like : Tag to filter sms by, this is not a = but a LIKE operator
          * 
          * @return int
          */
-        public function count_since_for_phone_and_user(int $id_user, int $id_phone, \DateTime $since): int
+        public function count_since_for_phone_and_user(int $id_user, int $id_phone, ?\DateTime $since, ?\DateTime $before = null, ?string $tag_like = null): int
         {
-            return $this->get_model()->count_since_for_phone_and_user($id_user, $id_phone, $since);
+            return $this->get_model()->count_since_for_phone_and_user($id_user, $id_phone, $since, $before, $tag_like);
         }
 
         /**
@@ -236,6 +242,7 @@ namespace controllers\internals;
          * @param $text : Text of the message
          * @param string     $destination           : Number of the receiver
          * @param bool       $flash                 : Is the sms a flash. By default false.
+         * @param ?string    $tag                   : A string tag to associate to sended SMS
          * @param bool       $mms                   : Is the sms a MMS. By default false.
          * @param array      $medias                : Array of medias to link to the MMS
          * @param string     $status                : Status of a the sms. By default \models\Sended::STATUS_UNKNOWN
@@ -246,12 +253,15 @@ namespace controllers\internals;
          *               ?string 'error_message' => null if success, error message else
          *               ]
          */
-        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, array $medias = [], $originating_scheduled = null, string $status = \models\Sended::STATUS_UNKNOWN): array
+        public function send(\adapters\AdapterInterface $adapter, int $id_user, int $id_phone, string $text, string $destination, bool $flash = false, bool $mms = false, ?string $tag = null, array $medias = [], $originating_scheduled = null, string $status = \models\Sended::STATUS_UNKNOWN): array
         {
             $return = [
                 'error' => false,
                 'error_message' => null,
             ];
+
+            $internal_setting = new Setting();
+            $user_settings = $internal_setting->gets_for_user($id_user);
 
             $at = (new \DateTime())->format('Y-m-d H:i:s');
             $media_uris = [];
@@ -275,71 +285,87 @@ namespace controllers\internals;
                 $text .= "\n" . join(' - ', $media_urls);
             }
 
-            //If we reached our max quota, do not send the message
-            $internal_quota = new Quota($this->bdd);
-            $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
-            if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
+            try
             {
-                $return['error'] = true;
-                $return['error_message'] = 'Not enough credit to send message.';
-            }
+                //If we reached our max quota, do not send the message
+                $internal_quota = new Quota($this->bdd);
+                $nb_credits = $internal_quota::compute_credits_for_message($text); //Calculate how much credit the message require
+                if (!$internal_quota->has_enough_credit($id_user, $nb_credits))
+                {
+                    throw new Exception('Not enough credit to send message.');
+                }
 
-            //If we reached limit for this phone, do not send the message
-            $internal_phone = new Phone($this->bdd);
-            $internal_sended = new Sended($this->bdd);
-            $limits = $internal_phone->get_limits($id_phone);
+                // If this phone status indicate it is not available
+                $internal_phone = new Phone($this->bdd);
+                $phone = $internal_phone->get_for_user($id_user, $id_phone);
+                if (!$phone || $phone['status'] != \models\Phone::STATUS_AVAILABLE)
+                {
+                    throw new Exception('Invalid phone status : ' . $phone['status']);
+                }
 
-            $remaining_volume = PHP_INT_MAX;
-            foreach ($limits as $limit)
-            {
-                $startpoint = new \DateTime($limit['startpoint']);
-                $consumed = $internal_sended->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
-                $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
-            }
+                //If we reached limit for this phone and phone limits are enabled, do not send the message
+                if ((int) ($user_settings['phone_limit'] ?? false))
+                {
+                    $limits = $internal_phone->get_limits($id_phone);
 
-            if ($remaining_volume < 1)
-            {
-                $return['error'] = true;
-                $return['error_message'] = 'Phone send limit have been reached.';
-            }
+                    $remaining_volume = PHP_INT_MAX;
+                    foreach ($limits as $limit)
+                    {
+                        $startpoint = new \DateTime($limit['startpoint']);
+                        $consumed = $this->count_since_for_phone_and_user($id_user, $id_phone, $startpoint);
+                        $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                    }
 
-            $uid = uniqid();
-            if (!$return['error'])
-            {
+                    if ($remaining_volume < 1)
+                    {
+                        throw new Exception('Phone send limit have been reached.');
+                    }
+                }
+
                 $response = $adapter->send($destination, $text, $flash, $mms, $media_uris);
-                $uid = $response['uid'] ?? $uid;
 
                 if ($response['error'])
                 {
-                    $return['error'] = true;
-                    $return['error_message'] = $response['error_message'];
+                    throw new Exception($response['error_message']);
                 }
-                else // If send with success, consume credit
-                {
-                    $internal_quota->consume_credit($id_user, $nb_credits);
-                }
+
+                $uid = $response['uid'];
+                $status = \models\Sended::STATUS_UNKNOWN;
+
+                // If send with success, consume credit
+                $internal_quota->consume_credit($id_user, $nb_credits);
             }
+            catch (Exception $e)
+            {
+                $return['error'] = true;
+                $return['error_message'] = $e->getMessage();
 
-            // If we fail to send or not, we will always save message as sended, only the status will change.
-            $status = $return['error'] ? \models\Sended::STATUS_FAILED : \models\Sended::STATUS_UNKNOWN;
-            $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $medias, $originating_scheduled, $status);
-            
-            $webhook_body = [
-                'id' => $sended_id,
-                'at' => $at,
-                'status' => $status,
-                'text' => $text,
-                'destination' => $destination,
-                'origin' => $id_phone,
-                'mms' => $mms,
-                'medias' => $medias,
-                'originating_scheduled' => $originating_scheduled,
-            ];
+                $status = \models\Sended::STATUS_FAILED;
+                
+                return $return;
+            }
+            finally
+            {
+                $uid = $uid ?? uniqid();
+                $sended_id = $this->create($id_user, $id_phone, $at, $text, $destination, $uid, $adapter->meta_classname(), $flash, $mms, $tag, $medias, $originating_scheduled, $status);
+                
+                $webhook_body = [
+                    'id' => $sended_id,
+                    'at' => $at,
+                    'status' => $status,
+                    'text' => $text,
+                    'destination' => $destination,
+                    'origin' => $id_phone,
+                    'mms' => $mms,
+                    'medias' => $medias,
+                    'originating_scheduled' => $originating_scheduled,
+                ];
 
-            $internal_webhook = new Webhook($this->bdd);
-            $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $webhook_body);
+                $internal_webhook = new Webhook($this->bdd);
+                $internal_webhook->trigger($id_user, \models\Webhook::TYPE_SEND_SMS, $webhook_body);
 
-            return $return;
+                return $return;
+            }
         }
 
         /**
