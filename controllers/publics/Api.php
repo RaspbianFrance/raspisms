@@ -1032,15 +1032,6 @@ namespace controllers\publics;
 
             //Check adapter is working correctly with thoses names and data
             $adapter_classname = $phone['adapter'];
-            if (!call_user_func([$adapter_classname, 'meta_support_phone_status']))
-            {
-                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
-                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
-                $this->auto_http_code(false);
-
-                return $this->json($return);
-            }
-
             $adapter_instance = new $adapter_classname($phone['adapter_data']);
             $new_status = $adapter_instance->check_phone_status();
 
