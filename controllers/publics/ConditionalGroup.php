@@ -218,7 +218,7 @@ namespace controllers\publics;
             }
 
             $return['success'] = true;
-            $return['result'] = $contacts;
+            $return['result'] = array_values($contacts);
             echo json_encode($return);
 
             return true;
