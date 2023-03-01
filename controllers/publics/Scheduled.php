@@ -441,9 +441,12 @@ namespace controllers\publics;
             $mms = (bool) count($media_ids);
 
             // Check if we must send message to a phone or a phone_group based on if id_phone start with 'phone_' or 'phonegroup_'
-            $original_id_phone = $id_phone;
-            $id_phone = str_starts_with($original_id_phone, 'phone_') ? mb_substr($original_id_phone, mb_strlen('phone_')) : null;
-            $id_phone_group = str_starts_with($original_id_phone, 'phonegroup_') ? mb_substr($original_id_phone, mb_strlen('phonegroup_')) : null;
+            $id_phone_group = null;
+            if ($id_phone)
+            {
+                $id_phone_group = str_starts_with($id_phone, 'phonegroup_') ? mb_substr($id_phone, mb_strlen('phonegroup_')) : null;
+                $id_phone = str_starts_with($id_phone, 'phone_') ? mb_substr($id_phone, mb_strlen('phone_')) : null;
+            }
 
             $scheduled_id = $this->internal_scheduled->create($id_user, $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
             if (!$scheduled_id)
@@ -663,10 +666,13 @@ namespace controllers\publics;
 
                 $mms = (bool) count($media_ids);
 
-                $original_id_phone = $id_phone;
-                $id_phone = str_starts_with($original_id_phone, 'phone_') ? mb_substr($original_id_phone, mb_strlen('phone_')) : null;
-                $id_phone_group = str_starts_with($original_id_phone, 'phonegroup_') ? mb_substr($original_id_phone, mb_strlen('phonegroup_')) : null;
-
+                $id_phone_group = null;
+                if ($id_phone)
+                {
+                    $id_phone_group = str_starts_with($id_phone, 'phonegroup_') ? mb_substr($id_phone, mb_strlen('phonegroup_')) : null;
+                    $id_phone = str_starts_with($id_phone, 'phone_') ? mb_substr($id_phone, mb_strlen('phone_')) : null;
+                }
+                
                 $this->internal_scheduled->update_for_user($id_user, $id_scheduled, $at, $text, $id_phone, $id_phone_group, $flash, $mms, $tag, $numbers, $contacts, $groups, $conditional_groups, $media_ids);
                 ++$nb_update;
             }
