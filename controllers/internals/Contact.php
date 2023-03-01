@@ -160,7 +160,7 @@ namespace controllers\internals;
                     continue;
                 }
 
-                if (!isset($line[array_keys($line)[0]], $line[array_keys($line)[1]]))
+                if (!isset(array_keys($line)[0], array_keys($line)[1]))
                 {
                     continue;
                 }
