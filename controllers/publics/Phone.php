@@ -18,11 +18,13 @@ class Phone extends \descartes\Controller
 {
     private $internal_phone;
     private $internal_adapter;
+    private $internal_sended;
 
     public function __construct()
     {
         $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
         $this->internal_phone = new \controllers\internals\Phone($bdd);
+        $this->internal_sended = new \controllers\internals\Sended($bdd);
         $this->internal_adapter = new \controllers\internals\Adapter();
 
         \controllers\internals\Tool::verifyconnect();
@@ -533,16 +535,43 @@ class Phone extends \descartes\Controller
         foreach ($ids as $id)
         {
             $phone = $this->internal_phone->get_for_user($id_user, $id);
-            
-            //Check adapter is working correctly with thoses names and data
-            $adapter_classname = $phone['adapter'];
-            if (!call_user_func([$adapter_classname, 'meta_support_phone_status']))
+
+            // If user have activated phone limits, check if RaspiSMS phone limit have already been reached
+            $limit_reached = false;
+            if ((int) ($_SESSION['user']['settings']['phone_limit'] ?? false))
             {
-                continue;
+                $limits = $this->internal_phone->get_limits($id);
+
+                $remaining_volume = PHP_INT_MAX;
+                foreach ($limits as $limit)
+                {
+                    $startpoint = new \DateTime($limit['startpoint']);
+                    $consumed = $this->internal_sended->count_since_for_phone_and_user($_SESSION['user']['id'], $id, $startpoint);
+                    $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                }
+
+                if ($remaining_volume < 1)
+                {
+                    $limit_reached = true;
+                }
             }
 
-            $adapter_instance = new $adapter_classname($phone['adapter_data']);
-            $new_status = $adapter_instance->check_phone_status();
+            if ($limit_reached)
+            {
+                $new_status = \models\Phone::STATUS_LIMIT_REACHED;
+            }
+            else
+            {
+                //Check status on provider side 
+                $adapter_classname = $phone['adapter'];
+                if (!call_user_func([$adapter_classname, 'meta_support_phone_status']))
+                {
+                    continue;
+                }
+
+                $adapter_instance = new $adapter_classname($phone['adapter_data']);
+                $new_status = $adapter_instance->check_phone_status();
+            }
 
             $status_update = $this->internal_phone->update_status($id, $new_status);
         }

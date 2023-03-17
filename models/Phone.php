@@ -17,6 +17,7 @@ namespace models;
         const STATUS_AVAILABLE = 'available';
         const STATUS_UNAVAILABLE = 'unavailable';
         const STATUS_NO_CREDIT = 'no_credit';
+        const STATUS_LIMIT_REACHED = 'limit_reached';
 
         /**
          * Return all phones that belongs to active users

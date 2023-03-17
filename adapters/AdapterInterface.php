@@ -161,7 +161,7 @@ interface AdapterInterface
     /**
      * Method called to verify phone status
      * 
-     * @return string : Return one phone status among 'available', 'unavailable', 'no_credit'
+     * @return string : Return one phone status among 'available', 'unavailable', 'no_credit', 'limit_reached'
      */
     public function check_phone_status(): string;
 

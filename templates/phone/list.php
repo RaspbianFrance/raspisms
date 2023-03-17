@@ -112,6 +112,10 @@ jQuery(document).ready(function ()
                         case 'no_credit':
                             html += ' - <span class="text-warning">Plus de crédit</span>'
                             break;
+
+                        case 'limit_reached':
+                            html += ' - <span class="text-warning">Limite RaspiSMS atteinte</span>'
+                            break;
                     }
 
                     return html

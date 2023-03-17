@@ -1030,10 +1030,37 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
-            //Check adapter is working correctly with thoses names and data
-            $adapter_classname = $phone['adapter'];
-            $adapter_instance = new $adapter_classname($phone['adapter_data']);
-            $new_status = $adapter_instance->check_phone_status();
+            // If user have activated phone limits, check if RaspiSMS phone limit have already been reached
+            $limit_reached = false;
+            if ((int) ($this->user['settings']['phone_limit'] ?? false))
+            {
+                $limits = $this->internal_phone->get_limits($id);
+
+                $remaining_volume = PHP_INT_MAX;
+                foreach ($limits as $limit)
+                {
+                    $startpoint = new \DateTime($limit['startpoint']);
+                    $consumed = $this->internal_sended->count_since_for_phone_and_user($this->user['id'], $id, $startpoint);
+                    $remaining_volume = min(($limit['volume'] - $consumed), $remaining_volume);
+                }
+
+                if ($remaining_volume < 1)
+                {
+                    $limit_reached = true;
+                }
+            }
+
+            if ($limit_reached)
+            {
+                $new_status = \models\Phone::STATUS_LIMIT_REACHED;
+            }
+            else
+            {
+                //Check status on provider side 
+                $adapter_classname = $phone['adapter'];
+                $adapter_instance = new $adapter_classname($phone['adapter_data']);
+                $new_status = $adapter_instance->check_phone_status();
+            }
 
             $status_update = $this->internal_phone->update_status($id, $new_status);
             $return['response'] = $new_status;
