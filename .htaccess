@@ -3,3 +3,7 @@ RewriteRule ^assets - [L]
 RewriteRule ^.well-known - [L]
 RewriteRule ^data/public/ - [L]
 RewriteRule . index.php
+
+<IfModule headers_module>
+    Header always set Content-Security-Policy "upgrade-insecure-requests;"
+</ifModule>
