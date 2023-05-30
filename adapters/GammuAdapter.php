@@ -280,6 +280,7 @@ namespace adapters;
             $command_parts = [
                 PWD . '/bin/gammu_get_unread_sms.py',
                 escapeshellarg($this->data['config_file']),
+                '--delete'
             ];
 
             $return = $this->exec_command($command_parts);
