@@ -222,14 +222,14 @@ namespace models;
          *
          * @return array
          */
-        public function count_by_day_since_for_user($id_user, $date)
+        public function count_by_day_and_status_since_for_user($id_user, $date)
         {
             $query = "
-                SELECT COUNT(id) as nb, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
+                SELECT COUNT(id) as nb, status, DATE_FORMAT(at, '%Y-%m-%d') as at_ymd
                 FROM sended
                 WHERE at > :date
                 AND id_user = :id_user
-                GROUP BY at_ymd
+                GROUP BY at_ymd, status
             ";
 
             $params = [

@@ -87,11 +87,12 @@ namespace controllers\publics;
                 $stats_start_date_formated = $stats_start_date->format('Y-m-d');
             }
 
-            $nb_sendeds_by_day = $this->internal_sended->count_by_day_since_for_user($id_user, $stats_start_date_formated);
+            $nb_sendeds_by_day = $this->internal_sended->count_by_day_and_status_since_for_user($id_user, $stats_start_date_formated);
             $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $stats_start_date_formated);
 
             //On va traduire ces données pour les afficher en graphique
-            $array_area_chart = [];
+            $array_bar_chart_sended = [];
+            $array_bar_chart_received = [];
 
             $date = clone $stats_start_date;
             $one_day = new \DateInterval('P1D');
@@ -101,11 +102,14 @@ namespace controllers\publics;
             while ($date <= $now)
             {
                 $date_f = $date->format('Y-m-d');
-                $array_area_chart[$date_f] = [
+                $array_bar_chart_sended[$date_f] = [
                     'period' => $date_f,
-                    'sendeds' => 0,
-                    'receiveds' => 0,
+                    'sendeds_failed' => 0,
+                    'sendeds_unknown' => 0,
+                    'sendeds_delivered' => 0,
                 ];
+
+                $array_bar_chart_received[$date_f] = ['period' => $date_f, 'receiveds' => 0];
 
                 $date->add($one_day);
             }
@@ -114,15 +118,16 @@ namespace controllers\publics;
             $total_receiveds = 0;
 
             //0n remplie le tableau avec les données adaptées
-            foreach ($nb_sendeds_by_day as $date => $nb_sended)
+            foreach ($nb_sendeds_by_day as $nb_sended)
             {
-                $array_area_chart[$date]['sendeds'] = $nb_sended;
-                $total_sendeds += $nb_sended;
+                $array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_' . $nb_sended['status']] = $nb_sended['nb'];
+                $array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_total'] = ($array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_total'] ?? 0) + $nb_sended['nb'];
+                $total_sendeds += $nb_sended['nb'];
             }
 
             foreach ($nb_receiveds_by_day as $date => $nb_received)
             {
-                $array_area_chart[$date]['receiveds'] = $nb_received;
+                $array_bar_chart_received[$date]['receiveds'] = $nb_received;
                 $total_receiveds += $nb_received;
             }
 
@@ -130,7 +135,8 @@ namespace controllers\publics;
             $avg_sendeds = round($total_sendeds / $nb_days, 2);
             $avg_receiveds = round($total_receiveds / $nb_days, 2);
 
-            $array_area_chart = array_values($array_area_chart);
+            $array_bar_chart_sended = array_values($array_bar_chart_sended);
+            $array_bar_chart_received = array_values($array_bar_chart_received);
 
             $this->render('dashboard/show', [
                 'nb_contacts' => $nb_contacts,
@@ -145,7 +151,9 @@ namespace controllers\publics;
                 'sendeds' => $sendeds,
                 'receiveds' => $receiveds,
                 'events' => $events,
-                'data_area_chart' => json_encode($array_area_chart),
+                'data_bar_chart_sended' => json_encode($array_bar_chart_sended),
+                'data_bar_chart_received' => json_encode($array_bar_chart_received),
+                'stats_start_date_formated' => $stats_start_date_formated,
             ]);
         }
     }

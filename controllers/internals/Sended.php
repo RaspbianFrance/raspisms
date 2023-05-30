@@ -207,17 +207,9 @@ use Exception;
          *
          * @return array
          */
-        public function count_by_day_since_for_user(int $id_user, $date)
+        public function count_by_day_and_status_since_for_user(int $id_user, $date)
         {
-            $counts_by_day = $this->get_model()->count_by_day_since_for_user($id_user, $date);
-            $return = [];
-
-            foreach ($counts_by_day as $count_by_day)
-            {
-                $return[$count_by_day['at_ymd']] = $count_by_day['nb'];
-            }
-
-            return $return;
+            return $this->get_model()->count_by_day_and_status_since_for_user($id_user, $date);
         }
 
         /**

@@ -11,6 +11,8 @@
 
 namespace controllers\internals;
 
+use DateInterval;
+
     /**
      * Class to call the console scripts.
      */
@@ -211,5 +213,47 @@ namespace controllers\internals;
             $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
             $internal_quota = new \controllers\internals\Quota($bdd);
             $internal_quota->renew_quotas();
+        }
+
+        /**
+         * Do some fake population renewal.
+         */
+        public function f()
+        {
+            $bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            $internal_sended = new \controllers\internals\Sended($bdd);
+
+            $destinations = ['+33612345678','+33612345679','+33612345680',];
+            $statuses = [\models\Sended::STATUS_DELIVERED, \models\Sended::STATUS_FAILED, \models\Sended::STATUS_UNKNOWN];
+            $day = new \DateTime();
+            $day->sub(new DateInterval('P30D'));
+            for ($i = 0; $i < 30; $i++)
+            {
+                $day->add(new DateInterval('P1D'));
+                $n = rand(0, 100);
+                for ($j = 0; $j < $n; $j++)
+                {
+                    $id_user = 1;
+                    $id_phone = rand(1, 2);
+                    $destination = $destinations[array_rand($destinations)];
+                    $status = $statuses[array_rand($statuses)];
+                    $internal_sended->create(
+                        $id_user, 
+                        $id_phone, 
+                        $day->format('Y-m-d H:i:s'), 
+                        "TEST N°$i:$j", 
+                        $destination, 
+                        uniqid(), 
+                        'adapters\TestAdapter', 
+                        false,
+                        false,
+                        null,
+                        [],
+                        null,
+                        $status,
+                    );
+                }
+            }
+            
         }
     }
