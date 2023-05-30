@@ -225,7 +225,7 @@ if __name__ == "__main__":
         # see https://github.com/gammu/gammu/issues/460
         try:
             gammu_version = get_gammu_version()
-            if gammu_version[0] >= 1 and gammu_version[1] >= 42:
+            if gammu_version[0] > 1 or (gammu_version[0] == 1 and gammu_version[1] >= 42):
                 delete = True
             else:
                 logger.warning("Cannot delete SMS. You need gammu >= 1.42.0.")
