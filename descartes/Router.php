@@ -99,7 +99,7 @@
 
                     foreach ($method_routes as $route)
                     {
-                        $route_regex = preg_replReflectionNamedTypeace('#\\\{(.+)\\\}#iU', '([^/]+)', preg_quote($route, '#'));
+                        $route_regex = preg_replace('#\\\{(.+)\\\}#iU', '([^/]+)', preg_quote($route, '#'));
                         $route_regex = preg_replace('#/$#', '/?', $route_regex);
 
                         $match = preg_match('#^' . $route_regex . '$#U', $url);
@@ -248,6 +248,7 @@
 				{
 					continue;
                 }
+
 
                 $type = $parameter->getType();
                 $type = $type ?? false;
