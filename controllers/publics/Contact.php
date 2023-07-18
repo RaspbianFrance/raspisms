@@ -11,6 +11,8 @@
 
 namespace controllers\publics;
 
+use Exception;
+
     /**
      * Page des contacts.
      */
@@ -345,40 +347,28 @@ namespace controllers\publics;
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }
 
-            //Try to import file
-            $invalid_type = false;
-
-            switch ($read_file['mime_type'])
+            try
             {
-                case 'text/csv':
-                    $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
-
-                    break;
-
-                case 'application/json':
-                    $result = $this->internal_contact->import_json($id_user, $read_file['content']);
-
-                    break;
-
-                default:
-                    if ('csv' === $read_file['extension'])
-                    {
+                $result = false;
+                switch (true)
+                {
+                    case ($read_file['mime_type'] === 'text/csv' || 'csv' === $read_file['extension']) :
                         $result = $this->internal_contact->import_csv($id_user, $read_file['content']);
-                    }
-                    elseif ('json' === $read_file['extension'])
-                    {
-                        $result = $this->internal_contact->import_json($id_user, $read_file['content']);
-                    }
-                    else
-                    {
-                        $invalid_type = true;
-                        $result = false;
-                    }
-            }
 
-            if ($invalid_type)
+                        break;
+
+                    case ($read_file['mime_type'] === 'text/json' || 'json' === $read_file['extension']) :
+                        $result = $this->internal_contact->import_json($id_user, $read_file['content']);
+
+                        break;
+
+                    default:
+                        throw new Exception('Le type de fichier n\'est pas valide.');
+                }
+            }
+            catch (\Exception $e)
             {
-                \FlashMessage\FlashMessage::push('danger', 'Le type de fichier n\'est pas valide.');
+                \FlashMessage\FlashMessage::push('danger', 'Erreur lors de l\'import: ' . $e->getMessage());
 
                 return $this->redirect(\descartes\Router::url('Contact', 'list'));
             }

@@ -18,7 +18,7 @@ class AddIndexOnSendedUid extends AbstractMigration
 
         $table = $this->table('call');
         $table->changeColumn('uid', 'string', ['limit' => 100]);
-        $table->addIndex('uid');
+        $table->addIndex('uid');    
         $table->update();
     }
 }

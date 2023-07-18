@@ -141,8 +141,11 @@ namespace controllers\internals;
             $nb_insert = 0;
 
             $head = null;
+            $line_nb = 0;
             while ($line = fgetcsv($file_handler))
             {
+                $line_nb ++;
+                
                 if (null === $head)
                 {
                     $head = $line;
@@ -185,9 +188,16 @@ namespace controllers\internals;
                 }
                 $data = json_encode($data);
 
+                $contact_name = $line[array_keys($line)[0]];
+                $phone_number = \controllers\internals\Tool::parse_phone($line[array_keys($line)[1]]);
+                if (!$phone_number)
+                {
+                    throw new \Exception('Erreur à la ligne ' . $line_nb . ' colonne 1, numéro de téléphone invalide.');
+                }
+
                 try
                 {
-                    $success = $this->create($id_user, $line[array_keys($line)[1]], $line[array_keys($line)[0]], $data);
+                    $success = $this->create($id_user, $line[array_keys($line)[1]], $contact_name, $data);
                     if ($success)
                     {
                         ++$nb_insert;
