@@ -112,6 +112,30 @@
 									</div>
 								</div>
                             </div>
+
+							<?php if (ENABLE_URL_SHORTENER) { ?>
+								<div class="col-xs-12 col-md-6">
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											<h4 class="panel-title"><i class="fa fa-link fa-fw"></i> Support du raccourcisseur d'URL</h4>
+										</div>
+										<div class="panel-body">
+											<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'shorten_url', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+												<div class="form-group">
+													<label>Raccourcir automatiquement les liens HTTP(S) dans les SMS : </label>
+													<select name="setting_value" class="form-control">
+														<option value="0">Non</option>
+														<option value="1" <?php echo $_SESSION['user']['settings']['shorten_url'] ? 'selected' : ''; ?>>Oui</option>
+													</select>
+												</div>	
+												<div class="text-center">
+													<button class="btn btn-success">Mettre à jour les données</button>	
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							<?php } ?>
                            
                             <div class="col-xs-12 col-md-6">
                                 <div class="panel panel-default">

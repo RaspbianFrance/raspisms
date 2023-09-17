@@ -450,7 +450,8 @@ use Monolog\Logger;
             $users_smsstops = [];
             $users_settings = [];
             $users_phones = [];
-            $users_phone_groups = [];            
+            $users_phone_groups = [];
+            $shortlink_cache = [];  
 
             $now = new \DateTime();
             $now = $now->format('Y-m-d H:i:s');
@@ -641,6 +642,33 @@ use Monolog\Logger;
                     if ((int) ($users_settings[$id_user]['force_gsm_alphabet'] ?? false))
                     {
                         $text = Tool::convert_to_gsm0338($text);
+                    }
+
+                    // If the text contain http links we must replace them
+                    if (ENABLE_URL_SHORTENER && ((int) ($users_settings[$id_user]['shorten_url'] ?? false)))
+                    {
+                        $http_links = Tool::search_http_links($text);
+                        if ($http_links !== false)
+                        {
+                            foreach ($http_links as $http_link)
+                            {
+                                if (!array_key_exists($http_link, $shortlink_cache))
+                                {
+                                    $shortlkink = LinkShortener::shorten($http_link);
+
+                                    // If link shortening failed, keep original one 
+                                    if ($shortlkink === false)
+                                    {
+                                        continue;
+                                    }
+
+                                    $shortlink_cache[$http_link] = $shortlkink;
+                                }
+
+                                $shortlink = $shortlink_cache[$http_link];
+                                $text = str_replace($http_link, $shortlink, $text);
+                            }
+                        }
                     }
 
                     /*

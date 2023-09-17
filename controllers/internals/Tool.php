@@ -86,6 +86,22 @@ use BenMorel\GsmCharsetConverter\Converter;
         }
 
         /**
+         * Check for http link in a text
+         *
+         * @param string $text : Text to search a link in
+         *
+         * @return bool|array : False if no link in the text, or an array of all http links
+         */
+        public static function search_http_links($text)
+        {
+            $regex = "#http(s?)://\S+#i";
+            $matches = [];
+            $nb_matches = preg_match_all($regex, $text, $matches);
+
+            return $nb_matches > 0 ? $matches[0] : false;
+        }
+
+        /**
          * Cette fonction fait la correspondance entre un type d'evenement et une icone font awesome.
          *
          * @param string $type : Le type de l'évenement à analyser
