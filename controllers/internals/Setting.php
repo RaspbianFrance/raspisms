@@ -36,6 +36,18 @@ namespace controllers\internals;
         }
 
         /**
+         * Get a user setting by his name for a user.
+         *
+         * @param int $id_user : user id
+         *
+         * @return array
+         */
+        public function get_by_name_for_user(int $id_user, string $name)
+        {
+            return $this->get_model()->get_by_name_for_user($id_user, $name);
+        }
+
+        /**
          * Update a setting by his name and user id.
          *
          * @param int    $id_user : user id

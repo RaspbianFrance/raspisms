@@ -28,6 +28,18 @@ namespace models;
         }
 
         /**
+         * Get a user setting by his name for a user.
+         *
+         * @param int $id_user : user id
+         *
+         * @return array
+         */
+        public function get_by_name_for_user(int $id_user, string $name)
+        {
+            return $this->_select_one($this->get_table_name(), ['name' => $name, 'id_user' => $id_user]);
+        }
+
+        /**
          * Return table name.
          */
         protected function get_table_name(): string

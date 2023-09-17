@@ -75,12 +75,27 @@ namespace controllers\publics;
                 $setting_value = json_encode($setting_value);
             }
 
-            $update_setting_result = $this->internal_setting->update_for_user($_SESSION['user']['id'], $setting_name, $setting_value);
-            if (false === $update_setting_result)
+            // If setting dont exists yet, create it, else update
+            $setting = $this->internal_setting->get_by_name_for_user($_SESSION['user']['id'], $setting_name);
+            if (!$setting)
             {
-                \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');
+                $success = $this->internal_setting->create($_SESSION['user']['id'], $setting_name, $setting_value);
+                if (false === $success)
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');
 
-                return $this->redirect(\descartes\Router::url('Setting', 'show'));
+                    return $this->redirect(\descartes\Router::url('Setting', 'show'));
+                }
+            }
+            else 
+            {
+                $update_setting_result = $this->internal_setting->update_for_user($_SESSION['user']['id'], $setting_name, $setting_value);
+                if (false === $update_setting_result)
+                {
+                    \FlashMessage\FlashMessage::push('danger', 'Impossible de mettre à jour ce réglage.');
+
+                    return $this->redirect(\descartes\Router::url('Setting', 'show'));
+                }
             }
 
             $settings = $this->internal_setting->gets_for_user($_SESSION['user']['id']);
