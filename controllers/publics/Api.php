@@ -426,7 +426,7 @@ namespace controllers\publics;
             $at = (string) $at;
             $text = (string) $text;
 
-            if (($this->user['settings']['mms'] ?? false) && $mms)
+            if ($mms && !(int)($this->user['settings']['mms'] ?? false))
             {
                 $return = self::DEFAULT_RETURN;
                 $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
