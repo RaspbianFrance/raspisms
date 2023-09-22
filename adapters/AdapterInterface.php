@@ -207,7 +207,7 @@ interface AdapterInterface
      *               ]
      *               ]
      */
-    public function inbound_call_callback(): array;
+    public static function inbound_call_callback(): array;
 
     /**
      * Method called on reception of a end call notification.
@@ -221,5 +221,5 @@ interface AdapterInterface
      *               ]
      *               ]
      */
-    public function end_call_callback(): array;
+    public static function end_call_callback(): array;
 }

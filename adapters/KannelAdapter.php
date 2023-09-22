@@ -508,12 +508,12 @@ class KannelAdapter implements AdapterInterface
         return $response;
     }
 
-    public function inbound_call_callback(): array
+    public static function inbound_call_callback(): array
     {
         return [];
     }
 
-    public function end_call_callback(): array
+    public static function end_call_callback(): array
     {
         return [];
     }

@@ -351,7 +351,7 @@ namespace adapters;
             return [];
         }
 
-        public function inbound_call_callback(): array
+        public static function inbound_call_callback(): array
         {
             $response = [
                 'error' => false,
@@ -380,7 +380,7 @@ namespace adapters;
             return $response;
         }
 
-        public function end_call_callback(): array
+        public static function end_call_callback(): array
         {
             $response = [
                 'error' => false,

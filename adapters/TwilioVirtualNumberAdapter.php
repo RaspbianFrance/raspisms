@@ -374,12 +374,12 @@ class TwilioVirtualNumberAdapter implements AdapterInterface
         return [];
     }
 
-    public function inbound_call_callback(): array
+    public static function inbound_call_callback(): array
     {
         return [];
     }
 
-    public function end_call_callback(): array
+    public static function end_call_callback(): array
     {
         return [];
     }
