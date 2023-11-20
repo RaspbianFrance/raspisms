@@ -605,6 +605,7 @@ use Monolog\Logger;
                     //Remove messages to smsstops numbers
                     if (($users_smsstops[$id_user] ?? false) && in_array($target['number'], $users_smsstops[$id_user]))
                     {
+                        unset($targets[$key]);
                         continue;
                     }
 
