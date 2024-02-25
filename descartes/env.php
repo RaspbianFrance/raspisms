@@ -4,7 +4,7 @@
     /*
      * Define Descartes env
      */
-    $http_dir_path = '/raspisms'; //Path we need to put after servername in url to access app
+    $http_dir_path = ''; //Path we need to put after servername in url to access app
     $https = $_SERVER['HTTPS'] ?? 0;
 
     // Check for proxy forward
@@ -27,10 +27,9 @@
     $port = $proxy ? '' : $port;
     $http_server_port = $port ? ':' . $port : '';
     
-
+    
     $pwd = substr(__DIR__, 0, strrpos(__DIR__, '/'));
-    $http_pwd = $http_protocol . $http_server_name . $http_server_port . $http_dir_path;
-
+    
 
     $env = [
         //Global http and file path
@@ -39,31 +38,25 @@
         'HTTP_SERVER_NAME' => $http_server_name,
         'HTTP_SERVER_PORT' => $http_server_port,
         'PWD' => $pwd,
-        'HTTP_PWD' => $http_pwd,
-
+        
         //path of back resources
         'PWD_CONTROLLER' =>  $pwd . '/controllers', //Controllers dir
         'PWD_MODEL' => $pwd . '/models', //Models dir
         'PWD_TEMPLATES' => $pwd . '/templates', //Templates dir
 
         //path of front resources
-        'PWD_ASSETS' => $pwd . '/assets', //Assets dir
-        'HTTP_PWD_ASSETS' => $http_pwd . '/assets', //HTTP path of asset dir
+        'PWD_ASSETS' => $pwd . '/assets', //Assets dir 
 
         //images
         'PWD_IMG' => $pwd . '/assets' . '/img',
-        'HTTP_PWD_IMG' => $http_pwd . '/assets' . '/img', 
-
+        
         //css
         'PWD_CSS' => $pwd . '/assets' . '/css', 
-        'HTTP_PWD_CSS' => $http_pwd . '/assets' . '/css', 
-
+        
         //javascript
         'PWD_JS' => $pwd . '/assets' . '/js', 
-        'HTTP_PWD_JS' => $http_pwd . '/assets' . '/js', 
-
+        
         //fonts
         'PWD_FONT' => $pwd . '/assets' . '/font', 
-        'HTTP_PWD_FONT' => $http_pwd . '/assets' . '/font', 
     ];
 

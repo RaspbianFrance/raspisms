@@ -24,7 +24,7 @@
 
 			if (!is_readable($template_path))
             {
-                throw new DescartesTemplateNotReadableException('Template ' . $template_path . ' is not readable.');
+                throw new exceptions\DescartesExceptionTemplateNotReadable('Template ' . $template_path . ' is not readable.');
             }
 
             require $template_path;
