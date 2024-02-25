@@ -73,7 +73,8 @@ namespace controllers\internals;
          */
         public function check_for_stop(string $str)
         {
-            return 'stop' == trim(mb_strtolower($str));
+            $str = trim(mb_strtolower($str));
+            return 'stop' == $str || 'stop sms' == $str;
         }
 
         /**

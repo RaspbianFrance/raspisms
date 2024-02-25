@@ -161,6 +161,16 @@
                             '</div>' +
                         '</div>';
             }
+            else if (field.type == 'textarea')
+            {
+                html += '<div class="form-group">' +
+                            '<label>' + field.title + '</label>' +
+                            '<p class="italic small help">' + field.description + '</p>' +
+                            '<div class="form-group">' + 
+                                '<textarea name="adapter_data[' + field.name + ']" class="form-control" ' + (field.required ? 'required' : '') + ' >' + (field.default_value ? field.default_value :  '') +  '</textarea>' +
+                            '</div>' +
+                        '</div>';
+            }
             else
             {
                 html += '<div class="form-group">' +

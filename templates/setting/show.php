@@ -203,6 +203,47 @@
 								</div>
                             </div>
 
+							<div class="col-xs-12 col-md-6">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-ban fa-fw"></i> Activation des réponses automatiques aux SMS-STOP</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'smsstop_respond', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Réponses automatiques aux SMS STOP activées : </label>
+												<select name="setting_value" class="form-control">
+													<option value="0">Non</option>
+													<option value="1" <?php echo $_SESSION['user']['settings']['smsstop_respond'] ? 'selected' : ''; ?>>Oui</option>
+												</select>
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+                            </div>
+
+							<div class="col-xs-12 col-md-6">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title"><i class="fa fa-comments-o fa-fw"></i> Texte de réponse aux SMS-STOP</h4>
+									</div>
+									<div class="panel-body">
+										<form action="<?php echo \descartes\Router::url('Setting', 'update', ['setting_name' => 'smsstop_response', 'csrf' => $_SESSION['csrf']]); ?>" method="POST">
+											<div class="form-group">
+												<label>Texte des réponses automatiques aux SMS-STOP : </label>
+												<input name="setting_value" class="form-control" value="<?php $this->s($_SESSION['user']['settings']['smsstop_response'] ?? ''); ?>" />
+											</div>	
+											<div class="text-center">
+												<button class="btn btn-success">Mettre à jour les données</button>	
+											</div>
+										</form>
+									</div>
+								</div>
+                            </div>
+
                             <div class="col-xs-12 col-md-6">
 								<div class="panel panel-default">
 									<div class="panel-heading">

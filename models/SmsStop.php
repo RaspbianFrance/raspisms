@@ -13,6 +13,8 @@ namespace models;
 
     class SmsStop extends StandardModel
     {
+        const SMS_STOP_TAG = 'SMS_STOP';
+         
         /**
          * Return a smsstop by his number and user.
          *

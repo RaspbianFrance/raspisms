@@ -602,8 +602,8 @@ use Monolog\Logger;
                         continue;
                     }
 
-                    //Remove messages to smsstops numbers
-                    if (($users_smsstops[$id_user] ?? false) && in_array($target['number'], $users_smsstops[$id_user]))
+                    //Remove messages to smsstops numbers if not with tag SMS_STOP
+                    if ($scheduled['tag'] != \models\SmsStop::SMS_STOP_TAG && ($users_smsstops[$id_user] ?? false) && in_array($target['number'], $users_smsstops[$id_user]))
                     {
                         unset($targets[$key]);
                         continue;

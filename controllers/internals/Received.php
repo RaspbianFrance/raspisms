@@ -11,6 +11,8 @@
 
 namespace controllers\internals;
 
+use Exception;
+
     class Received extends StandardController
     {
         protected $model;
@@ -88,14 +90,6 @@ namespace controllers\internals;
                 return false;
             }
 
-            //Check if the received message is a SMS STOP and we must register it
-            $internal_smsstop = new SmsStop($this->bdd);
-            $is_stop = $internal_smsstop->check_for_stop($received['text']);
-            if ($is_stop)
-            {
-                $internal_smsstop->create($id_user, $origin);
-            }
-
             //Link medias
             $internal_media = new Media($this->bdd);
             foreach ($media_ids as $media_id)
@@ -114,6 +108,32 @@ namespace controllers\internals;
             if (!$success)
             {
                 return false;
+            }
+
+            //Check if the received message is a SMS STOP and we must register it
+            $internal_smsstop = new SmsStop($this->bdd);
+            $is_stop = $internal_smsstop->check_for_stop($received['text']);
+            if ($is_stop)
+            {
+                $stop_exists = (bool) $internal_smsstop->get_by_number_for_user($id_user, $origin);
+                if ($stop_exists)
+                {
+                    return $id_received;
+                }
+
+                $internal_smsstop->create($id_user, $origin);
+
+                //If stop response enabled, respond to user 
+                //(this will happen only for first stop, any further stop will not trigger responses)
+                $internal_setting = new Setting($this->bdd);
+                $user_settings = $internal_setting->gets_for_user($id_user);
+
+                if ((int) ($user_settings['smsstop_respond'] ?? false))
+                {
+                    $response = $user_settings['smsstop_response'];
+                    $internal_scheduled = new Scheduled($this->bdd);
+                    $internal_scheduled->create($id_user, (new \DateTime())->format('Y-m-d H:i:s'), $response, $id_phone, null, false, false, \models\SmsStop::SMS_STOP_TAG, [['number' => $origin, 'data' => '[]']]);
+                }
             }
 
             return $id_received;
