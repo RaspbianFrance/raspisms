@@ -72,12 +72,7 @@
 		protected static function clean_url (string $url)
         {
             $to_remove = parse_url(HTTP_PWD, PHP_URL_PATH);
-            if ($to_remove === null)
-            {
-                return $url;
-            } 
-            
-            $url = mb_strcut($url, mb_strlen($to_remove));
+            $url = mb_strcut($url, $to_remove ? mb_strlen($to_remove) : 0);
             $url = parse_url($url, PHP_URL_PATH);
 
             return $url;
