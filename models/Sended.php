@@ -295,6 +295,50 @@ namespace models;
         }
 
         /**
+         * Get number of sended SMS by day and status between two dates, possibly by sending phone.
+         *
+         * @param int       $id_user : user id
+         * @param \DateTime $start_date : Date since which we want the messages
+         * @param \DateTime $end_date : Date until which we want the messages
+         * @param ?int      $id_phone : Id of the phone to search sended for, null by default get all phones
+         *
+         * @return array
+         */
+        public function get_sended_status_stats ($id_user, $start_date, $end_date, ?int $id_phone = null)
+        {
+            $params = [
+                'start_date' => $start_date->format('y-m-d H:i:s'),
+                'end_date' => $end_date->format('y-m-d H:i:s'),
+                'id_user' => $id_user,
+            ];
+
+            $query = "
+                SELECT DATE_FORMAT(at, '%Y-%m-%d') as at_ymd, id_phone, status, COUNT(id) as nb
+                FROM sended
+                WHERE id_user = :id_user
+                AND id_phone IS NOT NULL
+                AND at >= :start_date
+                AND at <= :end_date                
+            ";
+
+            if ($id_phone) 
+            {
+                $params['id_phone'] = $id_phone;
+                $query .= "
+                    AND id_phone = :id_phone
+                ";
+            }
+
+            $query .= "
+                GROUP BY at_ymd, status, id_phone
+                ORDER BY at_ymd, id_phone, status
+            ";
+
+
+            return $this->_run_query($query, $params);
+        }
+
+        /**
          * Return table name.
          */
         protected function get_table_name(): string

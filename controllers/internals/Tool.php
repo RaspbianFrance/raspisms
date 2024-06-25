@@ -169,6 +169,26 @@ use BenMorel\GsmCharsetConverter\Converter;
         }
 
         /**
+         * Check if a string is a valid PHP date
+         *
+         * @param string $date   : Datestring to validate
+         *
+         * @return bool : True if a valid date, false else
+         */
+        public static function is_valid_date($date)
+        {
+            try 
+            {
+                new \DateTime($date);
+                return true;
+            }
+            catch (\Exception $e)
+            {
+                return false;
+            }
+        }
+
+        /**
          * Cette fonction vérifie une date.
          *
          * @param string $date   : La date a valider

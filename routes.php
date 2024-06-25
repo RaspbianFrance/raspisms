@@ -202,6 +202,10 @@
             'inbound_call' => '/callback/inbound_call/{id_phone}/',
             'end_call' => '/callback/end_call/{id_phone}/',
         ],
+
+        'Stat' => [
+            'sms_status' => '/stats/sms-status/',
+        ],
         
         'Api' => [
             'get_entries' => [
@@ -209,6 +213,7 @@
                 '/api/list/{entry_type}/{page}/',
             ],
             'get_usage' => '/api/usage/',
+            'get_sms_status_stats' => '/api/stats/sms-status/',
             'post_scheduled' => [
                 '/api/scheduled/',
             ],

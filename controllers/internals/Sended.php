@@ -226,6 +226,22 @@ use Exception;
         }
 
         /**
+         * Get number of sended SMS by day and status between two dates, possibly by sending phone.
+         *
+         * @param int       $id_user : user id
+         * @param \DateTime $start_date : Date since which we want the messages
+         * @param \DateTime $end_date : Date until which we want the messages
+         * @param ?int      $id_phone : Id of the phone to search sended for, null by default get all phones
+         *
+         * @return array
+         */
+        public function get_sended_status_stats ($id_user, $start_date, $end_date, ?int $id_phone = null)
+        {
+            return $this->get_model()->get_sended_status_stats($id_user, $start_date, $end_date, $id_phone);
+        }
+        
+
+        /**
          * Send a SMS message.
          *
          * @param \adapters\AdapterInterface $adapter  : Adapter object to use to send the message

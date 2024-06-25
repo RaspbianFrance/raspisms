@@ -42,6 +42,9 @@
 		<script src="<?php echo HTTP_PWD_JS; ?>/datatables/datatables.min.js"></script>
 		<!-- Qrcode lib -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/qrcode.min.js"></script>
+		<!-- Chartjs -->
+		<script src="<?php echo HTTP_PWD_JS; ?>/chart.js"></script>
+
 
 		<!-- Custom JS -->
 		<script src="<?php echo HTTP_PWD_JS; ?>/custom.js"></script>

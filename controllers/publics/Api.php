@@ -91,6 +91,10 @@ namespace controllers\publics;
             {
                 $this->user = $this->internal_user->get_by_api_key($api_key);
             }
+            elseif ($_SESSION['user'] ?? false)
+            {
+                $this->user = $this->internal_user->get($_SESSION['user']['id']);
+            }
 
             if (!$this->user)
             {
@@ -1064,6 +1068,78 @@ namespace controllers\publics;
 
             $status_update = $this->internal_phone->update_status($id, $new_status);
             $return['response'] = $new_status;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+
+        /**
+         * Return statistics about status of sended sms for a period by phone
+         *
+         * @param string $_GET['start']   : Date from which to get sms volume, format Y-m-d H:i:s.
+         * @param string $_GET['end']     : Date up to which to get sms volume, format Y-m-d H:i:s.
+         * @param ?int $_GET['id_phone']  : Id of the phone we want to check the status for. Default to null will return stats for all phone.
+         *
+         * @return : List of entries
+         */
+        public function get_sms_status_stats()
+        {
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
+            $id_phone = $_GET['id_phone'] ?? null;
+
+            if (!$start || !$end)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'start and end date are required.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $return = self::DEFAULT_RETURN;
+
+            if (!\controllers\internals\Tool::is_valid_date($start))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'start must be a date of format "Y-m-d H:i:s".';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+            $start = new \DateTime($start);
+
+            if (!\controllers\internals\Tool::is_valid_date($end))
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'end must be a date of format "Y-m-d H:i:s".';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+            $end = new \DateTime($end);
+
+            if ($id_phone)
+            {
+                $phone = $this->internal_phone->get_for_user($this->user['id'], $id_phone);
+                if (!$phone)
+                {
+                    $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                    $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . 'phone with id ' . $id_phone . ' does not exists.';
+                    $this->auto_http_code(false);
+
+                    return $this->json($return);
+                }
+            }
+            
+            $stats = $this->internal_sended->get_sended_status_stats($this->user['id'], $start, $end, $id_phone);
+
+            $return = self::DEFAULT_RETURN;
+            $return['response'] = $stats;
             $this->auto_http_code(true);
 
             return $this->json($return);
