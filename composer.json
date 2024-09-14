@@ -9,12 +9,13 @@
         "symfony/expression-language": "^5.0",
         "robmorgan/phinx": "^0.11.1",
         "monolog/monolog": "^2.0",
-        "ovh/ovh": "^2.0",
+        "ovh/ovh": "^3.0",
         "twilio/sdk": "^6.1",
         "symfony/yaml": "^5.0",
         "phpmailer/phpmailer": "^6.1",
         "xantios/mimey": ">=2.1",
-        "kreait/firebase-php": "^5.14",
-        "benmorel/gsm-charset-converter": "^0.3.0"
+        "kreait/firebase-php": "^7.0",
+        "benmorel/gsm-charset-converter": "^0.3.0",
+        "google/cloud-pubsub": "^1.46"
     }
 }
