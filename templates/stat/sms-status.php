@@ -81,15 +81,11 @@
         const formatedEndDate = endDate.toISOString().split('T')[0]
         const id_phone = document.getElementById('id_phone').value;
 
-        const query_infos = <?= json_encode(['url' => \descartes\Router::url('Api', 'get_sms_status_stats'), 'api_key' => $_SESSION['user']['api_key']])?>;
+        const query_infos = <?= json_encode(['url' => \descartes\Router::url('Api', 'get_sms_status_stats')])?>;
 
         let url = `${query_infos.url}?start=${formatedStartDate}&end=${formatedEndDate}`;
         url += id_phone ? `&id_phone=${id_phone}` : '';
-        const response = await fetch(url, {
-            headers: {
-                'X-Api-Key': query_infos.api_key
-            }
-        });
+        const response = await fetch(url);
         const data = (await response.json()).response;
         
         // Get all dates to avoid holes in data
