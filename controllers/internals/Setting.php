@@ -91,6 +91,12 @@ namespace controllers\internals;
             $all_success = true;
             foreach (USER_DEFAULT_SETTINGS as $name => $value)
             {
+                // Ignore if already existing settings
+                if (count($this->get_by_name_for_user($id_user, $name)))
+                {
+                    continue;
+                }
+                
                 $success = $this->create($id_user, $name, $value);
                 $all_success = ($all_success && $success);
             }
