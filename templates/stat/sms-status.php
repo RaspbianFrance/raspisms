@@ -81,9 +81,15 @@
         const formatedEndDate = endDate.toISOString().split('T')[0]
         const id_phone = document.getElementById('id_phone').value;
 
-        let url = `http://127.0.0.1/raspisms/api/stats/sms-status?api_key=a25cc40e2ffcc661170e28dc56724f67&start=${formatedStartDate}&end=${formatedEndDate}`;
-        url = (id_phone ? `${url}&id_phone=${id_phone}` : url );
-        const response = await fetch(url);
+        const query_infos = <?= json_encode(['url' => \descartes\Router::url('Api', 'get_sms_status_stats'), 'api_key' => $_SESSION['user']['api_key']])?>;
+
+        let url = `${query_infos.url}?start=${formatedStartDate}&end=${formatedEndDate}`;
+        url += id_phone ? `&id_phone=${id_phone}` : '';
+        const response = await fetch(url, {
+            headers: {
+                'X-Api-Key': query_infos.api_key
+            }
+        });
         const data = (await response.json()).response;
         
         // Get all dates to avoid holes in data
