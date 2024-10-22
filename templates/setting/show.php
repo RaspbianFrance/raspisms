@@ -1025,6 +1025,7 @@
                     {"id": "events", "name": "Évènements"},
                     {"id": "commands", "name": "Commandes"},
                     {"id": "phones", "name": "Téléphones"},
+                    {"id": "stats", "name": "Statistiques"}, 
                     {"id": "settings", "name": "Réglages"}, 
                 ],
                 valueField: 'id',

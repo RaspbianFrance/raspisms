@@ -123,7 +123,7 @@
                         </li>
 					<?php } ?>
                     <?php if (!in_array('stats', json_decode($_SESSION['user']['settings']['hide_menus'], true) ?? [])) { ?>
-                        <li <?php echo $page == 'settings' ? 'class="active"' : ''; ?>>
+                        <li <?php echo $page == 'stats' ? 'class="active"' : ''; ?>>
                             <a href="<?php echo \descartes\Router::url('Stat', 'sms_status'); ?>"><i class="fa fa-fw fa-area-chart"></i> Statistiques</a>
                         </li>
 					<?php } ?>
