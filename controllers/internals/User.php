@@ -32,6 +32,17 @@ namespace controllers\internals;
         }
 
         /**
+         * Return all active users.
+         *
+         * @return array
+         */
+        public function get_all_active()
+        {
+            return $this->model_user->get_all_active();
+        }
+
+
+        /**
          * Return a list of users by their ids.
          *
          * @param array $ids : ids of entries to find

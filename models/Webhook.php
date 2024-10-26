@@ -19,6 +19,7 @@ namespace models;
         const TYPE_INBOUND_CALL = 'inbound_call';
         const TYPE_QUOTA_LEVEL_ALERT = 'quota_level';
         const TYPE_QUOTA_REACHED = 'quota_reached';
+        const TYPE_PHONE_RELIABILITY = 'phone_reliability';
 
         /**
          * Find all webhooks for a user and for a type of webhook.

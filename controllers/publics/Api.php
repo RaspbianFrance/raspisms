@@ -1034,6 +1034,15 @@ namespace controllers\publics;
                 return $this->json($return);
             }
 
+            if ($phone['status'] === \models\Phone::STATUS_DISABLED)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'] . 'Phone have been manually disabled, you need to re-enable it manually.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
             // If user have activated phone limits, check if RaspiSMS phone limit have already been reached
             $limit_reached = false;
             if ((int) ($this->user['settings']['phone_limit'] ?? false))
@@ -1064,6 +1073,42 @@ namespace controllers\publics;
                 $adapter_classname = $phone['adapter'];
                 $adapter_instance = new $adapter_classname($phone['adapter_data']);
                 $new_status = $adapter_instance->check_phone_status();
+            }
+
+            $status_update = $this->internal_phone->update_status($id, $new_status);
+            $return['response'] = $new_status;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
+         * Manually disable/enable phones
+         * @param int id : id of phone we want to update status
+         * @param string $_POST['new_status'] : New status of the phone, either 'disabled' or 'available'
+         * @param $csrf : CSRF token
+         */
+        public function post_change_phone_status ($id)
+        {
+            $new_status = $_POST['status'] ?? '';
+
+            if (!in_array($new_status, [\models\Phone::STATUS_AVAILABLE, \models\Phone::STATUS_DISABLED]))
+            {
+                $return['error'] = self::ERROR_CODES['INVALID_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['INVALID_PARAMETER'] . ' "status" must be "disabled" or "available".';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $phone = $this->internal_phone->get_for_user($this->user['id'], $id);
+            if (!$phone)
+            {
+                $return['error'] = self::ERROR_CODES['CANNOT_UPDATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_UPDATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
             }
 
             $status_update = $this->internal_phone->update_status($id, $new_status);

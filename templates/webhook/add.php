@@ -49,6 +49,7 @@
                                         <option value="send_sms" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'send_sms' ? 'selected' : ''  ?>>Envoi d'un SMS</option>
                                         <option value="send_sms_status_change" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'send_sms_status_change' ? 'selected' : ''  ?>>Mise à jour du statut d'un SMS envoyé</option>
                                         <option value="inbound_call" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'inbound_call' ? 'selected' : ''  ?>>Réception d'un appel téléphonique</option>
+                                        <option value="phone_reliability" <?= ($_SESSION['previous_http_post']['type'] ?? '') == 'phone_reliability' ? 'selected' : ''  ?>>Détection d'un problème de fiabilité sur un téléphone</option>
 									</select>
 								</div>	
 								<a class="btn btn-danger" href="<?php echo \descartes\Router::url('Webhook', 'list'); ?>">Annuler</a>

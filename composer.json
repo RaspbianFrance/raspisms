@@ -17,5 +17,8 @@
         "kreait/firebase-php": "^7.0",
         "benmorel/gsm-charset-converter": "^0.3.0",
         "google/cloud-pubsub": "^1.46"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.21"
     }
 }

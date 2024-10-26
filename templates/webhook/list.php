@@ -96,6 +96,8 @@ jQuery(document).ready(function ()
                             return 'Réception de SMS';
                         case 'inbound_call':
                             return 'Réception d\'un appel téléphonique';
+                        case 'phone_reliability':
+                            return 'Détection d\'un problème de fiabilité sur un téléphone';
                         default:
                             return 'Inconnu';
                     }

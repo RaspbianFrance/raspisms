@@ -62,9 +62,11 @@
                                     </div>
                                     <div class="text-right col-xs-6 no-padding">
                                         <strong>Action pour la séléction :</strong>
-                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'update_status', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-refresh"></span> Rafraichir le status</button>
-                                        <button class="btn btn-default" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
-                                        <button class="btn btn-default btn-confirm" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
+                                        <button class="btn btn-default mb-2" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'update_status', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-refresh"></span> Rafraichir le status</button>
+                                        <button class="btn btn-default mb-2" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'change_status', ['csrf' => $_SESSION['csrf'], 'new_status' => 'available']); ?>"><span class="fa fa-toggle-on"></span> Activer</button>
+                                        <button class="btn btn-default mb-2" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'change_status', ['csrf' => $_SESSION['csrf'], 'new_status' => 'disabled']); ?>"><span class="fa fa-toggle-off"></span> Désactiver</button>
+                                        <button class="btn btn-default mb-2" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'edit'); ?>"><span class="fa fa-edit"></span> Modifier</button>
+                                        <button class="btn btn-default btn-confirm mb-2" type="submit" formaction="<?php echo \descartes\Router::url('Phone', 'delete', ['csrf' => $_SESSION['csrf']]); ?>"><span class="fa fa-trash-o"></span> Supprimer</button>
                                     </div>
                                 </div>
                             </form>
@@ -103,6 +105,10 @@ jQuery(document).ready(function ()
                     {
                         case 'available':
                             html += ' - <span class="text-success">Disponible</span>'
+                            break;
+
+                        case 'disabled':
+                            html += ' - <span class="text-warning">Désactivé</span>'
                             break;
 
                         case 'unavailable':

@@ -52,6 +52,7 @@
                                                 <option <?php echo $webhook['type'] == 'send_sms' ? 'selected="selected"' : '' ?> value="send_sms">Envoi d'un SMS</option>
 												<option <?php echo $webhook['type'] == 'send_sms_status_change' ? 'selected="selected"' : '' ?> value="send_sms_status_change">Mise à jour du statut d'un SMS envoyé</option>
 												<option <?php echo $webhook['type'] == 'inbound_call' ? 'selected="selected"' : '' ?> value="inbound_call">Réception d'un appel téléphonique</option>
+												<option <?php echo $webhook['type'] == 'phone_reliability' ? 'selected="selected"' : '' ?> value="phone_reliability">Détection d'un problème de fiabilité sur un téléphone</option>
 											</select>
 										</div>	
 										<hr/>

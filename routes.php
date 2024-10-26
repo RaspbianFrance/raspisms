@@ -165,6 +165,7 @@
             'edit' => '/phone/edit/',
             'update' => '/phone/update/{csrf}/',
             'update_status' => '/phone/update_status/{csrf}/',
+            'change_status' => '/phone/change_status/{new_status}/{csrf}/',
             'json_list' => '/phones.json/',
         ],
 
@@ -228,6 +229,9 @@
             ],
             'post_update_phone_status' => [
                 '/api/phone/{id}/status/',
+            ],
+            'post_change_phone_status' => [
+                '/api/phone/{id}/status/force/',
             ],
             'delete_phone' => [
                 '/api/phone/{id}/',

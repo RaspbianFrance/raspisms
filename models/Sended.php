@@ -338,6 +338,7 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
+
         /**
          * Return table name.
          */

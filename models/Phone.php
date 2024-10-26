@@ -14,10 +14,11 @@ namespace models;
     class Phone extends StandardModel
     {
 
-        const STATUS_AVAILABLE = 'available';
-        const STATUS_UNAVAILABLE = 'unavailable';
-        const STATUS_NO_CREDIT = 'no_credit';
-        const STATUS_LIMIT_REACHED = 'limit_reached';
+        const STATUS_AVAILABLE = 'available'; # Everything OK 
+        const STATUS_UNAVAILABLE = 'unavailable'; # RaspiSMS cannot communication with the phone 
+        const STATUS_DISABLED = 'disabled'; # Phone have been manually or automatically disabled by user/system
+        const STATUS_NO_CREDIT = 'no_credit'; # Phone have no more credit available
+        const STATUS_LIMIT_REACHED = 'limit_reached'; # We reached the limit in of SMS in RaspiSMS for this phone
 
         /**
          * Return all phones that belongs to active users
@@ -108,7 +109,6 @@ namespace models;
         {
             return $this->_delete('phone_limit', ['id_phone' => $id_phone]);
         }
-
 
         /**
          * Return table name.

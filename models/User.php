@@ -32,6 +32,16 @@ namespace models;
         }
 
         /**
+         * Return all active users.
+         *
+         * @return array
+         */
+        public function get_all_active()
+        {
+            return $this->_select('user', ['status' => self::STATUS_ACTIVE]);
+        }
+
+        /**
          * Find user by ids.
          *
          * @param array $ids : users ids

@@ -535,6 +535,16 @@ class Phone extends \descartes\Controller
         foreach ($ids as $id)
         {
             $phone = $this->internal_phone->get_for_user($id_user, $id);
+            if (!$phone)
+            {
+                continue;
+            }
+
+            if ($phone['status'] === \models\Phone::STATUS_DISABLED)
+            {
+                \FlashMessage\FlashMessage::push('error', 'Certains téléphones ont été désactivés manuellements, vous devez les réactiver manuellement.');
+                continue;
+            }
 
             // If user have activated phone limits, check if RaspiSMS phone limit have already been reached
             $limit_reached = false;
@@ -577,6 +587,48 @@ class Phone extends \descartes\Controller
         }
 
         \FlashMessage\FlashMessage::push('success', 'Les status des téléphones ont bien été mis à jour.');
+            
+        return $this->redirect(\descartes\Router::url('Phone', 'list'));
+    }
+
+
+    /**
+     * Manually disable/enable phones
+     * @param array int $_GET['ids'] : ids of phones we want to update status
+     * @param string $new_status : New status of the phone, either 'disabled' or 'available'
+     * @param $csrf : CSRF token
+     */
+    public function change_status ($new_status, $csrf)
+    {
+        if (!$this->verify_csrf($csrf))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Jeton CSRF invalid !');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        if (!in_array($new_status, [\models\Phone::STATUS_AVAILABLE, \models\Phone::STATUS_DISABLED]))
+        {
+            \FlashMessage\FlashMessage::push('danger', 'Seul les status disponibles et désactivés peuvent être définis manuellement.');
+
+            return $this->redirect(\descartes\Router::url('Phone', 'add'));
+        }
+
+        $ids = $_GET['ids'] ?? [];
+        $id_user = $_SESSION['user']['id'];
+
+        foreach ($ids as $id)
+        {
+            $phone = $this->internal_phone->get_for_user($id_user, $id);
+            if (!$phone)
+            {
+                continue;
+            }
+
+            $status_update = $this->internal_phone->update_status($id, $new_status);
+        }
+
+        \FlashMessage\FlashMessage::push('success', 'Les status des téléphones ont bien été mis à jour manuellement.');
             
         return $this->redirect(\descartes\Router::url('Phone', 'list'));
     }
