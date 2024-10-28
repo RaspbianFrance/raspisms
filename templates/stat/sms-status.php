@@ -53,6 +53,7 @@
                                 <input type="submit" class="btn btn-success ml-4" value="Valider" /> 	
                             </form>
                             <canvas id="bar-chart-sms-status"></canvas>
+                            <div id="bar-chart-sms-status-loader" class="text-center mb-5"><div class="loader"></div></div>
                         </div>
                     </div>
                 </div>
@@ -81,9 +82,8 @@
         const formatedEndDate = endDate.toISOString().split('T')[0]
         const id_phone = document.getElementById('id_phone').value;
 
-        const query_infos = <?= json_encode(['url' => \descartes\Router::url('Api', 'get_sms_status_stats')])?>;
-
-        let url = `${query_infos.url}?start=${formatedStartDate}&end=${formatedEndDate}`;
+        let url = <?= json_encode(\descartes\Router::url('Api', 'get_sms_status_stats'))?>;
+        url += `?start=${formatedStartDate}&end=${formatedEndDate}`;
         url += id_phone ? `&id_phone=${id_phone}` : '';
         const response = await fetch(url);
         const data = (await response.json()).response;
@@ -186,6 +186,8 @@
             },
             plugins: [noDataPlugin],
         };
+
+        document.getElementById('bar-chart-sms-status-loader').classList.add('hidden');
 
         // On first run create chart, after update
         if (!smsStatusChart) {

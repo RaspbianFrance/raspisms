@@ -253,9 +253,9 @@ use Exception;
          *
          * @return array
          */
-        public function get_discussions_for_user(int $id_user)
+        public function get_discussions_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null)
         {
-            return $this->get_model()->get_discussions_for_user($id_user);
+            return $this->get_model()->get_discussions_for_user($id_user, $nb_entry, $page);
         }
 
         /**

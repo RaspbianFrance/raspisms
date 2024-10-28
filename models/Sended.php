@@ -338,6 +338,45 @@ namespace models;
             return $this->_run_query($query, $params);
         }
 
+        /**
+         * Get list of invalid phone number we've sent message to
+         *
+         * @param int       $id_user : user id
+         * @param int       $volume : Minimum number of sms sent to the number
+         * @param float     $percent_failed : Minimum ratio of failed message
+         * @param float     $percent_unknown : Minimum ratio of unknown message
+         * @param int       $limit : Limit of results
+         * @param int       $page : Page of results (offset = page * limit)
+         *
+         */
+        public function get_invalid_numbers (int $id_user, int $volume, float $percent_failed, float $percent_unknown, int $limit, int $page)
+        {
+            $query = "
+                SELECT 
+                    destination,
+                    COUNT(*) AS total_sms_sent,
+                    ROUND(SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) / COUNT(*), 2) AS failed_percentage,
+                    ROUND(SUM(CASE WHEN status = 'unknown' THEN 1 ELSE 0 END) / COUNT(*), 2) AS unknown_percentage
+                FROM 
+                    sended
+                GROUP BY 
+                    destination
+                HAVING 
+                    total_sms_sent >= :volume
+                    AND failed_percentage >= :percent_failed 
+                    AND unknown_percentage >= :percent_unknown
+                LIMIT " . intval($page * $limit) . "," . intval($limit) . "
+            ";
+
+            $params = [
+                'volume' => $volume,
+                'percent_failed' => $percent_failed,
+                'percent_unknown' => $percent_unknown
+            ];
+
+            return $this->_run_query($query, $params);
+        }
+
 
         /**
          * Return table name.

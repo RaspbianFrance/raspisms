@@ -74,7 +74,7 @@ namespace models;
                 WHERE
                     total >= :min_volume
                 AND 
-                    (unreliable / total) > :rate_limit;
+                    (unreliable / total) >= :rate_limit;
             ", [
                 'id_user' => $id_user,
                 'sms_status' => $sms_status,

@@ -377,6 +377,22 @@ use Exception;
         }
 
         /**
+         * Get list of invalid phone number we've sent message to
+         *
+         * @param int       $id_user : user id
+         * @param int       $volume : Minimum number of sms sent to the number
+         * @param float     $percent_failed : Minimum ratio of failed message
+         * @param float     $percent_unknown : Minimum ratio of unknown message
+         * @param int       $limit : Limit of results
+         * @param int       $page : Page of results (offset = page * limit)
+         *
+         */
+        public function get_invalid_numbers (int $id_user, int $volume, float $percent_failed, float $percent_unknown, int $limit, int $page)
+        {
+            return $this->get_model()->get_invalid_numbers($id_user, $volume, $percent_failed, $percent_unknown, $limit, $page);
+        }
+
+        /**
          * Get the model for the Controller.
          */
         protected function get_model(): \models\Sended

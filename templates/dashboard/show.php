@@ -121,13 +121,14 @@
                     <div class="panel panel-default dashboard-panel-chart">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> SMS envoyés depuis le <?= $stats_start_date_formated; ?> : </h3>
-                            <span style="color: #5CB85C;">SMS envoyés (moyenne = <?php echo $avg_sendeds; ?> par jour).</span><br/>
+                            <span style="color: #5CB85C;">SMS envoyés (moyenne = <span id="avg_sendeds">0</span> par jour).</span><br/>
                             <?php if ($quota_unused) { ?>
                                 <br/>
                                 <span style="color: #d9534f">Crédits restants : <?= $quota_unused; ?>.</span>
                             <?php } ?>
                         </div>
                         <div class="panel-body">
+                            <div id="morris-bar-chart-sended-loader" class="text-center"><div class="loader"></div></div>
                             <div id="morris-bar-chart-sended"></div>
                         </div>
                     </div>
@@ -139,9 +140,10 @@
                     <div class="panel panel-default dashboard-panel-chart">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-area-chart fa-fw"></i> SMS reçus depuis le <?= $stats_start_date_formated; ?> : </h3>
-                            <span style="color: #EDAB4D">SMS reçus (moyenne = <?php echo $avg_receiveds; ?> par jour).</span>
+                            <span style="color: #EDAB4D">SMS reçus (moyenne = <span id="avg_receiveds">0</span> par jour).</span>
                         </div>
                         <div class="panel-body">
+                            <div id="morris-bar-chart-received-loader" class="text-center"><div class="loader"></div></div>
 							<div id="morris-bar-chart-received"></div>
                         </div>
                     </div>
@@ -255,18 +257,23 @@
 
 </div>
 <script>
-    jQuery(document).ready(function()
-    {
+    async function drawChartSended() {
+        let url = <?= json_encode(\descartes\Router::url('Dashboard', 'stats_sended'))?>;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        document.getElementById('avg_sendeds').textContent = data.avg_sendeds;
+
         Morris.Bar({
             element: 'morris-bar-chart-sended',
             fillOpacity: 0.4,
-            data: <?php echo $data_bar_chart_sended;?>,
+            data: data.data_bar_chart_sended,
             xkey: 'period',
             parseTime: false,
             ykeys: ['sendeds_failed', 'sendeds_unknown', 'sendeds_delivered'],
             labels: ['SMS échoués', 'SMS inconnus', 'SMS délivrés'],
             barColors: ['#D9534F', '#337AB7', '#5CB85C'],
-            goals: [<?php echo $avg_sendeds; ?>,],
+            goals: [data.avg_sendeds],
             goalLineColors: ['#5CB85C'],
             goalStrokeWidth: 2,
             pointSize: 4,
@@ -290,22 +297,42 @@
             }
         });
 
-		Morris.Bar({
+        document.getElementById('morris-bar-chart-sended-loader').classList.add('hidden');
+    }
+
+    async function drawChartReceived() {
+        let url = <?= json_encode(\descartes\Router::url('Dashboard', 'stats_received'))?>;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+
+
+        document.getElementById('avg_receiveds').textContent = data.avg_receiveds;
+        Morris.Bar({
             element: 'morris-bar-chart-received',
             fillOpacity: 0.4,
-            data: <?php echo $data_bar_chart_received;?>,
+            data: data.data_bar_chart_received,
             xkey: 'period',
             parseTime: false,
             ykeys: ['receiveds'],
             labels: ['SMS reçus'],
             barColors: ['#EDAB4D'],
-            goals: [<?php echo $avg_receiveds; ?>],
+            goals: [data.avg_receiveds],
             goalLineColors: ['#EDAB4D'],
             goalStrokeWidth: 2,
             pointSize: 4,
             hideHover: 'auto',
             resize: true,
         });
+
+        document.getElementById('morris-bar-chart-received-loader').classList.add('hidden');
+    }
+    
+    
+    jQuery(document).ready(function()
+    {
+        drawChartSended();
+        drawChartReceived();
     });
 </script>
 <!-- /#wrapper -->

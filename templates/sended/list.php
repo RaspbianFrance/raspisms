@@ -14,6 +14,7 @@
 				<div class="col-lg-12">
 					<h1 class="page-header">
 						Dashboard <small>SMS envoyés</small>
+                        <a class="btn btn-warning float-right" id="btn-invalid-numbers" href="#"><span class="fa fa-eraser"></span> Télécharger les numéros invalides</a>
 					</h1>
 					<ol class="breadcrumb">
 						<li>
@@ -65,9 +66,122 @@
 		</div>
 	</div>
 </div>
+<div class="modal fade" tabindex="-1" id="invalid-numbers-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="invalid-numbers-form" action="<?php $this->s(\descartes\Router::url('Api', 'get_invalid_numbers')); ?>" method="GET">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Télécharger les numéros invalides</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="help">Vous pouvez téléchager une liste de destinataires qui affichent un taux d'erreur anormal selon les critères de votre choix (liste limitée à 25 000 numéros).</p>
+                    <div class="form-group">
+                        <label>Volume minimum de SMS envoyés au numéros</label>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><span class="fa fa-arrow-circle-up"></span></span>
+                            <input name="volume" class="form-control" type="number" min="1" step="1" placeholder="" autofocus required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Pourcentage d'échecs minimum</label>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><span class="fa fa-percent"></span></span>
+                            <input name="percent_failed" class="form-control" type="number" min="0" step="1" placeholder="" autofocus required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Pourcentage d'inconnus minimum</label>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><span class="fa fa-percent"></span></span>
+                            <input name="percent_unknown" class="form-control" type="number" min="0" step="1" placeholder="" autofocus required>
+                        </div>
+                    </div>
+                    <div id="invalid-numbers-loader" class="text-center hidden"><div class="loader"></div></div>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-danger" data-dismiss="modal">Annuler</a>
+                    <input type="submit" class="btn btn-success" value="Valider" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
 jQuery(document).ready(function ()
 {
+    jQuery('body').on('click', '#btn-invalid-numbers', function ()
+    {
+        jQuery('#invalid-numbers-modal').modal({'keyboard': true});
+    });
+
+    jQuery('body').on('submit', '#invalid-numbers-form', function (e)
+    {
+        e.preventDefault();
+        
+        jQuery('#invalid-numbers-loader').removeClass('hidden');
+
+        const form = this;
+        const formData = jQuery(form).serialize();
+
+        let invalidNumbers = []; // Array to store cumulative results
+
+        // Function to fetch data and handle pagination
+        const fetchData = (url, limit = -1, params = null) => {
+            if (params) {
+                url += '?' + params;
+            }
+            
+            fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(jsonResponse => {
+                invalidNumbers = invalidNumbers.concat(jsonResponse.response);
+
+                // Check if there is a "next" URL to fetch more data
+                if (jsonResponse.next && limit != 0) {
+                    fetchData(jsonResponse.next, limit - 1); // Recursive call for next page
+                } else {
+                    exportToCSV(invalidNumbers);
+                    jQuery('#invalid-numbers-loader').addClass('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        };
+
+        // Function to export data to CSV
+        const exportToCSV = (results) => {
+            // Define the CSV headers
+            let csvContent = "Destination,Total SMS Sent,Failed Percentage,Unknown Percentage\n";
+            
+            // Append each row of data to the CSV content
+            results.forEach(item => {
+                csvContent += `${item.destination},${item.total_sms_sent},${item.failed_percentage},${item.unknown_percentage}\n`;
+            });
+
+            // Create a downloadable link for the CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = 'invalid_numbers.csv';
+            
+            // Trigger download
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink); // Clean up
+        };
+
+        // Initial call to fetch data
+        fetchData(form.action, 1000, formData);
+    });
+
     jQuery('.datatable').DataTable({
         "pageLength": 25,
         "lengthMenu": [[25, 50, 100, 1000, 10000, Math.pow(10, 10)], [25, 50, 100, 1000, 10000, "All"]],

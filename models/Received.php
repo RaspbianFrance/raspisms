@@ -267,27 +267,33 @@ namespace models;
          *
          * @return array
          */
-        public function get_discussions_for_user(int $id_user)
+        public function get_discussions_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null)
         {
             $query = '
-                    SELECT discussions.at, discussions.number, contact.name as contact_name
-                    FROM (
-                        SELECT at, destination as number FROM sended
-                        WHERE id_user = :id_user
-                        UNION (
-                            SELECT at, origin as number FROM received
-                            WHERE id_user = :id_user
-                        )
-                    ) as discussions
-                    LEFT JOIN contact
-                    ON discussions.number = contact.number AND id_user = :id_user
-                    GROUP BY number
-                    ORDER BY at DESC
+                SELECT at, destination AS number, contact.name AS contact_name
+                FROM sended
+                LEFT JOIN contact ON contact.number = sended.destination
+                WHERE sended.id_user = :id_user
+
+                UNION ALL
+
+                SELECT at, origin AS number, contact.name AS contact_name
+                FROM received
+                LEFT JOIN contact ON contact.number = received.origin
+                WHERE received.id_user = :id_user
+
+                ORDER BY at DESC
             ';
 
             $params = ['id_user' => $id_user];
 
-            return $this->_run_query($query, $params);
+            if ($nb_entry !== null)
+            {
+                $query .= 'LIMIT ' . intval($nb_entry) * intval($page) . ', ' . intval($nb_entry);
+            }
+
+            $results = $this->_run_query($query, $params);
+            return $results;
         }
 
         /**

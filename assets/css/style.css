@@ -127,6 +127,23 @@
 .mr-4 { margin-right: 1.5rem !important; }
 .mr-5 { margin-right: 3rem !important; }
 
+/* HTML: <div class="loader"></div> */
+.loader {
+	display: inline-block;
+	width: 50px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background: 
+	  radial-gradient(farthest-side,#999 94%,#0000) top/8px 8px no-repeat,
+	  conic-gradient(#0000 30%,#999);
+	-webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+	animation: l13 1s infinite linear;
+}
+
+@keyframes l13{ 
+	100%{transform: rotate(1turn)}
+}
+
 
 /** POPUPS ALERT **/
 .popup-alerts-container

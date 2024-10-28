@@ -56,7 +56,7 @@ namespace controllers\publics;
          */
         public function list_json()
         {
-            $entities = $this->internal_received->get_discussions_for_user($_SESSION['user']['id']);
+            $entities = $this->internal_received->get_discussions_for_user($_SESSION['user']['id'], 1000);
 
             foreach ($entities as &$entity)
             {

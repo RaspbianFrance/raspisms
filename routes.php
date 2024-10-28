@@ -11,6 +11,8 @@
 
         'Dashboard' => [
             'show' => '/dashboard/',
+            'stats_sended' => '/dashboard/stats/sended.json/',
+            'stats_received' => '/dashboard/stats/received.json/',
         ],
 
         'Account' => [
@@ -215,6 +217,10 @@
             ],
             'get_usage' => '/api/usage/',
             'get_sms_status_stats' => '/api/stats/sms-status/',
+            'get_invalid_numbers' => [
+                '/api/invalid_number/',
+                '/api/invalid_number/{page}/',
+            ],
             'post_scheduled' => [
                 '/api/scheduled/',
             ],

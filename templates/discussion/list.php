@@ -64,7 +64,7 @@ jQuery(document).ready(function ()
 {
     jQuery('.datatable').DataTable({
         "pageLength": 25,
-        "lengthMenu": [[25, 50, 100, 1000, 10000, -1], [25, 50, 100, 1000, 10000, "All"]],
+        "lengthMenu": [[25, 50, 100, 1000], [25, 50, 100, 1000]],
         "language": {
             "url": HTTP_PWD + "/assets/js/datatables/french.json",
         },
@@ -73,7 +73,6 @@ jQuery(document).ready(function ()
             'targets': 'checkcolumn',
             'orderable': false,
         }],
-
         "ajax": {
             'url': '<?php echo \descartes\Router::url('Discussion', 'list_json'); ?>',
             'dataSrc': 'data',

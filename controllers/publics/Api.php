@@ -1189,4 +1189,68 @@ namespace controllers\publics;
 
             return $this->json($return);
         }
+
+        /**
+         * Return statistics about invalid numbers
+         *
+         * @param int $page                    : Pagination number, Default = 0. Group of 25 results.
+         * @param int $_GET['volume']          : Minimum number of SMS sent to the number
+         * @param int $_GET['percent_failed']  : Minimum percentage of failed SMS to the number
+         * @param int $_GET['percent_unknown'] : Minimum percentage of unknown SMS to the number
+         *
+         * @return : List of entries
+         */
+        public function get_invalid_numbers($page = 0)
+        {
+            $page = (int) $page;
+            $limit = 25;
+            $volume = $_GET['volume'] ?? false;
+            $percent_failed = $_GET['percent_failed'] ?? false;
+            $percent_unknown = $_GET['percent_unknown'] ?? false;
+
+            if ($volume === false || $percent_failed === false || $percent_unknown === false)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . 'volume, percent_failed and percent_unknown are required.';
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $volume = (int) $volume;
+            $percent_failed = ((float) $percent_failed) / 100;
+            $percent_unknown = ((float) $percent_unknown) / 100;
+
+            $return = self::DEFAULT_RETURN;
+            
+            $invalid_numbers = $this->internal_sended->get_invalid_numbers($this->user['id'], $volume, $percent_failed, $percent_unknown, $limit, $page);
+
+            $return = self::DEFAULT_RETURN;
+
+            if (\count($invalid_numbers) === $limit)
+            {
+                $return['next'] = \descartes\Router::url('Api', __FUNCTION__, ['page' => $page + 1], [
+                    'api_key' => $this->user['api_key'], 
+                    'volume' => $volume, 
+                    'percent_failed' => $percent_failed * 100, 
+                    'percent_unknown' => $percent_unknown * 100
+                ]);    
+            }
+
+            if ($page > 0)
+            {
+                $return['prev'] = \descartes\Router::url('Api', __FUNCTION__, ['page' => $page - 1], [
+                    'api_key' => $this->user['api_key'], 
+                    'volume' => $volume, 
+                    'percent_failed' => $percent_failed * 100, 
+                    'percent_unknown' => $percent_unknown * 100
+                ]);
+            }
+
+            $return['response'] = $invalid_numbers;
+            $this->auto_http_code(true);
+
+            return $this->json($return, false);
+        }
     }

@@ -87,16 +87,50 @@ namespace controllers\publics;
                 $stats_start_date_formated = $stats_start_date->format('Y-m-d');
             }
 
+            $this->render('dashboard/show', [
+                'nb_contacts' => $nb_contacts,
+                'nb_groups' => $nb_groups,
+                'nb_scheduleds' => $nb_scheduleds,
+                'nb_sendeds' => $nb_sendeds,
+                'nb_receiveds' => $nb_receiveds,
+                'nb_unreads' => $nb_unreads,
+                'quota_unused' => $quota_unused,
+                'sendeds' => $sendeds,
+                'receiveds' => $receiveds,
+                'events' => $events,
+                'stats_start_date_formated' => $stats_start_date_formated,
+            ]);
+        }
+
+        /**
+         * Return stats about sended sms
+         */
+        public function stats_sended()
+        {
+            $id_user = $_SESSION['user']['id'];
+
+            //Création de la date d'il y a 30 jours
+            $now = new \DateTime();
+            $one_month = new \DateInterval('P1M');
+            $stats_start_date = clone $now;
+            $stats_start_date->sub($one_month);
+            $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+
+            //If user have a quota and the quota start before today, use quota start date instead
+            $quota = $this->internal_quota->get_user_quota($id_user);
+            if ($quota && (new \DateTime($quota['start_date']) <= $now) && (new \DateTime($quota['expiration_date']) > $now))
+            {
+                $stats_start_date = new \DateTime($quota['start_date']);
+                $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+            }
+
             $nb_sendeds_by_day = $this->internal_sended->count_by_day_and_status_since_for_user($id_user, $stats_start_date_formated);
-            $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $stats_start_date_formated);
 
             //On va traduire ces données pour les afficher en graphique
             $array_bar_chart_sended = [];
-            $array_bar_chart_received = [];
 
             $date = clone $stats_start_date;
             $one_day = new \DateInterval('P1D');
-            $i = 0;
 
             //On va construire un tableau avec la date en clef, et les données pour chaque date
             while ($date <= $now)
@@ -109,21 +143,72 @@ namespace controllers\publics;
                     'sendeds_delivered' => 0,
                 ];
 
-                $array_bar_chart_received[$date_f] = ['period' => $date_f, 'receiveds' => 0];
-
                 $date->add($one_day);
             }
 
             $total_sendeds = 0;
             $total_receiveds = 0;
 
-            //0n remplie le tableau avec les données adaptées
+            //On remplie le tableau avec les données adaptées
             foreach ($nb_sendeds_by_day as $nb_sended)
             {
                 $array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_' . $nb_sended['status']] = $nb_sended['nb'];
                 $array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_total'] = ($array_bar_chart_sended[$nb_sended['at_ymd']]['sendeds_total'] ?? 0) + $nb_sended['nb'];
                 $total_sendeds += $nb_sended['nb'];
             }
+
+            $nb_days = $stats_start_date->diff($now)->days + 1;
+            $avg_sendeds = round($total_sendeds / $nb_days, 2);
+
+            $array_bar_chart_sended = array_values($array_bar_chart_sended);
+            
+            header('content-type:application/json');
+            echo json_encode([
+                'data_bar_chart_sended' => $array_bar_chart_sended,
+                'avg_sendeds' => $avg_sendeds,
+            ]);
+        }
+
+
+        /**
+         * Return stats about received sms
+         */
+        public function stats_received()
+        {
+            $id_user = $_SESSION['user']['id'];
+
+            //Création de la date d'il y a 30 jours
+            $now = new \DateTime();
+            $one_month = new \DateInterval('P1M');
+            $stats_start_date = clone $now;
+            $stats_start_date->sub($one_month);
+            $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+
+            $quota = $this->internal_quota->get_user_quota($id_user);
+            if ($quota && (new \DateTime($quota['start_date']) <= $now) && (new \DateTime($quota['expiration_date']) > $now))
+            {
+                $stats_start_date = new \DateTime($quota['start_date']);
+                $stats_start_date_formated = $stats_start_date->format('Y-m-d');
+            }
+
+            $nb_receiveds_by_day = $this->internal_received->count_by_day_since_for_user($id_user, $stats_start_date_formated);
+
+            //On va traduire ces données pour les afficher en graphique
+            $array_bar_chart_received = [];
+
+            $date = clone $stats_start_date;
+            $one_day = new \DateInterval('P1D');
+
+            //On va construire un tableau avec la date en clef, et les données pour chaque date
+            while ($date <= $now)
+            {
+                $date_f = $date->format('Y-m-d');
+                $array_bar_chart_received[$date_f] = ['period' => $date_f, 'receiveds' => 0];
+
+                $date->add($one_day);
+            }
+
+            $total_receiveds = 0;
 
             foreach ($nb_receiveds_by_day as $date => $nb_received)
             {
@@ -132,28 +217,15 @@ namespace controllers\publics;
             }
 
             $nb_days = $stats_start_date->diff($now)->days + 1;
-            $avg_sendeds = round($total_sendeds / $nb_days, 2);
             $avg_receiveds = round($total_receiveds / $nb_days, 2);
 
-            $array_bar_chart_sended = array_values($array_bar_chart_sended);
             $array_bar_chart_received = array_values($array_bar_chart_received);
 
-            $this->render('dashboard/show', [
-                'nb_contacts' => $nb_contacts,
-                'nb_groups' => $nb_groups,
-                'nb_scheduleds' => $nb_scheduleds,
-                'nb_sendeds' => $nb_sendeds,
-                'nb_receiveds' => $nb_receiveds,
-                'nb_unreads' => $nb_unreads,
-                'avg_sendeds' => $avg_sendeds,
+            header('content-type:application/json');
+            echo json_encode([
+                'data_bar_chart_received' => $array_bar_chart_received,
                 'avg_receiveds' => $avg_receiveds,
-                'quota_unused' => $quota_unused,
-                'sendeds' => $sendeds,
-                'receiveds' => $receiveds,
-                'events' => $events,
-                'data_bar_chart_sended' => json_encode($array_bar_chart_sended),
-                'data_bar_chart_received' => json_encode($array_bar_chart_received),
-                'stats_start_date_formated' => $stats_start_date_formated,
             ]);
         }
+
     }
