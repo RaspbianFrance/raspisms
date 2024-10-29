@@ -305,6 +305,47 @@ namespace controllers\publics;
         }
 
         /**
+         * Simplest method to send a SMS immediately with nothing but a URL and a GET query
+         * @param string $_GET['to'] = Phone number to send sms to
+         * @param string $_GET['text'] = Text of the SMS
+         * @param ?int   $_GET['id_phone'] = Id of the phone to use, if null use a random phone
+         */
+        public function get_send_sms()
+        {
+            $to = \controllers\internals\Tool::parse_phone($_GET['to'] ?? '');
+            $text = $_GET['text'] ?? false;
+            $id_phone = empty($_GET['id_phone']) ? null : $_GET['id_phone'];
+
+            if (!$to || !$text)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['MISSING_PARAMETER'];
+                $return['message'] = self::ERROR_MESSAGES['MISSING_PARAMETER'] . ($to ? '' : 'to ') . ($text ? '' : 'text');
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+            $at = (new \DateTime())->format('Y-m-d H:i:s');
+
+            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone);
+            if (!$scheduled_id)
+            {
+                $return = self::DEFAULT_RETURN;
+                $return['error'] = self::ERROR_CODES['CANNOT_CREATE'];
+                $return['message'] = self::ERROR_MESSAGES['CANNOT_CREATE'];
+                $this->auto_http_code(false);
+
+                return $this->json($return);
+            }
+
+            $return = self::DEFAULT_RETURN;
+            $return['response'] = $scheduled_id;
+            $this->auto_http_code(true);
+
+            return $this->json($return);
+        }
+
+        /**
          * Schedule a message to be send.
          *
          * @param string $_POST['at']                 : Date to send message at format Y-m-d H:i:s

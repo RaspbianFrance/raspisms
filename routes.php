@@ -221,6 +221,9 @@
                 '/api/invalid_number/',
                 '/api/invalid_number/{page}/',
             ],
+            'get_send_sms' => [
+                '/api/send-sms/',
+            ],
             'post_scheduled' => [
                 '/api/scheduled/',
             ],
