@@ -117,11 +117,10 @@ class Mailer extends \descartes\Controller
             'attachments' => $attachments,
         ];
 
-        $error_code = null;
-        $queue = msg_get_queue(QUEUE_ID_EMAIL);
-        $success = msg_send($queue, QUEUE_TYPE_EMAIL, $message, true, true, $error_code);
+        $queue = new Queue(QUEUE_ID_EMAIL);
+        $queue->push(json_encode($message), QUEUE_TYPE_EMAIL);
 
-        return (bool) $success;
+        return true;
     }
 
     /**

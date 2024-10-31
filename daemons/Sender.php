@@ -11,6 +11,8 @@
 
 namespace daemons;
 
+use controllers\internals\Queue;
+use Exception;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -19,12 +21,9 @@ use Monolog\Logger;
  */
 class Sender extends AbstractDaemon
 {
-    private $internal_phone;
     private $internal_scheduled;
-    private $internal_received;
-    private $internal_sended;
     private $bdd;
-    private $msg_queue;
+    private ?Queue $queue;
 
     public function __construct()
     {
@@ -44,9 +43,7 @@ class Sender extends AbstractDaemon
 
     public function run()
     {
-        //Create the internal controllers
         $this->internal_scheduled = new \controllers\internals\Scheduled($this->bdd);
-        $this->internal_sended = new \controllers\internals\Sended($this->bdd);
 
         //Get smss and transmit order to send to appropriate phone daemon
         $smss_per_scheduled = $this->internal_scheduled->get_smss_to_send();
@@ -64,12 +61,6 @@ class Sender extends AbstractDaemon
     {
         foreach ($smss_per_scheduled as $id_scheduled => $smss)
         {
-            //If queue not already exists
-            if (!msg_queue_exists(QUEUE_ID_PHONE) || !isset($this->msg_queue))
-            {
-                $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
-            }
-
             foreach ($smss as $sms)
             {
                 $msg = [
@@ -84,9 +75,10 @@ class Sender extends AbstractDaemon
                     'medias' => $sms['medias'] ?? [],
                 ];
 
+
                 // Message type is forged from a prefix concat with the phone ID
                 $message_type = (int) QUEUE_TYPE_SEND_MSG_PREFIX . $sms['id_phone'];
-                msg_send($this->msg_queue, $message_type, $msg);
+                $this->queue->push(json_encode($msg), $message_type);
                 $this->logger->info('Transmit sms send signal to phone ' . $sms['id_phone'] . ' on queue ' . QUEUE_ID_PHONE . ' with message type ' . $message_type . '.');
             }
 
@@ -97,16 +89,25 @@ class Sender extends AbstractDaemon
 
     public function on_start()
     {
-        $this->logger->info('Starting Sender with pid ' . getmypid());
-        $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+        try
+        {
+            $this->logger->info('Starting Sender with pid ' . getmypid());
+            $this->bdd = \descartes\Model::_connect(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+            $this->queue = new Queue(QUEUE_ID_PHONE);
+        }
+        catch (Exception $e)
+        {
+            $this->logger->error('Failed to start sender daemon : ' . $e->getMessage());
+        }
+        
     }
 
     public function on_stop()
     {
         //Delete queue on daemon close
-        $this->logger->info('Closing queue : ' . $this->msg_queue);
-        msg_remove_queue($this->msg_queue);
-
+        $this->logger->info('Closing queue : ' . QUEUE_ID_PHONE);
+        $this->queue->close();
+        
         $this->logger->info('Stopping Sender with pid ' . getmypid());
     }
 

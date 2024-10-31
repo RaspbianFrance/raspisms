@@ -11,6 +11,7 @@
 
 namespace daemons;
 
+use controllers\internals\Queue;
 use GuzzleHttp\Promise\Utils;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -20,11 +21,7 @@ use Monolog\Logger;
  */
 class Webhook extends AbstractDaemon
 {
-    private $webhook_queue;
-    private $last_message_at;
-    private $phone;
-    private $adapter;
-    private $bdd;
+    private ?Queue $webhook_queue;
     private $guzzle_client;
 
     /**
@@ -56,30 +53,17 @@ class Webhook extends AbstractDaemon
         $promises = [];
         while ($find_message)
         {
-            //Call message
-            $msgtype = null;
-            $maxsize = 409600;
-            $message = null;
+            $message = $this->webhook_queue->read(QUEUE_TYPE_WEBHOOK);
 
-            $error_code = null;
-            $success = msg_receive($this->webhook_queue, QUEUE_TYPE_WEBHOOK, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
-            if (!$success && MSG_ENOMSG !== $error_code)
+            if ($message === null)
             {
-                $this->logger->critical('Error for webhook queue reading, error code : ' . $error_code);
                 $find_message = false;
-
                 continue;
             }
 
-            if (!$message)
-            {
-                $find_message = false;
+            $this->logger->info('Trigger webhook : ' . $message);
 
-                continue;
-            }
-
-            $this->logger->info('Trigger webhook : ' . json_encode($message));
-
+            $message = json_decode($message, true);
             $promises[] = $this->guzzle_client->postAsync($message['url'], ['form_params' => $message['data']]);
         }
 
@@ -97,10 +81,13 @@ class Webhook extends AbstractDaemon
 
     public function on_start()
     {
-        //Set last message at to construct time
-        $this->last_message_at = microtime(true);
-
-        $this->webhook_queue = msg_get_queue(QUEUE_ID_WEBHOOK);
+        try{
+            $this->webhook_queue = new Queue(QUEUE_ID_WEBHOOK);
+        }
+        catch (\Exception $e)
+        {
+            $this->logger->info('Webhook : failed with ' . $e->getMessage());
+        }
 
         $this->logger->info('Starting Webhook daemon with pid ' . getmypid());
     }
@@ -109,7 +96,7 @@ class Webhook extends AbstractDaemon
     {
         //Delete queue on daemon close
         $this->logger->info('Closing queue : ' . QUEUE_ID_WEBHOOK);
-        msg_remove_queue($this->webhook_queue);
+        unset($this->webhook_queue);
 
         $this->logger->info('Stopping Webhook daemon with pid ' . getmypid());
     }

@@ -135,12 +135,11 @@ class Webhook extends StandardController
                 ],
             ];
 
-            $error_code = null;
-            $queue = msg_get_queue(QUEUE_ID_WEBHOOK);
-            msg_send($queue, QUEUE_TYPE_WEBHOOK, $message, true, true, $error_code);
+            $queue = new Queue(QUEUE_ID_WEBHOOK);
+            $success = $queue->push(json_encode($message), QUEUE_TYPE_WEBHOOK);
         }
 
-        return true;
+        return (bool) $success;
     }
 
     /**

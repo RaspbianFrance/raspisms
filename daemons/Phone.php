@@ -11,6 +11,7 @@
 
 namespace daemons;
 
+use controllers\internals\Queue;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -22,7 +23,7 @@ class Phone extends AbstractDaemon
     private $max_inactivity = 5 * 60;
     private $read_delay = 20 / 0.5;
     private $read_tick = 0;
-    private $msg_queue;
+    private ?Queue $queue;
     private $webhook_queue;
     private $last_message_at;
     private $phone;
@@ -85,7 +86,7 @@ class Phone extends AbstractDaemon
         //Set last message at to construct time
         $this->last_message_at = microtime(true);
 
-        $this->msg_queue = msg_get_queue(QUEUE_ID_PHONE);
+        $this->queue = new Queue(QUEUE_ID_PHONE);
 
         //Instanciate adapter
         $adapter_class = $this->phone['adapter'];
@@ -96,7 +97,7 @@ class Phone extends AbstractDaemon
 
     public function on_stop()
     {
-            $this->logger->info('Stopping Phone daemon with pid ' . getmypid());
+        $this->logger->info('Stopping Phone daemon with pid ' . getmypid());
     }
 
     public function handle_other_signals($signal)
@@ -114,29 +115,16 @@ class Phone extends AbstractDaemon
         $find_message = true;
         while ($find_message)
         {
-            //Call message
-            $msgtype = null;
-            $maxsize = 409600;
-            $message = null;
-
-            // Message type is forged from a prefix concat with the phone ID
             $message_type = (int) QUEUE_TYPE_SEND_MSG_PREFIX . $this->phone['id'];
-            $error_code = null;
-            $success = msg_receive($this->msg_queue, $message_type, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
+            $message = $this->queue->read($message_type);
 
-            if (!$success && MSG_ENOMSG !== $error_code)
-            {
-                $this->logger->critical('Error reading MSG SEND Queue, error code : ' . $error_code);
-
-                return false;
-            }
-
-            if (!$message)
+            if ($message === null)
             {
                 $find_message = false;
-
                 continue;
             }
+
+            $message = json_decode($message, true);
 
             //Update last message time
             $this->last_message_at = microtime(true);

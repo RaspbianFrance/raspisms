@@ -11,6 +11,7 @@
 
 namespace daemons;
 
+use controllers\internals\Queue;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -19,7 +20,7 @@ use Monolog\Logger;
  */
 class Mailer extends AbstractDaemon
 {
-    private $mailer_queue;
+    private ?Queue $mailer_queue;
     private $last_message_at;
     private $bdd;
 
@@ -49,27 +50,15 @@ class Mailer extends AbstractDaemon
         $find_message = true;
         while ($find_message)
         {
-            //Call message
-            $msgtype = null;
-            $maxsize = 409600;
-            $message = null;
+            $message = $this->mailer_queue->read(QUEUE_TYPE_EMAIL);
 
-            $error_code = null;
-            $success = msg_receive($this->mailer_queue, QUEUE_TYPE_EMAIL, $msgtype, $maxsize, $message, true, MSG_IPC_NOWAIT, $error_code); //MSG_IPC_NOWAIT == dont wait if no message found
-            if (!$success && MSG_ENOMSG !== $error_code)
+            if ($message === null)
             {
-                $this->logger->critical('Error for mailer queue reading, error code : ' . $error_code);
                 $find_message = false;
-
                 continue;
             }
 
-            if (!$message)
-            {
-                $find_message = false;
-
-                continue;
-            }
+            $message = json_decode($message, true);
 
             $this->logger->info('Try sending email : ' . json_encode($message));
 
@@ -92,7 +81,7 @@ class Mailer extends AbstractDaemon
     public function on_start()
     {
         //Set last message at to construct time
-        $this->mailer_queue = msg_get_queue(QUEUE_ID_EMAIL);
+        $this->mailer_queue = new Queue(QUEUE_ID_EMAIL);
 
         $this->logger->info('Starting Mailer daemon with pid ' . getmypid());
     }
@@ -101,8 +90,6 @@ class Mailer extends AbstractDaemon
     {
         //Delete queue on daemon close
         $this->logger->info('Closing queue : ' . QUEUE_ID_EMAIL);
-        msg_remove_queue($this->mailer_queue);
-
         $this->logger->info('Stopping Mailer daemon with pid ' . getmypid());
     }
 
