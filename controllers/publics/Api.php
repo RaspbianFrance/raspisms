@@ -327,7 +327,18 @@ namespace controllers\publics;
             }
             $at = (new \DateTime())->format('Y-m-d H:i:s');
 
-            $scheduled_id = $this->internal_scheduled->create($this->user['id'], $at, $text, $id_phone);
+
+            $scheduled_id = $this->internal_scheduled->create(
+                $this->user['id'], 
+                $at, 
+                $text, 
+                $id_phone, 
+                null,
+                false,
+                false,
+                null,
+                [['number' => $to, 'data' => '[]']]
+            );
             if (!$scheduled_id)
             {
                 $return = self::DEFAULT_RETURN;

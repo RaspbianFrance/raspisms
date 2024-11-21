@@ -70,7 +70,7 @@ class SystemVQueue implements Queue
         
         $this->get_queue();
         $error_code = null;
-        $success = msg_send($this->queue, $tag, $message, true, false, $error_code);
+        $success = msg_send($this->queue, $tag, $message, true, true, $error_code);
         if (!$success)
         {
             throw new \Exception('Impossible to send the message on system V queue, error code : ' . $error_code);
