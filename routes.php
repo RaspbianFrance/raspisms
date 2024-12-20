@@ -214,6 +214,8 @@
             'get_entries' => [
                 '/api/list/{entry_type}/',
                 '/api/list/{entry_type}/{page}/',
+                '/api/list/{entry_type}/after/{after_id}/',
+                '/api/list/{entry_type}/before/{before_id}/',
             ],
             'get_usage' => '/api/usage/',
             'get_sms_status_stats' => '/api/stats/sms-status/',

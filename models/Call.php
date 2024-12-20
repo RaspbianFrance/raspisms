@@ -26,10 +26,13 @@ namespace models;
          * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
+         * @param ?int $after_id  : If provided use where id > $after_id instead of offset 
+         * @param ?int $before_id  : If provided use where id < $before_id instead of offset 
+         *
          *
          * @return array
          */
-        public function list_for_user(int $id_user, $limit, $offset)
+        public function list_for_user(int $id_user, $limit, $offset, ?int $after_id = null, ?int $before_id = null)
         {
             $query = '
                 SELECT `call`.*, contact.name as contact_name, phone.name as phone_name
@@ -41,6 +44,37 @@ namespace models;
                 ON phone.id = `call`.id_phone
                 WHERE `call`.id_user = :id_user
             ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            if ($after_id || $before_id)
+            {
+                $offset = null;
+            }
+
+            if ($after_id)
+            {
+                $query .= '
+                    AND `call`.id > :after_id
+                    ORDER BY `call`.id
+                ';
+                $params['after_id'] = $after_id;
+            }
+            elseif ($before_id)
+            {
+                $query .= '
+                    AND `call`.id < :before_id
+                    ORDER BY `call`.id DESC
+                ';
+                $params['before_id'] = $before_id;
+            }
+            else
+            {
+                $query .= ' ORDER BY `call`.id';
+            }
+
 
             if (null !== $limit)
             {
@@ -54,9 +88,10 @@ namespace models;
                 }
             }
 
-            $params = [
-                'id_user' => $id_user,
-            ];
+            if ($before_id)
+            {
+                return array_reverse($this->_run_query($query, $params));
+            }
 
             return $this->_run_query($query, $params);
         }

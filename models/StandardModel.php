@@ -70,12 +70,22 @@ namespace models;
          * @param int $id_user : user id
          * @param int $limit   : Number of entry to return
          * @param int $offset  : Number of entry to ignore
+         * @param ?int $after_id  : If provided use where id > $after_id instead of offset 
+         * @param ?int $before_id  : If provided use where id < $before_id instead of offset 
          *
          * @return array
          */
-        public function list_for_user(int $id_user, $limit, $offset)
+        public function list_for_user(int $id_user, $limit, $offset, ?int $after_id = null, ?int $before_id = null)
         {
-            return $this->_select($this->get_table_name(), ['id_user' => $id_user], null, false, $limit, $offset);
+            if ($after_id !== null) {
+                return $this->_select($this->get_table_name(), ['id_user' => $id_user, '>id' => $after_id], 'id', false, $limit);
+            }
+
+            if ($before_id !== null) {
+                return array_reverse($this->_select($this->get_table_name(), ['id_user' => $id_user, '<id' => $before_id], 'id', true, $limit));
+            }
+
+            return $this->_select($this->get_table_name(), ['id_user' => $id_user], 'id', false, $limit, $offset);
         }
 
         /**

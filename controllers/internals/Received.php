@@ -83,7 +83,7 @@ use Exception;
             $this->bdd->beginTransaction();
 
             $id_received = $this->get_model()->insert($received);
-            if (!$id_received)
+            if (!$id_received) 
             {
                 $this->bdd->rollBack();
 

@@ -77,12 +77,14 @@ namespace controllers\internals;
          * @param int  $id_user  : User id
          * @param ?int $nb_entry : Number of entry to return
          * @param ?int $page     : Pagination, used to calcul offset, $nb_entry * $page
+         * @param ?int $after_id  : If provided use where id > $after_id instead of offset 
+         * @param ?int $before_id  : If provided use where id < $before_id instead of offset 
          *
          * @return array : Entrys list
          */
-        public function list_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null)
+        public function list_for_user(int $id_user, ?int $nb_entry = null, ?int $page = null, ?int $after_id = null, ?int $before_id = null)
         {
-            return $this->get_model()->list_for_user($id_user, $nb_entry, $nb_entry * $page);
+            return $this->get_model()->list_for_user($id_user, $nb_entry, $nb_entry * $page, $after_id, $before_id);
         }
 
         /**

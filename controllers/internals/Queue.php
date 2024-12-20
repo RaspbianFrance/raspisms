@@ -66,7 +66,7 @@ class Queue extends \descartes\InternalController
      * 
      * @return mixed $message : The oldest message or null if no message found, can be anything
      * @param ?string $tag : A tag to associate to the message for routing purposes, if null will read from general queue
-     * @param mixed : The message to add to the queue, can be anything, the queue will have to treat it by itself
+     * @param mixed : The message return from the queue, can be anything, null if no message found
      */
     public function read(?string $tag = null)
     {

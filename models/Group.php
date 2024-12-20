@@ -20,10 +20,12 @@ namespace models;
          * @param int  $id_user : user id
          * @param ?int $limit   : Number of entry to return or null
          * @param ?int $offset  : Number of entry to ignore or null
+         * @param ?int $after_id  : If provided use where id > $after_id instead of offset 
+         * @param ?int $before_id  : If provided use where id < $before_id instead of offset 
          *
          * @return array
          */
-        public function list_for_user(int $id_user, $limit, $offset)
+        public function list_for_user(int $id_user, $limit, $offset, ?int $after_id = null, ?int $before_id = null)
         {
             $query = '
                 SELECT g.*, COUNT(gc.id) as nb_contact
@@ -31,8 +33,42 @@ namespace models;
                 LEFT JOIN group_contact as gc
                 ON g.id = gc.id_group
                 WHERE id_user = :id_user
-                GROUP BY g.id
             ';
+
+            $params = [
+                'id_user' => $id_user,
+            ];
+
+            if ($after_id || $before_id)
+            {
+                $offset = null;
+            }
+
+            if ($after_id)
+            {
+                $query .= '
+                    AND g.id > :after_id
+                    GROUP BY g.id
+                    ORDER BY g.id
+                ';
+                $params['after_id'] = $after_id;
+            }
+            elseif ($before_id)
+            {
+                $query .= '
+                    AND g.id < :before_id
+                    GROUP BY g.id
+                    ORDER BY g.id DESC
+                ';
+                $params['before_id'] = $before_id;
+            }
+            else
+            {
+                $query .= '
+                    GROUP BY g.id
+                    ORDER BY g.id
+                ';
+            }
 
             if (null !== $limit)
             {
@@ -46,10 +82,11 @@ namespace models;
                 }
             }
 
-            $params = [
-                'id_user' => $id_user,
-            ];
-
+            if ($before_id)
+            {
+                return array_reverse($this->_run_query($query, $params));
+            }
+            
             return $this->_run_query($query, $params);
         }
 

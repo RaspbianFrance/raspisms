@@ -126,10 +126,13 @@ namespace controllers\publics;
          *
          * @param string $entry_type : Type of entries we want to list ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'phone_group', 'media']
          * @param int    $page       : Pagination number, Default = 0. Group of 25 results.
+         * @param ?int   $after_id   : If provided use where id > $after_id instead of offset based on page, more performant 
+         * @param ?int   $before_id  : If provided use where id < $before_id instead of offset based on page, more performant
+         *
          *
          * @return : List of entries
          */
-        public function get_entries(string $entry_type, int $page = 0)
+        public function get_entries(string $entry_type, int $page = 0, ?int $after_id = null, ?int $before_id = null)
         {
             $entry_types = ['sended', 'received', 'scheduled', 'contact', 'group', 'conditional_group', 'phone', 'phone_group', 'media'];
 
@@ -148,7 +151,7 @@ namespace controllers\publics;
 
             $page = (int) $page;
             $limit = 25;
-            $entries = $controller->list_for_user($this->user['id'], $limit, $page);
+            $entries = $controller->list_for_user($this->user['id'], $limit, $page, $after_id, $before_id);
 
             //Special case for scheduled, we must add numbers because its a join
             if ('scheduled' === $entry_type)
@@ -221,14 +224,16 @@ namespace controllers\publics;
             $return = self::DEFAULT_RETURN;
             $return['response'] = $entries;
 
-            if (\count($entries) === $limit)
+            if (\count($entries) === $limit || ($entries && $before_id))
             {
-                $return['next'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'page' => $page + 1], ['api_key' => $this->user['api_key']]);
+                $last_entry = end($entries);
+                $return['next'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'after_id' => $last_entry['id']], ['api_key' => $this->user['api_key']]);
             }
 
-            if ($page > 0)
+            if ($page > 0 || ($entries && ($after_id || $before_id)))
             {
-                $return['prev'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'page' => $page - 1], ['api_key' => $this->user['api_key']]);
+                $first_entry = $entries[0];
+                $return['prev'] = \descartes\Router::url('Api', __FUNCTION__, ['entry_type' => $entry_type, 'before_id' => $first_entry['id']], ['api_key' => $this->user['api_key']]);
             }
 
             $this->auto_http_code(true);
