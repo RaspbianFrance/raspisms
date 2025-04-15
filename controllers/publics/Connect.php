@@ -11,6 +11,8 @@
 
 namespace controllers\publics;
 
+use controllers\internals\Tool;
+
     /**
      * Page de connexion.
      */
@@ -117,8 +119,9 @@ namespace controllers\publics;
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
             $token = $Tokenista->generate(3600, ['id_user' => $user['id']]);
+            $encoded_token = Tool::url_base64_encode($token);
 
-            $reset_link = \descartes\Router::url('Connect', 'reset_password', ['id_user' => $user['id'], 'token' => $token]);
+            $reset_link = \descartes\Router::url('Connect', 'reset_password', ['id_user' => $user['id'], 'token' => $encoded_token]);
 
             $mailer = new \controllers\internals\Mailer();
             $email_send = $mailer->enqueue($email, EMAIL_RESET_PASSWORD, ['reset_link' => $reset_link]);
@@ -139,7 +142,8 @@ namespace controllers\publics;
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
 
-            if (!$Tokenista->validate($token, ['id_user' => $id_user]))
+            $decoded_token = Tool::url_base64_decode($token);
+            if (!$Tokenista->validate($decoded_token, ['id_user' => $id_user]))
             {
                 return $this->render('connect/reset-password-invalid');
             }

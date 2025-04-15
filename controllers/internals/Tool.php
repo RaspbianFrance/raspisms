@@ -463,4 +463,28 @@ use BenMorel\GsmCharsetConverter\Converter;
             $converter = new Converter();
             return $converter->cleanUpUtf8String($text, true, '?');
         }
+
+        /**
+         * Encode some data into the URL version of Base64 encoding
+         * 
+         * @param string $data Input data
+         * @return string A Base64 (URL-safe) encoded string
+         */
+        public static function url_base64_encode(string $data): string
+        {
+            return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        }
+
+        /**
+         * Decode a URL-safe Base64 encoded string
+         * 
+         * @param string $data Encoded data
+         * @return string Decoded original data
+         */
+        public static function url_base64_decode(string $data): string
+        {
+            $replaced = strtr($data, '-_', '+/');
+            $padded = str_pad($replaced, mb_strlen($replaced) % 4 === 0 ? mb_strlen($replaced) : mb_strlen($replaced) + 4 - mb_strlen($replaced) % 4, '=', STR_PAD_RIGHT);
+            return base64_decode($padded);
+        }
     }
