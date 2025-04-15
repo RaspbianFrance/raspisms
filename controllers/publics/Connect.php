@@ -139,7 +139,7 @@ namespace controllers\publics;
 
             $Tokenista = new \Ingenerator\Tokenista(APP_SECRET);
 
-            if (!$Tokenista->isValid($token, ['id_user' => $id_user]))
+            if (!$Tokenista->validate($token, ['id_user' => $id_user]))
             {
                 return $this->render('connect/reset-password-invalid');
             }

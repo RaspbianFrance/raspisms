@@ -115,6 +115,7 @@ class Webhook extends StandardController
             return false;
         }
 
+        $success = false;
         $webhooks = $this->gets_for_type_and_user($id_user, $type);
         foreach ($webhooks as $webhook)
         {
