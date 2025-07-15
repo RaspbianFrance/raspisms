@@ -11,6 +11,7 @@ ExecStart=/usr/share/raspisms/bin/start.sh
 ExecStop=/usr/share/raspisms/bin/stop.sh
 WorkingDirectory=/usr/share/raspisms
 Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target 

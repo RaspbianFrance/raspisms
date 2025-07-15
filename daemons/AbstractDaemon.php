@@ -153,10 +153,12 @@ abstract class AbstractDaemon
         //Really start the daemon
         $this->on_start();
 
+        
         try
         {
             while ($this->is_running)
             {
+                
                 pcntl_signal_dispatch(); //Call dispatcher for signals
                 $this->run();
             }
@@ -164,6 +166,7 @@ abstract class AbstractDaemon
         catch (\Throwable $t)
         {
             $this->logger->critical('Exception : ' . $t->getMessage() . ' in ' . $t->getFile() . ' line ' . $t->getLine());
+            $exit_code = $t->getCode() ?: 1; 
         }
 
         //Stop the daemon
@@ -174,6 +177,8 @@ abstract class AbstractDaemon
         {
             unlink($this->pid_dir . '/' . $this->name . '.pid');
         }
+
+        exit($exit_code ?? 0);
     }
 
     /**

@@ -18,7 +18,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
 /**
- * Mailing class.
+ * Link shortner class.
  */
 class LinkShortener
 {
