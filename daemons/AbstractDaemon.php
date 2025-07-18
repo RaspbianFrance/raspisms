@@ -150,12 +150,12 @@ abstract class AbstractDaemon
         //Write the pid of the process into a file
         file_put_contents($this->pid_dir . '/' . $this->name . '.pid', getmypid());
 
-        //Really start the daemon
-        $this->on_start();
-
-        
+              
         try
         {
+            //Really start the daemon
+            $this->on_start();
+
             while ($this->is_running)
             {
                 
@@ -168,17 +168,19 @@ abstract class AbstractDaemon
             $this->logger->critical('Exception : ' . $t->getMessage() . ' in ' . $t->getFile() . ' line ' . $t->getLine());
             $exit_code = $t->getCode() ?: 1; 
         }
-
-        //Stop the daemon
-        $this->on_stop();
-
-        //Delete pid file
-        if (file_exists($this->pid_dir . '/' . $this->name . '.pid'))
+        finally
         {
-            unlink($this->pid_dir . '/' . $this->name . '.pid');
-        }
+            //Stop the daemon
+            $this->on_stop();
 
-        exit($exit_code ?? 0);
+            //Delete pid file
+            if (file_exists($this->pid_dir . '/' . $this->name . '.pid'))
+            {
+                unlink($this->pid_dir . '/' . $this->name . '.pid');
+            }
+
+            exit($exit_code ?? 0);
+        }
     }
 
     /**
