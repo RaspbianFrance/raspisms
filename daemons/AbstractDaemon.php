@@ -165,7 +165,7 @@ abstract class AbstractDaemon
         }
         catch (\Throwable $t)
         {
-            $this->logger->critical('Exception : ' . $t->getMessage() . ' in ' . $t->getFile() . ' line ' . $t->getLine());
+            $this->logger->critical('Exception : ' . $t->getMessage() . ' in ' . $t->getFile() . ' line ' . $t->getLine() . ' code ' . $t->getCode());
             $exit_code = $t->getCode() ?: 1; 
         }
         finally

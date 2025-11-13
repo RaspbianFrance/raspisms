@@ -33,9 +33,15 @@ namespace controllers\internals;
             ];
 
             $internal_ruler = new Ruler();
-            $valid_condition = $internal_ruler->validate_condition($condition, ['contact' => (object) ['data' => (object) null]]);
+            $data = [
+                'contact' => (object) ['data' => (object) null],
+                'contact_metas' => (object) ['data' => (object) null],
+            ];
+            $valid_condition = $internal_ruler->validate_condition($condition, $data);
             if (!$valid_condition)
             {
+                var_dump('invalid condition');
+                die();
                 return false;
             }
 
